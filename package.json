@@ -1,0 +1,76 @@
+{
+  "name": "rockmelon-qa",
+  "productName": "Rockmelon QA",
+  "description": "New evolution for automation testing",
+  "author": "Rockmelon QA",
+  "license": "MIT",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "nodemon": "nodemon",
+    "start": "npm run compile && electron .",
+    "svelte:dev": "cd svelte && npm run dev",
+    "svelte:build": "cd svelte && npm run build",
+    "common:build": "cd common && npm run build",
+    "compile": "tsc",
+    "out:win": "npm run common:build && npm run svelte:build && npm run compile && electron-builder build --win --publish never",
+    "publish:win": "npm run common:build && npm run svelte:build && npm run compile && electron-builder build --win --publish always",
+    "check-updates": "npx npm-check-updates",
+    "check-updates:minor": "npx npm-check-updates --target minor",
+    "check-updates:patch": "npx npm-check-updates --target patch",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.18.6",
+    "@types/chokidar": "^2.1.3",
+    "@types/jest": "^29.2.6",
+    "@types/node": "^18.7.18",
+    "concurrently": "^7.4.0",
+    "electron": "^23.1.1",
+    "electron-builder": "^22.10.3",
+    "jest": "^29.3.1",
+    "nodemon": "^2.0.20",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.3"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "dotenv": "^16.0.3",
+    "electron-is-dev": "^2.0.0",
+    "electron-reload": "^1.5.0",
+    "electron-serve": "^1.1.0",
+    "electron-updater": "^5.2.1",
+    "moment": "^2.29.4",
+    "rockmelonqa.common": "file:./common/dist/commonjs"
+  },
+  "build": {
+    "appId": "rockmelon-qa",
+    "productName": "Rockmelon QA",
+    "copyright": "Copyright © 2023 Rockmelon QA",
+    "directories": {
+      "output": "release/build"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "installerIcon": "icon.ico",
+      "uninstallerIcon": "icon.ico",
+      "uninstallDisplayName": "Rockmelon QA",
+      "license": "LICENSE",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "rockmelonqa",
+        "repo": "ide"
+      }
+    ]
+  }
+}

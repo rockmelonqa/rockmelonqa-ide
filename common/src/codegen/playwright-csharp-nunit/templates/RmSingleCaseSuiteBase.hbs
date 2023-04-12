@@ -1,0 +1,29 @@
+namespace {{{rootNamespace}}}.Support;
+
+/// <summary>
+/// Base class for RM "Single case" test suite 
+/// </summary>
+public abstract class RmSingleCaseSuiteBase : PageTest
+{
+    protected PageTest? TestSuiteInstance;
+
+    /// <summary>
+    /// Returns TestSuiteInstance.Page when TestSuiteInstance is not null, otherwise return the Page of base class (PageTest.Page)
+    /// </summary>
+    public new IPage Page => TestSuiteInstance == null ? base.Page : TestSuiteInstance.Page;
+
+    /// <summary>
+    /// Default constructor
+    /// </summary>
+    public RmSingleCaseSuiteBase()
+    {
+    }
+
+    /// <summary>
+    /// Create new instance of RmSingleCaseSuiteBase with the provided "caller" testSuiteInstance
+    /// </summary>
+    public RmSingleCaseSuiteBase(PageTest testSuiteInstance)
+    {
+        this.TestSuiteInstance = testSuiteInstance;
+    }
+}

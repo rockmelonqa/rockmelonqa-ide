@@ -1,0 +1,9 @@
+module.exports = {
+    testTimeout: 20000,
+    preset: "jest-playwright-preset",
+    testMatch: ["**/__tests__/**/*.+(ts|js)", "**/?(*.)+(spec|test).+(ts|js)"],
+    transform: {
+        "^.+\\.(ts)$": "ts-jest",
+    },
+    setupFilesAfterEnv: ["expect-playwright"],
+};

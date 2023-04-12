@@ -1,0 +1,14 @@
+import { Page } from "playwright";
+{{{pageImports}}}
+
+export class PageDefinitions {
+    public page: Page;
+
+{{{pageDeclarations}}}
+
+    constructor(page: Page) {
+        this.page = page;
+        
+{{{pageAssignments}}}
+    }
+}

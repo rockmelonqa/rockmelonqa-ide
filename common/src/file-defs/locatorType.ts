@@ -1,0 +1,17 @@
+export enum LocatorType {
+  Attribute = "Attribute",
+  Code = "Code",
+  Css = "Css",
+  IFrame = "IFrame",
+  IFrameId = "IFrameId",
+  IFrameName = "IFrameName",
+  Id = "Id",
+  Label = "Label",
+  Name = "Name",
+  Placeholder = "Placeholder",
+  Relative = "Relative",
+  TestId = "TestId",
+  Text = "Text",
+  Title = "Title",
+  Xpath = "Xpath",
+}
