@@ -1,0 +1,18 @@
+using {{{rootNamespace}}}.Support;
+
+namespace {{{fullNamespace}}};
+
+/// <summary>
+/// {{{description}}}
+/// </summary>
+public partial class {{{testCaseName}}} : RmSingleCaseSuiteBase
+{
+    public {{{testCaseName}}}(PageTest testSuiteInstance): base(testSuiteInstance) {}
+
+    public async Task RunAsync()
+    {
+        PageDefinitions defs = new PageDefinitions(this.Page);
+
+{{{body}}}
+    }
+}

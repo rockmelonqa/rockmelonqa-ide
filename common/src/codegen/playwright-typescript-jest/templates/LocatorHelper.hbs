@@ -1,0 +1,71 @@
+import { Locator, Page } from "playwright";
+
+export class LocatorHelper {
+    public static async GetLocatorTagTypeAsync(locator: Locator) {
+        return await locator.evaluate<string>("e => e.tagName");
+    }
+
+    /// <summary>
+    /// Dyanmic input based on locator tag
+    /// </summary>
+    /// <param name="locator">Locator name</param>
+    /// <param name="data">Data to be input</param>
+    public static async InputAsync(locator: Locator, data: string) {
+        let tagName = await LocatorHelper.GetLocatorTagTypeAsync(locator);
+        switch (tagName.toLowerCase()) {
+            case "input":
+                await locator.fill("");
+                await locator.type(data);
+                break;
+            case "select":
+                await locator.selectOption(data);
+                break;
+            default:
+                await locator.fill("");
+                await locator.type(data);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Click outside of element. This will helps Single Page Application sets it states to new value
+    /// </summary>
+    /// <param name="page">Playwright page</param>
+    public static async ClickOutsideAsync(page: Page) {
+        await page.locator("xpath=//body >> nth=0").click();
+    }
+
+    public static async verify(locator: Locator, data: string) {
+        switch (data.toLowerCase()) {
+            case "visible":
+                await expect(locator).toBeVisible();
+                break;
+            case "hidden":
+                await expect(locator).toBeHidden();
+                break;
+            case "readonly":
+                await expect(locator).toBeDisabled();
+                break;
+            case "edittable":
+                await expect(locator).toBeEditable();
+                break;
+            default:
+                // Otherwise we just compare the text contain base on element type
+                let tagName = await LocatorHelper.GetLocatorTagTypeAsync(locator);
+                switch (tagName.toLocaleLowerCase()) {
+                    case "input":
+                        await expect(locator).toHaveValue(data);
+                        break;
+                    default:
+                        await expect(locator).toHaveValue(data);
+                        break;
+                }
+                break;
+        }
+
+        return {
+            message: () => "passed",
+            pass: true,
+        };
+    }
+}

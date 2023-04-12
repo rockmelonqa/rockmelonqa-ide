@@ -1,0 +1,452 @@
+/* Fonts for Mullish, Roboto Condense, Heebo */
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;500;600;700&family=Mulish:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*:focus-visible {
+    outline: none !important;
+}
+
+/********************************************
+ * Semantec palette
+ ********************************************/
+:root {
+    /* Brand Colors */
+    --color-brand: #e56d00;
+    --color-brand--dark: rgb(227, 62, 14); /* #e33e0e */
+    --color-brand--vibrant: #f1663d;
+    --color-brand--bright: #ffa085;
+    --color-brand--light: rgb(248, 171, 149); /* #f8ab95 */
+    --color-brand--extra-light: #feeeea;
+    --color-secondary: #818ea3;
+    --color-secondary--dark: #677284;
+    --color-secondary--extra-dark: #4d5562;
+    --color-secondary--light: #9eacc4;
+    --color-secondary--extra-light: #fbfbfb;
+
+    /* Fonts */
+    --font-family--default: 'Mulish', sans-serif;
+    --font-family--condensed: 'Roboto Condensed', sans-serif;
+    --font-family--heading: 'Heebo', sans-serif;
+
+    /* General Colors */
+    --color-white: rgba(255, 255, 255, 1);
+    --color-black: rgba(0, 0, 0, 1);
+    --color-grey--light: #f2f2f2;
+    --color-body-background: #f9fbfc;
+    --color-text-body: #585858;
+    --color-highlight: #f1f7fe;
+    --color-highlight--bright: #e0f0ff;
+    --color-highlight--extra-bright: rgba(81, 122, 189); /* #517abd; */
+    --color-highlight--vibrant: #c5e2ff;
+    --color-alert: #870307;
+    --color-alert--bright: #e1341b;
+    --color-alert--medium: #dcb7b8;
+    --color-alert--light: #ffe7e7;
+    --color-success: #09a47a;
+    --color-info: #cce5ff;
+    --color-info--medium: #b8daff;
+    --color-info--dark: #004085;
+    --color-warning: #fffbd8;
+    --color-warning--dark: #edeacf;
+
+    /* Input Colors */
+    --color-input-border: rgb(209 213 219); /* grey-300 */
+    --color-input-border--focus: rgb(99 102 241); /* indigo-500 */
+    --color-input-background--error: rgba(135, 3, 7, 0.08);
+    --color-input-border--error: rgba(135, 3, 7, 0.24);
+    --color-button-border--standard: rgba(81, 122, 189, 0.28);
+    --color-button--disabled: rgb(226 232 240); /*text-slate-200*/
+
+    /* Others */
+    --color-panel-border: #cbd5e1; /* border-slate-300 */
+}
+
+/********************************************
+ * Layout
+ ********************************************/
+html,
+body {
+    background: var(--color-body-background);
+    box-sizing: border-box;
+    color: var(--color-secondary--extra-dark);
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
+html {
+    /* Change 16px=1rem to 14px=1rem! */
+    font-size: 87.5%;
+}
+
+body {
+    color: var(--color-secondary--extra-dark);
+    font-family: var(--font-family--default);
+    font-size: 1rem;
+    line-height: 1rem;
+    overflow-x: hidden;
+}
+
+h1 {
+    color: var(--color-secondary--extra-dark);
+    font-family: var(--font-family--condensed);
+    font-size: 1.6rem;
+    line-height: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.05px;
+    margin-bottom: 16px;
+}
+
+h2 {
+    color: var(--color-secondary--extra-dark);
+    font-family: var(--font-family--condensed);
+    font-size: 1.4rem;
+    line-height: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.05px;
+    margin-bottom: 16px;
+}
+
+h3 {
+    color: var(--color-secondary--extra-dark);
+    font-family: var(--font-family--condensed);
+    font-size: 1.2rem;
+    line-height: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.05px;
+    margin-bottom: 16px;
+}
+
+hr {
+    background-color: var(--color-panel-border);
+    border: none;
+    height: 1px;
+    margin: 1rem 0;
+}
+
+/*********************************************
+ * Form Fields
+ ********************************************/
+.dropdown-field-root .svelte-select {
+    /* https://www.npmjs.com/package/svelte-select */
+    /* https://github.com/rob-balfre/svelte-select/blob/HEAD/docs/theming_variables.md */
+    --list-border: 1px solid var(--color-input-border);
+    --list-border-radius: 0.375rem;
+    --font-size: 1rem;
+    --item-is-active-bg: var(--color-highlight--extra-bright);
+    --clear-icon-width: 14px;
+    --clear-icon-color: #c5cacf;
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.dropdown-field-root.fancy .svelte-select {
+    --border-radius: 0.375rem;
+    --height: 37px; /* height: 37 = 35 (2.5 rem) + 2px (border top & bottom) */
+}
+
+.dropdown-field-root.fancy .svelte-select {
+    --border: 1px solid var(--color-input-border);
+    --border-focused: 1px solid var(--color-input-border--focus);
+}
+
+.dropdown-field-root.fancy .svelte-select:not(.select-error).focused {
+    outline: 1px solid var(--color-input-border--focus);
+}
+
+.dropdown-field-root.fancy .svelte-select.select-error {
+    --border: 1px solid var(--color-input-border--error);
+    --border-focused: 1px solid var(--color-input-border--error);
+    --background: var(--color-input-background--error);
+}
+
+.dropdown-field-root.fancy .svelte-select.select-error.focused {
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 1.25px rgb(239, 68, 68);
+}
+
+.dropdown-field-root.inline-fancy .dropdown-field-select-container {
+    border-bottom: 1px solid var(--color-input-border);
+}
+
+.dropdown-field-root.inline-fancy .dropdown-field-select-container:focus-within {
+    border-bottom: 2px solid rgb(99 102 241); /* border-indigo-500 */
+}
+
+.dropdown-field-root.inline-fancy .svelte-select {
+    --border: 'none';
+    --height: 2.5rem;
+}
+
+.dropdown-field-root.inline-fancy .svelte-select:hover {
+    --border-hover: transparent;
+}
+
+.dropdown-field-root.inline-fancy .svelte-select.focused {
+    --border-focused: transparent;
+}
+
+.text-field-input,
+.number-field-input,
+.folder-pick-field-input {
+    color: var(--color-secondary--extra-dark);
+}
+
+input.text-field-input::placeholder,
+input.number-field-input::placeholder,
+input.folder-picker-field-input::placeholder {
+    color: var(--color-secondary--light);
+}
+
+input.text-field-input.text-field-error,
+input.number-field-input.number-field-error,
+input.folder-picker-field-input.folder-picker-field-error {
+    color: var(--color-alert);
+    background-color: var(--color-input-background--error);
+    border-color: var(--color-input-border--error);
+}
+
+input.text-field-input.text-field-error::placeholder,
+input.number-field-input.number-field-error::placeholder,
+input.folder-picker-field-input.folder-picker-field-error::placeholder {
+    color: var(--color-alert);
+}
+
+input.text-field-input.text-field-error:focus,
+input.number-field-input.number-field-error:focus,
+input.folder-picker-field-input.folder-picker-field-error:focus {
+    border-color: var(--color-input-border--error);
+}
+
+.text-field-root .text-field-error,
+.number-field-root .number-field-error,
+.dropdown-field-root .dropdown-field-error,
+.folder-picker-field-root .folder-picker-field-error {
+    color: var(--color-alert);
+}
+
+/*********************************************
+ * svelte-toast.  https://www.npmjs.com/package/@zerodevx/svelte-toast
+ ********************************************/
+:root {
+    --toastContainerTop: 2rem;
+    --toastContainerRight: auto;
+    --toastContainerBottom: auto;
+    --toastContainerLeft: calc(50vw - 8rem);
+    --toastBorderRadius: 4px;
+    --toastPadding: 6px;
+    --toastWidth: 20rem;
+}
+
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/*********************************************
+ * SF-PRO fonts
+ ********************************************/
+@font-face {
+    font-family: 'SF Pro Text';
+    font-style: normal;
+    src: url('/fonts/SF-Pro-Text-Regular.otf');
+}
+
+* {
+    font-family: 'SF Pro Text';
+    font-style: normal;
+}
+
+/*********************************************
+ * Svelte splitpanes
+ ********************************************/
+/* Fixed width for the whole screen based on window size */
+.splitpanes {
+    width: calc(100vw - 3.5rem) !important; /* 3.5rem is the width of the Activity Bar */
+}
+
+/* /https://orefalo.github.io/svelte-splitpanes/examples/styling/splitters-modern */
+.splitpanes.modern-theme .splitpanes__pane {
+    background-color: var(--color-white);
+}
+
+.splitpanes.modern-theme .splitpanes__splitter {
+    background-color: var(--color-input-border);
+    position: relative;
+}
+
+.splitpanes.modern-theme .splitpanes__splitter:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition: opacity 0.4s;
+    background-color: var(--color-input-border--focus);
+    opacity: 0;
+    z-index: 1;
+}
+.splitpanes.modern-theme .splitpanes__splitter:hover:before {
+    opacity: 1;
+}
+.splitpanes.modern-theme .splitpanes__splitter.splitpanes__splitter__active {
+    z-index: 2; /* Fix an issue of overlap fighting with a near hovered splitter */
+}
+.modern-theme.splitpanes--vertical > .splitpanes__splitter:before {
+    left: -1px;
+    right: -1px;
+    height: 100%;
+    cursor: col-resize;
+}
+.modern-theme.splitpanes--horizontal > .splitpanes__splitter:before {
+    top: -1px;
+    bottom: -1px;
+    width: 100%;
+    cursor: row-resize;
+}
+
+/*********************************************
+ * File Explorer (based on Framework7 Treeview)
+ * (also used for Collapsible Panel)
+ ********************************************/
+:root {
+    /* Framework7 treeview */
+    --f7-treeview-item-padding-left: 16px;
+    --f7-treeview-item-padding-right: 16px;
+    --f7-treeview-item-height: 34px;
+    --f7-treeview-toggle-size: 24px;
+    --f7-treeview-children-offset: 29px;
+    --f7-theme-color-rgb: 0, 122, 255;
+    --f7-treeview-toggle-color: rgba(0, 0, 0, 0.5);
+    --f7-treeview-toggle-hover-bg-color: rgba(0, 0, 0, 0.1);
+    --f7-treeview-selectable-hover-bg-color: rgba(0, 0, 0, 0.1);
+}
+.treeview-item-root {
+    padding-left: var(--f7-treeview-item-padding-left);
+    padding-right: var(--f7-treeview-item-padding-right);
+    min-height: var(--f7-treeview-item-height);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.treeview-item-toggle.treeview-item-root,
+.treeview-item-toggle > .treeview-item-root,
+.treeview-item-selectable.treeview-item-root,
+.treeview-item-selectable > .treeview-item-root {
+    cursor: pointer;
+}
+
+.treeview-item-toggle.treeview-item-root:hover,
+.treeview-item-toggle > .treeview-item-root:hover {
+    background-color: var(--f7-treeview-toggle-hover-bg-color);
+}
+.treeview-item-selectable.treeview-item-root:hover,
+.treeview-item-selectable > .treeview-item-root:hover {
+    background-color: var(--f7-treeview-selectable-hover-bg-color);
+}
+
+.treeview-item-selected.treeview-item-root,
+.treeview-item-selected > .treeview-item-root {
+    background-color: var(--f7-treeview-selectable-selected-bg-color, rgba(var(--f7-theme-color-rgb), 0.2)) !important;
+}
+
+.treeview-toggle {
+    width: var(--f7-treeview-toggle-size);
+    height: var(--f7-treeview-toggle-size);
+    cursor: pointer;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0);
+    transition-duration: 0.2s;
+    position: relative;
+    margin-right: 5px;
+}
+.treeview-toggle:after {
+    transition-duration: 0.2s;
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    transform: translate(-50%, -50%);
+    border-left: 6px solid var(--f7-treeview-toggle-color);
+}
+.treeview-item-opened > .treeview-item-root .treeview-toggle:after {
+    transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.treeview-item-content {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: 0.5rem; /* gap-x-2 */
+}
+
+.treeview-item-content:first-child {
+    margin-left: calc(var(--f7-treeview-toggle-size) + 5px);
+}
+
+.treeview-item-children {
+    display: none;
+}
+.treeview-item-opened > .treeview-item-children {
+    display: block;
+}
+
+/*********************************************
+ * Tabs
+ ********************************************/
+
+/* Customize scrollbar */
+.tab-item-title-bar {
+    overflow-x: auto;
+}
+.tab-item-title-bar::-webkit-scrollbar {
+    height: 4px;
+}
+.tab-item-title-bar::-webkit-scrollbar-track {
+    background-color: whitesmoke;
+}
+.tab-item-title-bar::-webkit-scrollbar-thumb {
+    background-color: lightgray;
+    opacity: 0.5;
+}
+
+.tab-item-title-container:not(.active):hover {
+    color: var(--color-brand);
+    padding-bottom: 9.5px; /* py-3 (10.5px) - border-bottom */
+    border-bottom: 1px;
+    border-style: solid;
+    border-color: var(--color-brand);
+}
+
+.tab-item-title-container.active .tab-item-title {
+    color: var(--color-brand);
+}
+
+.tab-item-title-container .tab-item-title {
+    max-width: 12rem;
+}
+
+.tab-item-title-container .dirty-icon {
+    color: var(--color-brand);
+    display: none;
+}
+
+.tab-item-title-container.dirty .tab-button:not(:hover) .dirty-icon {
+    display: inline-block;
+}
+
+.tab-item-title-container .close-button {
+    display: none;
+}
+
+.tab-item-title-container.active:not(.dirty) .close-button,
+.tab-item-title-container:not(.active):not(.dirty):hover .close-button,
+.tab-item-title-container.dirty .tab-button:hover .close-button {
+    display: inline-block;
+}
