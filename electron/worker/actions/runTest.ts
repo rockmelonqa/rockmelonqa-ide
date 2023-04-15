@@ -1,11 +1,12 @@
 import path from "path";
 import { Worker } from "worker_threads";
 
-import { IProgressEvent, IRmProjFile, IRunTestSettings, Language, StandardFolder } from "rockmelonqa.common";
+import { IProgressEvent, IRmProjFile, IRunTestSettings, Language, StandardFolder, TestFramework } from "rockmelonqa.common";
 import { MessagePort } from "worker_threads";
 import * as fileSystem from "../../utils/fileSystem";
 import { WorkerAction, WorkerMessage } from "../worker";
 import { executeCommand, IGenericActionResult } from "./shared";
+import { CommandBuilderFactory } from "./runTest/commandBuilder";
 
 export interface IRunTestContext {
   rmProjFile: IRmProjFile;
@@ -55,34 +56,16 @@ const prepareActionRs = (context: IRunTestContext, actionRs: IRunTestActionResul
   return actionRs;
 };
 
+
+
 export const doRunTest = async (port: MessagePort | null, context: IRunTestContext) => {
   const { settings } = context;
-  const { language } = context.rmProjFile.content;
+  const { language, testFramework } = context.rmProjFile.content;
 
   const resultFileName = toResultFileName(context.rmProjFile);
   const resultFilePath = path.join(context.storageFolder, resultFileName);
-  let cmd: string;
-
-  switch (language) {
-    case Language.CSharp: {
-      const filterStr = settings.dotnetFilterStr ? `--filter "${settings.dotnetFilterStr}"` : "";
-      const browserStr = settings.browser
-        ? `Playwright.BrowserName=${settings.browser}`
-        : "Playwright.LaunchOptions.Headless=true";
-
-      // See https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-test for more details about `dotnet test`
-      // stand at 'output-code/bin' folder
-      cmd = `dotnet test ${filterStr} -l:"trx;LogFileName=${`..${path.sep}..${path.sep}${resultFilePath}`}" -- ${browserStr}`;
-      break;
-    }
-    case Language.Typescript: {
-      // stand at 'output-code' folder
-      cmd = `jest --json --outputFile=${`..${path.sep}${resultFilePath}`}`;
-      break;
-    }
-    default:
-      throw new Error("Language not supported: " + language);
-  }
+  let commandBuilder = CommandBuilderFactory.getBuilder(language, testFramework);
+  let cmd: string = commandBuilder.build(settings, resultFilePath);
 
   postMessage(port, { type: "running-test", log: `Executing: '${cmd}'` });
   let outputCodeDir = path.join(context.rmProjFile.folderPath, StandardFolder.OutputCode);
