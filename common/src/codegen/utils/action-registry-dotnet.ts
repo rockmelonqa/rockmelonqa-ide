@@ -16,6 +16,7 @@ import verifyAttribute from "./action-generator-dotnet/verifyAttribute";
 import verifyHasText from "./action-generator-dotnet/verifyHasText";
 import verifyHasValue from "./action-generator-dotnet/verifyHasValue";
 import verifyIsHidden from "./action-generator-dotnet/verifyIsHidden";
+import verifyIsVisible from "./action-generator-dotnet/verifyIsVisible";
 import verifyTitle from "./action-generator-dotnet/verifyTitle";
 import verifyTitleContain from "./action-generator-dotnet/verifyTitleContain";
 import verifyUrl from "./action-generator-dotnet/verifyUrl";
@@ -39,6 +40,7 @@ actionRegistyDotnet
   .set(ActionType.VerifyHasText, verifyHasText)
   .set(ActionType.VerifyHasValue, verifyHasValue)
   .set(ActionType.VerifyIsHidden, verifyIsHidden)
+  .set(ActionType.VerifyIsVisible, verifyIsVisible)
   .set(ActionType.VerifyTitle, verifyTitle)
   .set(ActionType.VerifyTitleContain, verifyTitleContain)
   .set(ActionType.VerifyUrl, verifyUrl);
