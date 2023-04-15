@@ -1,12 +1,14 @@
 import { AutomationFramework, ICodeGenMeta, TestFramework } from "../file-defs";
 import { PlaywrightCsharpMSTestCodeGen } from "./playwright-csharp-mstest/playwrightCsharpMsTestCodeGen";
 import { PlaywrightCsharpNunitCodeGen } from "./playwright-csharp-nunit/playwrightCsharpNunitCodeGen";
+import { PlaywrightCsharpXUnitCodeGen } from "./playwright-csharp-xunit/playwrightCsharpXUnitCodeGen";
 import { ICodeGen } from "./types";
 
 const registy: { [key in keyof typeof AutomationFramework]?: { [key in keyof typeof TestFramework]?: any } } = {
   [AutomationFramework.Playwright]: {
     [TestFramework.NUnit]: PlaywrightCsharpNunitCodeGen,
     [TestFramework.MSTest]: PlaywrightCsharpMSTestCodeGen,
+    [TestFramework.xUnit]: PlaywrightCsharpXUnitCodeGen,
     // ... add other types of TestFramework
   },
   // ... add other types of AutomationFramework

@@ -2,11 +2,13 @@ import { AutomationFramework, ICodeGenMeta, TestFramework } from "../file-defs";
 import { IOutProjMeta } from "./playwright-charp/outProjMeta";
 import { MsTestProjMeta } from "./playwright-csharp-mstest/msTestProjMeta";
 import { NunitProjectMeta } from "./playwright-csharp-nunit/nunitProjectMeta";
+import { XUnitProjectMeta } from "./playwright-csharp-xunit/xunitProjectMeta";
 
 const codegenMetaRegisty: { [key in keyof typeof AutomationFramework]?: { [key in keyof typeof TestFramework]?: any } } = {
   [AutomationFramework.Playwright]: {
     [TestFramework.NUnit]: NunitProjectMeta,
     [TestFramework.MSTest]: MsTestProjMeta,
+    [TestFramework.xUnit]: XUnitProjectMeta,
     // ... add other types of TestFramework
   },
   // ... add other types of AutomationFramework
