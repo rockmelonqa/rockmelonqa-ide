@@ -46,6 +46,7 @@ export interface IActionTypeStringRes {
     verifyHasText: string;
     verifyHasValue: string;
     verifyIsHidden: string;
+    verifyIsVisible: string;
     verifyTitle: string;
     verifyTitleContain: string;
     verifyUrl: string;
