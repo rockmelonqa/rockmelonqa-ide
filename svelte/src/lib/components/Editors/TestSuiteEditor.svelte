@@ -51,6 +51,7 @@
 
     let appContext = getContext(appContextKey) as IAppContext;
     let { state: appState, dispatch: appStateDispatch } = appContext;
+
     const formDef: IFormDef = {
         fields: {
             id: {
@@ -87,7 +88,6 @@
     let deleteDialogType: AlertDialogType = AlertDialogType.None;
     let indexToDelete: number;
 
-    // Key: test case id.  Value: test case name
     let testCaseOptions: IDropdownOption[] = [];
 
     const { registerOnSaveHandler, unregisterOnSaveHandler } = getContext(appActionContextKey) as IAppActionContext;

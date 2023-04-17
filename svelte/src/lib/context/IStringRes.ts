@@ -13,6 +13,7 @@ export interface IStringRes {
     project: IProjectStringRes;
     runTestDialog: IRunTestDialogStringRes;
     testCaseEditor: ITestCaseEditorStringRes;
+    testRoutineEditor: ITestRoutineStringRes;
     testSuiteEditor: ITestSuiteEditorStringRes;
 }
 
@@ -175,6 +176,20 @@ export interface ITestCaseEditorStringRes {
     element: string;
     name: string;
     page: string;
+}
+
+export interface ITestRoutineStringRes {
+    actions: string;
+    action: string;
+    addComment: string;
+    comment: string;
+    dataSet: string;
+    deleteRowConfirmation: string;
+    description: string;
+    element: string;
+    name: string;
+    page: string;
+    steps: string;
 }
 
 export interface ITestSuiteEditorStringRes {

@@ -109,7 +109,7 @@ export class MsTestProjMeta implements IOutProjMeta {
     // ITestRoutine
     for (let routine of this.routineMetaMap.keys()) {
       if (routine.id === guid) {
-        return this.caseMetaMap.get(routine)!;
+        return this.routineMetaMap.get(routine)!;
       }
     }
     throw new Error(`NameMap doesn't contain a complete set of names.`);

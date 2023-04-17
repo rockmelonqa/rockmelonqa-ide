@@ -1,5 +1,4 @@
 import { IFileDef } from "./fileDef";
-import { ITestStep } from "./testStep";
 
 /** A test case is a collection of test steps */
 export interface ITestCase {
@@ -11,4 +10,15 @@ export interface ITestCase {
 /** Describes the file and its test case contents */
 export interface ITestCaseFile extends Omit<IFileDef, "content"> {
   content: ITestCase;
+}
+
+export interface ITestStep {
+  id: string;
+  type: "testStep" | "comment";
+  page?: string;
+  element?: string;
+  action?: string;
+  data?: string;
+  parameters?: string[];
+  comment?: string;
 }
