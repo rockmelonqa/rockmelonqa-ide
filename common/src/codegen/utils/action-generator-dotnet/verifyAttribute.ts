@@ -6,7 +6,7 @@ export default (params: IActionTemplateParam) => {
   let temp = data.split("=");
   let attributeName = temp[0];
   let attributeValue = temp.length === 2 ? temp[1] : "";
-  return `await expect(defs.${pageName}.${elementName}(${getParameters(parameters)})).ToHaveAttributeAsync(\"${escapeStr(
+  return `await Expect(defs.${pageName}.${elementName}(${getParameters(parameters)})).ToHaveAttributeAsync(\"${escapeStr(
     attributeName
   )}\", \"${attributeValue}\");`;
 };
