@@ -149,10 +149,14 @@
         }
         // if parentNode.children is null (not lazy load), then leave it for next expanding action
         // if already loads children, then add new node manually if required
-        if (parentNode.children) {
-            const newNode = await buildNode(fileSystemPath, name, isDir, parentNode, true);
+        const newNode = await buildNode(fileSystemPath, name, isDir, parentNode, true);
+        if(parentNode.children != null) {
             newValue.children = NodeInfo.sort([...parentNode.children, newNode!]);
+        } else {
+            newValue.children = [newNode!];
         }
+        newValue.expanded = true;
+       
         if (!lodash.isEmpty(newValue)) {
             appStateDispatch({
                 type: AppActionType.UpdateFile,
