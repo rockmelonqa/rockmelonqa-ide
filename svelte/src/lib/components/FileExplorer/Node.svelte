@@ -1,8 +1,10 @@
 <script lang="ts">
     import { AppActionType, appContextKey, type IAppContext } from '$lib/context/AppContext';
     import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import { fileSystem } from '$lib/ipc';
+    import DeleteTestCaseDialog from '$lib/dialogs/DeleteTestCaseDialog.svelte';
+    import { codeGenerator, fileSystem } from '$lib/ipc';
     import type { IFileInfo } from '$lib/models';
+    import type { ITestSuite } from 'rockmelonqa.common';
     import { getContext } from 'svelte';
     import { getEditor } from '../Editors/Editor';
     import FileIcon from '../FileIcon.svelte';
@@ -12,7 +14,7 @@
     import Menu from './Menu.svelte';
     import MenuDivider from './MenuDivider.svelte';
     import MenuItem from './MenuItem.svelte';
-    import { buildChildrenNodes, extractPath, Node as NodeInfo, showMenuAt, toFileSystemPath } from './Node';
+    import { buildChildrenNodes, combinePath, extractPath, Node as NodeInfo, showMenuAt, toFileSystemPath } from './Node';
     import NodeEditor from './NodeEditor.svelte';
 
     export let node: NodeInfo;
@@ -21,6 +23,7 @@
     let uiContext = getContext(uiContextKey) as IUiContext;
     let appContext = getContext(appContextKey) as IAppContext;
     let { state: appState, dispatch: appStateDispatch } = appContext;
+    let showDeleteTestCaseDialog: boolean = false;
 
     $: nodePath = node.toTreePath();
     $: fileSystemPath = toFileSystemPath(nodePath, $appState.projectFile!.folderPath, uiContext.pathSeparator);
@@ -130,7 +133,28 @@
         });
     };
 
+    let relatedTestSuites: ITestSuite[] = [];
+
+    const handleDeleteTestCase = async () => {        
+        const meta = await codeGenerator.generateProjectMetadata($appState.projectFile!);      
+        const testCase = meta?.testCases.find(tc => combinePath([tc.folderPath, tc.fileName], uiContext.pathSeparator) === fileSystemPath)  
+        
+        relatedTestSuites = meta?.testSuites.map(suiteFile => suiteFile.content)
+            .filter(suite => suite.testcases.some(tcId => tcId === testCase?.content.id)) || [];
+            
+        console.log('generateProjectMetadata', meta)
+        console.log('testCase', testCase)
+        console.log('relatedTestSuites', relatedTestSuites)
+        showDeleteTestCaseDialog = true;
+
+    }
+
     const handleMenuDelete = async () => {
+        if (type === FileType.TCase) {
+            await handleDeleteTestCase();
+            return;
+        }
+        
         const response = await fileSystem.deleteFileSystem(fileSystemPath);
         if (!response.isSuccess) {
             if (response.errorMessage) {
@@ -293,3 +317,5 @@
         {/if}
     </Menu>
 {/if}
+
+<DeleteTestCaseDialog bind:showDialog={showDeleteTestCaseDialog} relatedSuites={relatedTestSuites} />

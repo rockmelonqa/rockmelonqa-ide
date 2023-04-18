@@ -20,6 +20,7 @@
     import { combinePath } from './FileExplorer/Node';
     import { Notify } from './Notify';
     import type { IGenericTab } from './Tab/Tab';
+    import DeleteTestCaseDialog from '$lib/dialogs/DeleteTestCaseDialog.svelte';
 
     const window = getWindow();
 
@@ -30,6 +31,7 @@
 
     let showNewProjectDialog: boolean = false;
     let showAboutDialog: boolean = false;
+    let showDeleteTestCaseDialog: boolean = false;
     let showCodeGenerationDialog: boolean = false;
     let showRunTestDialog: boolean = false;
 
@@ -213,3 +215,5 @@
 {/if}
 
 <AboutDialog bind:showDialog={showAboutDialog} />
+
+<DeleteTestCaseDialog bind:showDialog={showDeleteTestCaseDialog} />
