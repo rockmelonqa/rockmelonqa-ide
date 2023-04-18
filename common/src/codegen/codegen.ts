@@ -153,7 +153,10 @@ export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: (eve
   info(`Finish generating code!`);
 };
 
-export const createCodeGenMeta = async (rmprojFile: IRmProjFile, progressNotify?: (event: IProgressEvent) => void) => {
+export const createCodeGenMeta = async (
+  rmprojFile: IRmProjFile,
+  progressNotify?: (event: IProgressEvent) => void
+): Promise<ICodeGenMeta> => {
   const notify = (event: IProgressEvent) => progressNotify && progressNotify(event);
 
   // Print out information about the context

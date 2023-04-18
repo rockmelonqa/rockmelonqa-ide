@@ -17,7 +17,12 @@ import { ITestSuitesMetadata } from "rockmelonqa.common/codegen/playwright-charp
 import { StandardOutputFile } from "rockmelonqa.common/file-defs";
 import * as fileSystem from "../utils/fileSystem";
 import { StringBuilder } from "../utils/stringBuilder";
-import { extractMajorMinorVersion, genCode as generateCode, IActionResult } from "../worker/actions";
+import {
+  IActionResult,
+  extractMajorMinorVersion,
+  generateProjectMetadata as genProjectMetadata,
+  genCode as generateCode,
+} from "../worker/actions";
 import { buildCode } from "../worker/actions/buildCode";
 import { IChannels } from "./core/channelsInterface";
 import IPC from "./core/ipc";
@@ -27,7 +32,11 @@ const nameAPI = "codeGenerator";
 // to Main
 const validSendChannel: IChannels = { genCode: genCode };
 
-const validInvokeChannel: IChannels = { prerequire: prerequire, getSuitesMetadata: getSuitesMetadata };
+const validInvokeChannel: IChannels = {
+  prerequire: prerequire,
+  getSuitesMetadata: getSuitesMetadata,
+  generateProjectMetadata: generateProjectMetadata,
+};
 
 // from Main
 const validReceiveChannel: string[] = [
@@ -216,6 +225,19 @@ async function genCode(browserWindow: BrowserWindow, event: Electron.IpcMainEven
     ipcRs.data = { logFile: path.join(StandardFolder.Logs, logFileName) };
   } finally {
     browserWindow.webContents.send("finish", ipcRs);
+  }
+}
+
+async function generateProjectMetadata(
+  browserWindow: BrowserWindow,
+  event: Electron.IpcMainEvent,
+  projectFile: IRmProjFile
+): Promise<IIpcGenericResponse<ITestSuitesMetadata>> {
+  try {
+    const actionRs = await genProjectMetadata(projectFile);
+    return { isSuccess: true, data: actionRs.data } as IIpcResponse;
+  } catch (error) {
+    return { isSuccess: false, errorMessage: "Cannot generate suites metadata: " + error };
   }
 }
 
