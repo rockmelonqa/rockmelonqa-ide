@@ -1,0 +1,22 @@
+namespace {{{fullNamespace}}};
+
+{{#if pageDescription}}
+/// <summary>
+/// {{{pageDescription}}}
+/// </summary>
+{{/if}}
+public class {{{pageName}}}
+{
+    private IPage _page;
+
+    /// <summary>
+    /// Default constructor
+    /// </summary>
+    /// <param name="page">Playwright Page</param>
+    public {{{pageName}}}(IPage page)
+    {
+        this._page = page;
+    }
+
+{{{pageBody}}}
+}

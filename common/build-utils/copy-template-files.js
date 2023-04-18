@@ -26,4 +26,5 @@ const copy = (from, to, codegen) => {
 
 copy(FROM, TO, "playwright-csharp-mstest");
 copy(FROM, TO, "playwright-csharp-nunit");
+copy(FROM, TO, "playwright-csharp-xunit");
 copy(FROM, TO, "playwright-typescript-jest");

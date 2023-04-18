@@ -1,0 +1,152 @@
+using System.Xml.Serialization;
+
+namespace {{{rootNamespace}}}.Support;
+
+/// <summary>
+/// Base class for page
+/// </summary>
+public abstract class PageBase
+{
+    protected IPage _page;
+
+    public PageBase(IPage page)
+    {
+        _page = page;
+    }
+}
+
+/// <summary>
+/// Base class for test case
+/// </summary>
+public abstract class TestCaseBase : PageTest
+{
+    /// <summary>
+    /// Returns TestSuiteInstance.Page when TestSuiteInstance is not null, otherwise return the Page of base class (PageTest.Page)
+    /// </summary>
+    public new IPage Page => TestSuiteInstance == null ? base.Page : TestSuiteInstance.Page;
+
+    /// <summary>
+    /// Default constructor
+    /// </summary>
+    public TestCaseBase()
+    {
+    }
+
+    /// <summary>
+    /// Create new instance of RmTestSuiteBase with the provided testSuiteInstance
+    /// </summary>
+    public TestCaseBase(PageTest testSuiteInstance) : base(testSuiteInstance)
+    {
+    }
+}
+
+/// <summary>
+/// Base class for test fixture
+/// </summary>
+public abstract class TestFixtureBase : PageTest
+{
+
+}
+
+
+/// <summary>
+/// Implement our PageTest for XUnit 
+/// </summary>
+public abstract class PageTest
+{
+    private IBrowser Browser { get; }
+    private IPlaywright PlaywrightInstance { get; }
+    public IPage Page { get; }
+    protected PageTest? TestSuiteInstance;
+
+    public PageTest()
+    {
+        RunSettings runSettings = LoadFromRunSettings();
+
+        BrowserTypeLaunchOptions launchOptions = new BrowserTypeLaunchOptions
+        {
+            Headless = runSettings.Playwright.LaunchOptions.Headless
+        };
+
+        PlaywrightInstance = Playwright.CreateAsync().Result;
+        Browser = GetBrowser(runSettings.Playwright.BrowserName).LaunchAsync(launchOptions).Result;
+        Page = Browser.NewPageAsync().Result;
+
+    }
+
+    public PageTest(PageTest testSuiteInstance)
+    {
+        TestSuiteInstance = testSuiteInstance;
+        Page = TestSuiteInstance.Page;
+        Browser = TestSuiteInstance.Browser;
+        PlaywrightInstance = TestSuiteInstance.PlaywrightInstance;
+    }
+
+    public async Task Dispose()
+    {
+        await Page.CloseAsync();
+        await Browser.DisposeAsync();
+        PlaywrightInstance.Dispose();
+    }
+
+    public ILocatorAssertions Expect(ILocator locator)
+    {
+        return Assertions.Expect(locator);
+    }
+
+    private IBrowserType GetBrowser(string browserName)
+    {
+        switch (browserName)
+        {
+            case "chromium": return PlaywrightInstance.Chromium;
+            case "firefox": return PlaywrightInstance.Firefox;
+            case "webkit": return PlaywrightInstance.Webkit;
+        }
+        return PlaywrightInstance.Chromium;
+    }
+
+    private RunSettings LoadFromRunSettings()
+    {
+        string runSettingsRaw = File.ReadAllText(".runsettings");
+        XmlSerializer serializer = new XmlSerializer(typeof(RunSettings));
+        using (StringReader reader = new StringReader(runSettingsRaw))
+        {
+            RunSettings? runSettings = (serializer.Deserialize(reader)) as RunSettings;
+            if (runSettings is null)
+            {
+                return new RunSettings();
+            }
+
+            return runSettings;
+        }
+    }
+
+    public string ToXML(object obj)
+    {
+        using (var stringwriter = new System.IO.StringWriter())
+        {
+            var serializer = new XmlSerializer(obj.GetType());
+            serializer.Serialize(stringwriter, obj);
+            string xml = stringwriter.ToString();
+            return xml;
+        }
+    }
+}
+
+public class RunSettings
+{
+    public PlaywrightSetting Playwright { get; set; } = new PlaywrightSetting();
+}
+
+public class PlaywrightSetting
+{
+    public string BrowserName { get; set; } = "";
+    public int ExpectTimeout { get; set; } = 10_000;
+
+    public PlaywrightLaunchOptionsSetting LaunchOptions { get; set; } = new PlaywrightLaunchOptionsSetting();
+}
+
+public class PlaywrightLaunchOptionsSetting
+{
+    public bool Headless { get; set; }
+}

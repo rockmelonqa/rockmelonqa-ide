@@ -8,21 +8,23 @@ import { CodeGenMetaFactory } from "../codegenMetaFactory";
 import { ICodeGen } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
-import { NunitProjectMeta } from "./nunitProjectMeta";
-import { PlaywrightCsharpNunitTemplatesProvider } from "./playwrightCsharpNunitTemplatesProvider";
+import { XUnitProjectMeta } from "./xunitProjectMeta";
+import { PlaywrightCsharpXUnitTemplatesProvider } from "./playwrightCsharpXUnitTemplatesProvider";
 
-export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
+type WriteFileFn = (path: string, content: string) => Promise<void>;
+
+export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
   private _projMeta: ICodeGenMeta;
   private _rmprojFile: IRmProjFile;
   private _rootNamespace: string;
-  private _templateProvider: PlaywrightCsharpNunitTemplatesProvider;
+  private _templateProvider: PlaywrightCsharpXUnitTemplatesProvider;
   private _outputFileExt: string;
 
   private _indentChar: string;
   private _indentSize: number;
   private _indentString: string;
 
-  private _outProjMeta: NunitProjectMeta;
+  private _outProjMeta: XUnitProjectMeta;
 
   constructor(projMeta: ICodeGenMeta) {
     const rmprojFile = projMeta.project;
@@ -30,7 +32,7 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
     this._projMeta = projMeta;
     this._rmprojFile = rmprojFile;
     this._rootNamespace = rmprojFile.content.rootNamespace;
-    this._templateProvider = new PlaywrightCsharpNunitTemplatesProvider(
+    this._templateProvider = new PlaywrightCsharpXUnitTemplatesProvider(
       path.join(rmprojFile.folderPath, StandardFolder.CustomCode, "templates")
     );
     this._outputFileExt = languageExtensionMap[rmprojFile.content.language];
@@ -42,39 +44,59 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
     /** String representing 1 indent */
     this._indentString = this._indentChar.repeat(this._indentSize);
 
-    this._outProjMeta = new NunitProjectMeta(projMeta);
+    this._outProjMeta = new XUnitProjectMeta(projMeta);
   }
 
-  async generateCode(full: boolean, writeFile: (path: string, content: string) => Promise<void>): Promise<string> {
-    // # Build PageDefinitions
+  async generateCode(full: boolean, writeFile: WriteFileFn): Promise<string> {
+    await this.writePageDefinitionsFile(writeFile);
+    await this.writePageFiles(writeFile);
+    await this.writeTestCaseFiles(writeFile);
+    await this.writeTestSuiteFiles(writeFile);
+    await this.writeLocatorHelperFiles(writeFile);
+    await this.writeBaseClassesFile(writeFile);
 
-    // Each page definition will be a property
-    // Filename: PageDefinitions.cs
+    if (full) {
+      await this.writeProjectFiles(writeFile);
+    }
+    await this.writeMetaFile(writeFile);
+
+    return "";
+  }
+
+  private async writeMetaFile(writeFile: WriteFileFn) {
+    const inProjMeta = await createCodeGenMeta(this._rmprojFile);
+    const outProjMeta = CodeGenMetaFactory.newInstance(inProjMeta);
+    const data = outProjMeta.createSuitesMeta();
+    await writeFile(StandardOutputFile.MetaData, JSON.stringify(data, null, 2));
+  }
+
+  private async writeProjectFiles(writeFile: WriteFileFn) {
     await writeFile(
-      `${StandardOutputFile.PageDefinitions}${this._outputFileExt}`,
-      this.generatePageDefinitions(this._projMeta.pages.map((p) => p.content))
+      `${this._rmprojFile.content.rootNamespace}.csproj`,
+      this._templateProvider.getCSProject(this._rmprojFile.content.rootNamespace)
     );
+    await writeFile(
+      `${StandardOutputFile.Usings}${this._outputFileExt}`,
+      this._templateProvider.getUsings(this._rmprojFile.content.rootNamespace)
+    );
+    await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
+  }
 
-    // # Generate Page definition for each page
-    // Filename: Pages/{PageName}.cs
-    for (let page of this._projMeta.pages) {
-      let filePath = this._outProjMeta.get(page.content.id)!.outputFileRelPath;
-      await writeFile(filePath, this.generatePage(page.content));
-    }
+  private async writeBaseClassesFile(writeFile: WriteFileFn) {
+    await writeFile(
+      `Support/${StandardOutputFile.RmSingleCaseSuiteBase}${this._outputFileExt}`,
+      this._templateProvider.getBaseClasses(this._rmprojFile.content.rootNamespace)
+    );
+  }
 
-    // # Generate TestCase
+  private async writeLocatorHelperFiles(writeFile: WriteFileFn) {
+    await writeFile(
+      `Support/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
+      this._templateProvider.getLocatorHelper(this._rmprojFile.content.rootNamespace)
+    );
+  }
 
-    // Filename: TestCases/{TestCaseName}.cs
-    for (let { content: testCase } of this._projMeta.testCases) {
-      let testClassContent = this.generateTestCaseFile(
-        testCase,
-        this._projMeta.pages.map((p) => p.content)
-      );
-      let outputFileRelPath = this._outProjMeta.get(testCase.id)!.outputFileRelPath;
-
-      await writeFile(outputFileRelPath, testClassContent);
-    }
-
+  private async writeTestSuiteFiles(writeFile: WriteFileFn) {
     // Filename: Tests/{TestClassName}.cs
     for (let testSuite of this._projMeta.testSuites) {
       let fileRelPath = this._outProjMeta.get(testSuite.content.id)!.outputFileRelPath;
@@ -84,47 +106,33 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
       );
       await writeFile(fileRelPath, classContent);
     }
-
-    // # Generate TestLocatorHelper
-
-    // Filename: Support/LocatorHelper.cs
-    await writeFile(
-      `Support/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
-      this._templateProvider.getLocatorHelper(this._rmprojFile.content.rootNamespace)
-    );
-    // Filename: Support/RmSingleCaseSuiteBase.cs
-    await writeFile(
-      `Support/${StandardOutputFile.RmSingleCaseSuiteBase}${this._outputFileExt}`,
-      this._templateProvider.getSingleCaseSuiteBase(this._rmprojFile.content.rootNamespace)
-    );
-
-    // # Generate full project files
-    // Files:
-    //     - {Namespace}.csproj
-    //     - Usings.cs
-    //     - .runsettings
-    if (full) {
-      await writeFile(
-        `${this._rmprojFile.content.rootNamespace}.csproj`,
-        this._templateProvider.getCSProject(this._rmprojFile.content.rootNamespace)
-      );
-      await writeFile(
-        `${StandardOutputFile.Usings}${this._outputFileExt}`,
-        this._templateProvider.getNUNitUsing(this._rmprojFile.content.rootNamespace)
-      );
-      await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
-    }
-
-    // Write suites meta
-    const inProjMeta = await createCodeGenMeta(this._rmprojFile);
-    const outProjMeta = CodeGenMetaFactory.newInstance(inProjMeta);
-    const data = outProjMeta.createSuitesMeta();
-    await writeFile(StandardOutputFile.MetaData, JSON.stringify(data, null, 2));
-
-    return "";
   }
 
-  generatePageDefinitions(pages: IPage[]): string {
+  private async writeTestCaseFiles(writeFile: WriteFileFn) {
+    for (let { content: testCase } of this._projMeta.testCases) {
+      let testClassContent = this.generateTestCaseFile(
+        testCase,
+        this._projMeta.pages.map((p) => p.content)
+      );
+      let outputFileRelPath = this._outProjMeta.get(testCase.id)!.outputFileRelPath;
+
+      await writeFile(outputFileRelPath, testClassContent);
+    }
+  }
+
+  private async writePageFiles(writeFile: WriteFileFn) {
+    for (let page of this._projMeta.pages) {
+      let filePath = this._outProjMeta.get(page.content.id)!.outputFileRelPath;
+      await writeFile(filePath, this.generatePage(page.content));
+    }
+  }
+
+  private async writePageDefinitionsFile(writeFile: WriteFileFn) {
+    const content = this.generatePageDefinitions(this._projMeta.pages.map((p) => p.content));
+    await writeFile(`${StandardOutputFile.PageDefinitions}${this._outputFileExt}`, content);
+  }
+
+  private generatePageDefinitions(pages: IPage[]): string {
     let usingDirectives: string[] = [];
     for (let page of pages) {
       let pageNamespace = this._outProjMeta.get(page.id)!.outputFileFullNamespace;
@@ -160,7 +168,7 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
     return this._templateProvider.getPageDefinitions(usings, this._rootNamespace, pagesDeclarations, pageInits);
   }
 
-  generatePage(page: IPage): string {
+  private generatePage(page: IPage): string {
     let pageItems = [];
 
     for (let element of page.elements) {
@@ -199,7 +207,7 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
     );
   }
 
-  generateTestSuite(testSuite: ITestSuite, testcases: ITestCase[]) {
+  private generateTestSuite(testSuite: ITestSuite, testcases: ITestCase[]) {
     var testcaseMethods = [];
     var usingItems = [];
 
@@ -233,7 +241,7 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
     return testClass;
   }
 
-  generateTestCaseFile(testCase: ITestCase, pages: IPage[]) {
+  private generateTestCaseFile(testCase: ITestCase, pages: IPage[]) {
     const testcaseBody = this.generateTestCaseBody(testCase, pages);
 
     let testFile = this._templateProvider.getTestCaseFile(
@@ -246,13 +254,13 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
     return testFile;
   }
 
-  generateTestCaseFunction(testCase: ITestCase) {
+  private generateTestCaseFunction(testCase: ITestCase) {
     const testcaseName = this._outProjMeta.get(testCase.id)!.outputFileClassName;
     const testCaseMethod = this._templateProvider.getTestFunction(testcaseName, testCase.description);
     return testCaseMethod;
   }
 
-  generateTestCaseBody(testCase: ITestCase, pages: IPage[]) {
+  private generateTestCaseBody(testCase: ITestCase, pages: IPage[]) {
     let stepItems = [];
     for (let step of testCase.steps) {
       if (step.type === "testStep") {
