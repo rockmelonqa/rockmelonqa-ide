@@ -328,7 +328,10 @@
         isEmpty={false}
     >
         <svelte:fragment slot="header">
-            <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-2/12">
+            <ListTableHeaderCell type={ListTableCellType.First} class="text-center w-1/12">
+                {uiContext.str(stringResKeys.testCaseEditor.actions)}
+            </ListTableHeaderCell>
+            <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-2/12">
                 {uiContext.str(stringResKeys.testCaseEditor.page)}
             </ListTableHeaderCell>
             <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-3/12">
@@ -340,15 +343,37 @@
             <ListTableHeaderCell type={ListTableCellType.Last} class="text-left w-3/12">
                 {uiContext.str(stringResKeys.testCaseEditor.data)}
             </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-1/12">
-                {uiContext.str(stringResKeys.testCaseEditor.actions)}
-            </ListTableHeaderCell>
+
         </svelte:fragment>
         <svelte:fragment slot="body">
             {#each $listData.items as item, index}
                 <ListTableBodyRow>
+                    <ListTableBodyCell type={ListTableCellType.First} class="align-bottom whitespace-nowrap">
+                        <IconLinkButton
+                            on:click={() => handleDeleteClick(index)}
+                            title={uiContext.str(stringResKeys.general.delete)}
+                        >
+                            <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
+                        </IconLinkButton>
+                        {#if index > 0}
+                            <IconLinkButton
+                                on:click={() => handleMoveUpClick(index)}
+                                title={uiContext.str(stringResKeys.general.moveUp)}
+                            >
+                                <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>
+                            </IconLinkButton>
+                        {/if}
+                        {#if index < $listData.items.length - 1}
+                            <IconLinkButton
+                                on:click={() => handleMoveDownClick(index)}
+                                title={uiContext.str(stringResKeys.general.moveDown)}
+                            >
+                                <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>
+                            </IconLinkButton>
+                        {/if}
+                    </ListTableBodyCell>
                     {#if isComment(item)}
-                        <ListTableBodyCell type={ListTableCellType.First} colspan={4}>
+                        <ListTableBodyCell type={ListTableCellType.Normal} colspan={4}>
                             <CommentTextField
                                 name={`${formContext.formName}_${index}_comment`}
                                 value={item.comment}
@@ -357,7 +382,7 @@
                             />
                         </ListTableBodyCell>
                     {:else}
-                        <ListTableBodyCell type={ListTableCellType.First}>
+                        <ListTableBodyCell type={ListTableCellType.Normal}>
                             <FancyDropdownField
                                 name={`${formContext.formName}_${index}_page`}
                                 value={item.page}
@@ -389,30 +414,7 @@
                             />
                         </ListTableBodyCell>
                     {/if}
-                    <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">
-                        <IconLinkButton
-                            on:click={() => handleDeleteClick(index)}
-                            title={uiContext.str(stringResKeys.general.delete)}
-                        >
-                            <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
-                        </IconLinkButton>
-                        {#if index > 0}
-                            <IconLinkButton
-                                on:click={() => handleMoveUpClick(index)}
-                                title={uiContext.str(stringResKeys.general.moveUp)}
-                            >
-                                <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>
-                            </IconLinkButton>
-                        {/if}
-                        {#if index < $listData.items.length - 1}
-                            <IconLinkButton
-                                on:click={() => handleMoveDownClick(index)}
-                                title={uiContext.str(stringResKeys.general.moveDown)}
-                            >
-                                <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>
-                            </IconLinkButton>
-                        {/if}
-                    </ListTableBodyCell>
+                    
                 </ListTableBodyRow>
             {/each}
         </svelte:fragment>
