@@ -1,4 +1,4 @@
-import type { ICultureStringRes, IFormStringRes } from "$lib/context/UiStringResKeys";
+import type { ICultureStringRes, IFormStringRes } from '$lib/context/UiStringResKeys';
 
 export interface IStringRes {
     aboutDialog: IAboutDialogStringRes;
