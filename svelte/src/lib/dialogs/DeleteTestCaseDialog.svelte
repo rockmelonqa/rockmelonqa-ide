@@ -31,11 +31,11 @@
     let testCaseId: string = "";
 
     const fileContent = await fileSystem.readFile(testCaseFilePath);
-    if (fileContent) {
+    if (fileContent) { 
       const testCase = JSON.parse(fileContent) as ITestCase;
       testCaseId = testCase.id;
     }
-
+ 
     return testCaseId;
   };
 
