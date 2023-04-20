@@ -16,7 +16,7 @@
     import { derived } from 'svelte/store';
     import { FileType, getFileType } from '../FileType';
     import CollapsiblePanel from './CollapsiblePanel.svelte';
-    import { buildChildrenNodes, Node as NodeInfo, toFileSystemPath, toTreePath } from './Node';
+    import { buildChildrenNodes, extractPath, Node as NodeInfo, toFileSystemPath, toTreePath } from './Node';
     import Nodes from './Nodes.svelte';
 
     let uiContext = getContext(uiContextKey) as IUiContext;
@@ -121,6 +121,8 @@
         }
 
         const { parentPath, name } = NodeInfo.extractPath(nodePath);
+        let { parentPath: folderSystemPath } = extractPath(fileSystemPath, uiContext.pathSeparator); 
+
         if (!parentPath) {
             // No parent, this is root node.
             // Just build a node then add to root
@@ -147,16 +149,31 @@
             // now it has new child
             newValue.hasChildren = true;
         }
+
         // if parentNode.children is null (not lazy load), then leave it for next expanding action
         // if already loads children, then add new node manually if required
         const newNode = await buildNode(fileSystemPath, name, isDir, parentNode, true);
         if(parentNode.children != null) {
             newValue.children = NodeInfo.sort([...parentNode.children, newNode!]);
         } else {
-            newValue.children = [newNode!];
+            if(parentNode.hasChildren) {
+                if(isDir) {
+                    newValue.children = NodeInfo.sort([...await buildChildrenNodes(fileSystemPath), newNode!]);
+                } else {
+                    let childrenNodes: NodeInfo[] = await buildChildrenNodes(folderSystemPath);
+
+                    // make sure this file is added from rockmelon
+                    if(childrenNodes.findIndex(_ => _.type != FileType.Folder && _.name == name) < 0)
+                    {
+                        newValue.children = NodeInfo.sort([...childrenNodes, newNode!]);
+                    }
+                }
+            } else {
+                newValue.children = [newNode!];
+                newValue.expanded = true;
+            }
         }
-        newValue.expanded = true;
-       
+        
         if (!lodash.isEmpty(newValue)) {
             appStateDispatch({
                 type: AppActionType.UpdateFile,
