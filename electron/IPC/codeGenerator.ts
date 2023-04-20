@@ -241,7 +241,7 @@ async function generateSourceProjectMetadata(
         const actionRs = await genSourceProjectMetadata(projectFile);
         return { isSuccess: true, data: actionRs.data } as IIpcResponse;
     } catch (error) {
-        return { isSuccess: false, errorMessage: 'Cannot generate suites metadata: ' + error };
+        return { isSuccess: false, errorMessage: `Cannot generate source project metadata: ${error}` };
     }
 }
 
@@ -256,6 +256,9 @@ async function getOutputProjectMetadata(
         const metaData = JSON.parse(content);
         return { isSuccess: true, data: metaData } as IIpcResponse;
     } catch (error) {
-        return { isSuccess: false, errorMessage: 'Cannot get suites metadata: ' + error };
+        return {
+            isSuccess: false,
+            errorMessage: `Cannot get output project metadata from ${StandardOutputFile.MetaData} file: ${error}`,
+        };
     }
 }
