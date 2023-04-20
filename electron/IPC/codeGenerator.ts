@@ -34,8 +34,8 @@ const validSendChannel: IChannels = { genCode: genCode };
 
 const validInvokeChannel: IChannels = {
     prerequire: prerequire,
-    getSuitesMetadata: getOutputProjectMetadata,
-    generateProjectMetadata: generateSourceProjectMetadata,
+    getOutputProjectMetadata: getOutputProjectMetadata,
+    generateSourceProjectMetadata: generateSourceProjectMetadata,
 };
 
 // from Main

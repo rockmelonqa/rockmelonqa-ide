@@ -1,104 +1,27 @@
 <script lang="ts">
-    import { combinePath } from '$lib/components/FileExplorer/Node';
-    import { Notify } from '$lib/components/Notify';
     import PrimaryButton from '$lib/components/PrimaryButton.svelte';
     import StandardButton from '$lib/components/StandardButton.svelte';
-    import { AppActionType, appContextKey, type IAppContext } from '$lib/context/AppContext';
+    import { appContextKey, type IAppContext } from '$lib/context/AppContext';
     import { stringResKeys } from '$lib/context/StringResKeys';
     import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import { fileSystem } from '$lib/ipc';
-    import { StandardFolder, type ITestCase, type ITestSuite } from 'rockmelonqa.common/file-defs';
-    import { getContext, onDestroy, onMount } from 'svelte';
-    import { Node } from '../components/FileExplorer/Node';
+    import { createEventDispatcher, getContext, onDestroy, onMount } from 'svelte';
 
     /** Toggle on dialog */
     export let showDialog: boolean = false;
-    /** File system physical path */
-    export let testCaseFilePath: string;
-    /** Path on tree (used for closing coresponding tab after deleting testcase node) */
-    export let nodePath: string;
     /** Array of relative paths (from 'test-suites' folder) of the test suites that contains the test case being deleted */
     export let relatedTestSuiteRelPaths: string[] = [];
 
     let uiContext = getContext(uiContextKey) as IUiContext;
     let appContext = getContext(appContextKey) as IAppContext;
     let { state: appState, dispatch: appStateDispatch } = appContext;
+    const dispatch = createEventDispatcher();
 
     onMount(async () => {});
 
     onDestroy(() => {});
-
-    const getTestCaseId = async () => {
-        let testCaseId: string = '';
-
-        const fileContent = await fileSystem.readFile(testCaseFilePath);
-        if (fileContent) {
-            const testCase = JSON.parse(fileContent) as ITestCase;
-            testCaseId = testCase.id;
-        }
-
-        return testCaseId;
-    };
-
-    const getTestSuiteFilePaths = () => {
-        const relatedSuiteFilePaths = relatedTestSuiteRelPaths.map((relPath) => {
-            const suiteFilePath = combinePath(
-                [
-                    $appState.projectFile!.folderPath,
-                    StandardFolder.TestSuites,
-                    relPath.replaceAll(Node.PATH_SEPARATOR, uiContext.pathSeparator),
-                ],
-                uiContext.pathSeparator
-            );
-            return suiteFilePath;
-        });
-
-        return relatedSuiteFilePaths;
-    };
-
-    const removeTestCaseFromTestSuites = async (testCaseId: string, relatedSuiteFilePaths: string[]) => {
-        for (let relatedSuiteFilePath of relatedSuiteFilePaths) {
-            const fileContent = await fileSystem.readFile(relatedSuiteFilePath);
-            if (fileContent) {
-                const testSuite = JSON.parse(fileContent) as ITestSuite;
-                testSuite.testcases.splice(testSuite.testcases.indexOf(testCaseId), 1);
-                await fileSystem.writeFile(relatedSuiteFilePath, JSON.stringify(testSuite, null, 4));
-            }
-        }
-    };
-
-    const deleteTestCaseFile = async () => {
-        const response = await fileSystem.deleteFileSystem(testCaseFilePath);
-        if (!response.isSuccess) {
-            if (response.errorMessage) {
-                Notify.error(response.errorMessage);
-            }
-            return false;
-        }
-        return true;
-    };
-
-    const closeTestCaseEditorTab = () => {
-        const tabIndex = $appState.tabs.findIndex((t) => t.id === nodePath);
-        if (tabIndex >= 0) {
-            appStateDispatch({ type: AppActionType.CloseTab, tabIndex: tabIndex });
-        }
-    };
-
     const handleDeleteClick = async () => {
+        dispatch('deleteConfirmed');
         showDialog = false;
-
-        const testCaseId = await getTestCaseId();
-
-        if (!(await deleteTestCaseFile())) {
-            return;
-        }
-
-        closeTestCaseEditorTab();
-
-        const relatedSuiteFilePaths = getTestSuiteFilePaths();
-
-        await removeTestCaseFromTestSuites(testCaseId, relatedSuiteFilePaths);
     };
     const handleCancelClick = () => {
         showDialog = false;

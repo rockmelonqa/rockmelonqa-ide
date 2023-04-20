@@ -4,7 +4,7 @@
     import DeleteTestCaseDialog from '$lib/dialogs/DeleteTestCaseDialog.svelte';
     import { codeGenerator, fileSystem } from '$lib/ipc';
     import type { IFileInfo } from '$lib/models';
-    import { StandardFolder } from 'rockmelonqa.common';
+    import { StandardFolder, type ITestCase, type ITestSuite } from 'rockmelonqa.common';
     import { getContext } from 'svelte';
     import { getEditor } from '../Editors/Editor';
     import FileIcon from '../FileIcon.svelte';
@@ -59,6 +59,9 @@
         ${selected ? 'treeview-item-selected' : ''}
         min-w-fit`;
     $: rootItemStyle = `padding-left: calc(var(--f7-treeview-item-padding-left) + var(--f7-treeview-children-offset) * ${level})`;
+
+    /** Array of relative paths (from 'test-suites' folder) of the test suites that contains the test case being deleted */
+    let relatedTestSuiteRelPaths: string[] = [];
 
     let handleClick = async () => {
         if (toggleable) {
@@ -140,14 +143,85 @@
         });
     };
 
-    let relatedTestSuiteRelPaths: string[] = [];
+    const getTestCaseId = async () => {
+        let testCaseId: string = '';
 
-    const handleDeleteTestCase = async () => {
+        const fileContent = await fileSystem.readFile(fileSystemPath);
+        if (fileContent) {
+            const testCase = JSON.parse(fileContent) as ITestCase;
+            testCaseId = testCase.id;
+        }
+
+        return testCaseId;
+    };
+
+    const getTestSuiteFilePaths = () => {
+        const relatedSuiteFilePaths = relatedTestSuiteRelPaths.map((relPath) => {
+            const suiteFilePath = combinePath(
+                [
+                    $appState.projectFile!.folderPath,
+                    StandardFolder.TestSuites,
+                    relPath.replaceAll(NodeInfo.PATH_SEPARATOR, uiContext.pathSeparator),
+                ],
+                uiContext.pathSeparator
+            );
+            return suiteFilePath;
+        });
+
+        return relatedSuiteFilePaths;
+    };
+
+    const removeTestCaseFromTestSuites = async (testCaseId: string, relatedSuiteFilePaths: string[]) => {
+        for (let relatedSuiteFilePath of relatedSuiteFilePaths) {
+            const fileContent = await fileSystem.readFile(relatedSuiteFilePath);
+            if (fileContent) {
+                const testSuite = JSON.parse(fileContent) as ITestSuite;
+                testSuite.testcases.splice(testSuite.testcases.indexOf(testCaseId), 1);
+                await fileSystem.writeFile(relatedSuiteFilePath, JSON.stringify(testSuite, null, 4));
+            }
+        }
+    };
+
+    const deleteTestCaseFile = async () => {
+        const response = await fileSystem.deleteFileSystem(fileSystemPath);
+        if (!response.isSuccess) {
+            if (response.errorMessage) {
+                Notify.error(response.errorMessage);
+            }
+            return false;
+        }
+        return true;
+    };
+
+    const closeEditorTab = () => {
+        const tabIndex = $appState.tabs.findIndex((t) => t.id === nodePath);
+        if (tabIndex >= 0) {
+            appStateDispatch({ type: AppActionType.CloseTab, tabIndex: tabIndex });
+        }
+    };
+
+    const doDeleteTestCase = async () => {
+        const testCaseId = await getTestCaseId();
+
+        if (!(await deleteTestCaseFile())) {
+            return;
+        }
+
+        closeEditorTab();
+
+        const relatedSuiteFilePaths = getTestSuiteFilePaths();
+
+        await removeTestCaseFromTestSuites(testCaseId, relatedSuiteFilePaths);
+    };
+
+    /** Handle deleting a Test Case file */
+    const handleMenuDeleteTestCase = async () => {
         const meta = await codeGenerator.generateProjectMetadata($appState.projectFile!);
         const testCase = meta?.testCases.find(
             (tc) => combinePath([tc.folderPath, tc.fileName], uiContext.pathSeparator) === fileSystemPath
         );
 
+        // Find test suites that contains this test case, if found any, display a confirmation dialog
         if (meta?.testSuites) {
             relatedTestSuiteRelPaths = meta.testSuites
                 .filter((suiteFile) => suiteFile.content.testcases.some((tcId) => tcId === testCase?.content.id))
@@ -163,20 +237,18 @@
                     const suiteFileRelPath = suiteFileFullPath.replace(suitesFolder, '').substring(1);
                     return suiteFileRelPath.replaceAll(uiContext.pathSeparator, NodeInfo.PATH_SEPARATOR);
                 });
-        }
 
-        console.log('generateProjectMetadata', meta);
-        console.log('testCase', testCase);
-        console.log('relatedTestSuiteRelPaths', relatedTestSuiteRelPaths);
-        showDeleteTestCaseDialog = true;
+            if (relatedTestSuiteRelPaths.length > 0) {
+                showDeleteTestCaseDialog = true;
+                return;
+            }
+        }
+        // No suite contains this test case, delete it immediately
+        handleMenuDeleteFile();
     };
 
-    const handleMenuDelete = async () => {
-        if (type === FileType.TCase) {
-            await handleDeleteTestCase();
-            return;
-        }
-
+    /** Handle deleting a file */
+    const handleMenuDeleteFile = async () => {
         const response = await fileSystem.deleteFileSystem(fileSystemPath);
         if (!response.isSuccess) {
             if (response.errorMessage) {
@@ -191,10 +263,15 @@
         }
 
         // This is 'File', let's find related tab to close
-        const tabIndex = $appState.tabs.findIndex((t) => t.id === nodePath);
-        if (tabIndex >= 0) {
-            appStateDispatch({ type: AppActionType.CloseTab, tabIndex: tabIndex });
+        closeEditorTab();
+    };
+
+    const handleMenuDelete = async () => {
+        if (type === FileType.TCase) {
+            await handleMenuDeleteTestCase();
+            return;
         }
+        await handleMenuDeleteFile();
     };
 
     const cancelNew = () => {
@@ -343,6 +420,5 @@
 <DeleteTestCaseDialog
     bind:showDialog={showDeleteTestCaseDialog}
     {relatedTestSuiteRelPaths}
-    testCaseFilePath={fileSystemPath}
-    {nodePath}
+    on:deleteConfirmed={doDeleteTestCase}
 />

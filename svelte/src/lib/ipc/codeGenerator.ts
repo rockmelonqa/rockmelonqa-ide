@@ -55,7 +55,7 @@ const generateProjectMetadata = async (
     projFile: IRmProjFile,
     options?: { apiKey?: string }
 ): Promise<ISourceProjectMeta | null> => {
-    const response = await getApi(options?.apiKey).invoke('generateSourceProjectMeta', projFile);
+    const response = await getApi(options?.apiKey).invoke('generateSourceProjectMetadata', projFile);
     if (response.isSuccess) {
         return response.data;
     } else {
