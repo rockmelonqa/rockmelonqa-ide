@@ -1,4 +1,4 @@
-import { ITestSuitesMetadata } from "./codegen/playwright-charp/testSuiteMetadata";
+import { IOutputProjectMetadata } from "./codegen/playwright-charp/outputProjectMetadata";
 import {
   ActionType,
   AutomationFramework,
@@ -76,7 +76,7 @@ export {
   ITestStep,
   ITestSuite,
   ITestSuiteFile,
-  ITestSuitesMetadata,
+  IOutputProjectMetadata as ITestSuitesMetadata,
   IUserSettings,
   IUserSettingsFile,
   IWriteFileRequest,

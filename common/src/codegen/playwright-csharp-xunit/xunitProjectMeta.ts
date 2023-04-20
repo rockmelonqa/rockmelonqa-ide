@@ -1,13 +1,13 @@
 import { ICodeGenMeta, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import {
+  IOutProjMeta,
   createMapForPages,
   createMapForTestCases,
   createMapForTestRoutines,
   createMapForTestSuites,
-  IOutProjMeta,
 } from "../playwright-charp/outProjMeta";
-import { ITestSuitesMetadata } from "../playwright-charp/testSuiteMetadata";
+import { IOutputProjectMetadata } from "../playwright-charp/outputProjectMetadata";
 import { IOutputFileFileInfo, ISuiteInfo, ITestCaseInfo } from "../types";
 
 export class XUnitProjectMeta implements IOutProjMeta {
@@ -31,7 +31,7 @@ export class XUnitProjectMeta implements IOutProjMeta {
     this.routineNameMap = createMapForTestRoutines(rmprojFile, codegenMeta.testRoutines);
   }
 
-  public createSuitesMeta(): ITestSuitesMetadata {
+  public createSuitesMeta(): IOutputProjectMetadata {
     const suites: ISuiteInfo[] = [];
 
     for (let { content: testsuite, isValid } of this._projMeta.testSuites) {

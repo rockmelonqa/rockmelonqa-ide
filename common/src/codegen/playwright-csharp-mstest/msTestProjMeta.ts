@@ -1,13 +1,13 @@
 import { ICodeGenMeta, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import {
+  IOutProjMeta,
   createMapForPages,
   createMapForTestCases,
   createMapForTestRoutines,
   createMapForTestSuites,
-  IOutProjMeta,
 } from "../playwright-charp/outProjMeta";
-import { ITestSuitesMetadata } from "../playwright-charp/testSuiteMetadata";
+import { IOutputProjectMetadata } from "../playwright-charp/outputProjectMetadata";
 import { IOutputFileFileInfo, ISuiteInfo, ITestCaseInfo } from "../types";
 
 /** MsTest project meta: Contains info of all files and other resources */
@@ -32,7 +32,7 @@ export class MsTestProjMeta implements IOutProjMeta {
     this.verifyDuplication();
   }
 
-  public createSuitesMeta(): ITestSuitesMetadata {
+  public createSuitesMeta(): IOutputProjectMetadata {
     const suites: ISuiteInfo[] = [];
 
     for (let { content: testsuite } of this._projMeta.testSuites) {

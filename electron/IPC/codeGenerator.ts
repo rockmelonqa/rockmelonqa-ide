@@ -14,7 +14,7 @@ import {
     StandardFolder,
 } from 'rockmelonqa.common';
 import { ITestSuitesMetadata } from 'rockmelonqa.common/codegen/playwright-charp/testSuiteMetadata';
-import { StandardOutputFile } from 'rockmelonqa.common/file-defs';
+import { ICodeGenMeta, StandardOutputFile } from 'rockmelonqa.common/file-defs';
 import * as fileSystem from '../utils/fileSystem';
 import { StringBuilder } from '../utils/stringBuilder';
 import {
@@ -236,7 +236,7 @@ async function generateProjectMetadata(
     browserWindow: BrowserWindow,
     event: Electron.IpcMainEvent,
     projectFile: IRmProjFile
-): Promise<IIpcGenericResponse<ITestSuitesMetadata>> {
+): Promise<IIpcGenericResponse<ICodeGenMeta>> {
     try {
         const actionRs = await genProjectMetadata(projectFile);
         return { isSuccess: true, data: actionRs.data } as IIpcResponse;
