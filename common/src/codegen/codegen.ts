@@ -7,8 +7,8 @@ import fse from "fs-extra";
 import path from "path";
 
 import {
-  ICodeGenMeta,
   IRmProjFile,
+  ISourceProjectMeta,
   ITestRoutine,
   ITestRoutineFile,
   ITestSuite,
@@ -156,7 +156,7 @@ export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: (eve
 export const createCodeGenMeta = async (
   rmprojFile: IRmProjFile,
   progressNotify?: (event: IProgressEvent) => void
-): Promise<ICodeGenMeta> => {
+): Promise<ISourceProjectMeta> => {
   const notify = (event: IProgressEvent) => progressNotify && progressNotify(event);
 
   // Print out information about the context
@@ -252,7 +252,7 @@ export const createCodeGenMeta = async (
 
   let routines: ITestRoutineFile[] = [];
 
-  let projMeta: ICodeGenMeta = {
+  let projMeta: ISourceProjectMeta = {
     project: rmprojFile,
     pages: pages,
     testCases: cases,

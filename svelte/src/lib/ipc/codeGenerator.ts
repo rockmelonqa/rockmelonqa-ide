@@ -1,5 +1,11 @@
-import type { Action, ICodeGenMeta, IIpcGenericResponse, IProgressDetail, IRmProjFile } from 'rockmelonqa.common';
-import type { ITestSuitesMetadata } from 'rockmelonqa.common/codegen/playwright-charp/testSuiteMetadata';
+import type {
+    Action,
+    IIpcGenericResponse,
+    IOutputProjectMetadata,
+    IProgressDetail,
+    IRmProjFile,
+} from 'rockmelonqa.common';
+import type { ISourceProjectMeta } from 'rockmelonqa.common/file-defs/sourceProjectMeta';
 import { DefaultApiKey } from './shared';
 
 const nameAPI = 'codeGenerator';
@@ -48,33 +54,33 @@ const prerequire = async (rmprojFile: IRmProjFile, options?: { apiKey?: string }
 const generateProjectMetadata = async (
     projFile: IRmProjFile,
     options?: { apiKey?: string }
-): Promise<ICodeGenMeta | null> => {
-    const response = await getApi(options?.apiKey).invoke('generateProjectMetadata', projFile);
+): Promise<ISourceProjectMeta | null> => {
+    const response = await getApi(options?.apiKey).invoke('generateSourceProjectMeta', projFile);
     if (response.isSuccess) {
         return response.data;
     } else {
-        console.error(`Cannot generate codegen metadata. ${response.errorMessage}`);
+        console.error(`Cannot generate source project metadata. ${response.errorMessage}`);
         return null;
     }
 };
 
 /** Get metadata of all test suites */
-const getSuitesMetadata = async (
+const getOutputProjectMetadata = async (
     projFile: IRmProjFile,
     options?: { apiKey?: string }
-): Promise<ITestSuitesMetadata> => {
-    const response = await getApi(options?.apiKey).invoke('getSuitesMetadata', projFile);
+): Promise<IOutputProjectMetadata> => {
+    const response = await getApi(options?.apiKey).invoke('getOutputProjectMetadata', projFile);
     if (response.isSuccess) {
         return response.data;
     } else {
-        console.error(`Cannot get suites metadata. ${response.errorMessage}`);
+        console.error(`Cannot get output project metadata. ${response.errorMessage}`);
         return { suites: [] };
     }
 };
 
 export const codeGenerator = {
     genCode,
-    getSuitesMetadata,
+    getOutputProjectMetadata,
     generateProjectMetadata,
     onBuild,
     onCleanFolder,

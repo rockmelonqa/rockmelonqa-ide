@@ -13,14 +13,14 @@ import {
     Language,
     StandardFolder,
 } from 'rockmelonqa.common';
-import { ITestSuitesMetadata } from 'rockmelonqa.common/codegen/playwright-charp/testSuiteMetadata';
-import { ICodeGenMeta, StandardOutputFile } from 'rockmelonqa.common/file-defs';
+import { IOutputProjectMetadata } from 'rockmelonqa.common/codegen/playwright-charp/outputProjectMetadata';
+import { StandardOutputFile } from 'rockmelonqa.common/file-defs';
 import * as fileSystem from '../utils/fileSystem';
 import { StringBuilder } from '../utils/stringBuilder';
 import {
     IActionResult,
     extractMajorMinorVersion,
-    generateProjectMetadata as genProjectMetadata,
+    generateProjectMetadata as genSourceProjectMetadata,
     generateCode,
 } from '../worker/actions';
 import { buildCode } from '../worker/actions/buildCode';
@@ -34,8 +34,8 @@ const validSendChannel: IChannels = { genCode: genCode };
 
 const validInvokeChannel: IChannels = {
     prerequire: prerequire,
-    getSuitesMetadata: getSuitesMetadata,
-    generateProjectMetadata: generateProjectMetadata,
+    getSuitesMetadata: getOutputProjectMetadata,
+    generateProjectMetadata: generateSourceProjectMetadata,
 };
 
 // from Main
@@ -201,7 +201,7 @@ async function genCode(browserWindow: BrowserWindow, event: Electron.IpcMainEven
                 StandardFolder.OutputCode,
                 StandardOutputFile.MetaData
             );
-            const metaData = JSON.parse(await fileSystem.readFile(metaFilePath)) as ITestSuitesMetadata;
+            const metaData = JSON.parse(await fileSystem.readFile(metaFilePath)) as IOutputProjectMetadata;
             metaData.error = { message: actionRs.errorMessage ?? 'Unknown error' };
             await fileSystem.writeFile(metaFilePath, JSON.stringify(metaData, null, 2));
         }
@@ -232,24 +232,24 @@ async function genCode(browserWindow: BrowserWindow, event: Electron.IpcMainEven
     }
 }
 
-async function generateProjectMetadata(
+async function generateSourceProjectMetadata(
     browserWindow: BrowserWindow,
     event: Electron.IpcMainEvent,
     projectFile: IRmProjFile
-): Promise<IIpcGenericResponse<ICodeGenMeta>> {
+): Promise<IIpcGenericResponse<IOutputProjectMetadata>> {
     try {
-        const actionRs = await genProjectMetadata(projectFile);
+        const actionRs = await genSourceProjectMetadata(projectFile);
         return { isSuccess: true, data: actionRs.data } as IIpcResponse;
     } catch (error) {
         return { isSuccess: false, errorMessage: 'Cannot generate suites metadata: ' + error };
     }
 }
 
-async function getSuitesMetadata(
+async function getOutputProjectMetadata(
     browserWindow: BrowserWindow,
     event: Electron.IpcMainEvent,
     projectFile: IRmProjFile
-): Promise<IIpcGenericResponse<ITestSuitesMetadata>> {
+): Promise<IIpcGenericResponse<IOutputProjectMetadata>> {
     try {
         const metaFilePath = path.join(projectFile.folderPath, StandardFolder.OutputCode, StandardOutputFile.MetaData);
         const content = fs.readFileSync(metaFilePath, 'utf-8');

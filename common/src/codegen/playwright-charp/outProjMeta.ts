@@ -4,8 +4,8 @@ import { IOutputFileFileInfo } from "../types";
 import { createCsharpFileMeta } from "./createCsharpFileMeta";
 import { IOutputProjectMetadata } from "./outputProjectMetadata";
 
-export interface IOutProjMeta {
-  createSuitesMeta: () => IOutputProjectMetadata;
+export interface IOutputProjMetaGenerator {
+  generateOutputProjectMeta: () => IOutputProjectMetadata;
 }
 
 export const createMapForPages = (proj: IRmProjFile, pageFiles: IPageFile[]): Map<IPage, IOutputFileFileInfo> => {
