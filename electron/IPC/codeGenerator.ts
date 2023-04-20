@@ -1,8 +1,8 @@
-import { exec } from "child_process";
-import { BrowserWindow } from "electron";
-import fs from "fs";
-import moment from "moment";
-import path from "path";
+import { exec } from 'child_process';
+import { BrowserWindow } from 'electron';
+import fs from 'fs';
+import moment from 'moment';
+import path from 'path';
 
 import {
     IIpcGenericResponse,
@@ -12,22 +12,22 @@ import {
     IRmProjFile,
     Language,
     StandardFolder,
-} from "rockmelonqa.common";
-import { ITestSuitesMetadata } from "rockmelonqa.common/codegen/playwright-charp/testSuiteMetadata";
-import { StandardOutputFile } from "rockmelonqa.common/file-defs";
-import * as fileSystem from "../utils/fileSystem";
-import { StringBuilder } from "../utils/stringBuilder";
+} from 'rockmelonqa.common';
+import { ITestSuitesMetadata } from 'rockmelonqa.common/codegen/playwright-charp/testSuiteMetadata';
+import { StandardOutputFile } from 'rockmelonqa.common/file-defs';
+import * as fileSystem from '../utils/fileSystem';
+import { StringBuilder } from '../utils/stringBuilder';
 import {
     IActionResult,
     extractMajorMinorVersion,
     generateProjectMetadata as genProjectMetadata,
-    genCode as generateCode,
-} from "../worker/actions";
-import { buildCode } from "../worker/actions/buildCode";
-import { IChannels } from "./core/channelsInterface";
-import IPC from "./core/ipc";
+    generateCode,
+} from '../worker/actions';
+import { buildCode } from '../worker/actions/buildCode';
+import { IChannels } from './core/channelsInterface';
+import IPC from './core/ipc';
 
-const nameAPI = "codeGenerator";
+const nameAPI = 'codeGenerator';
 
 // to Main
 const validSendChannel: IChannels = { genCode: genCode };
@@ -40,13 +40,13 @@ const validInvokeChannel: IChannels = {
 
 // from Main
 const validReceiveChannel: string[] = [
-    "gen-code:validate-input",
-    "gen-code:parse-data",
-    "gen-code:clean-folder",
-    "gen-code:generate-code",
-    "build:build",
-    "build:install-dependencies",
-    "finish",
+    'gen-code:validate-input',
+    'gen-code:parse-data',
+    'gen-code:clean-folder',
+    'gen-code:generate-code',
+    'build:build',
+    'build:install-dependencies',
+    'finish',
 ];
 
 const codeGenearator = new IPC({
@@ -72,14 +72,14 @@ async function prerequire(
             const [dotnet, pwsh] = await Promise.all([detectDotnet(6), detectPwsh()]);
             const invalidPrerequisites = [];
             if (!dotnet) {
-                invalidPrerequisites.push("dotnet");
+                invalidPrerequisites.push('dotnet');
             }
             if (!pwsh) {
-                invalidPrerequisites.push("pwsh");
+                invalidPrerequisites.push('pwsh');
             }
             return invalidPrerequisites;
         case Language.Typescript:
-            return (await detectNode(16.16)) ? [] : ["node"];
+            return (await detectNode(16.16)) ? [] : ['node'];
         default:
             return [];
     }
@@ -91,7 +91,7 @@ async function prerequire(
  */
 async function detectDotnet(miniumVersion: number): Promise<boolean> {
     return await new Promise<boolean>((rs, _) => {
-        const cmd = "dotnet --version";
+        const cmd = 'dotnet --version';
         exec(cmd, (error, stdout, stderr) => {
             if (error) {
                 console.error(`Error (${cmd}): ${error.message}`);
@@ -121,7 +121,7 @@ async function detectDotnet(miniumVersion: number): Promise<boolean> {
  */
 async function detectNode(miniumVersion: number): Promise<boolean> {
     return await new Promise<boolean>((rs, _) => {
-        const cmd = "node -v";
+        const cmd = 'node -v';
         exec(cmd, (error, stdout, stderr) => {
             if (error) {
                 console.error(`Error (${cmd}): ${error.message}`);
@@ -151,7 +151,7 @@ async function detectNode(miniumVersion: number): Promise<boolean> {
 
 async function detectPwsh(): Promise<boolean> {
     return await new Promise<boolean>((rs, _) => {
-        exec("pwsh --version", (error, stdout, stderr) => {
+        exec('pwsh --version', (error, stdout, stderr) => {
             if (error) {
                 rs(false);
             } else if (stderr) {
@@ -202,7 +202,7 @@ async function genCode(browserWindow: BrowserWindow, event: Electron.IpcMainEven
                 StandardOutputFile.MetaData
             );
             const metaData = JSON.parse(await fileSystem.readFile(metaFilePath)) as ITestSuitesMetadata;
-            metaData.error = { message: actionRs.errorMessage ?? "Unknown error" };
+            metaData.error = { message: actionRs.errorMessage ?? 'Unknown error' };
             await fileSystem.writeFile(metaFilePath, JSON.stringify(metaData, null, 2));
         }
     } catch (err) {
@@ -216,19 +216,19 @@ async function genCode(browserWindow: BrowserWindow, event: Electron.IpcMainEven
 
     // Print log file
     try {
-        sb.appendLine(`*** Finish at ${moment().format("MMMM Do YYYY, h:mm:ss a")}`);
+        sb.appendLine(`*** Finish at ${moment().format('MMMM Do YYYY, h:mm:ss a')}`);
         sb.appendLine(JSON.stringify(ipcRs, null, 4));
 
         const logsFolder = path.join(rmprojFile.folderPath, StandardFolder.Logs);
         await fileSystem.createFoler(logsFolder);
 
-        const logFileName = `gen-code.${moment(startTime).format("YYYYMMDD_HHmmss")}.log`;
+        const logFileName = `gen-code.${moment(startTime).format('YYYYMMDD_HHmmss')}.log`;
         const logFilePath = path.join(logsFolder, logFileName);
         await fileSystem.writeFile(logFilePath, sb.toString());
 
         ipcRs.data = { logFile: path.join(StandardFolder.Logs, logFileName) };
     } finally {
-        browserWindow.webContents.send("finish", ipcRs);
+        browserWindow.webContents.send('finish', ipcRs);
     }
 }
 
@@ -241,7 +241,7 @@ async function generateProjectMetadata(
         const actionRs = await genProjectMetadata(projectFile);
         return { isSuccess: true, data: actionRs.data } as IIpcResponse;
     } catch (error) {
-        return { isSuccess: false, errorMessage: "Cannot generate suites metadata: " + error };
+        return { isSuccess: false, errorMessage: 'Cannot generate suites metadata: ' + error };
     }
 }
 
@@ -252,10 +252,10 @@ async function getSuitesMetadata(
 ): Promise<IIpcGenericResponse<ITestSuitesMetadata>> {
     try {
         const metaFilePath = path.join(projectFile.folderPath, StandardFolder.OutputCode, StandardOutputFile.MetaData);
-        const content = fs.readFileSync(metaFilePath, "utf-8");
+        const content = fs.readFileSync(metaFilePath, 'utf-8');
         const metaData = JSON.parse(content);
         return { isSuccess: true, data: metaData } as IIpcResponse;
     } catch (error) {
-        return { isSuccess: false, errorMessage: "Cannot get suites metadata: " + error };
+        return { isSuccess: false, errorMessage: 'Cannot get suites metadata: ' + error };
     }
 }
