@@ -7,7 +7,6 @@
   import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
   import { StandardFolder, type ITestSuite, type ITestCase } from "rockmelonqa.common";
   import { createEventDispatcher, getContext, onDestroy, onMount } from "svelte";
-  import Node from "./RunTestDialog/Node.svelte";
   import { fileSystem } from "$lib/ipc";
 
   let uiContext = getContext(uiContextKey) as IUiContext;
@@ -69,12 +68,12 @@
                     text-left shadow-xl transform transition-all max-w-xl w-full"
         >
           <div class="modal-title text-xl leading-6 font-bold mb-8">
-            {uiContext.str(stringResKeys.deleteTestCaseDialog.deleteTestCase)}
+            {uiContext.str(stringResKeys.deleteTestCaseConfirmationDialog.dialogTitle)}
           </div>
           <div class="modal-content mb-8 flex flex-col gap-y-4">
             {#if suiteRelPaths.length}
               <div>
-                {uiContext.str(stringResKeys.deleteTestCaseDialog.relatedSuitesMessage)}
+                {uiContext.str(stringResKeys.deleteTestCaseConfirmationDialog.relatedSuitesMessage)}
               </div>
               <ul class="list-disc list-inside">
                 {#each suiteRelPaths as relatedSuite}

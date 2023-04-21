@@ -67,9 +67,9 @@ export const stringResEn: IStringRes = {
         thousandsDelimeter: ',',
         timeFormat: 'hh:mm:ss a',
     },
-    deleteTestCaseDialog: {
-        deleteTestCase: 'Delete test case',
-        relatedSuitesMessage: 'Test Case will be removed from Test Suites:',
+    deleteTestCaseConfirmationDialog: {
+        dialogTitle: 'Delete test case',
+        relatedSuitesMessage: 'Test case is being used by following test suites. Do you want to remove it?',
     },
     form: {
         invalidDateError: 'Invalid date',
