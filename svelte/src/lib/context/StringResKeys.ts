@@ -42,9 +42,9 @@ export const stringResKeys = {
         thousandsDelimeter: 'culture.thousandsDelimeter',
         timeFormat: 'culture.timeFormat',
     },
-    deleteTestCaseDialog: {
-        deleteTestCase: 'deleteTestCaseDialog.deleteTestCase',
-        relatedSuitesMessage: 'deleteTestCaseDialog.relatedSuitesMessage',
+    deleteTestCaseConfirmationDialog: {
+        dialogTitle: 'deleteTestCaseConfirmationDialog.dialogTitle',
+        relatedSuitesMessage: 'deleteTestCaseConfirmationDialog.relatedSuitesMessage',
     },
     form: {
         invalidDateError: 'form.invalidDateError',

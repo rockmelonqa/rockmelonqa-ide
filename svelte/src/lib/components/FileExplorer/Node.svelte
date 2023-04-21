@@ -4,7 +4,6 @@
   
   import { codeGenerator, fileSystem } from "$lib/ipc";
   import type { IFileInfo } from "$lib/models";
-  import { StandardFolder, type ITestCase, type ITestSuite } from "rockmelonqa.common";
   import { getContext } from "svelte";
   import { getEditor } from "../Editors/Editor";
   import FileIcon from "../FileIcon.svelte";
@@ -16,7 +15,7 @@
   import MenuItem from "./MenuItem.svelte";
   import { buildChildrenNodes, combinePath, extractPath, Node as NodeInfo, showMenuAt, toFileSystemPath } from "./Node";
   import NodeEditor from "./NodeEditor.svelte";
-  import DeleteTestCaseDialog from "$lib/dialogs/DeleteTestCaseDialog.svelte";
+  import DeleteTestCaseConfirmationDialog from "$lib/dialogs/DeleteTestCaseConfirmationDialog.svelte";
 
   export let node: NodeInfo;
   export let level: number = 0;
@@ -366,7 +365,7 @@
   </Menu>
 {/if}
 
-<DeleteTestCaseDialog
+<DeleteTestCaseConfirmationDialog
   bind:showDialog={showDeleteTestCaseDialog}
   testCaseFilePath={testCasePathToDelete}
   suiteFilePaths={relatedTestSuitePaths}
