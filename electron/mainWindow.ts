@@ -4,6 +4,7 @@ import path from "path";
 import applicationMenu from "./applicationMenu";
 import ConfigureDev, { DeveloperOptions } from "./configureDev";
 
+import { isWindowMaximize, setWindowMaximize, setWindowMinimize } from './utils/electronStore';
 const appName = "Rockmelon QA";
 const localHost = "http://localhost:7011";
 
@@ -91,7 +92,20 @@ class Main {
       }
     }
 
-    window.maximize();
+    if(isWindowMaximize()) {
+      window.maximize();
+    } else {
+      window.minimize();
+    }
+
+    window.on('maximize', () => {
+      setWindowMaximize();
+    });
+
+    window.on('minimize', () => {
+      setWindowMinimize();
+    });
+
     window.show();
 
     return window;
