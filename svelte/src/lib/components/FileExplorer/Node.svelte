@@ -118,6 +118,7 @@
     };
 
     const handleMenuNew = async (isDir: boolean) => {
+        debugger;
         addMode = true;
         typeToAdd = isDir ? FileType.Folder : FileType.File;
     };
@@ -156,6 +157,22 @@
     };
 
     const submitNew = async (e: any) => {
+        // after creating new file/folder, we want to expand parent node if it was collapsed
+        // must do it here, because FileExplorer-addNode cannot distinguish event from ide or from Windows Explorer
+        // let's expand it with current child nodes and leave FileExplorer-addNode handles new node event later
+        if (!node.expanded) {
+            if (hasChildren && children == null) {
+                node.setChildren(NodeInfo.sort(await buildChildrenNodes(fileSystemPath)));
+            }
+
+            appStateDispatch({
+                type: AppActionType.UpdateFile,
+                nodePath: nodePath,
+                value: { expanded: true, hasChildren: node.hasChildren, children: node.children ?? []},
+            });
+        }
+        
+        // create file or folder
         const { value } = e.detail;
         if (value) {
             const newPath = fileSystemPath + uiContext.pathSeparator + value;
@@ -166,6 +183,7 @@
             }
         }
 
+        // turn of add mode
         addMode = false;
     };
 
