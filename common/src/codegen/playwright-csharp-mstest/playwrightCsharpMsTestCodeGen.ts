@@ -1,6 +1,6 @@
 import { EOL } from "os";
 import path from "path";
-import { ActionType, ICodeGenMeta, IRmProjFile, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
+import { ActionType, IRmProjFile, ISourceProjectMeta, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { createCodeGenMeta } from "../codegen";
@@ -12,7 +12,7 @@ import { MsTestProjMeta } from "./msTestProjMeta";
 import { PlaywrightCsharpMsTestTemplatesProvider } from "./playwrightCsharpMsTestTemplatesProvider";
 
 export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
-  private _projMeta: ICodeGenMeta;
+  private _projMeta: ISourceProjectMeta;
   private _rmprojFile: IRmProjFile;
   private _rootNamespace: string;
   private _templateProvider: PlaywrightCsharpMsTestTemplatesProvider;
@@ -27,7 +27,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
   /**
    * Constructor
    */
-  constructor(projMeta: ICodeGenMeta) {
+  constructor(projMeta: ISourceProjectMeta) {
     const rmprojFile = projMeta.project;
 
     this._projMeta = projMeta;
@@ -123,7 +123,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     // Write suites meta
     const inProjMeta = await createCodeGenMeta(this._rmprojFile);
     const outProjMeta = CodeGenMetaFactory.newInstance(inProjMeta);
-    const data = outProjMeta.createSuitesMeta();
+    const data = outProjMeta.generateOutputProjectMeta();
     await writeFile(StandardOutputFile.MetaData, JSON.stringify(data, null, 2));
 
     return "";
@@ -206,7 +206,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
   }
 
   generateTestSuite(testSuite: ITestSuite, testcases: ITestCase[]) {
-    var testcaseMethods: string[]  = [];
+    var testcaseMethods: string[] = [];
     var usingDirectives: string[] = [];
 
     for (let testcaseId of testSuite.testcases) {

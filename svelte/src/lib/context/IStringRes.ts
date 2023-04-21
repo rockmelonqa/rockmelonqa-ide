@@ -5,6 +5,7 @@ export interface IStringRes {
     actionType: IActionTypeStringRes;
     application: IApplicationStringRes;
     codeGenerationDialog: ICodeGenerationDialogStringRes;
+    deleteTestCaseDialog: IDeleteTestCaseDialogStringRes;
     culture: ICultureStringRes;
     form: IFormStringRes;
     general: IGeneralStringRes;
@@ -54,6 +55,11 @@ export interface IActionTypeStringRes {
 
 export interface IApplicationStringRes {
     name: string;
+}
+
+export interface IDeleteTestCaseDialogStringRes {
+    deleteTestCase: string;
+    relatedSuitesMessage: string;
 }
 
 export interface ICodeGenerationDialogStringRes {

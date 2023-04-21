@@ -1,3 +1,4 @@
-export * from "./buildCode";
-export * from "./genCode";
-export * from "./shared";
+export * from './buildCode';
+export * from './generateCode';
+export * from './generateProjectMetadata';
+export * from './shared';

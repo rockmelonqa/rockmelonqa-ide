@@ -2,10 +2,10 @@ import { IRmProjFile, ITestCase, ITestCaseFile, ITestRoutine, ITestRoutineFile, 
 import { IPage, IPageFile } from "../../file-defs/pageFile";
 import { IOutputFileFileInfo } from "../types";
 import { createCsharpFileMeta } from "./createCsharpFileMeta";
-import { ITestSuitesMetadata } from "./testSuiteMetadata";
+import { IOutputProjectMetadata } from "./outputProjectMetadata";
 
-export interface IOutProjMeta {
-  createSuitesMeta: () => ITestSuitesMetadata;
+export interface IOutputProjMetaGenerator {
+  generateOutputProjectMeta: () => IOutputProjectMetadata;
 }
 
 export const createMapForPages = (proj: IRmProjFile, pageFiles: IPageFile[]): Map<IPage, IOutputFileFileInfo> => {
