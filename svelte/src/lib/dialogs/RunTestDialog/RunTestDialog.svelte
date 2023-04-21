@@ -210,6 +210,7 @@
                 setting: {
                     browser: model.browser,
                     dotnetFilterStr: filter,
+                    outputCodeDir: ""
                 },
             });
         } else {

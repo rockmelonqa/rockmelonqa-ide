@@ -1,25 +1,25 @@
-import { ICodeGenMeta, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
+import { ISourceProjectMeta, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import {
+  IOutputProjMetaGenerator,
   createMapForPages,
   createMapForTestCases,
   createMapForTestRoutines,
   createMapForTestSuites,
-  IOutProjMeta,
 } from "../playwright-charp/outProjMeta";
-import { ITestSuitesMetadata } from "../playwright-charp/testSuiteMetadata";
+import { IOutputProjectMetadata } from "../playwright-charp/outputProjectMetadata";
 import { IOutputFileFileInfo, ISuiteInfo, ITestCaseInfo } from "../types";
 
 /** MsTest project meta: Contains info of all files and other resources */
-export class MsTestProjMeta implements IOutProjMeta {
-  private _projMeta: ICodeGenMeta;
+export class MsTestProjMeta implements IOutputProjMetaGenerator {
+  private _projMeta: ISourceProjectMeta;
 
   public readonly pageMetaMap: Map<IPage, IOutputFileFileInfo> = new Map<IPage, IOutputFileFileInfo>();
   public readonly suiteMetaMap: Map<ITestSuite, IOutputFileFileInfo> = new Map<ITestSuite, IOutputFileFileInfo>();
   public readonly caseMetaMap: Map<ITestCase, IOutputFileFileInfo> = new Map<ITestCase, IOutputFileFileInfo>();
   public readonly routineMetaMap: Map<ITestRoutine, IOutputFileFileInfo> = new Map<ITestRoutine, IOutputFileFileInfo>();
 
-  constructor(codegenMeta: ICodeGenMeta) {
+  constructor(codegenMeta: ISourceProjectMeta) {
     this._projMeta = codegenMeta;
 
     const rmprojFile = codegenMeta.project;
@@ -32,7 +32,7 @@ export class MsTestProjMeta implements IOutProjMeta {
     this.verifyDuplication();
   }
 
-  public createSuitesMeta(): ITestSuitesMetadata {
+  public generateOutputProjectMeta(): IOutputProjectMetadata {
     const suites: ISuiteInfo[] = [];
 
     for (let { content: testsuite } of this._projMeta.testSuites) {

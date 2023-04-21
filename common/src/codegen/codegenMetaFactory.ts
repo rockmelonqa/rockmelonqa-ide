@@ -1,5 +1,5 @@
-import { AutomationFramework, ICodeGenMeta, TestFramework } from "../file-defs";
-import { IOutProjMeta } from "./playwright-charp/outProjMeta";
+import { AutomationFramework, ISourceProjectMeta, TestFramework } from "../file-defs";
+import { IOutputProjMetaGenerator } from "./playwright-charp/outProjMeta";
 import { MsTestProjMeta } from "./playwright-csharp-mstest/msTestProjMeta";
 import { NunitProjectMeta } from "./playwright-csharp-nunit/nunitProjectMeta";
 import { XUnitProjectMeta } from "./playwright-csharp-xunit/xunitProjectMeta";
@@ -16,7 +16,7 @@ const codegenMetaRegisty: { [key in keyof typeof AutomationFramework]?: { [key i
 
 export class CodeGenMetaFactory {
   /** Creates new instance of Codegen based on  { automationFramework, testFramework }*/
-  static newInstance(projMeta: ICodeGenMeta): IOutProjMeta {
+  static newInstance(projMeta: ISourceProjectMeta): IOutputProjMetaGenerator {
     let automationFramework = codegenMetaRegisty[projMeta.project.content.automationFramework];
 
     if (automationFramework === undefined) {
