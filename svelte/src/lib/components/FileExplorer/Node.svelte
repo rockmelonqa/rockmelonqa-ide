@@ -118,7 +118,6 @@
     };
 
     const handleMenuNew = async (isDir: boolean) => {
-        debugger;
         addMode = true;
         typeToAdd = isDir ? FileType.Folder : FileType.File;
     };
