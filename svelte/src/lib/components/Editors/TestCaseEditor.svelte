@@ -295,6 +295,24 @@
         dispatchChange();
     };
 
+    const handleAddStepFromIndex = (index: number) => {
+        listDataDispatch({
+            type: ListDataActionType.AppendItemAtIndex,
+            item: {
+                id: uuidv4(),
+                type: 'testStep',
+                name: '',
+                description: '',
+                data: '',
+            } as ITestStep,
+            hasMoreItems: false,
+            index: index + 1 // insert a line item directly after an existing item
+        });
+
+        dispatchChange();
+    };
+
+
     const handleAddComment = () => {
         listDataDispatch({
             type: ListDataActionType.AppendItems,
@@ -304,6 +322,17 @@
 
         dispatchChange();
     };
+
+    const handleAddCommentFromIndex = (index: number) => {
+        listDataDispatch({
+            type: ListDataActionType.AppendItemAtIndex,
+            item: { id: uuidv4(), type: 'comment', comment: '' } as ITestStep,
+            hasMoreItems: false,
+            index: index + 1 // insert a line item directly after an existing item
+        });
+
+        dispatchChange();
+    }
 </script>
 
 <div class="test-case-editor p-8">
@@ -390,6 +419,21 @@
                         </ListTableBodyCell>
                     {/if}
                     <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">
+                        {#if isComment(item)}
+                            <IconLinkButton
+                                on:click={() => handleAddCommentFromIndex(index)}
+                                title={uiContext.str(stringResKeys.general.add)}
+                            >
+                                <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
+                            </IconLinkButton>
+                        {:else}
+                            <IconLinkButton
+                            on:click={() => handleAddStepFromIndex(index)}
+                            title={uiContext.str(stringResKeys.general.add)}
+                            >
+                                <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
+                            </IconLinkButton>
+                        {/if}
                         <IconLinkButton
                             on:click={() => handleDeleteClick(index)}
                             title={uiContext.str(stringResKeys.general.delete)}
