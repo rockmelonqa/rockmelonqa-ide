@@ -1,6 +1,6 @@
 import { IRmProjFile } from 'rockmelonqa.common';
 import { parentPort } from 'worker_threads';
-import { doGenerateCode, doGenerateProjectMetadata } from './actions';
+import { doGenerateCode, doGenerateSourceProjectMetadata } from './actions';
 import { doBuildCode } from './actions/buildCode';
 import { IRunTestContext, doRunTest } from './actions/runTest';
 
@@ -23,7 +23,7 @@ parentPort?.on('message', async (msg: WorkerMessage) => {
             await doGenerateCode(parentPort, msg.rmProjectFile);
             return;
         case WorkerAction.GenProjectMetadata:
-            await doGenerateProjectMetadata(parentPort, msg.rmProjectFile);
+            await doGenerateSourceProjectMetadata(parentPort, msg.rmProjectFile);
             return;
         case WorkerAction.BuildCode:
             await doBuildCode(parentPort, msg.rmProjectFile);

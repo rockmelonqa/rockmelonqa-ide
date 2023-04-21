@@ -14,16 +14,16 @@ import {
     StandardFolder,
 } from 'rockmelonqa.common';
 import { IOutputProjectMetadata } from 'rockmelonqa.common/codegen/playwright-charp/outputProjectMetadata';
-import { StandardOutputFile } from 'rockmelonqa.common/file-defs';
+import { ISourceProjectMeta, StandardOutputFile } from 'rockmelonqa.common/file-defs';
 import * as fileSystem from '../utils/fileSystem';
 import { StringBuilder } from '../utils/stringBuilder';
 import {
     IActionResult,
     extractMajorMinorVersion,
-    generateProjectMetadata as genSourceProjectMetadata,
     generateCode,
 } from '../worker/actions';
 import { buildCode } from '../worker/actions/buildCode';
+import { generateSourceProjectMetadata } from '../worker/actions/generateSourceProjectMetadata';
 import { IChannels } from './core/channelsInterface';
 import IPC from './core/ipc';
 
@@ -35,7 +35,7 @@ const validSendChannel: IChannels = { genCode: genCode };
 const validInvokeChannel: IChannels = {
     prerequire: prerequire,
     getOutputProjectMetadata: getOutputProjectMetadata,
-    generateSourceProjectMetadata: generateSourceProjectMetadata,
+    generateSourceProjectMetadata: genSourceProjectMetadata,
 };
 
 // from Main
@@ -232,13 +232,13 @@ async function genCode(browserWindow: BrowserWindow, event: Electron.IpcMainEven
     }
 }
 
-async function generateSourceProjectMetadata(
+async function genSourceProjectMetadata(
     browserWindow: BrowserWindow,
     event: Electron.IpcMainEvent,
     projectFile: IRmProjFile
-): Promise<IIpcGenericResponse<IOutputProjectMetadata>> {
+): Promise<IIpcGenericResponse<ISourceProjectMeta>> {
     try {
-        const actionRs = await genSourceProjectMetadata(projectFile);
+        const actionRs = await generateSourceProjectMetadata(projectFile);
         return { isSuccess: true, data: actionRs.data } as IIpcResponse;
     } catch (error) {
         return { isSuccess: false, errorMessage: `Cannot generate source project metadata: ${error}` };

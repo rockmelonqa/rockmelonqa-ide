@@ -51,7 +51,7 @@ const prerequire = async (rmprojFile: IRmProjFile, options?: { apiKey?: string }
 };
 
 /** Gen metadata of all test suites */
-const generateProjectMetadata = async (
+const generateSourceProjectMetadata = async (
     projFile: IRmProjFile,
     options?: { apiKey?: string }
 ): Promise<ISourceProjectMeta | null> => {
@@ -81,7 +81,7 @@ const getOutputProjectMetadata = async (
 export const codeGenerator = {
     genCode,
     getOutputProjectMetadata,
-    generateProjectMetadata,
+    generateSourceProjectMetadata,
     onBuild,
     onCleanFolder,
     onFinish,

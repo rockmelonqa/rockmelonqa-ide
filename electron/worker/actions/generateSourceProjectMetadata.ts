@@ -7,7 +7,7 @@ import { MessagePort } from 'worker_threads';
 import { WorkerAction, WorkerMessage } from '../worker';
 import { IActionResult } from './shared';
 
-export const generateProjectMetadata = async function (rmprojFile: IRmProjFile): Promise<IActionResult> {
+export const generateSourceProjectMetadata = async function (rmprojFile: IRmProjFile): Promise<IActionResult> {
     return await new Promise<IActionResult>((rs, _) => {
         const workerPath = path.join(__dirname, '../worker.js');
         const worker = new Worker(workerPath);
@@ -30,7 +30,7 @@ export const generateProjectMetadata = async function (rmprojFile: IRmProjFile):
     });
 };
 
-export const doGenerateProjectMetadata = async (port: MessagePort | null, rmProjectFile: IRmProjFile) => {
+export const doGenerateSourceProjectMetadata = async (port: MessagePort | null, rmProjectFile: IRmProjFile) => {
     const meta = await createCodeGenMeta(rmProjectFile, (event: IProgressEvent) => port?.postMessage(event));
 
     port?.postMessage({ type: 'finish', data: meta } as IProgressEvent);

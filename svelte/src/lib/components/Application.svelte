@@ -30,7 +30,6 @@
 
     let showNewProjectDialog: boolean = false;
     let showAboutDialog: boolean = false;
-    let showDeleteTestCaseDialog: boolean = false;
     let showCodeGenerationDialog: boolean = false;
     let showRunTestDialog: boolean = false;
 
