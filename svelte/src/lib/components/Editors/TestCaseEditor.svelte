@@ -332,10 +332,10 @@
                 {uiContext.str(stringResKeys.testCaseEditor.action)}
             </ListTableHeaderCell>
             <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-3/12">
-                {uiContext.str(stringResKeys.testCaseEditor.element)}
+                {uiContext.str(stringResKeys.testCaseEditor.page)}
             </ListTableHeaderCell>
             <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-3/12">
-                {uiContext.str(stringResKeys.testCaseEditor.page)}
+                {uiContext.str(stringResKeys.testCaseEditor.element)}
             </ListTableHeaderCell>
             <ListTableHeaderCell type={ListTableCellType.Last} class="text-left w-3/12">
                 {uiContext.str(stringResKeys.testCaseEditor.data)}
@@ -367,18 +367,18 @@
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Normal}>
                             <FancyDropdownField
-                                name={`${formContext.formName}_${index}_element`}
-                                value={item.element}
-                                options={pageElementsMap.get(item.page) ?? []}
-                                on:change={(event) => handleItemChange(index, 'element', event.detail.value)}
-                            />
-                        </ListTableBodyCell>
-                        <ListTableBodyCell type={ListTableCellType.Normal}>
-                            <FancyDropdownField
                                 name={`${formContext.formName}_${index}_page`}
                                 value={item.page}
                                 options={pageDefinitionOptions}
                                 on:change={(event) => handleSelectPage(index, 'page', event.detail.value)}
+                            />
+                        </ListTableBodyCell>
+                        <ListTableBodyCell type={ListTableCellType.Normal}>
+                            <FancyDropdownField
+                                name={`${formContext.formName}_${index}_element`}
+                                value={item.element}
+                                options={pageElementsMap.get(item.page) ?? []}
+                                on:change={(event) => handleItemChange(index, 'element', event.detail.value)}
                             />
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Last}>
