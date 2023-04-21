@@ -23,7 +23,6 @@
   let uiContext = getContext(uiContextKey) as IUiContext;
   let appContext = getContext(appContextKey) as IAppContext;
   let { state: appState, dispatch: appStateDispatch } = appContext;
-  let showDeleteTestCaseDialog: boolean = false;
 
   $: nodePath = node.toTreePath();
   $: fileSystemPath = toFileSystemPath(nodePath, $appState.projectFile!.folderPath, uiContext.pathSeparator);
@@ -275,6 +274,7 @@
     }
   };
 
+  let showDeleteTestCaseConfirmationDialog: boolean = false;
   let testCasePathToDelete: string = '';
   let relatedTestSuitePaths: string[] = [];
 
@@ -305,7 +305,7 @@
         });
 
       if (relatedTestSuitePaths.length > 0) {
-        showDeleteTestCaseDialog = true;
+        showDeleteTestCaseConfirmationDialog = true;
         return true;
       }
     }
@@ -366,7 +366,7 @@
 {/if}
 
 <DeleteTestCaseConfirmationDialog
-  bind:showDialog={showDeleteTestCaseDialog}
+  bind:showDialog={showDeleteTestCaseConfirmationDialog}
   testCaseFilePath={testCasePathToDelete}
   suiteFilePaths={relatedTestSuitePaths}
   on:deleteConfirmed={doDeleteFile}
