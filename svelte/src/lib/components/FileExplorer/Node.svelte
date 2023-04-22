@@ -16,6 +16,8 @@
   import { buildChildrenNodes, combinePath, extractPath, Node as NodeInfo, showMenuAt, toFileSystemPath } from "./Node";
   import NodeEditor from "./NodeEditor.svelte";
   import DeleteTestCaseConfirmationDialog from "$lib/dialogs/DeleteTestCaseConfirmationDialog.svelte";
+    import { StandardFileExtension, StandardFolder } from "rockmelonqa.common";
+    import { stringResKeys } from "$lib/context/StringResKeys";
 
   export let node: NodeInfo;
   export let level: number = 0;
@@ -189,10 +191,18 @@
     // create file or folder
     const { value } = e.detail;
     if (value) {
-      const newPath = fileSystemPath + uiContext.pathSeparator + value;
+      let newPath = fileSystemPath + uiContext.pathSeparator + value;
       if (typeToAdd === FileType.Folder) {
         fileSystem.createFolder(newPath);
       } else {
+        if(nodePath.startsWith(StandardFolder.PageDefinitions) && !value.endsWith(StandardFileExtension.Page)){
+          newPath += StandardFileExtension.Page;
+        } else if (nodePath.startsWith(StandardFolder.TestCases) && !value.endsWith(StandardFileExtension.TestCase)) {
+          newPath += StandardFileExtension.TestCase;
+        } else if (nodePath.startsWith(StandardFolder.TestSuites) && !value.endsWith(StandardFileExtension.TestSuite)){
+          newPath += StandardFileExtension.TestSuite;
+        }
+                
         await fileSystem.writeFile(newPath, "");
       }
     }
@@ -351,8 +361,16 @@
 {#if showMenu}
   <Menu {...position} on:click={closeMenu} on:clickoutside={closeMenu}>
     {#if type == FileType.Folder}
-      <MenuItem label="New Folder..." on:click={() => handleMenuNew(true)} />
-      <MenuItem label="New File..." on:click={() => handleMenuNew(false)} />
+        {#if nodePath.includes(StandardFolder.TestCases)}
+            <MenuItem label={uiContext.str(stringResKeys.fileExplorer.newTestCase)} on:click={() => handleMenuNew(false)} />
+        {:else if nodePath.includes(StandardFolder.TestSuites)}
+            <MenuItem label={uiContext.str(stringResKeys.fileExplorer.newTestSuite)} on:click={() => handleMenuNew(false)} />
+        {:else if nodePath.includes(StandardFolder.PageDefinitions)}
+            <MenuItem label={uiContext.str(stringResKeys.fileExplorer.newPage)} on:click={() => handleMenuNew(false)} />
+        {:else}
+            <MenuItem label={uiContext.str(stringResKeys.fileExplorer.newFile)} on:click={() => handleMenuNew(false)} />   
+        {/if}
+        <MenuItem label={uiContext.str(stringResKeys.fileExplorer.newFolder)} on:click={() => handleMenuNew(true)} />
     {/if}
     {#if node.parent}
       {#if type == FileType.Folder}

@@ -71,6 +71,13 @@ export const stringResEn: IStringRes = {
         dialogTitle: 'Delete test case',
         relatedSuitesMessage: 'Test case is being used by following test suites. Do you want to remove it?',
     },
+    fileExplorer: {
+        newFolder: 'New Folder',
+        newFile: 'New File',
+        newPage: 'New Page',
+        newTestCase: 'New Test Case',
+        newTestSuite: 'New Test Suite',
+    },
     form: {
         invalidDateError: 'Invalid date',
         invalidDateTimeError: 'Invalid date and time',

@@ -46,6 +46,13 @@ export const stringResKeys = {
         dialogTitle: 'deleteTestCaseConfirmationDialog.dialogTitle',
         relatedSuitesMessage: 'deleteTestCaseConfirmationDialog.relatedSuitesMessage',
     },
+    fileExplorer: {
+        newFolder: 'fileExplorer.newFolder',
+        newFile: 'fileExplorer.newFile',
+        newPage: 'fileExplorer.newPage',
+        newTestCase: 'fileExplorer.newTestCase',
+        newTestSuite: 'fileExplorer.newTestSuite',
+    },
     form: {
         invalidDateError: 'form.invalidDateError',
         invalidDateTimeError: 'form.invalidDateTimeError',
