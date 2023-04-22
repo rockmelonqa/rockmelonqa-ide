@@ -16,8 +16,8 @@
   import { buildChildrenNodes, combinePath, extractPath, Node as NodeInfo, showMenuAt, toFileSystemPath } from "./Node";
   import NodeEditor from "./NodeEditor.svelte";
   import DeleteTestCaseConfirmationDialog from "$lib/dialogs/DeleteTestCaseConfirmationDialog.svelte";
-    import { StandardFileExtension, StandardFolder } from "rockmelonqa.common";
-    import { stringResKeys } from "$lib/context/StringResKeys";
+  import { StandardFileExtension, StandardFolder } from "rockmelonqa.common";
+  import { stringResKeys } from "$lib/context/StringResKeys";
 
   export let node: NodeInfo;
   export let level: number = 0;
