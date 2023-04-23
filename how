@@ -1,0 +1,1103 @@
+[1mdiff --git a/svelte/src/lib/components/Editors/PageDefinitionEditor.svelte b/svelte/src/lib/components/Editors/PageDefinitionEditor.svelte[m
+[1mindex 6eeff3e..cfd054c 100644[m
+[1m--- a/svelte/src/lib/components/Editors/PageDefinitionEditor.svelte[m
+[1m+++ b/svelte/src/lib/components/Editors/PageDefinitionEditor.svelte[m
+[36m@@ -1,420 +1,448 @@[m
+ <script lang="ts">[m
+[31m-    import { stringResKeys } from '$lib/context/StringResKeys';[m
+[31m-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';[m
+[31m-    import type { IUiTheme } from '$lib/context/UiTheme';[m
+[31m-    import FancyDropdownField from '$lib/controls/FancyDropdownField.svelte';[m
+[31m-    import FormGroup from '$lib/controls/layout/FormGroup.svelte';[m
+[31m-    import FormGroupColumn from '$lib/controls/layout/FormGroupColumn.svelte';[m
+[31m-    import TextField from '$lib/controls/TextField.svelte';[m
+[31m-    import Form from '$lib/form-controls/Form.svelte';[m
+[31m-    import FormTextField from '$lib/form-controls/TextField.svelte';[m
+[31m-    import { FieldDataType, type IDictionary } from '$lib/form/FieldDef';[m
+[31m-    import { createFormContext } from '$lib/form/FormContext';[m
+[31m-    import { FormDataActionType } from '$lib/form/FormData';[m
+[31m-    import type { IFormDef } from '$lib/form/FormDef';[m
+[31m-    import { FormModeState } from '$lib/form/FormMode';[m
+[31m-    import { FormSerializer } from '$lib/form/FormSerializer';[m
+[31m-    import { createListDataContext, ListDataActionType } from '$lib/form/ListData';[m
+[31m-    import type { IListDef } from '$lib/form/ListDef';[m
+[31m-    import AddIcon from '$lib/icons/AddIcon.svelte';[m
+[31m-    import CommentIcon from '$lib/icons/CommentIcon.svelte';[m
+[31m-    import DeleteIcon from '$lib/icons/DeleteIcon.svelte';[m
+[31m-    import MoveDownIcon from '$lib/icons/MoveDownIcon.svelte';[m
+[31m-    import MoveUpIcon from '$lib/icons/MoveUpIcon.svelte';[m
+[31m-    import SaveIcon from '$lib/icons/SaveIcon.svelte';[m
+[31m-    import { fileSystem } from '$lib/ipc';[m
+[31m-    import { getLocatorTypeDropDownOptions } from '$lib/utils/dropdowns';[m
+[31m-    import { fileDefFactory } from 'rockmelonqa.common';[m
+[31m-    import type { IPage, IPageElement } from 'rockmelonqa.common/file-defs/pageFile';[m
+[31m-    import { createEventDispatcher, getContext, onMount } from 'svelte';[m
+[31m-    import { v4 as uuidv4 } from 'uuid';[m
+[31m-    import { AlertDialogButtons, AlertDialogType } from '../Alert';[m
+[31m-    import AlertDialog from '../AlertDialog.svelte';[m
+[31m-    import { appActionContextKey, type IAppActionContext } from '../Application';[m
+[31m-    import CommentTextField from '../CommentTextField.svelte';[m
+[31m-    import { combinePath } from '../FileExplorer/Node';[m
+[31m-    import IconLinkButton from '../IconLinkButton.svelte';[m
+[31m-    import { ListTableCellType } from '../ListTable';[m
+[31m-    import ListTable from '../ListTable.svelte';[m
+[31m-    import ListTableBodyCell from '../ListTableBodyCell.svelte';[m
+[31m-    import ListTableBodyRow from '../ListTableBodyRow.svelte';[m
+[31m-    import ListTableHeaderCell from '../ListTableHeaderCell.svelte';[m
+[31m-    import PrimaryButton from '../PrimaryButton.svelte';[m
+[31m-    import { toTitle } from './Editor';[m
+[31m-[m
+[31m-    const uiContext = getContext(uiContextKey) as IUiContext;[m
+[31m-    const { theme } = uiContext;[m
+[31m-    const uiTheme = $theme as IUiTheme;[m
+[31m-[m
+[31m-    export let folderPath: string;[m
+[31m-    export let fileName: string;[m
+[31m-    $: filePath = combinePath([folderPath, fileName], uiContext.pathSeparator);[m
+[31m-[m
+[31m-    export let contentIndex: number;[m
+[31m-[m
+[31m-    const formDef: IFormDef = {[m
+[31m-        fields: {[m
+[31m-            id: {[m
+[31m-                dataType: FieldDataType.Text,[m
+[31m-                dataPath: 'id',[m
+[31m-                isRequired: true,[m
+[31m-            },[m
+[31m-            description: {[m
+[31m-                dataType: FieldDataType.Text,[m
+[31m-                dataPath: 'description',[m
+[31m-            },[m
+[31m-        },[m
+[32m+[m[32m  import { stringResKeys } from "$lib/context/StringResKeys";[m
+[32m+[m[32m  import { uiContextKey, type IUiContext } from "$lib/context/UiContext";[m
+[32m+[m[32m  import type { IUiTheme } from "$lib/context/UiTheme";[m
+[32m+[m[32m  import FancyDropdownField from "$lib/controls/FancyDropdownField.svelte";[m
+[32m+[m[32m  import FormGroup from "$lib/controls/layout/FormGroup.svelte";[m
+[32m+[m[32m  import FormGroupColumn from "$lib/controls/layout/FormGroupColumn.svelte";[m
+[32m+[m[32m  import TextField from "$lib/controls/TextField.svelte";[m
+[32m+[m[32m  import Form from "$lib/form-controls/Form.svelte";[m
+[32m+[m[32m  import FormTextField from "$lib/form-controls/TextField.svelte";[m
+[32m+[m[32m  import { FieldDataType, type IDictionary } from "$lib/form/FieldDef";[m
+[32m+[m[32m  import { createFormContext } from "$lib/form/FormContext";[m
+[32m+[m[32m  import { FormDataActionType } from "$lib/form/FormData";[m
+[32m+[m[32m  import type { IFormDef } from "$lib/form/FormDef";[m
+[32m+[m[32m  import { FormModeState } from "$lib/form/FormMode";[m
+[32m+[m[32m  import { FormSerializer } from "$lib/form/FormSerializer";[m
+[32m+[m[32m  import { createListDataContext, ListDataActionType } from "$lib/form/ListData";[m
+[32m+[m[32m  import type { IListDef } from "$lib/form/ListDef";[m
+[32m+[m[32m  import AddIcon from "$lib/icons/AddIcon.svelte";[m
+[32m+[m[32m  import CommentIcon from "$lib/icons/CommentIcon.svelte";[m
+[32m+[m[32m  import DeleteIcon from "$lib/icons/DeleteIcon.svelte";[m
+[32m+[m[32m  import MoveDownIcon from "$lib/icons/MoveDownIcon.svelte";[m
+[32m+[m[32m  import MoveUpIcon from "$lib/icons/MoveUpIcon.svelte";[m
+[32m+[m[32m  import SaveIcon from "$lib/icons/SaveIcon.svelte";[m
+[32m+[m[32m  import { fileSystem } from "$lib/ipc";[m
+[32m+[m[32m  import { getLocatorTypeDropDownOptions } from "$lib/utils/dropdowns";[m
+[32m+[m[32m  import { fileDefFactory } from "rockmelonqa.common";[m
+[32m+[m[32m  import type { IPage, IPageElement } from "rockmelonqa.common/file-defs/pageFile";[m
+[32m+[m[32m  import { createEventDispatcher, getContext, onMount } from "svelte";[m
+[32m+[m[32m  import { v4 as uuidv4 } from "uuid";[m
+[32m+[m[32m  import { AlertDialogButtons, AlertDialogType } from "../Alert";[m
+[32m+[m[32m  import AlertDialog from "../AlertDialog.svelte";[m
+[32m+[m[32m  import { appActionContextKey, type IAppActionContext } from "../Application";[m
+[32m+[m[32m  import CommentTextField from "../CommentTextField.svelte";[m
+[32m+[m[32m  import { combinePath } from "../FileExplorer/Node";[m
+[32m+[m[32m  import IconLinkButton from "../IconLinkButton.svelte";[m
+[32m+[m[32m  import { ListTableCellType } from "../ListTable";[m
+[32m+[m[32m  import ListTable from "../ListTable.svelte";[m
+[32m+[m[32m  import ListTableBodyCell from "../ListTableBodyCell.svelte";[m
+[32m+[m[32m  import ListTableBodyRow from "../ListTableBodyRow.svelte";[m
+[32m+[m[32m  import ListTableHeaderCell from "../ListTableHeaderCell.svelte";[m
+[32m+[m[32m  import PrimaryButton from "../PrimaryButton.svelte";[m
+[32m+[m[32m  import { toTitle } from "./Editor";[m
+[32m+[m
+[32m+[m[32m  const uiContext = getContext(uiContextKey) as IUiContext;[m
+[32m+[m[32m  const { theme } = uiContext;[m
+[32m+[m[32m  const uiTheme = $theme as IUiTheme;[m
+[32m+[m
+[32m+[m[32m  export let folderPath: string;[m
+[32m+[m[32m  export let fileName: string;[m
+[32m+[m[32m  $: filePath = combinePath([folderPath, fileName], uiContext.pathSeparator);[m
+[32m+[m
+[32m+[m[32m  export let contentIndex: number;[m
+[32m+[m
+[32m+[m[32m  const formDef: IFormDef = {[m
+[32m+[m[32m    fields: {[m
+[32m+[m[32m      id: {[m
+[32m+[m[32m        dataType: FieldDataType.Text,[m
+[32m+[m[32m        dataPath: "id",[m
+[32m+[m[32m        isRequired: true,[m
+[32m+[m[32m      },[m
+[32m+[m[32m      description: {[m
+[32m+[m[32m        dataType: FieldDataType.Text,[m
+[32m+[m[32m        dataPath: "description",[m
+[32m+[m[32m      },[m
+[32m+[m[32m    },[m
+[32m+[m[32m  };[m
+[32m+[m[32m  let formContext = createFormContext("pageDefinitionEditor", formDef, uiContext, FormModeState.Edit);[m
+[32m+[m[32m  let { mode: formMode, modeDispatch: formModeDispatch, data: formData, dataDispatch: formDataDispatch } = formContext;[m
+[32m+[m
+[32m+[m[32m  const listDef: IListDef = {[m
+[32m+[m[32m    fields: {[m
+[32m+[m[32m      id: {[m
+[32m+[m[32m        dataType: FieldDataType.Text,[m
+[32m+[m[32m        dataPath: "id",[m
+[32m+[m[32m      },[m
+[32m+[m[32m      type: {[m
+[32m+[m[32m        dataType: FieldDataType.Text,[m
+[32m+[m[32m        dataPath: "type",[m
+[32m+[m[32m      },[m
+[32m+[m[32m      name: {[m
+[32m+[m[32m        dataType: FieldDataType.Text,[m
+[32m+[m[32m        dataPath: "name",[m
+[32m+[m[32m        maxLength: 200,[m
+[32m+[m[32m      },[m
+[32m+[m[32m      findBy: {[m
+[32m+[m[32m        dataType: FieldDataType.Dropdown,[m
+[32m+[m[32m        dataPath: "findBy",[m
+[32m+[m[32m      },[m
+[32m+[m[32m      locator: {[m
+[32m+[m[32m        dataType: FieldDataType.Text,[m
+[32m+[m[32m        dataPath: "locator",[m
+[32m+[m[32m      },[m
+[32m+[m[32m      description: {[m
+[32m+[m[32m        dataType: FieldDataType.Text,[m
+[32m+[m[32m        dataPath: "description",[m
+[32m+[m[32m      },[m
+[32m+[m[32m      comment: {[m
+[32m+[m[32m        dataType: FieldDataType.Text,[m
+[32m+[m[32m        dataPath: "comment",[m
+[32m+[m[32m      },[m
+[32m+[m[32m    },[m
+[32m+[m[32m  };[m
+[32m+[m[32m  let listDataContext = createListDataContext(listDef, uiContext);[m
+[32m+[m[32m  let { value: listData, dispatch: listDataDispatch } = listDataContext;[m
+[32m+[m
+[32m+[m[32m  $: title = toTitle(fileName);[m
+[32m+[m[32m  const locatorTypeOptions = getLocatorTypeDropDownOptions(uiContext);[m
+[32m+[m
+[32m+[m[32m  let deleteDialogType: AlertDialogType = AlertDialogType.None;[m
+[32m+[m[32m  let indexToDelete: number;[m
+[32m+[m
+[32m+[m[32m  const { registerOnSaveHandler, unregisterOnSaveHandler } = getContext(appActionContextKey) as IAppActionContext;[m
+[32m+[m[32m  const dispatch = createEventDispatcher();[m
+[32m+[m
+[32m+[m[32m  onMount(async () => {[m
+[32m+[m[32m    // default/empty data[m
+[32m+[m[32m    let model: IPage = fileDefFactory.newPageDefinition();[m
+[32m+[m
+[32m+[m[32m    // parse file content if any[m
+[32m+[m[32m    const fileContent = await fileSystem.readFile(filePath);[m
+[32m+[m[32m    if (fileContent) {[m
+[32m+[m[32m      model = JSON.parse(fileContent) as IPage;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    const serializer = new FormSerializer(uiContext);[m
+[32m+[m[32m    const fieldValues = serializer.deserialize(model, formDef.fields);[m
+[32m+[m[32m    formDataDispatch({ type: FormDataActionType.Load, newValues: fieldValues });[m
+[32m+[m
+[32m+[m[32m    const items = serializer.deserializeList(model.elements, listDef.fields);[m
+[32m+[m[32m    listDataDispatch({ type: ListDataActionType.SetItems, items: items, hasMoreItems: false });[m
+[32m+[m
+[32m+[m[32m    registerOnSaveHandler(contentIndex, doSave);[m
+[32m+[m
+[32m+[m[32m    return () => {[m
+[32m+[m[32m      unregisterOnSaveHandler(contentIndex);[m
+     };[m
+[31m-    let formContext = createFormContext('pageDefinitionEditor', formDef, uiContext, FormModeState.Edit);[m
+[31m-    let {[m
+[31m-        mode: formMode,[m
+[31m-        modeDispatch: formModeDispatch,[m
+[31m-        data: formData,[m
+[31m-        dataDispatch: formDataDispatch,[m
+[31m-    } = formContext;[m
+[31m-[m
+[31m-    const listDef: IListDef = {[m
+[31m-        fields: {[m
+[31m-            id: {[m
+[31m-                dataType: FieldDataType.Text,[m
+[31m-                dataPath: 'id',[m
+[31m-            },[m
+[31m-            type: {[m
+[31m-                dataType: FieldDataType.Text,[m
+[31m-                dataPath: 'type',[m
+[31m-            },[m
+[31m-            name: {[m
+[31m-                dataType: FieldDataType.Text,[m
+[31m-                dataPath: 'name',[m
+[31m-                maxLength: 200,[m
+[31m-            },[m
+[31m-            findBy: {[m
+[31m-                dataType: FieldDataType.Dropdown,[m
+[31m-                dataPath: 'findBy',[m
+[31m-            },[m
+[31m-            locator: {[m
+[31m-                dataType: FieldDataType.Text,[m
+[31m-                dataPath: 'locator',[m
+[31m-            },[m
+[31m-            description: {[m
+[31m-                dataType: FieldDataType.Text,[m
+[31m-                dataPath: 'description',[m
+[31m-            },[m
+[31m-            comment: {[m
+[31m-                dataType: FieldDataType.Text,[m
+[31m-                dataPath: 'comment',[m
+[31m-            },[m
+[31m-        },[m
+[31m-    };[m
+[31m-    let listDataContext = createListDataContext(listDef, uiContext);[m
+[31m-    let { value: listData, dispatch: listDataDispatch } = listDataContext;[m
+[31m-[m
+[31m-    $: title = toTitle(fileName);[m
+[31m-    const locatorTypeOptions = getLocatorTypeDropDownOptions(uiContext);[m
+[31m-[m
+[31m-    let deleteDialogType: AlertDialogType = AlertDialogType.None;[m
+[31m-    let indexToDelete: number;[m
+[31m-[m
+[31m-    const { registerOnSaveHandler, unregisterOnSaveHandler } = getContext(appActionContextKey) as IAppActionContext;[m
+[31m-    const dispatch = createEventDispatcher();[m
+[31m-[m
+[31m-    onMount(async () => {[m
+[31m-        // default/empty data[m
+[31m-        let model: IPage = fileDefFactory.newPageDefinition();[m
+[31m-[m
+[31m-        // parse file content if any[m
+[31m-        const fileContent = await fileSystem.readFile(filePath);[m
+[31m-        if (fileContent) {[m
+[31m-            model = JSON.parse(fileContent) as IPage;[m
+[31m-        }[m
+[32m+[m[32m  });[m
+ [m
+[31m-        const serializer = new FormSerializer(uiContext);[m
+[31m-        const fieldValues = serializer.deserialize(model, formDef.fields);[m
+[31m-        formDataDispatch({ type: FormDataActionType.Load, newValues: fieldValues });[m
+[32m+[m[32m  const handleItemChange = (index: number, key: string, value: any) => {[m
+[32m+[m[32m    const item = { ...$listData.items[index] };[m
+[32m+[m[32m    item[key] = value;[m
+ [m
+[31m-        const items = serializer.deserializeList(model.elements, listDef.fields);[m
+[31m-        listDataDispatch({ type: ListDataActionType.SetItems, items: items, hasMoreItems: false });[m
+[31m-[m
+[31m-        registerOnSaveHandler(contentIndex, doSave);[m
+[31m-[m
+[31m-        return () => {[m
+[31m-            unregisterOnSaveHandler(contentIndex);[m
+[31m-        };[m
+[32m+[m[32m    listDataDispatch({[m
+[32m+[m[32m      type: ListDataActionType.UpdateItem,[m
+[32m+[m[32m      index,[m
+[32m+[m[32m      item,[m
+     });[m
+ [m
+[31m-    const handleItemChange = (index: number, key: string, value: any) => {[m
+[31m-        const item = { ...$listData.items[index] };[m
+[31m-        item[key] = value;[m
+[31m-[m
+[31m-        listDataDispatch({[m
+[31m-            type: ListDataActionType.UpdateItem,[m
+[31m-            index,[m
+[31m-            item,[m
+[31m-        });[m
+[31m-[m
+[31m-        dispatchChange();[m
+[31m-    };[m
+[31m-[m
+[31m-    const dispatchChange = () => {[m
+[31m-        dispatch('change');[m
+[31m-    };[m
+[31m-[m
+[31m-    const handleDeleteClick = (index: number) => {[m
+[31m-        // Determine if this row has any input.[m
+[31m-        // If yes, show confirmation dialog. Otherwise, delete straight away[m
+[31m-        if (isEmptyItem($listData.items[index])) {[m
+[31m-            doDeleteRow(index);[m
+[31m-        } else {[m
+[31m-            deleteDialogType = AlertDialogType.Question;[m
+[31m-            indexToDelete = index;[m
+[31m-        }[m
+[31m-    };[m
+[31m-[m
+[31m-    const isEmptyItem = (item: IDictionary) => {[m
+[31m-        const ignoredProperties: string[] = ['id', 'type'];[m
+[31m-        return Object.entries(item)[m
+[31m-            .filter(([key, value]) => !ignoredProperties.includes(key))[m
+[31m-            .map(([key, value]) => value)[m
+[31m-            .every((x) => !x);[m
+[31m-    };[m
+[31m-[m
+[31m-    const handleDeleteConfirmation = async (event: any) => {[m
+[31m-        if (event.detail.button === 'delete') {[m
+[31m-            doDeleteRow(indexToDelete);[m
+[31m-        }[m
+[31m-    };[m
+[31m-[m
+[31m-    const doDeleteRow = (index: number) => {[m
+[31m-        listDataDispatch({[m
+[31m-            type: ListDataActionType.RemoveItem,[m
+[31m-            index: index,[m
+[31m-        });[m
+[31m-[m
+[31m-        dispatchChange();[m
+[31m-    };[m
+[31m-[m
+[31m-    const handleMoveDownClick = (index: number) => {[m
+[31m-        if (index >= 0 && index <= $listData.items.length - 2) {[m
+[31m-            listDataDispatch({[m
+[31m-                type: ListDataActionType.SwapItems,[m
+[31m-                indexA: index,[m
+[31m-                indexB: index + 1,[m
+[31m-            });[m
+[31m-[m
+[31m-            dispatchChange();[m
+[31m-        }[m
+[31m-    };[m
+[31m-[m
+[31m-    const handleMoveUpClick = (index: number) => {[m
+[31m-        if (index >= 1 && index <= $listData.items.length - 1) {[m
+[31m-            listDataDispatch({[m
+[31m-                type: ListDataActionType.SwapItems,[m
+[31m-                indexA: index,[m
+[31m-                indexB: index - 1,[m
+[31m-            });[m
+[31m-[m
+[31m-            dispatchChange();[m
+[31m-        }[m
+[31m-    };[m
+[31m-[m
+[31m-    const handleAddElement = () => {[m
+[31m-        listDataDispatch({[m
+[31m-            type: ListDataActionType.AppendItems,[m
+[31m-            items: [[m
+[31m-                {[m
+[31m-                    id: uuidv4(),[m
+[31m-                    type: 'pageElement',[m
+[31m-                    name: '',[m
+[31m-                    findBy: undefined,[m
+[31m-                    locator: '',[m
+[31m-                    description: '',[m
+[31m-                } as IPageElement,[m
+[31m-            ],[m
+[31m-            hasMoreItems: false,[m
+[31m-        });[m
+[31m-[m
+[31m-        dispatchChange();[m
+[31m-    };[m
+[31m-[m
+[31m-    const handleAddComment = () => {[m
+[31m-        listDataDispatch({[m
+[31m-            type: ListDataActionType.AppendItems,[m
+[31m-            items: [{ id: uuidv4(), type: 'comment', comment: '' } as IPageElement],[m
+[31m-            hasMoreItems: false,[m
+[31m-        });[m
+[31m-[m
+[31m-        dispatchChange();[m
+[31m-    };[m
+[31m-[m
+[31m-    const isComment = (item: IDictionary) => {[m
+[31m-        return (item as IPageElement).type === 'comment';[m
+[31m-    };[m
+[32m+[m[32m    dispatchChange();[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const dispatchChange = () => {[m
+[32m+[m[32m    dispatch("change");[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const handleDeleteClick = (index: number) => {[m
+[32m+[m[32m    // Determine if this row has any input.[m
+[32m+[m[32m    // If yes, show confirmation dialog. Otherwise, delete straight away[m
+[32m+[m[32m    if (isEmptyItem($listData.items[index])) {[m
+[32m+[m[32m      doDeleteRow(index);[m
+[32m+[m[32m    } else {[m
+[32m+[m[32m      deleteDialogType = AlertDialogType.Question;[m
+[32m+[m[32m      indexToDelete = index;[m
+[32m+[m[32m    }[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const isEmptyItem = (item: IDictionary) => {[m
+[32m+[m[32m    const ignoredProperties: string[] = ["id", "type"];[m
+[32m+[m[32m    return Object.entries(item)[m
+[32m+[m[32m      .filter(([key, value]) => !ignoredProperties.includes(key))[m
+[32m+[m[32m      .map(([key, value]) => value)[m
+[32m+[m[32m      .every((x) => !x);[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const handleDeleteConfirmation = async (event: any) => {[m
+[32m+[m[32m    if (event.detail.button === "delete") {[m
+[32m+[m[32m      doDeleteRow(indexToDelete);[m
+[32m+[m[32m    }[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const doDeleteRow = (index: number) => {[m
+[32m+[m[32m    listDataDispatch({[m
+[32m+[m[32m      type: ListDataActionType.RemoveItem,[m
+[32m+[m[32m      index: index,[m
+[32m+[m[32m    });[m
+ [m
+[31m-    const handleSave = async () => {[m
+[31m-        await doSave();[m
+[31m-    };[m
+[32m+[m[32m    dispatchChange();[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const handleMoveDownClick = (index: number) => {[m
+[32m+[m[32m    if (index >= 0 && index <= $listData.items.length - 2) {[m
+[32m+[m[32m      listDataDispatch({[m
+[32m+[m[32m        type: ListDataActionType.SwapItems,[m
+[32m+[m[32m        indexA: index,[m
+[32m+[m[32m        indexB: index + 1,[m
+[32m+[m[32m      });[m
+[32m+[m
+[32m+[m[32m      dispatchChange();[m
+[32m+[m[32m    }[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const handleMoveUpClick = (index: number) => {[m
+[32m+[m[32m    if (index >= 1 && index <= $listData.items.length - 1) {[m
+[32m+[m[32m      listDataDispatch({[m
+[32m+[m[32m        type: ListDataActionType.SwapItems,[m
+[32m+[m[32m        indexA: index,[m
+[32m+[m[32m        indexB: index - 1,[m
+[32m+[m[32m      });[m
+[32m+[m
+[32m+[m[32m      dispatchChange();[m
+[32m+[m[32m    }[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const handleAddElement = () => {[m
+[32m+[m[32m    listDataDispatch({[m
+[32m+[m[32m      type: ListDataActionType.AppendItems,[m
+[32m+[m[32m      items: [newElement()],[m
+[32m+[m[32m      hasMoreItems: false,[m
+[32m+[m[32m    });[m
+ [m
+[31m-    const doSave = async (): Promise<boolean> => {[m
+[31m-        if ($formData.isValid) {[m
+[31m-            const serializer = new FormSerializer(uiContext);[m
+[31m-            const model = serializer.serialize($formData.values, formDef.fields);[m
+[32m+[m[32m    dispatchChange();[m
+[32m+[m[32m  };[m
+[32m+[m[32m  const handleInsertElement = (index: number) => {[m
+[32m+[m[32m    listDataDispatch({[m
+[32m+[m[32m      type: ListDataActionType.InsertItem,[m
+[32m+[m[32m      item: newElement(),[m
+[32m+[m[32m      index: index + 1,[m
+[32m+[m[32m    });[m
+ [m
+[31m-            const items = $listData.items.filter((r) => !isEmptyItem(r));[m
+[31m-            const elements = serializer.serializeList(items, listDef.fields);[m
+[31m-            const data = { ...model, elements };[m
+[31m-            await fileSystem.writeFile(filePath, JSON.stringify(data, null, 4));[m
+[32m+[m[32m    dispatchChange();[m
+[32m+[m[32m  };[m
+[32m+[m[32m  const newElement = (): IPageElement => {[m
+[32m+[m[32m    return {[m
+[32m+[m[32m      id: uuidv4(),[m
+[32m+[m[32m      type: "pageElement",[m
+[32m+[m[32m      name: "",[m
+[32m+[m[32m      findBy: undefined,[m
+[32m+[m[32m      locator: "",[m
+[32m+[m[32m      description: "",[m
+[32m+[m[32m    } as IPageElement;[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const handleAddComment = () => {[m
+[32m+[m[32m    listDataDispatch({[m
+[32m+[m[32m      type: ListDataActionType.AppendItems,[m
+[32m+[m[32m      items: [{ id: uuidv4(), type: "comment", comment: "" } as IPageElement],[m
+[32m+[m[32m      hasMoreItems: false,[m
+[32m+[m[32m    });[m
+ [m
+[31m-            dispatch('saved');[m
+[31m-            return true;[m
+[31m-        }[m
+[32m+[m[32m    dispatchChange();[m
+[32m+[m[32m  };[m
+[32m+[m[32m  const handleInsertComment = (index: number) => {[m
+[32m+[m[32m    listDataDispatch({[m
+[32m+[m[32m      type: ListDataActionType.InsertItem,[m
+[32m+[m[32m      item: newComment(),[m
+[32m+[m[32m      index: index + 1,[m
+[32m+[m[32m    });[m
+ [m
+[31m-        formDataDispatch({ type: FormDataActionType.ShowAllErrors });[m
+[31m-        return false;[m
+[31m-    };[m
+[32m+[m[32m    dispatchChange();[m
+[32m+[m[32m  };[m
+[32m+[m[32m  const newComment = (): IPageElement => {[m
+[32m+[m[32m    return { id: uuidv4(), type: "comment", comment: "" } as IPageElement;[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const isComment = (item: IDictionary) => {[m
+[32m+[m[32m    return (item as IPageElement).type === "comment";[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const handleSave = async () => {[m
+[32m+[m[32m    await doSave();[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const doSave = async (): Promise<boolean> => {[m
+[32m+[m[32m    if ($formData.isValid) {[m
+[32m+[m[32m      const serializer = new FormSerializer(uiContext);[m
+[32m+[m[32m      const model = serializer.serialize($formData.values, formDef.fields);[m
+[32m+[m
+[32m+[m[32m      const items = $listData.items.filter((r) => !isEmptyItem(r));[m
+[32m+[m[32m      const elements = serializer.serializeList(items, listDef.fields);[m
+[32m+[m[32m      const data = { ...model, elements };[m
+[32m+[m[32m      await fileSystem.writeFile(filePath, JSON.stringify(data, null, 4));[m
+[32m+[m
+[32m+[m[32m      dispatch("saved");[m
+[32m+[m[32m      return true;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    formDataDispatch({ type: FormDataActionType.ShowAllErrors });[m
+[32m+[m[32m    return false;[m
+[32m+[m[32m  };[m
+ </script>[m
+ [m
+ <div class="page-definition-editor p-8">[m
+[31m-    <div class="font-semibold text-xl mb-4">{title}</div>[m
+[31m-    <Form {formContext}>[m
+[31m-        <FormGroup columns={1}>[m
+[31m-            <FormGroupColumn>[m
+[31m-                <FormTextField[m
+[31m-                    name="description"[m
+[31m-                    theme={uiTheme.inlineTextField}[m
+[31m-                    on:input={dispatchChange}[m
+[31m-                    displayLabel={false}[m
+[31m-                    placeholder={uiContext.str(stringResKeys.pageDefinitionEditor.description)}[m
+[31m-                />[m
+[31m-            </FormGroupColumn>[m
+[31m-        </FormGroup>[m
+[31m-    </Form>[m
+[31m-[m
+[31m-    <ListTable[m
+[31m-        class="table-fixed mb-8"[m
+[31m-        isProcessing={$formMode.isLoading() || $formMode.isProcessing()}[m
+[31m-        isEmpty={false}[m
+[31m-    >[m
+[31m-        <svelte:fragment slot="header">[m
+[31m-            <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-3/12">[m
+[31m-                {uiContext.str(stringResKeys.pageDefinitionEditor.elementName)}[m
+[31m-            </ListTableHeaderCell>[m
+[31m-            <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-2/12">[m
+[31m-                {uiContext.str(stringResKeys.pageDefinitionEditor.findBy)}[m
+[31m-            </ListTableHeaderCell>[m
+[31m-            <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-3/12">[m
+[31m-                {uiContext.str(stringResKeys.pageDefinitionEditor.locator)}[m
+[31m-            </ListTableHeaderCell>[m
+[31m-            <ListTableHeaderCell type={ListTableCellType.Last} class="text-left w-3/12">[m
+[31m-                {uiContext.str(stringResKeys.pageDefinitionEditor.description)}[m
+[31m-            </ListTableHeaderCell>[m
+[31m-            <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-1/12">[m
+[31m-                {uiContext.str(stringResKeys.pageDefinitionEditor.actions)}[m
+[31m-            </ListTableHeaderCell>[m
+[31m-        </svelte:fragment>[m
+[31m-        <svelte:fragment slot="body">[m
+[31m-            {#each $listData.items as item, index}[m
+[31m-                <ListTableBodyRow>[m
+[31m-                    {#if isComment(item)}[m
+[31m-                        <ListTableBodyCell type={ListTableCellType.First} colspan={4}>[m
+[31m-                            <CommentTextField[m
+[31m-                                name={`${formContext.formName}_${index}_comment`}[m
+[31m-                                value={item.comment}[m
+[31m-                                placeholder={uiContext.str(stringResKeys.pageDefinitionEditor.comment)}[m
+[31m-                                on:input={(event) => handleItemChange(index, 'comment', event.detail.value)}[m
+[31m-                            />[m
+[31m-                        </ListTableBodyCell>[m
+[31m-                    {:else}[m
+[31m-                        <ListTableBodyCell type={ListTableCellType.First}>[m
+[31m-                            <TextField[m
+[31m-                                name={`${formContext.formName}_${index}_name`}[m
+[31m-                                value={item.name}[m
+[31m-                                on:input={(event) => handleItemChange(index, 'name', event.detail.value)}[m
+[31m-                            />[m
+[31m-                        </ListTableBodyCell>[m
+[31m-                        <ListTableBodyCell type={ListTableCellType.Normal}>[m
+[31m-                            <FancyDropdownField[m
+[31m-                                name={`${formContext.formName}_${index}_findBy`}[m
+[31m-                                value={item.findBy}[m
+[31m-                                options={locatorTypeOptions}[m
+[31m-                                on:change={(event) => handleItemChange(index, 'findBy', event.detail.value)}[m
+[31m-                            />[m
+[31m-                        </ListTableBodyCell>[m
+[31m-                        <ListTableBodyCell type={ListTableCellType.Normal}>[m
+[31m-                            <TextField[m
+[31m-                                name={`${formContext.formName}_${index}_locator`}[m
+[31m-                                value={item.locator}[m
+[31m-                                on:input={(event) => handleItemChange(index, 'locator', event.detail.value)}[m
+[31m-                            />[m
+[31m-                        </ListTableBodyCell>[m
+[31m-                        <ListTableBodyCell type={ListTableCellType.Last}>[m
+[31m-                            <TextField[m
+[31m-                                name={`${formContext.formName}_${index}_description`}[m
+[31m-                                value={item.description}[m
+[31m-                                on:input={(event) => handleItemChange(index, 'description', event.detail.value)}[m
+[31m-                            />[m
+[31m-                        </ListTableBodyCell>[m
+[31m-                    {/if}[m
+[31m-                    <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">[m
+[31m-                        <IconLinkButton[m
+[31m-                            on:click={() => handleDeleteClick(index)}[m
+[31m-                            title={uiContext.str(stringResKeys.general.delete)}[m
+[31m-                        >[m
+[31m-                            <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>[m
+[31m-                        </IconLinkButton>[m
+[31m-                        {#if index > 0}[m
+[31m-                            <IconLinkButton[m
+[31m-                                on:click={() => handleMoveUpClick(index)}[m
+[31m-                                title={uiContext.str(stringResKeys.general.moveUp)}[m
+[31m-                            >[m
+[31m-                                <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>[m
+[31m-                            </IconLinkButton>[m
+[31m-                        {/if}[m
+[31m-                        {#if index < $listData.items.length - 1}[m
+[31m-                            <IconLinkButton[m
+[31m-                                on:click={() => handleMoveDownClick(index)}[m
+[31m-                                title={uiContext.str(stringResKeys.general.moveDown)}[m
+[31m-                            >[m
+[31m-                                <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>[m
+[31m-                            </IconLinkButton>[m
+[31m-                        {/if}[m
+[31m-                    </ListTableBodyCell>[m
+[31m-                </ListTableBodyRow>[m
+[31m-            {/each}[m
+[31m-        </svelte:fragment>[m
+[31m-    </ListTable>[m
+[31m-[m
+[31m-    <div class="flex items-center gap-x-2">[m
+[31m-        <IconLinkButton on:click={handleAddElement}>[m
+[31m-            <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>[m
+[31m-            <svelte:fragment slot="label">[m
+[31m-                {uiContext.str(stringResKeys.pageDefinitionEditor.addElement)}[m
+[31m-            </svelte:fragment>[m
+[31m-        </IconLinkButton>[m
+[31m-        <span>|</span>[m
+[31m-        <IconLinkButton on:click={handleAddComment}>[m
+[31m-            <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>[m
+[31m-            <svelte:fragment slot="label">[m
+[31m-                {uiContext.str(stringResKeys.pageDefinitionEditor.addComment)}[m
+[31m-            </svelte:fragment>[m
+[31m-        </IconLinkButton>[m
+[31m-[m
+[31m-        <div class="ml-auto">[m
+[31m-            <PrimaryButton on:click={handleSave}>[m
+[31m-                <span class="flex items-center gap-x-2">[m
+[31m-                    <SaveIcon class="w-5 h-5" />[m
+[31m-                    {uiContext.str(stringResKeys.general.save)}[m
+[31m-                </span>[m
+[31m-            </PrimaryButton>[m
+[31m-        </div>[m
+[32m+[m[32m  <div class="font-semibold text-xl mb-4">{title}</div>[m
+[32m+[m[32m  <Form {formContext}>[m
+[32m+[m[32m    <FormGroup columns={1}>[m
+[32m+[m[32m      <FormGroupColumn>[m
+[32m+[m[32m        <FormTextField[m
+[32m+[m[32m          name="description"[m
+[32m+[m[32m          theme={uiTheme.inlineTextField}[m
+[32m+[m[32m          on:input={dispatchChange}[m
+[32m+[m[32m          displayLabel={false}[m
+[32m+[m[32m          placeholder={uiContext.str(stringResKeys.pageDefinitionEditor.description)}[m
+[32m+[m[32m        />[m
+[32m+[m[32m      </FormGroupColumn>[m
+[32m+[m[32m    </FormGroup>[m
+[32m+[m[32m  </Form>[m
+[32m+[m
+[32m+[m[32m  <ListTable class="table-fixed mb-8" isProcessing={$formMode.isLoading() || $formMode.isProcessing()} isEmpty={false}>[m
+[32m+[m[32m    <svelte:fragment slot="header">[m
+[32m+[m[32m      <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-3/12">[m
+[32m+[m[32m        {uiContext.str(stringResKeys.pageDefinitionEditor.elementName)}[m
+[32m+[m[32m      </ListTableHeaderCell>[m
+[32m+[m[32m      <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-2/12">[m
+[32m+[m[32m        {uiContext.str(stringResKeys.pageDefinitionEditor.findBy)}[m
+[32m+[m[32m      </ListTableHeaderCell>[m
+[32m+[m[32m      <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-3/12">[m
+[32m+[m[32m        {uiContext.str(stringResKeys.pageDefinitionEditor.locator)}[m
+[32m+[m[32m      </ListTableHeaderCell>[m
+[32m+[m[32m      <ListTableHeaderCell type={ListTableCellType.Last} class="text-left w-3/12">[m
+[32m+[m[32m        {uiContext.str(stringResKeys.pageDefinitionEditor.description)}[m
+[32m+[m[32m      </ListTableHeaderCell>[m
+[32m+[m[32m      <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-1/12">[m
+[32m+[m[32m        {uiContext.str(stringResKeys.pageDefinitionEditor.actions)}[m
+[32m+[m[32m      </ListTableHeaderCell>[m
+[32m+[m[32m    </svelte:fragment>[m
+[32m+[m[32m    <svelte:fragment slot="body">[m
+[32m+[m[32m      {#each $listData.items as item, index}[m
+[32m+[m[32m        <ListTableBodyRow>[m
+[32m+[m[32m          {#if isComment(item)}[m
+[32m+[m[32m            <ListTableBodyCell type={ListTableCellType.First} colspan={4}>[m
+[32m+[m[32m              <CommentTextField[m
+[32m+[m[32m                name={`${formContext.formName}_${index}_comment`}[m
+[32m+[m[32m                value={item.comment}[m
+[32m+[m[32m                placeholder={uiContext.str(stringResKeys.pageDefinitionEditor.comment)}[m
+[32m+[m[32m                on:input={(event) => handleItemChange(index, "comment", event.detail.value)}[m
+[32m+[m[32m              />[m
+[32m+[m[32m            </ListTableBodyCell>[m
+[32m+[m[32m          {:else}[m
+[32m+[m[32m            <ListTableBodyCell type={ListTableCellType.First}>[m
+[32m+[m[32m              <TextField[m
+[32m+[m[32m                name={`${formContext.formName}_${index}_name`}[m
+[32m+[m[32m                value={item.name}[m
+[32m+[m[32m                on:input={(event) => handleItemChange(index, "name", event.detail.value)}[m
+[32m+[m[32m              />[m
+[32m+[m[32m            </ListTableBodyCell>[m
+[32m+[m[32m            <ListTableBodyCell type={ListTableCellType.Normal}>[m
+[32m+[m[32m              <FancyDropdownField[m
+[32m+[m[32m                name={`${formContext.formName}_${index}_findBy`}[m
+[32m+[m[32m                value={item.findBy}[m
+[32m+[m[32m                options={locatorTypeOptions}[m
+[32m+[m[32m                on:change={(event) => handleItemChange(index, "findBy", event.detail.value)}[m
+[32m+[m[32m              />[m
+[32m+[m[32m            </ListTableBodyCell>[m
+[32m+[m[32m            <ListTableBodyCell type={ListTableCellType.Normal}>[m
+[32m+[m[32m              <TextField[m
+[32m+[m[32m                name={`${formContext.formName}_${index}_locator`}[m
+[32m+[m[32m                value={item.locator}[m
+[32m+[m[32m                on:input={(event) => handleItemChange(index, "locator", event.detail.value)}[m
+[32m+[m[32m              />[m
+[32m+[m[32m            </ListTableBodyCell>[m
+[32m+[m[32m            <ListTableBodyCell type={ListTableCellType.Last}>[m
+[32m+[m[32m              <TextField[m
+[32m+[m[32m                name={`${formContext.formName}_${index}_description`}[m
+[32m+[m[32m                value={item.description}[m
+[32m+[m[32m                on:input={(event) => handleItemChange(index, "description", event.detail.value)}[m
+[32m+[m[32m              />[m
+[32m+[m[32m            </ListTableBodyCell>[m
+[32m+[m[32m          {/if}[m
+[32m+[m[32m          <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">[m
+[32m+[m[32m            {#if isComment(item)}[m
+[32m+[m[32m              <IconLinkButton[m
+[32m+[m[32m                on:click={() => handleInsertComment(index)}[m
+[32m+[m[32m                title={uiContext.str(stringResKeys.general.add)}[m
+[32m+[m[32m              >[m
+[32m+[m[32m                <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>[m
+[32m+[m[32m              </IconLinkButton>[m
+[32m+[m[32m            {:else}[m
+[32m+[m[32m              <IconLinkButton[m
+[32m+[m[32m                on:click={() => handleInsertElement(index)}[m
+[32m+[m[32m                title={uiContext.str(stringResKeys.general.add)}[m
+[32m+[m[32m              >[m
+[32m+[m[32m                <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>[m
+[32m+[m[32m              </IconLinkButton>[m
+[32m+[m[32m            {/if}[m
+[32m+[m[32m            <IconLinkButton[m
+[32m+[m[32m              on:click={() => handleDeleteClick(index)}[m
+[32m+[m[32m              title={uiContext.str(stringResKeys.general.delete)}[m
+[32m+[m[32m            >[m
+[32m+[m[32m              <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>[m
+[32m+[m[32m            </IconLinkButton>[m
+[32m+[m[32m            {#if index > 0}[m
+[32m+[m[32m              <IconLinkButton[m
+[32m+[m[32m                on:click={() => handleMoveUpClick(index)}[m
+[32m+[m[32m                title={uiContext.str(stringResKeys.general.moveUp)}[m
+[32m+[m[32m              >[m
+[32m+[m[32m                <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>[m
+[32m+[m[32m              </IconLinkButton>[m
+[32m+[m[32m            {/if}[m
+[32m+[m[32m            {#if index < $listData.items.length - 1}[m
+[32m+[m[32m              <IconLinkButton[m
+[32m+[m[32m                on:click={() => handleMoveDownClick(index)}[m
+[32m+[m[32m                title={uiContext.str(stringResKeys.general.moveDown)}[m
+[32m+[m[32m              >[m
+[32m+[m[32m                <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>[m
+[32m+[m[32m              </IconLinkButton>[m
+[32m+[m[32m            {/if}[m
+[32m+[m[32m          </ListTableBodyCell>[m
+[32m+[m[32m        </ListTableBodyRow>[m
+[32m+[m[32m      {/each}[m
+[32m+[m[32m    </svelte:fragment>[m
+[32m+[m[32m  </ListTable>[m
+[32m+[m
+[32m+[m[32m  <div class="flex items-center gap-x-2">[m
+[32m+[m[32m    <IconLinkButton on:click={handleAddElement}>[m
+[32m+[m[32m      <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>[m
+[32m+[m[32m      <svelte:fragment slot="label">[m
+[32m+[m[32m        {uiContext.str(stringResKeys.pageDefinitionEditor.addElement)}[m
+[32m+[m[32m      </svelte:fragment>[m
+[32m+[m[32m    </IconLinkButton>[m
+[32m+[m[32m    <span>|</span>[m
+[32m+[m[32m    <IconLinkButton on:click={handleAddComment}>[m
+[32m+[m[32m      <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>[m
+[32m+[m[32m      <svelte:fragment slot="label">[m
+[32m+[m[32m        {uiContext.str(stringResKeys.pageDefinitionEditor.addComment)}[m
+[32m+[m[32m      </svelte:fragment>[m
+[32m+[m[32m    </IconLinkButton>[m
+[32m+[m
+[32m+[m[32m    <div class="ml-auto">[m
+[32m+[m[32m      <PrimaryButton on:click={handleSave}>[m
+[32m+[m[32m        <span class="flex items-center gap-x-2">[m
+[32m+[m[32m          <SaveIcon class="w-5 h-5" />[m
+[32m+[m[32m          {uiContext.str(stringResKeys.general.save)}[m
+[32m+[m[32m        </span>[m
+[32m+[m[32m      </PrimaryButton>[m
+     </div>[m
+[32m+[m[32m  </div>[m
+ </div>[m
+ [m
+ <AlertDialog[m
+[31m-    id="dialogDeleteRow"[m
+[31m-    bind:type={deleteDialogType}[m
+[31m-    buttons={AlertDialogButtons.DeleteCancel}[m
+[31m-    on:click={handleDeleteConfirmation}[m
+[32m+[m[32m  id="dialogDeleteRow"[m
+[32m+[m[32m  bind:type={deleteDialogType}[m
+[32m+[m[32m  buttons={AlertDialogButtons.DeleteCancel}[m
+[32m+[m[32m  on:click={handleDeleteConfirmation}[m
+ >[m
+[31m-    <div slot="title">{uiContext.str(stringResKeys.general.confirmation)}</div>[m
+[31m-    <div slot="content">{uiContext.str(stringResKeys.pageDefinitionEditor.deleteRowConfirmation)}</div>[m
+[32m+[m[32m  <div slot="title">{uiContext.str(stringResKeys.general.confirmation)}</div>[m
+[32m+[m[32m  <div slot="content">{uiContext.str(stringResKeys.pageDefinitionEditor.deleteRowConfirmation)}</div>[m
+ </AlertDialog>[m
+[1mdiff --git a/svelte/src/lib/components/Editors/TestCaseEditor.svelte b/svelte/src/lib/components/Editors/TestCaseEditor.svelte[m
+[1mindex 4e98d88..608b511 100644[m
+[1m--- a/svelte/src/lib/components/Editors/TestCaseEditor.svelte[m
+[1m+++ b/svelte/src/lib/components/Editors/TestCaseEditor.svelte[m
+[36m@@ -1,499 +1,474 @@[m
+ <script lang="ts">[m
+[31m-    import { appContextKey, type IAppContext } from '$lib/context/AppContext';[m
+[31m-    import { stringResKeys } from '$lib/context/StringResKeys';[m
+[31m-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';[m
+[31m-    import type { IUiTheme } from '$lib/context/UiTheme';[m
+[31m-    import type { IDropdownOption } from '$lib/controls/DropdownField';[m
+[31m-    import FancyDropdownField from '$lib/controls/FancyDropdownField.svelte';[m
+[31m-    import FormGroup from '$lib/controls/layout/FormGroup.svelte';[m
+[31m-    import FormGroupColumn from '$lib/controls/layout/FormGroupColumn.svelte';[m
+[31m-    import TextField from '$lib/controls/TextField.svelte';[m
+[31m-    import Form from '$lib/form-controls/Form.svelte';[m
+[31m-    import FormTextField from '$lib/form-controls/TextField.svelte';[m
+[31m-    import { FieldDataType, type IDictionary } from '$lib/form/FieldDef';[m
+[31m-    import { createFormContext } from '$lib/form/FormContext';[m
+[31m-    import { FormDataActionType } from '$lib/form/FormData';[m
+[31m-    import type { IFormDef } from '$lib/form/FormDef';[m
+[31m-    import { FormModeState } from '$lib/form/FormMode';[m
+[31m-    import { FormSerializer } from '$lib/form/FormSerializer';[m
+[31m-    import { createListDataContext, ListDataActionType } from '$lib/form/ListData';[m
+[31m-    import type { IListDef } from '$lib/form/ListDef';[m
+[31m-    import AddIcon from '$lib/icons/AddIcon.svelte';[m
+[31m-    import CommentIcon from '$lib/icons/CommentIcon.svelte';[m
+[31m-    import DeleteIcon from '$lib/icons/DeleteIcon.svelte';[m
+[31m-    import MoveDownIcon from '$lib/icons/MoveDownIcon.svelte';[m
+[31m-    import MoveUpIcon from '$lib/icons/MoveUpIcon.svelte';[m
+[31m-    import SaveIcon from '$lib/icons/SaveIcon.svelte';[m
+[31m-    import { fileSystem } from '$lib/ipc';[m
+[31m-    import { getActionTypeDropDownOptions } from '$lib/utils/dropdowns';[m
+[31m-    import { fileDefFactory, type ITestCase, type ITestStep } from 'rockmelonqa.common';[m
+[31m-    import { createEventDispatcher, getContext, onMount } from 'svelte';[m
+[31m-    import { derived } from 'svelte/store';[m
+[31m-    import { v4 as uuidv4 } from 'uuid';[m
+[31m-    import { AlertDialogButtons, AlertDialogType } from '../Alert';[m
+[31m-    import AlertDialog from '../AlertDialog.svelte';[m
+[31m-    import { appActionContextKey, type IAppActionContext } from '../Application';[m
+[31m-    import CommentTextField from '../CommentTextField.svelte';[m
+[31m-    import { combinePath } from '../FileExplorer/Node';[m
+[31m-    import IconLinkButton from '../IconLinkButton.svelte';[m
+[31m-    import { ListTableCellType } from '../ListTable';[m
+[31m-    import ListTable from '../ListTable.svelte';[m
+[31m-    import ListTableBodyCell from '../ListTableBodyCell.svelte';[m
+[31m-    import ListTableBodyRow from '../ListTableBodyRow.svelte';[m
+[31m-    import ListTableHeaderCell from '../ListTableHeaderCell.svelte';[m
+[31m-    import PrimaryButton from '../PrimaryButton.svelte';[m
+[31m-    import { toTitle } from './Editor';[m
+[31m-[m
+[31m-    const uiContext = getContext(uiContextKey) as IUiContext;[m
+[31m-    const { theme } = uiContext;[m
+[31m-    const uiTheme = $theme as IUiTheme;[m
+[31m-[m
+[31m-    export let folderPath: string;[m
+[31m-    export let fileName: string;[m
+[31m-    $: filePath = combinePath([folderPath, fileName], uiContext.pathSeparator);[m
+[31m-[m
+[31m-    export let contentIndex: number;[m
+[31m-[m
+[31m-    let appContext = getContext(appContextKey) as IAppContext;[m
+[31m-    let { state: appState, dispatch: appStateDispatch } = appContext;[m
+[31m-    const formDef: IFormDef = {[m
+[31m-        fields: {[m
+[31m-            id: {[m
+[31m-                dataType: FieldDataType.Text,[m
+[31m-                dataPath: 'id',[m
+[31m-                isRequired: true,[m
+[31m-            },[m
+[31m-            description: {[m
+[31m-                dataType: FieldDataType.Text,[m
+[31m-                dataPath: 'description',[m
+[31m-            },[m
+[31m-        },[m
+[31m-    };[m
+[31m-    let formContext = createFormContext('testCaseEditor', formDef, uiContext, FormModeState.Edit);[m
+[31m-    let {[m
+[31m-        mode: formMode,[m
+[31m-        modeDispatch: formModeDispatch,[m
+[31m-        data: formData,[m
+[31m-        dataDispatch: formDataDispatch,[m
+[31m-    } = formContext;[m
+[31m-[m
+[31m-    const listDef: IListDef = {[m
+[31m-        fields: {[m
+[31m-            id: {[m
+[31m-                dataType: FieldDataType.Text,[m
+[31m-                dataPath: 'id',[m
+[31m-            },[m
+[31m-            type: {[m
+[31m-                dataType: FieldDataType.Text,[m
+[31m-                dataPath: 'type',[m
+[31m-            },[m
+[31m-            page: {[m
+[31m-                dataType: FieldDataType.Dropdown,[m
+[31m-                dataPath: 'page',[m
+[31m-            },[m
+[31m-            element: {[m
+[31m-                dataType: FieldDataType.Dropdown,[m
+[31m-                dataPath: 'element',[m
+[31m-            },[m
+[31m-            action: {[m
+[31m-                dataType: FieldDataType.Dropdown,[m
+[31m-                dataPath: 'action',[m
+[31m-            },[m
+[31m-            data: {[m
+[31m-                dataType: FieldDataType.Text,[m
+[31m-                dataPath: 'data',[m
+[31m-            },[m
+[31m-            comment: {[m
+[31m-                dataType: FieldDataType.Text,[m
+[31m-                dataPath: 'comment',[m
+[31m-            },[m
+[31m-        },[m
+[31m-    };[m
+[31m-    let listDataContext = createListDataContext(listDef, uiContext);[m
+[31m-    let { value: listData, dispatch: listDataDispatch } = listDataContext;[m
+[31m-[m
+[31m-    $: title = toTitle(fileName);[m
+[31m-    let deleteDialogType: AlertDialogType = AlertDialogType.None;[m
+[31m-    let indexToDelete: number;[m
+[31m-[m
+[31m-    // Key: page id.  Value: page name[m
+[31m-    let pageDefinitionOptions: IDropdownOption[] = [];[m
+[31m-    // Key: page id.  Value: page element options[m
+[31m-    let pageElementsMap: Map<string, IDropdownOption[]>;[m
+[31m-    let actionTypeOptions: IDropdownOption[] = getActionTypeDropDownOptions(uiContext);[m
+[31m-[m
+[31m-    const { registerOnSaveHandler, unregisterOnSaveHandler } = getContext(appActionContextKey) as IAppActionContext;[m
+[31m-    const dispatch = createEventDispatcher();[m
+[31m-[m
+[31m-    const pagesSubscription = derived(appState, ($appState) => $appState.pages);[m
+[31m-    pagesSubscription.subscribe((pages) => {[m
+[31m-        pageDefinitionOptions = Array.from(pages.entries())[m
+[31m-            .map(([key, { name }]) => ({ key, text: name } as IDropdownOption))[m
+[31m-            .sort((a, b) => a.text.localeCompare(b.text));[m
+[31m-[m
+[31m-        pageElementsMap = new Map();[m
+[31m-        for (const [pageId, pageData] of pages) {[m
+[31m-            const dropdownOptions: IDropdownOption[] = [];[m
+[31m-            for (const [elementId, elementData] of pageData.elements) {[m
+[31m-                dropdownOptions.push({[m
+[31m-                    key: elementId,[m
+[31m-                    text: elementData.name,[m
+[31m-                });[m
+[31m-            }[m
+[31m-            dropdownOptions.sort((a, b) => a.text.localeCompare(b.text));[m
+[31m-            pageElementsMap.set(pageId, dropdownOptions);[m
+[31m-        }[m
+[31m-    });[m
+[31m-[m
+[31m-    onMount(async () => {[m
+[31m-        // default/empty data[m
+[31m-        let model: ITestCase = fileDefFactory.newTestCase();[m
+[31m-[m
+[31m-        // parse file content if any[m
+[31m-        const fileContent = await fileSystem.readFile(filePath);[m
+[31m-        if (fileContent) {[m
+[31m-            model = JSON.parse(fileContent) as ITestCase;[m
+[31m-        }[m
+[32m+[m[32m  import { appContextKey, type IAppContext } from "$lib/context/AppContext";[m
+[32m+[m[32m  import { stringResKeys } from "$lib/context/StringResKeys";[m
+[32m+[m[32m  import { uiContextKey, type IUiContext } from "$lib/context/UiContext";[m
+[32m+[m[32m  import type { IUiTheme } from "$lib/context/UiTheme";[m
+[32m+[m[32m  import type { IDropdownOption } from "$lib/controls/DropdownField";[m
+[32m+[m[32m  import FancyDropdownField from "$lib/controls/FancyDropdownField.svelte";[m
+[32m+[m[32m  import FormGroup from "$lib/controls/layout/FormGroup.svelte";[m
+[32m+[m[32m  import FormGroupColumn from "$lib/controls/layout/FormGroupColumn.svelte";[m
+[32m+[m[32m  import TextField from "$lib/controls/TextField.svelte";[m
+[32m+[m[32m  import Form from "$lib/form-controls/Form.svelte";[m
+[32m+[m[32m  import FormTextField from "$lib/form-controls/TextField.svelte";[m
+[32m+[m[32m  import { FieldDataType, type IDictionary } from "$lib/form/FieldDef";[m
+[32m+[m[32m  import { createFormContext } from "$lib/form/FormContext";[m
+[32m+[m[32m  import { FormDataActionType } from "$lib/form/FormData";[m
+[32m+[m[32m  import type { IFormDef } from "$lib/form/FormDef";[m
+[32m+[m[32m  import { FormModeState } from "$lib/form/FormMode";[m
+[32m+[m[32m  import { FormSerializer } from "$lib/form/FormSerializer";[m
+[32m+[m[32m  import { createListDataContext, ListDataActionType } from "$lib/form/ListData";[m
+[32m+[m[32m  import type { IListDef } from "$lib/form/ListDef";[m
+[32m+[m[32m  import AddIcon from "$lib/icons/AddIcon.svelte";[m
+[32m+[m[32m  import CommentIcon from "$lib/icons/CommentIcon.svelte";[m
+[32m+[m[32m  import DeleteIcon from "$lib/icons/DeleteIcon.svelte";[m
+[32m+[m[32m  import MoveDownIcon from "$lib/icons/MoveDownIcon.svelte";[m
+[32m+[m[32m  import MoveUpIcon from "$lib/icons/MoveUpIcon.svelte";[m
+[32m+[m[32m  import SaveIcon from "$lib/icons/SaveIcon.svelte";[m
+[32m+[m[32m  import { fileSystem } from "$lib/ipc";[m
+[32m+[m[32m  import { getActionTypeDropDownOptions } from "$lib/utils/dropdowns";[m
+[32m+[m[32m  import { fileDefFactory, type ITestCase, type ITestStep } from "rockmelonqa.common";[m
+[32m+[m[32m  import { createEventDispatcher, getContext, onMount } from "svelte";[m
+[32m+[m[32m  import { derived } from "svelte/store";[m
+[32m+[m[32m  import { v4 as uuidv4 } from "uuid";[m
+[32m+[m[32m  import { AlertDialogButtons, AlertDialogType } from "../Alert";[m
+[32m+[m[32m  import AlertDialog from "../AlertDialog.svelte";[m
+[32m+[m[32m  import { appActionContextKey, type IAppActionContext } from "../Application";[m
+[32m+[m[32m  import CommentTextField from "../CommentTextField.svelte";[m
+[32m+[m[32m  import { combinePath } from "../FileExplorer/Node";[m
+[32m+[m[32m  import IconLinkButton from "../IconLinkButton.svelte";[m
+[32m+[m[32m  import { ListTableCellType } from "../ListTable";[m
+[32m+[m[32m  import ListTable from "../ListTable.svelte";[m
+[32m+[m[32m  import ListTableBodyCell from "../ListTableBodyCell.svelte";[m
+[32m+[m[32m  import ListTableBodyRow from "../ListTableBodyRow.svelte";[m
+[32m+[m[32m  import ListTableHeaderCell from "../ListTableHeaderCell.svelte";[m
+[32m+[m[32m  import PrimaryButton from "../PrimaryButton.svelte";[m
+[32m+[m[32m  import { toTitle } from "./Editor";[m
+[32m+[m
+[32m+[m[32m  const uiContext = getContext(uiContextKey) as IUiContext;[m
+[32m+[m[32m  const { theme } = uiContext;[m
+[32m+[m[32m  const uiTheme = $theme as IUiTheme;[m
+[32m+[m
+[32m+[m[32m  export let folderPath: string;[m
+[32m+[m[32m  export let fileName: string;[m
+[32m+[m[32m  $: filePath = combinePath([folderPath, fileName], uiContext.pathSeparator);[m
+[32m+[m
+[32m+[m[32m  export let contentIndex: number;[m
+[32m+[m
+[32m+[m[32m  let appContext = getContext(appContextKey) as IAppContext;[m
+[32m+[m[32m  let { state: appState, dispatch: appStateDispatch } = appContext;[m
+[32m+[m[32m  const formDef: IFormDef = {[m
+[32m+[m[32m    fields: {[m
+[32m+[m[32m      id: {[m
+[32m+[m[32m        dataType: FieldDataType.Text,[m
+[32m+[m[32m        dataPath: "id",[m
+[32m+[m[32m        isRequired: true,[m
+[32m+[m[32m      },[m
+[32m+[m[32m      description: {[m
+[32m+[m[32m        dataType: FieldDataType.Text,[m
+[32m+[m[32m        dataPath: "description",[m
+[32m+[m[32m      },[m
+[32m+[m[32m    },[m
+[32m+[m[32m  };[m
+[32m+[m[32m  let formContext = createFormContext("testCaseEditor", formDef, uiContext, FormModeState.Edit);[m
+[32m+[m[32m  let { mode: formMode, modeDispatch: formModeDispatch, data: formData, dataDispatch: formDataDispatch } = formContext;[m
+[32m+[m
+[32m+[m[32m  const listDef: IListDef = {[m
+[32m+[m[32m    fields: {[m
+[32m+[m[32m      id: {[m
+[32m+[m[32m        dataType: FieldDataType.Text,[m
+[32m+[m[32m        dataPath: "id",[m
+[32m+[m[32m      },[m
+[32m+[m[32m      type: {[m
+[32m+[m[32m        dataType: FieldDataType.Text,[m
+[32m+[m[32m        dataPath: "type",[m
+[32m+[m[32m      },[m
+[32m+[m[32m      page: {[m
+[32m+[m[32m        dataType: FieldDataType.Dropdown,[m
+[32m+[m[32m        dataPath: "page",[m
+[32m+[m[32m      },[m
+[32m+[m[32m      element: {[m
+[32m+[m[32m        da

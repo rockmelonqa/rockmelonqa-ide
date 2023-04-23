@@ -21,13 +21,10 @@ export enum ListDataActionType {
     SetItems = 'SetItems',
     /** Clear all data */
     ClearItems = 'ClearItems',
-
     /** Append the new data to the existing one */
     AppendItems = 'AppendItems',
-
-    /** Append the new date to the existing one from index */
-    AppendItemAtIndex = 'AppendItemAtIndex',
-
+    /** Insert the new data to the existing one at index */
+    InsertItem = 'InsertItem',
     /** Update specific item in the list data */
     UpdateItem = 'UpdateItem',
     /** Remove Item out of list */
@@ -39,7 +36,7 @@ export type ListDataAction =
     | { type: ListDataActionType.SetItems; items: IDictionary[]; hasMoreItems: boolean }
     | { type: ListDataActionType.ClearItems }
     | { type: ListDataActionType.AppendItems; items: IDictionary[]; hasMoreItems: boolean }
-    | { type: ListDataActionType.AppendItemAtIndex; item: IDictionary; index: number; hasMoreItems: boolean }
+    | { type: ListDataActionType.InsertItem; item: IDictionary; index: number; }
     | { type: ListDataActionType.UpdateItem; index: number; item: IDictionary }
     | { type: ListDataActionType.RemoveItem; index: number }
     | { type: ListDataActionType.SwapItems; indexA: number; indexB: number };
@@ -48,19 +45,15 @@ function listDataReducer(state: IListData, action: ListDataAction) {
     switch (action.type) {
         case ListDataActionType.SetItems:
             return { ...state, items: action.items, hasMoreItems: action.hasMoreItems };
-
         case ListDataActionType.ClearItems:
             return { ...state, items: [], hasMoreItems: false };
-
         case ListDataActionType.AppendItems:
             return { ...state, items: state.items.concat(action.items), hasMoreItems: action.hasMoreItems };
-
-        case ListDataActionType.AppendItemAtIndex: {
+        case ListDataActionType.InsertItem: {
             const newItems = [...state.items];
             newItems.splice(action.index, 0, action.item);
-            return { ...state, items: newItems, hasMoreItems: action.hasMoreItems };
+            return { ...state, items: newItems };
         }
-
         case ListDataActionType.UpdateItem: {
             const newItems = [...state.items];
             newItems[action.index] = action.item;
