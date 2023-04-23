@@ -42,7 +42,8 @@
     "electron-serve": "^1.1.0",
     "electron-updater": "^5.2.1",
     "moment": "^2.29.4",
-    "rockmelonqa.common": "file:./common/dist/commonjs"
+    "rockmelonqa.common": "file:./common/dist/commonjs",
+    "xml-js": "^1.6.11"
   },
   "build": {
     "appId": "rockmelon-qa",

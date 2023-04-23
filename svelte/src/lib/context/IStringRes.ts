@@ -5,7 +5,9 @@ export interface IStringRes {
     actionType: IActionTypeStringRes;
     application: IApplicationStringRes;
     codeGenerationDialog: ICodeGenerationDialogStringRes;
+    deleteTestCaseConfirmationDialog: IDeleteTestCaseConfirmationDialogStringRes;
     culture: ICultureStringRes;
+    fileExplorer: IFileExplorerStringRes;
     form: IFormStringRes;
     general: IGeneralStringRes;
     locatorType: ILocatorTypeStringRes;
@@ -57,6 +59,11 @@ export interface IApplicationStringRes {
     name: string;
 }
 
+export interface IDeleteTestCaseConfirmationDialogStringRes {
+    dialogTitle: string;
+    relatedSuitesMessage: string;
+}
+
 export interface ICodeGenerationDialogStringRes {
     buildMsg: string;
     checkPrerequisites: string;
@@ -70,6 +77,15 @@ export interface ICodeGenerationDialogStringRes {
     logFile: string;
     parseDataMsg: string;
     validateInputMsg: string;
+}
+
+
+export interface IFileExplorerStringRes {
+    newFile: string;
+    newFolder: string;
+    newPage: string;
+    newTestCase: string;
+    newTestSuite: string;
 }
 
 export interface IGeneralStringRes {

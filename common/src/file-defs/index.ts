@@ -1,9 +1,9 @@
 import { ActionType } from "./actionType";
-import { ICodeGenMeta } from "./codeGenMeta";
 import { IFileDef } from "./fileDef";
 import { fileDefFactory } from "./fileDefFactory";
 import { LocatorType } from "./locatorType";
 import { AutomationFramework, Browser, Indent, IRmProj, IRmProjFile, Language, TestFramework } from "./rmProjFile";
+import { ISourceProjectMeta } from "./sourceProjectMeta";
 import { StandardOutputFile } from "./standardOutputFile";
 import { ITestCase, ITestCaseFile, ITestStep as ITestCaseStep } from "./testCaseFile";
 import { IDataSet, ITestRoutine, ITestRoutineFile, ITestStep as ITestRoutineStep } from "./testRoutineFile";
@@ -20,7 +20,7 @@ export {
   fileDefFactory,
   IRmProjFile,
   IRmProj,
-  ICodeGenMeta,
+  ISourceProjectMeta,
   LocatorType,
   ActionType,
   ITestCase,

@@ -1,12 +1,14 @@
-import { AutomationFramework, ICodeGenMeta, TestFramework } from "../file-defs";
+import { AutomationFramework, ISourceProjectMeta, TestFramework } from "../file-defs";
 import { PlaywrightCsharpMSTestCodeGen } from "./playwright-csharp-mstest/playwrightCsharpMsTestCodeGen";
 import { PlaywrightCsharpNunitCodeGen } from "./playwright-csharp-nunit/playwrightCsharpNunitCodeGen";
+import { PlaywrightCsharpXUnitCodeGen } from "./playwright-csharp-xunit/playwrightCsharpXUnitCodeGen";
 import { ICodeGen } from "./types";
 
 const registy: { [key in keyof typeof AutomationFramework]?: { [key in keyof typeof TestFramework]?: any } } = {
   [AutomationFramework.Playwright]: {
     [TestFramework.NUnit]: PlaywrightCsharpNunitCodeGen,
     [TestFramework.MSTest]: PlaywrightCsharpMSTestCodeGen,
+    [TestFramework.xUnit]: PlaywrightCsharpXUnitCodeGen,
     // ... add other types of TestFramework
   },
   // ... add other types of AutomationFramework
@@ -14,7 +16,7 @@ const registy: { [key in keyof typeof AutomationFramework]?: { [key in keyof typ
 
 /** Creates new instance of Codegen based on  { automationFramework, testFramework }*/
 export class CodeGenFactory {
-  static newInstance(projMeta: ICodeGenMeta): ICodeGen {
+  static newInstance(projMeta: ISourceProjectMeta): ICodeGen {
     let automationFramework = registy[projMeta.project.content.automationFramework];
 
     if (automationFramework === undefined) {

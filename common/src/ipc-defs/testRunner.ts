@@ -15,4 +15,5 @@ export interface IRunTestResponseData {
 export interface IRunTestSettings {
   browser: Browser;
   dotnetFilterStr: string;
+  outputCodeDir: string;
 }

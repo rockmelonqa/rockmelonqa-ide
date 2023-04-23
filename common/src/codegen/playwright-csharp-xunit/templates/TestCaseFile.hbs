@@ -1,0 +1,16 @@
+namespace {{{fullNamespace}}};
+
+/// <summary>
+/// {{{description}}}
+/// </summary>
+public class {{{testCaseName}}} : TestCaseBase
+{
+    public {{{testCaseName}}}(PageTest testSuiteInstance): base(testSuiteInstance) {}
+ 
+    public async Task RunAsync()
+    {
+        PageDefinitions defs = new PageDefinitions(this.Page);
+
+{{{body}}}
+    }
+}

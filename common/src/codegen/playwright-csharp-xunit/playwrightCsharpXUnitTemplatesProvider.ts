@@ -5,13 +5,13 @@ import { IActionTemplateParam, ILocatorTemplateParam } from "../types";
 import { actionRegistyDotnet } from "../utils/action-registry-dotnet";
 import { locatorRegistyDotnet } from "../utils/locator-registry-dotnet";
 import { getParameters, escapeStr, hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
-import { NunitTemplateCollection } from "./templateCollection";
+import { XUnitTemplateCollection } from "./templateCollection";
 
-export class PlaywrightCsharpNunitTemplatesProvider {
-  private _templateCollection: NunitTemplateCollection;
+export class PlaywrightCsharpXUnitTemplatesProvider {
+  private _templateCollection: XUnitTemplateCollection;
 
   constructor(customTemplatesDir: string) {
-    this._templateCollection = new NunitTemplateCollection(path.resolve(__dirname, "./templates"), customTemplatesDir, ".hbs");
+    this._templateCollection = new XUnitTemplateCollection(path.resolve(__dirname, "./templates"), customTemplatesDir, ".hbs");
   }
 
   getTestClass(usings: string, name: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
@@ -59,13 +59,13 @@ export class PlaywrightCsharpNunitTemplatesProvider {
   getLocatorHelper(rootNamespace: string): string {
     return this._templateCollection.LOCATOR_HELPER_TEMPLATE({ rootNamespace });
   }
-  getSingleCaseSuiteBase(rootNamespace: string): string {
-    return this._templateCollection.SINGLE_CASE_SUITE_BASE({ rootNamespace });
+  getBaseClasses(rootNamespace: string): string {
+    return this._templateCollection.BASE_CLASSES_TEMPLATE({ rootNamespace });
   }
   getCSProject(rootNamespace: string) {
     return this._templateCollection.CSPROJECT_TEMPLATE({ rootNamespace });
   }
-  getNUNitUsing(rootNamespace: string) {
+  getUsings(rootNamespace: string) {
     return this._templateCollection.USINGS_TEMPLATE({ rootNamespace });
   }
   getRunSettings() {

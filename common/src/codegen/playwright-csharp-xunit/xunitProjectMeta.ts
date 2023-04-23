@@ -10,34 +10,33 @@ import {
 import { IOutputProjectMetadata } from "../playwright-charp/outputProjectMetadata";
 import { IOutputFileFileInfo, ISuiteInfo, ITestCaseInfo } from "../types";
 
-/** MsTest project meta: Contains info of all files and other resources */
-export class MsTestProjMeta implements IOutputProjMetaGenerator {
+export class XUnitProjectMeta implements IOutputProjMetaGenerator {
   private _projMeta: ISourceProjectMeta;
 
-  public readonly pageMetaMap: Map<IPage, IOutputFileFileInfo> = new Map<IPage, IOutputFileFileInfo>();
-  public readonly suiteMetaMap: Map<ITestSuite, IOutputFileFileInfo> = new Map<ITestSuite, IOutputFileFileInfo>();
-  public readonly caseMetaMap: Map<ITestCase, IOutputFileFileInfo> = new Map<ITestCase, IOutputFileFileInfo>();
-  public readonly routineMetaMap: Map<ITestRoutine, IOutputFileFileInfo> = new Map<ITestRoutine, IOutputFileFileInfo>();
+  public readonly pageNameMap: Map<IPage, IOutputFileFileInfo> = new Map<IPage, IOutputFileFileInfo>();
+  public readonly suiteNameMap: Map<ITestSuite, IOutputFileFileInfo> = new Map<ITestSuite, IOutputFileFileInfo>();
+  public readonly caseNameMap: Map<ITestCase, IOutputFileFileInfo> = new Map<ITestCase, IOutputFileFileInfo>();
+  public readonly routineNameMap: Map<ITestRoutine, IOutputFileFileInfo> = new Map<ITestRoutine, IOutputFileFileInfo>();
 
+  /**
+   *
+   */
   constructor(codegenMeta: ISourceProjectMeta) {
     this._projMeta = codegenMeta;
-
     const rmprojFile = codegenMeta.project;
 
-    this.pageMetaMap = createMapForPages(rmprojFile, codegenMeta.pages);
-    this.suiteMetaMap = createMapForTestSuites(rmprojFile, codegenMeta.testSuites);
-    this.caseMetaMap = createMapForTestCases(rmprojFile, codegenMeta.testCases);
-    this.routineMetaMap = createMapForTestRoutines(rmprojFile, codegenMeta.testRoutines);
-
-    this.verifyDuplication();
+    this.pageNameMap = createMapForPages(rmprojFile, codegenMeta.pages);
+    this.suiteNameMap = createMapForTestSuites(rmprojFile, codegenMeta.testSuites);
+    this.caseNameMap = createMapForTestCases(rmprojFile, codegenMeta.testCases);
+    this.routineNameMap = createMapForTestRoutines(rmprojFile, codegenMeta.testRoutines);
   }
 
   public generateOutputProjectMeta(): IOutputProjectMetadata {
     const suites: ISuiteInfo[] = [];
 
-    for (let { content: testsuite } of this._projMeta.testSuites) {
+    for (let { content: testsuite, isValid } of this._projMeta.testSuites) {
       let testCases = this._projMeta.testCases.filter((c) => testsuite.testcases.includes(c.content.id));
-      let suiteMeta = this.suiteMetaMap.get(testsuite)!;
+      let suiteMeta = this.suiteNameMap.get(testsuite)!;
 
       let suiteInfo: ISuiteInfo = {
         name: suiteMeta.outputFileClassName,
@@ -50,7 +49,7 @@ export class MsTestProjMeta implements IOutputProjMetaGenerator {
         outputFileRelPath: suiteMeta.outputFileRelPath,
         isValid: suiteMeta.isValid,
         testCases: testCases.map((tc) => {
-          let caseMeta = this.caseMetaMap.get(tc.content)!;
+          let caseMeta = this.caseNameMap.get(tc.content)!;
           let caseInfo: ITestCaseInfo = {
             name: caseMeta.outputFileClassName,
             fullyQualifiedName: `${suiteMeta.outputFileFullNamespace}.${suiteMeta.outputFileClassName}.${caseMeta.outputFileClassName}`,
@@ -72,10 +71,10 @@ export class MsTestProjMeta implements IOutputProjMetaGenerator {
   }
 
   private verifyDuplication() {
-    this.findDuplication(this.pageMetaMap.values());
-    this.findDuplication(this.caseMetaMap.values());
-    this.findDuplication(this.suiteMetaMap.values());
-    this.findDuplication(this.routineMetaMap.values());
+    this.findDuplication(this.pageNameMap.values());
+    this.findDuplication(this.caseNameMap.values());
+    this.findDuplication(this.suiteNameMap.values());
+    this.findDuplication(this.routineNameMap.values());
   }
 
   private findDuplication(nameInfo: IterableIterator<IOutputFileFileInfo>) {
@@ -89,27 +88,27 @@ export class MsTestProjMeta implements IOutputProjMetaGenerator {
   /** Get an instance of OutputFileFileInfo with the provided guid of an item in the rmProj  */
   public get(guid: string): IOutputFileFileInfo {
     // IPage
-    for (let page of this.pageMetaMap.keys()) {
+    for (let [page, info] of this.pageNameMap) {
       if (page.id === guid) {
-        return this.pageMetaMap.get(page)!;
+        return info;
       }
     }
     // ITestRoutine
-    for (let suite of this.suiteMetaMap.keys()) {
+    for (let [suite, info] of this.suiteNameMap) {
       if (suite.id === guid) {
-        return this.suiteMetaMap.get(suite)!;
+        return info;
       }
     }
     // TCase
-    for (let tcase of this.caseMetaMap.keys()) {
+    for (let [tcase, info] of this.caseNameMap) {
       if (tcase.id === guid) {
-        return this.caseMetaMap.get(tcase)!;
+        return info;
       }
     }
     // ITestRoutine
-    for (let routine of this.routineMetaMap.keys()) {
+    for (let [routine, info] of this.routineNameMap) {
       if (routine.id === guid) {
-        return this.routineMetaMap.get(routine)!;
+        return info;
       }
     }
     throw new Error(`NameMap doesn't contain a complete set of names.`);

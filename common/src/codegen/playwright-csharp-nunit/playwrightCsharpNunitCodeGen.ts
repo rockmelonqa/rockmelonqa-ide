@@ -1,6 +1,6 @@
 import { EOL } from "os";
 import path from "path";
-import { ActionType, ICodeGenMeta, IRmProjFile, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
+import { ActionType, IRmProjFile, ISourceProjectMeta, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { createCodeGenMeta } from "../codegen";
@@ -12,7 +12,7 @@ import { NunitProjectMeta } from "./nunitProjectMeta";
 import { PlaywrightCsharpNunitTemplatesProvider } from "./playwrightCsharpNunitTemplatesProvider";
 
 export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
-  private _projMeta: ICodeGenMeta;
+  private _projMeta: ISourceProjectMeta;
   private _rmprojFile: IRmProjFile;
   private _rootNamespace: string;
   private _templateProvider: PlaywrightCsharpNunitTemplatesProvider;
@@ -24,7 +24,7 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
 
   private _outProjMeta: NunitProjectMeta;
 
-  constructor(projMeta: ICodeGenMeta) {
+  constructor(projMeta: ISourceProjectMeta) {
     const rmprojFile = projMeta.project;
 
     this._projMeta = projMeta;
@@ -108,14 +108,17 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
         `${this._rmprojFile.content.rootNamespace}.csproj`,
         this._templateProvider.getCSProject(this._rmprojFile.content.rootNamespace)
       );
-      await writeFile(`${StandardOutputFile.Usings}${this._outputFileExt}`, this._templateProvider.getNUNitUsing());
+      await writeFile(
+        `${StandardOutputFile.Usings}${this._outputFileExt}`,
+        this._templateProvider.getNUNitUsing(this._rmprojFile.content.rootNamespace)
+      );
       await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
     }
 
     // Write suites meta
     const inProjMeta = await createCodeGenMeta(this._rmprojFile);
     const outProjMeta = CodeGenMetaFactory.newInstance(inProjMeta);
-    const data = outProjMeta.createSuitesMeta();
+    const data = outProjMeta.generateOutputProjectMeta();
     await writeFile(StandardOutputFile.MetaData, JSON.stringify(data, null, 2));
 
     return "";

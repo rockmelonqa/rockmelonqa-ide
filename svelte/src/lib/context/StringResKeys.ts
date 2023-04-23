@@ -42,6 +42,17 @@ export const stringResKeys = {
         thousandsDelimeter: 'culture.thousandsDelimeter',
         timeFormat: 'culture.timeFormat',
     },
+    deleteTestCaseConfirmationDialog: {
+        dialogTitle: 'deleteTestCaseConfirmationDialog.dialogTitle',
+        relatedSuitesMessage: 'deleteTestCaseConfirmationDialog.relatedSuitesMessage',
+    },
+    fileExplorer: {
+        newFile: 'fileExplorer.newFile',
+        newFolder: 'fileExplorer.newFolder',
+        newPage: 'fileExplorer.newPage',
+        newTestCase: 'fileExplorer.newTestCase',
+        newTestSuite: 'fileExplorer.newTestSuite',
+    },
     form: {
         invalidDateError: 'form.invalidDateError',
         invalidDateTimeError: 'form.invalidDateTimeError',
