@@ -72,8 +72,8 @@ export const stringResEn: IStringRes = {
         relatedSuitesMessage: 'Test case is being used by following test suites. Do you want to remove it?',
     },
     fileExplorer: {
-        newFolder: 'New Folder',
         newFile: 'New File',
+        newFolder: 'New Folder',
         newPage: 'New Page',
         newTestCase: 'New Test Case',
         newTestSuite: 'New Test Suite',

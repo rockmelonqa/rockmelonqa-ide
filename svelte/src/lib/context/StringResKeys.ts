@@ -47,8 +47,8 @@ export const stringResKeys = {
         relatedSuitesMessage: 'deleteTestCaseConfirmationDialog.relatedSuitesMessage',
     },
     fileExplorer: {
-        newFolder: 'fileExplorer.newFolder',
         newFile: 'fileExplorer.newFile',
+        newFolder: 'fileExplorer.newFolder',
         newPage: 'fileExplorer.newPage',
         newTestCase: 'fileExplorer.newTestCase',
         newTestSuite: 'fileExplorer.newTestSuite',

@@ -78,6 +78,15 @@ export interface ICodeGenerationDialogStringRes {
     validateInputMsg: string;
 }
 
+
+export interface IFileExplorerStringRes {
+    newFile: string;
+    newFolder: string;
+    newPage: string;
+    newTestCase: string;
+    newTestSuite: string;
+}
+
 export interface IGeneralStringRes {
     add: string;
     cancel: string;
@@ -192,12 +201,4 @@ export interface ITestSuiteEditorStringRes {
     description: string;
     name: string;
     testCase: string;
-}
-
-export interface IFileExplorerStringRes {
-    newFolder: string;
-    newFile: string;
-    newPage: string;
-    newTestCase: string;
-    newTestSuite: string;
 }
