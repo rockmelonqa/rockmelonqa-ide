@@ -5,9 +5,8 @@ import { LocatorType } from "./locatorType";
 import { AutomationFramework, Browser, Indent, IRmProj, IRmProjFile, Language, TestFramework } from "./rmProjFile";
 import { ISourceProjectMeta } from "./sourceProjectMeta";
 import { StandardOutputFile } from "./standardOutputFile";
-import { ITestCase, ITestCaseFile } from "./testCaseFile";
-import { IDataSet, ITestRoutine, ITestRoutineFile } from "./testRoutineFile";
-import { ITestStep } from "./testStep";
+import { ITestCase, ITestCaseFile, ITestStep as ITestCaseStep } from "./testCaseFile";
+import { IDataSet, ITestRoutine, ITestRoutineFile, ITestStep as ITestRoutineStep } from "./testRoutineFile";
 import { ITestSuite, ITestSuiteFile } from "./testSuiteFile";
 import { IRecentFile, IUserSettings, IUserSettingsFile } from "./userSettingsFile";
 
@@ -24,12 +23,13 @@ export {
   ISourceProjectMeta,
   LocatorType,
   ActionType,
-  ITestStep,
   ITestCase,
   ITestCaseFile,
+  ITestCaseStep,
   IDataSet,
   ITestRoutine,
   ITestRoutineFile,
+  ITestRoutineStep,
   ITestSuite,
   ITestSuiteFile,
   IUserSettings,

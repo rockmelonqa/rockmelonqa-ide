@@ -1,5 +1,5 @@
 import { IFileDef } from "./fileDef";
-import { ITestStep } from "./testStep";
+import { IDictionary } from "./shared";
 
 /** A data set is set of data to be used for a specific execution of a test routine   */
 export interface IDataSet {
@@ -18,4 +18,15 @@ export interface ITestRoutine {
 /** Describes the file and its test routine contents */
 export interface ITestRoutineFile extends Omit<IFileDef, "content"> {
   content: ITestRoutine;
+}
+
+export interface ITestStep {
+  id: string;
+  type: "testStep" | "comment";
+  page?: string;
+  element?: string;
+  action?: string;
+  data: IDictionary<string>[];
+  parameters?: string[];
+  comment?: string;
 }

@@ -3,7 +3,7 @@ import type { ComponentType } from 'svelte';
 import PageDefinitionEditor from './PageDefinitionEditor.svelte';
 import RmProjectEditor from './RmProjectEditor.svelte';
 import TestCaseEditor from './TestCaseEditor.svelte';
-import TestRoutineEditor from './TestRoutineEditor.svelte';
+import TestRoutineEditor from './TestRoutineEditor/TestRoutineEditor.svelte';
 import TestSuiteEditor from './TestSuiteEditor.svelte';
 import TextEditor from './TextEditor.svelte';
 import TrxViewer from './TrxViewer/TrxViewer.svelte';

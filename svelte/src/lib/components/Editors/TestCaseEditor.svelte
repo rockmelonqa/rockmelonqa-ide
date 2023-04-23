@@ -26,7 +26,7 @@
   import SaveIcon from "$lib/icons/SaveIcon.svelte";
   import { fileSystem } from "$lib/ipc";
   import { getActionTypeDropDownOptions } from "$lib/utils/dropdowns";
-  import { fileDefFactory, type ITestCase, type ITestStep } from "rockmelonqa.common";
+  import { fileDefFactory, type ITestCase, type ITestCaseStep as ITestStep } from "rockmelonqa.common";
   import { createEventDispatcher, getContext, onMount } from "svelte";
   import { derived } from "svelte/store";
   import { v4 as uuidv4 } from "uuid";
@@ -56,6 +56,7 @@
 
   let appContext = getContext(appContextKey) as IAppContext;
   let { state: appState, dispatch: appStateDispatch } = appContext;
+
   const formDef: IFormDef = {
     fields: {
       id: {
@@ -111,7 +112,6 @@
   let deleteDialogType: AlertDialogType = AlertDialogType.None;
   let indexToDelete: number;
 
-  // Key: page id.  Value: page name
   let pageDefinitionOptions: IDropdownOption[] = [];
   // Key: page id.  Value: page element options
   let pageElementsMap: Map<string, IDropdownOption[]>;
@@ -190,11 +190,6 @@
 
     formDataDispatch({ type: FormDataActionType.ShowAllErrors });
     return false;
-  };
-
-  const handleSelectPage = async (index: number, key: string, value: any) => {
-    handleItemChange(index, key, value);
-    const pageData = $appState.pages.get(value);
   };
 
   const handleItemChange = (index: number, key: string, value: any) => {
@@ -377,7 +372,7 @@
                 name={`${formContext.formName}_${index}_page`}
                 value={item.page}
                 options={pageDefinitionOptions}
-                on:change={(event) => handleSelectPage(index, "page", event.detail.value)}
+                on:change={(event) => handleItemChange(index, "page", event.detail.value)}
               />
             </ListTableBodyCell>
             <ListTableBodyCell type={ListTableCellType.Normal}>

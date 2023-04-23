@@ -76,6 +76,7 @@ export const stringResEn: IStringRes = {
         newFolder: 'New Folder',
         newPage: 'New Page',
         newTestCase: 'New Test Case',
+        newTestRoutine: 'New Test Routine',
         newTestSuite: 'New Test Suite',
     },
     form: {
@@ -195,6 +196,19 @@ export const stringResEn: IStringRes = {
         element: 'Element',
         name: 'Name',
         page: 'Page',
+    },
+    testRoutineEditor: {
+        actions: 'Actions',
+        action: 'Action',
+        addComment: 'Add Comment',
+        comment: 'Comment',
+        dataSet: 'Data Set',
+        deleteRowConfirmation: 'Are you sure to delete this row?',
+        description: 'Description',
+        element: 'Element',
+        name: 'Name',
+        page: 'Page',
+        steps: 'Steps',
     },
     testSuiteEditor: {
         action: 'Action',

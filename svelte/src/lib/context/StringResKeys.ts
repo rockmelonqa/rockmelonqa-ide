@@ -51,6 +51,7 @@ export const stringResKeys = {
         newFolder: 'fileExplorer.newFolder',
         newPage: 'fileExplorer.newPage',
         newTestCase: 'fileExplorer.newTestCase',
+        newTestRoutine: 'fileExplorer.newTestRoutine',
         newTestSuite: 'fileExplorer.newTestSuite',
     },
     form: {
@@ -153,6 +154,19 @@ export const stringResKeys = {
         element: 'testCaseEditor.element',
         name: 'testCaseEditor.name',
         page: 'testCaseEditor.page',
+    },
+    testRoutineEditor: {
+        actions: 'testRoutineEditor.actions',
+        action: 'testRoutineEditor.action',
+        addComment: 'testRoutineEditor.addComment',
+        comment: 'testRoutineEditor.comment',
+        dataSet: 'testRoutineEditor.dataSet',
+        deleteRowConfirmation: 'testRoutineEditor.deleteRowConfirmation',
+        description: 'testRoutineEditor.description',
+        element: 'testRoutineEditor.element',
+        name: 'testRoutineEditor.name',
+        page: 'testRoutineEditor.page',
+        steps: 'testRoutineEditor.steps',
     },
     testSuiteEditor: {
         action: 'testSuiteEditor.action',
