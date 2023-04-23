@@ -366,6 +366,11 @@
           label={uiContext.str(stringResKeys.fileExplorer.newTestCase)}
           on:click={() => handleMenuNew(FileType.TCase)}
         />
+      {:else if nodePath.includes(StandardFolder.TestRoutines)}
+        <MenuItem
+          label={uiContext.str(stringResKeys.fileExplorer.newTestRoutine)}
+          on:click={() => handleMenuNew(FileType.TRoutine)}
+        />
       {:else if nodePath.includes(StandardFolder.TestSuites)}
         <MenuItem
           label={uiContext.str(stringResKeys.fileExplorer.newTestSuite)}

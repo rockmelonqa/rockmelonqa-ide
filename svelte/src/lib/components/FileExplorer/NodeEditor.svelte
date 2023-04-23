@@ -60,6 +60,10 @@
             return val + StandardFileExtension.TestCase;
         }
 
+        if (type === FileType.TRoutine && !val.endsWith(StandardFileExtension.TestRoutine)) {
+            return val + StandardFileExtension.TestRoutine;
+        }
+
         if (type === FileType.TSuite && !val.endsWith(StandardFileExtension.TestSuite)) {
             return val + StandardFileExtension.TestSuite;
         }

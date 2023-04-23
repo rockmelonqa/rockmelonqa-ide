@@ -76,6 +76,7 @@ export const stringResEn: IStringRes = {
         newFolder: 'New Folder',
         newPage: 'New Page',
         newTestCase: 'New Test Case',
+        newTestRoutine: 'New Test Routine',
         newTestSuite: 'New Test Suite',
     },
     form: {

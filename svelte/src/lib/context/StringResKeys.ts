@@ -51,6 +51,7 @@ export const stringResKeys = {
         newFolder: 'fileExplorer.newFolder',
         newPage: 'fileExplorer.newPage',
         newTestCase: 'fileExplorer.newTestCase',
+        newTestRoutine: 'fileExplorer.newTestRoutine',
         newTestSuite: 'fileExplorer.newTestSuite',
     },
     form: {

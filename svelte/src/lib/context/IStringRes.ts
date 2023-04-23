@@ -85,6 +85,7 @@ export interface IFileExplorerStringRes {
     newFolder: string;
     newPage: string;
     newTestCase: string;
+    newTestRoutine: string;
     newTestSuite: string;
 }
 
