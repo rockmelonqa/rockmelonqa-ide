@@ -42,8 +42,8 @@ app.commandLine.appendSwitch("enable-experimental-web-platform-features");
 
 const windowSettings = {
   title: "Rockmelon QA",
-  // width: 854,
-  // height: 854,
+  width: 980,
+  height: 650,
 };
 
 let main = new Main(windowSettings, developerOptions);

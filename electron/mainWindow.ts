@@ -3,15 +3,15 @@ import EventEmitter from "events";
 import path from "path";
 import applicationMenu from "./applicationMenu";
 import ConfigureDev, { DeveloperOptions } from "./configureDev";
+import { store } from "./utils/appStore";
 
-import { isWindowMaximize, setWindowMaximize, setWindowMinimize } from './utils/electronStore';
 const appName = "Rockmelon QA";
 const localHost = "http://localhost:7011";
 
 const defaultSettings = {
   title: "Rockmelon QA",
-  width: 854,
-  height: 480,
+  width: 980,
+  height: 650,
 };
 
 const defaultSettingsDev: DeveloperOptions = {
@@ -92,19 +92,16 @@ class Main {
       }
     }
 
-    if(isWindowMaximize()) {
-      window.maximize();
-    } else {
-      window.minimize();
-    }
-
     window.on('maximize', () => {
-      setWindowMaximize();
+      store.set("isMaximize", true);
+    });
+    window.on('unmaximize', () => {
+      store.set('isMaximize', false);
     });
 
-    window.on('minimize', () => {
-      setWindowMinimize();
-    });
+    if(store.get('isMaximize')) {
+      window.maximize();
+    }
 
     window.show();
 
