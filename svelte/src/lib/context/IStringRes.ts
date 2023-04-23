@@ -7,6 +7,7 @@ export interface IStringRes {
     codeGenerationDialog: ICodeGenerationDialogStringRes;
     deleteTestCaseConfirmationDialog: IDeleteTestCaseConfirmationDialogStringRes;
     culture: ICultureStringRes;
+    fileExplorer: IFileExplorerStringRes;
     form: IFormStringRes;
     general: IGeneralStringRes;
     locatorType: ILocatorTypeStringRes;
@@ -75,6 +76,15 @@ export interface ICodeGenerationDialogStringRes {
     logFile: string;
     parseDataMsg: string;
     validateInputMsg: string;
+}
+
+
+export interface IFileExplorerStringRes {
+    newFile: string;
+    newFolder: string;
+    newPage: string;
+    newTestCase: string;
+    newTestSuite: string;
 }
 
 export interface IGeneralStringRes {
