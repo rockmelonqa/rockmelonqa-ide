@@ -159,7 +159,7 @@
             })
         );
 
-        const { suites, error } = await codeGenerator.getSuitesMetadata($appState.projectFile!);
+        const { suites, error } = await codeGenerator.getOutputProjectMetadata($appState.projectFile!);
         const hasTestCases = suites.some((suite: ISuiteInfo) => suite.testCases.length);
         allowRunTest = hasTestCases && !error;
 
@@ -210,7 +210,7 @@
                 setting: {
                     browser: model.browser,
                     dotnetFilterStr: filter,
-                    outputCodeDir: ""
+                    outputCodeDir: '',
                 },
             });
         } else {
