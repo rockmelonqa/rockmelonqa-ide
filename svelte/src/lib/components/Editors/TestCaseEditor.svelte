@@ -26,7 +26,7 @@
   import SaveIcon from "$lib/icons/SaveIcon.svelte";
   import { fileSystem } from "$lib/ipc";
   import { getActionTypeDropDownOptions } from "$lib/utils/dropdowns";
-  import { fileDefFactory, type ITestCase, type ITestCaseStep as ITestStep } from "rockmelonqa.common";
+  import { ActionType, fileDefFactory, type ITestCase, type ITestCaseStep as ITestStep } from "rockmelonqa.common";
   import { createEventDispatcher, getContext, onMount } from "svelte";
   import { derived } from "svelte/store";
   import { v4 as uuidv4 } from "uuid";
@@ -47,6 +47,11 @@
   const uiContext = getContext(uiContextKey) as IUiContext;
   const { theme } = uiContext;
   const uiTheme = $theme as IUiTheme;
+
+  const ITEM_KEY_ACTION = 'action';
+  const ITEM_KEY_ELEMENT = 'element';
+  const ITEM_KEY_PAGE = 'page';
+  const ITEM_KEY_DATA = 'data';
 
   export let folderPath: string;
   export let fileName: string;
@@ -168,6 +173,11 @@
     return (item as ITestStep).type === "comment";
   };
 
+  const pagelessActions = [ActionType.ClosePopup.toString(), ActionType.Delay.toString(), ActionType.GoToUrl.toString(), ActionType.RunCode.toString()];
+  const isPagelessAction = (action: string) => {
+    return pagelessActions.includes(action);
+  };
+
   const handleSave = async () => {
     await doSave();
   };
@@ -195,6 +205,13 @@
   const handleItemChange = (index: number, key: string, value: any) => {
     const item = { ...$listData.items[index] };
     item[key] = value;
+
+    if(key == 'action') {
+      if(isPagelessAction(value)) {
+        item[ITEM_KEY_ELEMENT] = '';
+        item[ITEM_KEY_PAGE] = '';
+      }
+    }
 
     listDataDispatch({
       type: ListDataActionType.UpdateItem,
@@ -364,7 +381,7 @@
                 name={`${formContext.formName}_${index}_action`}
                 value={item.action}
                 options={actionTypeOptions}
-                on:change={(event) => handleItemChange(index, "action", event.detail.value)}
+                on:change={(event) => handleItemChange(index, ITEM_KEY_ACTION, event.detail.value)}
               />
             </ListTableBodyCell>
             <ListTableBodyCell type={ListTableCellType.Normal}>
@@ -372,7 +389,8 @@
                 name={`${formContext.formName}_${index}_page`}
                 value={item.page}
                 options={pageDefinitionOptions}
-                on:change={(event) => handleItemChange(index, "page", event.detail.value)}
+                disabled={isPagelessAction(item.action)}
+                on:change={(event) => handleItemChange(index, ITEM_KEY_PAGE, event.detail.value)}
               />
             </ListTableBodyCell>
             <ListTableBodyCell type={ListTableCellType.Normal}>
@@ -380,14 +398,15 @@
                 name={`${formContext.formName}_${index}_element`}
                 value={item.element}
                 options={pageElementsMap.get(item.page) ?? []}
-                on:change={(event) => handleItemChange(index, "element", event.detail.value)}
+                disabled={isPagelessAction(item.action)}
+                on:change={(event) => handleItemChange(index, ITEM_KEY_ELEMENT, event.detail.value)}
               />
             </ListTableBodyCell>
             <ListTableBodyCell type={ListTableCellType.Last}>
               <TextField
                 name={`${formContext.formName}_${index}_data`}
                 value={item.data}
-                on:input={(event) => handleItemChange(index, "data", event.detail.value)}
+                on:input={(event) => handleItemChange(index, ITEM_KEY_DATA, event.detail.value)}
               />
             </ListTableBodyCell>
           {/if}
