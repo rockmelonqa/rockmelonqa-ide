@@ -52,7 +52,6 @@
   const ITEM_KEY_ELEMENT = 'element';
   const ITEM_KEY_PAGE = 'page';
   const ITEM_KEY_DATA = 'data';
-  const ITEM_KEY_COMMENT = 'comment';
 
   export let folderPath: string;
   export let fileName: string;
@@ -174,9 +173,9 @@
     return (item as ITestStep).type === "comment";
   };
 
-  const isDisabledOnPagelessAction = (item: IDictionary) => {
-    const actions = [ActionType.ClosePopup.toString(), ActionType.Delay.toString(), ActionType.GoToUrl.toString(), ActionType.RunCode.toString()];
-    return actions.includes((item as ITestStep).action!);
+  const pagelessActions = [ActionType.ClosePopup.toString(), ActionType.Delay.toString(), ActionType.GoToUrl.toString(), ActionType.RunCode.toString()];
+  const isPagelessAction = (action: string) => {
+    return pagelessActions.includes(action);
   };
 
   const handleSave = async () => {
@@ -208,7 +207,7 @@
     item[key] = value;
 
     if(key == 'action') {
-      if(isDisabledOnPagelessAction(item)) {
+      if(isPagelessAction(value)) {
         item[ITEM_KEY_ELEMENT] = '';
         item[ITEM_KEY_PAGE] = '';
       }
@@ -390,7 +389,7 @@
                 name={`${formContext.formName}_${index}_page`}
                 value={item.page}
                 options={pageDefinitionOptions}
-                disabled={isDisabledOnPagelessAction(item)}
+                disabled={isPagelessAction(item.action)}
                 on:change={(event) => handleItemChange(index, ITEM_KEY_PAGE, event.detail.value)}
               />
             </ListTableBodyCell>
@@ -399,7 +398,7 @@
                 name={`${formContext.formName}_${index}_element`}
                 value={item.element}
                 options={pageElementsMap.get(item.page) ?? []}
-                disabled={isDisabledOnPagelessAction(item)}
+                disabled={isPagelessAction(item.action)}
                 on:change={(event) => handleItemChange(index, ITEM_KEY_ELEMENT, event.detail.value)}
               />
             </ListTableBodyCell>
