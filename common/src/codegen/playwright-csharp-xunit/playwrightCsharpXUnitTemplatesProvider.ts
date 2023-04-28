@@ -1,10 +1,8 @@
-import { EOL } from "os";
 import path from "path";
-import { ActionType, Indent, LocatorType } from "../../file-defs";
 import { IActionTemplateParam, ILocatorTemplateParam } from "../types";
 import { actionRegistyDotnet } from "../utils/action-registry-dotnet";
 import { locatorRegistyDotnet } from "../utils/locator-registry-dotnet";
-import { getParameters, escapeStr, hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
+import { upperCaseFirstChar } from "../utils/stringUtils";
 import { XUnitTemplateCollection } from "./templateCollection";
 
 export class PlaywrightCsharpXUnitTemplatesProvider {
@@ -33,6 +31,10 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
 
   getLocator(params: ILocatorTemplateParam) {
     let { elementName, locatorType, returnedLocatorType, description } = params;
+
+    if (!locatorType) {
+      throw new Error("(DEV) LocatorType required. Current locatorType value is " + locatorType);
+    }
 
     const generateGetter = locatorRegistyDotnet.get(locatorType);
 

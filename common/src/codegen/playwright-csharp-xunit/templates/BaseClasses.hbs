@@ -94,6 +94,16 @@ public abstract class PageTest
         return Assertions.Expect(locator);
     }
 
+    public IPageAssertions Expect(IPage page)
+    {
+        return Assertions.Expect(page);
+    }
+
+    public IAPIResponseAssertions Expect(IAPIResponse response)
+    {
+        return Assertions.Expect(response);
+    }
+
     private IBrowserType GetBrowser(string browserName)
     {
         switch (browserName)

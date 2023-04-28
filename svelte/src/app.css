@@ -187,6 +187,10 @@ hr {
     --border-focused: transparent;
 }
 
+.dropdown-field-root.inline-fancy .svelte-select.disabled {
+    --disabled-background: none;
+}
+
 .text-field-input,
 .number-field-input,
 .folder-pick-field-input {
