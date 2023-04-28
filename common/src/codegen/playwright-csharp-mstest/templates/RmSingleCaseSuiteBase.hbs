@@ -26,4 +26,9 @@ public abstract class RmSingleCaseSuiteBase : PageTest
     {
         this.TestSuiteInstance = testSuiteInstance;
     }
+
+    public ILocatorAssertions Expect(IFrameLocator locator)
+    {
+        return base.Expect(locator.Locator(":root"));
+    }
 }
