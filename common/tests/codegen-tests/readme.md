@@ -167,7 +167,7 @@ Sample of testSpec
             type: "testStep",
             page: "searchResult",
             element: "",
-            action: "VerifyTitleContain",
+            action: "VerifyTitleContains",
             data: "playwright",
           },
           {

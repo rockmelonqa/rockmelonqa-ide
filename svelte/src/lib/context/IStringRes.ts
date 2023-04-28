@@ -52,7 +52,7 @@ export interface IActionTypeStringRes {
     verifyIsHidden: string;
     verifyIsVisible: string;
     verifyTitle: string;
-    verifyTitleContain: string;
+    verifyTitleContains: string;
     verifyUrl: string;
 }
 

@@ -14,7 +14,7 @@ import verifyHasText from "./action-generator/verifyHasText";
 import verifyHasValue from "./action-generator/verifyHasValue";
 import verifyIsHidden from "./action-generator/verifyIsHidden";
 import verifyTitle from "./action-generator/verifyTitle";
-import verifyTitleContain from "./action-generator/verifyTitleContain";
+import verifyTitleContains from "./action-generator/verifyTitleContains";
 import verifyUrl from "./action-generator/verifyUrl";
 
 export const actionRegisty = new Map<ActionType, (params: IActionTemplateParam) => string>();
@@ -35,5 +35,5 @@ actionRegisty
   .set(ActionType.VerifyHasValue, verifyHasValue)
   .set(ActionType.VerifyIsHidden, verifyIsHidden)
   .set(ActionType.VerifyTitle, verifyTitle)
-  .set(ActionType.VerifyTitleContain, verifyTitleContain)
+  .set(ActionType.VerifyTitleContains, verifyTitleContains)
   .set(ActionType.VerifyUrl, verifyUrl);

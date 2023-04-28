@@ -18,7 +18,7 @@ import verifyIsHidden from "./action-generator-dotnet/verifyIsHidden";
 import verifyIsReadOnly from "./action-generator-dotnet/verifyIsReadOnly";
 import verifyIsVisible from "./action-generator-dotnet/verifyIsVisible";
 import verifyTitle from "./action-generator-dotnet/verifyTitle";
-import verifyTitleContain from "./action-generator-dotnet/verifyTitleContain";
+import verifyTitleContains from "./action-generator-dotnet/verifyTitleContains";
 import verifyUrl from "./action-generator-dotnet/verifyUrl";
 
 export const actionRegistyDotnet = new Map<ActionType, (params: IActionTemplateParam) => string>();
@@ -43,5 +43,5 @@ actionRegistyDotnet
   .set(ActionType.VerifyIsHidden, verifyIsHidden)
   .set(ActionType.VerifyIsVisible, verifyIsVisible)
   .set(ActionType.VerifyTitle, verifyTitle)
-  .set(ActionType.VerifyTitleContain, verifyTitleContain)
+  .set(ActionType.VerifyTitleContains, verifyTitleContains)
   .set(ActionType.VerifyUrl, verifyUrl);
