@@ -12,7 +12,6 @@ export enum ActionType {
   /** Run the provided code */
   RunCode = "RunCode",
   SelectOption = "SelectOption",
-  Verify = "Verify",
   VerifyAttribute = "VerifyAttribute",
   VerifyHasText = "VerifyHasText",
   VerifyHasValue = "VerifyHasValue",
