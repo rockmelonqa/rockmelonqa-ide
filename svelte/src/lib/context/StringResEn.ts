@@ -30,6 +30,8 @@ export const stringResEn: IStringRes = {
         verifyHasText: 'Verify Has Text',
         verifyHasValue: 'Verify Has Value',
         verifyIsHidden: 'Verify Is Hidden',
+        verifyIsEditable: 'Verify Is Editable',
+        verifyIsReadOnly: 'Verify Is ReadOnly',
         verifyIsVisible: 'Verify Is Visible',
         verifyTitle: 'Verify Title',
         verifyTitleContain: 'Verify Title Contain',

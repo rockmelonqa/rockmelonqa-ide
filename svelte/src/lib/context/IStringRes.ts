@@ -46,6 +46,8 @@ export interface IActionTypeStringRes {
     selectOption: string;
     verifyAttribute: string;
     verifyHasText: string;
+    verifyIsEditable: string;
+    verifyIsReadOnly: string;
     verifyHasValue: string;
     verifyIsHidden: string;
     verifyIsVisible: string;

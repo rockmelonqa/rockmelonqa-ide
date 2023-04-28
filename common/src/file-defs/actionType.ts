@@ -14,6 +14,8 @@ export enum ActionType {
   SelectOption = "SelectOption",
   VerifyAttribute = "VerifyAttribute",
   VerifyHasText = "VerifyHasText",
+  VerifyIsEditable = "VerifyIsEditable",
+  VerifyIsReadOnly = "VerifyIsReadOnly",
   VerifyHasValue = "VerifyHasValue",
   VerifyIsHidden = "VerifyIsHidden",
   VerifyIsVisible = "VerifyIsVisible",
