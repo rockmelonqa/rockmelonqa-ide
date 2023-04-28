@@ -8,9 +8,7 @@ import delay from "./action-generator/delay";
 import gotoUrl from "./action-generator/gotoUrl";
 import input from "./action-generator/input";
 import inputByCode from "./action-generator/inputByCode";
-import run from "./action-generator/run";
 import selectOption from "./action-generator/selectOption";
-import verify from "./action-generator/verify";
 import verifyAttribute from "./action-generator/verifyAttribute";
 import verifyHasText from "./action-generator/verifyHasText";
 import verifyHasValue from "./action-generator/verifyHasValue";
@@ -32,7 +30,6 @@ actionRegisty
   .set(ActionType.InputByCode, inputByCode)
   //.set(ActionType.Run, run)
   .set(ActionType.SelectOption, selectOption)
-  .set(ActionType.Verify, verify)
   .set(ActionType.VerifyAttribute, verifyAttribute)
   .set(ActionType.VerifyHasText, verifyHasText)
   .set(ActionType.VerifyHasValue, verifyHasValue)

@@ -12,9 +12,10 @@ export enum ActionType {
   /** Run the provided code */
   RunCode = "RunCode",
   SelectOption = "SelectOption",
-  Verify = "Verify",
   VerifyAttribute = "VerifyAttribute",
   VerifyHasText = "VerifyHasText",
+  VerifyIsEditable = "VerifyIsEditable",
+  VerifyIsReadOnly = "VerifyIsReadOnly",
   VerifyHasValue = "VerifyHasValue",
   VerifyIsHidden = "VerifyIsHidden",
   VerifyIsVisible = "VerifyIsVisible",

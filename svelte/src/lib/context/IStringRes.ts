@@ -44,9 +44,10 @@ export interface IActionTypeStringRes {
     run: string;
     runCode: string;
     selectOption: string;
-    verify: string;
     verifyAttribute: string;
     verifyHasText: string;
+    verifyIsEditable: string;
+    verifyIsReadOnly: string;
     verifyHasValue: string;
     verifyIsHidden: string;
     verifyIsVisible: string;
@@ -78,7 +79,6 @@ export interface ICodeGenerationDialogStringRes {
     parseDataMsg: string;
     validateInputMsg: string;
 }
-
 
 export interface IFileExplorerStringRes {
     newFile: string;

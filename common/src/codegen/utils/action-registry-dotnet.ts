@@ -8,14 +8,14 @@ import delay from "./action-generator-dotnet/delay";
 import gotoUrl from "./action-generator-dotnet/gotoUrl";
 import input from "./action-generator-dotnet/input";
 import inputByCode from "./action-generator-dotnet/inputByCode";
-import run from "./action-generator-dotnet/run";
 import runCode from "./action-generator-dotnet/runCode";
 import selectOption from "./action-generator-dotnet/selectOption";
-import verify from "./action-generator-dotnet/verify";
 import verifyAttribute from "./action-generator-dotnet/verifyAttribute";
 import verifyHasText from "./action-generator-dotnet/verifyHasText";
 import verifyHasValue from "./action-generator-dotnet/verifyHasValue";
+import verifyIsEditable from "./action-generator-dotnet/verifyIsEditable";
 import verifyIsHidden from "./action-generator-dotnet/verifyIsHidden";
+import verifyIsReadOnly from "./action-generator-dotnet/verifyIsReadOnly";
 import verifyIsVisible from "./action-generator-dotnet/verifyIsVisible";
 import verifyTitle from "./action-generator-dotnet/verifyTitle";
 import verifyTitleContain from "./action-generator-dotnet/verifyTitleContain";
@@ -35,10 +35,11 @@ actionRegistyDotnet
   //.set(ActionType.Run, run)
   .set(ActionType.RunCode, runCode)
   .set(ActionType.SelectOption, selectOption)
-  .set(ActionType.Verify, verify)
   .set(ActionType.VerifyAttribute, verifyAttribute)
   .set(ActionType.VerifyHasText, verifyHasText)
   .set(ActionType.VerifyHasValue, verifyHasValue)
+  .set(ActionType.VerifyIsEditable, verifyIsEditable)
+  .set(ActionType.VerifyIsReadOnly, verifyIsReadOnly)
   .set(ActionType.VerifyIsHidden, verifyIsHidden)
   .set(ActionType.VerifyIsVisible, verifyIsVisible)
   .set(ActionType.VerifyTitle, verifyTitle)

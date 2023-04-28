@@ -1,0 +1,3 @@
+# Ignore handlebars template file:
+*.hbs
+/unit-test-files/*
