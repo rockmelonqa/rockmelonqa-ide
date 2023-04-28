@@ -18,7 +18,7 @@ const newPackageJson = {
   devDependencies: packageJson.devDependencies,
   dependencies: packageJson.dependencies,
 };
-fs.writeFileSync(path.join(__rootDir, "dist/module/package.json"), JSON.stringify(newPackageJson, null, 4));
+fs.writeFileSync(path.join(__rootDir, "dist/module/package.json"), JSON.stringify(newPackageJson, null, 2));
 
 newPackageJson.type = "commonjs";
-fs.writeFileSync(path.join(__rootDir, "dist/commonjs/package.json"), JSON.stringify(newPackageJson, null, 4));
+fs.writeFileSync(path.join(__rootDir, "dist/commonjs/package.json"), JSON.stringify(newPackageJson, null, 2));
