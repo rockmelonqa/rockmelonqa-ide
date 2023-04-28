@@ -33,7 +33,7 @@ export const stringResEn: IStringRes = {
         verifyIsHidden: 'Verify Is Hidden',
         verifyIsVisible: 'Verify Is Visible',
         verifyTitle: 'Verify Title',
-        verifyTitleContain: 'Verify Title Contain',
+        verifyTitleContains: 'Verify Title Contains',
         verifyUrl: 'Verify Url',
     },
     application: {

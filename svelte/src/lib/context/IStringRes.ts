@@ -51,7 +51,7 @@ export interface IActionTypeStringRes {
     verifyIsHidden: string;
     verifyIsVisible: string;
     verifyTitle: string;
-    verifyTitleContain: string;
+    verifyTitleContains: string;
     verifyUrl: string;
 }
 
@@ -78,7 +78,6 @@ export interface ICodeGenerationDialogStringRes {
     parseDataMsg: string;
     validateInputMsg: string;
 }
-
 
 export interface IFileExplorerStringRes {
     newFile: string;

@@ -19,6 +19,6 @@ export enum ActionType {
   VerifyIsHidden = "VerifyIsHidden",
   VerifyIsVisible = "VerifyIsVisible",
   VerifyTitle = "VerifyTitle",
-  VerifyTitleContain = "VerifyTitleContain",
+  VerifyTitleContains = "VerifyTitleContains",
   VerifyUrl = "VerifyUrl",
 }

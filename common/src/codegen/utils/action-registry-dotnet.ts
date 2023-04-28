@@ -8,7 +8,6 @@ import delay from "./action-generator-dotnet/delay";
 import gotoUrl from "./action-generator-dotnet/gotoUrl";
 import input from "./action-generator-dotnet/input";
 import inputByCode from "./action-generator-dotnet/inputByCode";
-import run from "./action-generator-dotnet/run";
 import runCode from "./action-generator-dotnet/runCode";
 import selectOption from "./action-generator-dotnet/selectOption";
 import verify from "./action-generator-dotnet/verify";
@@ -18,7 +17,7 @@ import verifyHasValue from "./action-generator-dotnet/verifyHasValue";
 import verifyIsHidden from "./action-generator-dotnet/verifyIsHidden";
 import verifyIsVisible from "./action-generator-dotnet/verifyIsVisible";
 import verifyTitle from "./action-generator-dotnet/verifyTitle";
-import verifyTitleContain from "./action-generator-dotnet/verifyTitleContain";
+import verifyTitleContains from "./action-generator-dotnet/verifyTitleContains";
 import verifyUrl from "./action-generator-dotnet/verifyUrl";
 
 export const actionRegistyDotnet = new Map<ActionType, (params: IActionTemplateParam) => string>();
@@ -42,5 +41,5 @@ actionRegistyDotnet
   .set(ActionType.VerifyIsHidden, verifyIsHidden)
   .set(ActionType.VerifyIsVisible, verifyIsVisible)
   .set(ActionType.VerifyTitle, verifyTitle)
-  .set(ActionType.VerifyTitleContain, verifyTitleContain)
+  .set(ActionType.VerifyTitleContains, verifyTitleContains)
   .set(ActionType.VerifyUrl, verifyUrl);
