@@ -12,8 +12,12 @@ export class PlaywrightCsharpMsTestTemplatesProvider {
     this._templateCollection = new MsTestTemplateCollection(path.resolve(__dirname, "./templates"), customTemplatesDir, ".hbs");
   }
 
-  getTestClass(usings: string, name: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
-    return this._templateCollection.TEST_CLASS_TEMPLATE({ usings, rootNamespace, name, description, body, fullNamespace });
+  getTestSuiteFile(usings: string, name: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
+    return this._templateCollection.TEST_SUITE_FILE({ usings, rootNamespace, name, description, body, fullNamespace });
+  }
+
+  getTestSuiteBase(rootNamespace: string, testIdAttributeName: string) {
+    return this._templateCollection.TEST_SUITE_BASE({ rootNamespace, testIdAttributeName });
   }
 
   getTestCaseFile(testCaseName: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
@@ -50,25 +54,25 @@ export class PlaywrightCsharpMsTestTemplatesProvider {
     return output;
   }
 
-  GetComment(message: string) {
+  getComment(message: string) {
     return this._templateCollection.COMMENT({ message });
   }
 
-  GetTestFunction(name: string, description: string) {
+  getTestFunction(name: string, description: string) {
     return this._templateCollection.TEST_FUNCTION_TEMPLATE({ name, description });
   }
 
-  GetCSProject(rootNamespace: string) {
+  getCsProject(rootNamespace: string) {
     return this._templateCollection.CSPROJECT_TEMPLATE({ rootNamespace });
   }
-  GetUsings() {
+  getUsings() {
     return this._templateCollection.USINGS_TEMPLATE({});
   }
-  GetRunSettings() {
+  getRunSettings() {
     return this._templateCollection.RUNSETTINGS_TEMPLATE({});
   }
 
-  GetRmTestSuiteBase(rootNamespace: string) {
+  getTestCaseBase(rootNamespace: string) {
     return this._templateCollection.TEST_CASE_BASE({ rootNamespace });
   }
 

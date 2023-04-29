@@ -1,7 +1,7 @@
 namespace {{{rootNamespace}}}.Support;
 
 /// <summary>
-/// Base class for RM "Single case" test suite 
+/// Base class for RM test case 
 /// </summary>
 public abstract class TestCaseBase : PageTest
 {
@@ -27,6 +27,9 @@ public abstract class TestCaseBase : PageTest
         this.TestSuiteInstance = testSuiteInstance;
     }
 
+    /// <summary>
+    /// Custom Expect method that works from IFrameLocator
+    /// </summary>
     public ILocatorAssertions Expect(IFrameLocator locator)
     {
         return base.Expect(locator.Locator(":root"));

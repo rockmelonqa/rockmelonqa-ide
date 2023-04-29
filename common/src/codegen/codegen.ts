@@ -115,7 +115,10 @@ const readDirRecursive = async (dir: string) => {
 
 /** Generates test project */
 export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: (event: IProgressEvent) => void): Promise<void> => {
-  info("Generate code: ", rmprojFile);
+  info("#################");
+  info("# GENERATE CODE", rmprojFile);
+  info("#################");
+
   const projMeta = await createCodeGenMeta(rmprojFile, progressNotify);
 
   const writeFile = async (relativeFilePath: string, content: string) => {
@@ -194,6 +197,10 @@ export const createCodeGenMeta = async (
   if (!rmprojFile.content.rootNamespace) {
     rmprojFile.content.rootNamespace = "AutomationTests";
     info(`    ---> Root Namespace is not set. Default to '${rmprojFile.content.rootNamespace}'`);
+  }
+
+  if (!rmprojFile.content.testIdAttributeName) {
+    info(`    ---> Property testIdAttributeName is not set, will be defaulted to data-testid at runtime.`);
   }
 
   // Parsing page definitions
