@@ -25,6 +25,7 @@ export const fileDefFactory = {
       rootNamespace: "",
       indent: Indent.Spaces,
       indentSize: 4,
+      testIdAttributeName: "",
     };
   },
 

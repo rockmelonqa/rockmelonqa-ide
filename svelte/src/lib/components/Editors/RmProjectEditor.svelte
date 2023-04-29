@@ -99,7 +99,7 @@
                 dataType: FieldDataType.Text,
                 dataPath: 'testIdAttributeName',
                 isRequired: false,
-                initialValue: 'data-testid',
+                initialValue: '',
             },
         },
     };
@@ -244,6 +244,7 @@
                     disabled={$formData.values.language === Language.Typescript}
                 />
                 <DropdownField name="indent" options={indentOptions} />
+                <TextField name="testIdAttributeName" />
             </FormGroupColumn>
             <FormGroupColumn>
                 <TextField name="description" />
@@ -254,9 +255,6 @@
                 />
                 <TextField name="rootNamespace" />
                 <NumberField name="indentSize" />
-            </FormGroupColumn>
-            <FormGroupColumn>
-                <TextField name="testIdAttributeName" />
             </FormGroupColumn>
         </FormGroup>
 
