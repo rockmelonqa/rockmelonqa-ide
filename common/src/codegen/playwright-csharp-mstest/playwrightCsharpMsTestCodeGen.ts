@@ -211,8 +211,8 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
   }
 
   generateTestSuiteFile(testSuite: ITestSuite, testcases: ITestCase[]) {
-    var testcaseMethods: string[] = [];
-    var usingDirectives: string[] = [];
+    const testcaseMethods: string[] = [];
+    const usingDirectives: string[] = [];
 
     for (let testcaseId of testSuite.testcases) {
       let testcase = testcases.find((tc) => tc.id === testcaseId);

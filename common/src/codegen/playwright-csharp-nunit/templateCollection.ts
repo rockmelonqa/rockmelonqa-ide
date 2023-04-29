@@ -7,13 +7,14 @@ export class NunitTemplateCollection {
   public PAGE_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public LOCATOR_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public TEST_FUNCTION_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public TEST_CLASS_TEMPLATE: HandlebarsTemplateDelegate<any>;
+  public TEST_SUITE_FILE: HandlebarsTemplateDelegate<any>;
   public LOCATOR_HELPER_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public CSPROJECT_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public USINGS_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public RUNSETTINGS_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public COMMENT_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public TEST_CASE_BASE: HandlebarsTemplateDelegate<any>;
+  public TEST_SUITE_BASE: HandlebarsTemplateDelegate<any>;
   public TEST_CASE_FILE_TEMPLATE: HandlebarsTemplateDelegate<any>;
 
   constructor(templatesDir: string, customTemplatesDir: string, fileExtension: string) {
@@ -24,13 +25,14 @@ export class NunitTemplateCollection {
     this.PAGE_TEMPLATE = loadAndCompile("Page");
     this.LOCATOR_TEMPLATE = loadAndCompile("Locator");
     this.TEST_FUNCTION_TEMPLATE = loadAndCompile("TestFunction");
-    this.TEST_CLASS_TEMPLATE = loadAndCompile("TestClass");
+    this.TEST_SUITE_FILE = loadAndCompile("TestSuiteFile");
     this.LOCATOR_HELPER_TEMPLATE = loadAndCompile("LocatorHelper");
     this.CSPROJECT_TEMPLATE = loadAndCompile("CsProject");
     this.USINGS_TEMPLATE = loadAndCompile("Usings");
     this.RUNSETTINGS_TEMPLATE = loadAndCompile("RunSettings");
     this.COMMENT_TEMPLATE = loadAndCompile("Comment");
     this.TEST_CASE_BASE = loadAndCompile("TestCaseBase");
+    this.TEST_SUITE_BASE = loadAndCompile("TestSuiteBase");
     this.TEST_CASE_FILE_TEMPLATE = loadAndCompile("TestCaseFile");
   }
 }

@@ -100,7 +100,7 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
     // Filename: Tests/{TestClassName}.cs
     for (let testSuite of this._projMeta.testSuites) {
       let fileRelPath = this._outProjMeta.get(testSuite.content.id)!.outputFileRelPath;
-      let classContent = this.generateTestSuite(
+      let classContent = this.generateTestSuiteFile(
         testSuite.content,
         this._projMeta.testCases.map((tcFile) => tcFile.content)
       );
@@ -207,7 +207,7 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
     );
   }
 
-  private generateTestSuite(testSuite: ITestSuite, testcases: ITestCase[]) {
+  private generateTestSuiteFile(testSuite: ITestSuite, testcases: ITestCase[]) {
     var testcaseMethods = [];
     var usingItems = [];
 
@@ -230,7 +230,7 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
     // Indent test method body with 1 indent;
     classBody = addIndent(classBody, this._indentString);
 
-    let testClass = this._templateProvider.getTestClass(
+    let testClass = this._templateProvider.getTestSuiteFile(
       usings,
       this._outProjMeta.get(testSuite.id)!.outputFileClassName,
       testSuite.description,

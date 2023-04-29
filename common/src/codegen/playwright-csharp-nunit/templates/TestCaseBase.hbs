@@ -15,9 +15,7 @@ public abstract class TestCaseBase : PageTest
     /// <summary>
     /// Default constructor
     /// </summary>
-    public TestCaseBase()
-    {
-    }
+    public TestCaseBase() { }
 
     /// <summary>
     /// Create new instance of TestCaseBase with the provided "caller" testSuiteInstance
@@ -25,5 +23,13 @@ public abstract class TestCaseBase : PageTest
     public TestCaseBase(PageTest testSuiteInstance)
     {
         this.TestSuiteInstance = testSuiteInstance;
+    }
+    
+    /// <summary>
+    /// Custom Expect method that works from IFrameLocator
+    /// </summary>
+    public ILocatorAssertions Expect(IFrameLocator locator)
+    {
+        return base.Expect(locator.Locator(":root"));
     }
 }

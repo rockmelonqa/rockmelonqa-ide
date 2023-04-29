@@ -12,8 +12,8 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
     this._templateCollection = new XUnitTemplateCollection(path.resolve(__dirname, "./templates"), customTemplatesDir, ".hbs");
   }
 
-  getTestClass(usings: string, name: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
-    return this._templateCollection.TEST_CLASS_TEMPLATE({ usings, name, description, body, rootNamespace, fullNamespace });
+  getTestSuiteFile(usings: string, name: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
+    return this._templateCollection.TEST_SUITE_FILE({ usings, name, description, body, rootNamespace, fullNamespace });
   }
 
   getTestCaseFile(testCaseName: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
