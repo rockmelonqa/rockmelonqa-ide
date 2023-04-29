@@ -34,38 +34,4 @@ export class LocatorHelper {
     public static async ClickOutsideAsync(page: Page) {
         await page.locator("xpath=//body >> nth=0").click();
     }
-
-    public static async verify(locator: Locator, data: string) {
-        switch (data.toLowerCase()) {
-            case "visible":
-                await expect(locator).toBeVisible();
-                break;
-            case "hidden":
-                await expect(locator).toBeHidden();
-                break;
-            case "readonly":
-                await expect(locator).toBeDisabled();
-                break;
-            case "edittable":
-                await expect(locator).toBeEditable();
-                break;
-            default:
-                // Otherwise we just compare the text contain base on element type
-                let tagName = await LocatorHelper.GetLocatorTagTypeAsync(locator);
-                switch (tagName.toLocaleLowerCase()) {
-                    case "input":
-                        await expect(locator).toHaveValue(data);
-                        break;
-                    default:
-                        await expect(locator).toHaveValue(data);
-                        break;
-                }
-                break;
-        }
-
-        return {
-            message: () => "passed",
-            pass: true,
-        };
-    }
 }

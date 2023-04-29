@@ -5,7 +5,7 @@ import { expect } from "@playwright/test";
 declare global {
     namespace PlaywrightTest {
         interface Matchers<R> {
-            verify: (data: string) => Promise<R>;
+            customAction: (data: string) => Promise<R>;
         }
     }
 }
@@ -14,8 +14,7 @@ expect.extend({
     /**
      * Notice that this implementation has 2 arguments, but the implementation inside the Matchers only has 1
      */
-    async verify(locator: Locator, data: string) {
-        await LocatorHelper.verify(locator, data);
+    async customAction(locator: Locator, data: string) {
 
         return {
             pass: true,

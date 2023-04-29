@@ -5,19 +5,23 @@
   "type": "module",
   "scripts": {
     "test": "jest",
-    "clean": "node build-utils/clean.js",
-    "build": "npm run clean && npm run compile-commonjs && npm run compile-module && node build-utils/gen-package-files.js && node build-utils/copy-template-files.js",
+    "build": "npm run compile-commonjs && npm run compile-module && npm run clean-module && npm run clean-commonjs && npm run copy-templates && node build-utils/gen-package-files.js",
     "compile-commonjs": "tsc --build tsconfig.commonjs.json",
     "compile-module": "tsc --build tsconfig.json",
     "install-commonjs": "cd dist/commonjs && npm install",
-    "install-module": "cd dist/module && npm install"
+    "install-module": "cd dist/module && npm install",
+    "clean-module": "ts-cleaner -s src -d dist/module",
+    "clean-commonjs": "ts-cleaner -s src -d dist/commonjs",
+    "copy-templates": "copyfiles -u 1 src/**/*.hbs dist/commonjs && copyfiles -u 1 src/**/*.hbs dist/module"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.1",
     "@types/jest": "^29.2.6",
     "@types/uuid": "^9.0.0",
+    "copyfiles": "^2.4.1",
     "dir-compare": "^4.0.0",
     "jest": "^29.3.1",
+    "ts-cleaner": "^1.0.5",
     "ts-jest": "^29.0.5",
     "typescript": "^4.9.4"
   },

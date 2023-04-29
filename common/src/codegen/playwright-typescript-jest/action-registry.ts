@@ -8,15 +8,13 @@ import delay from "./action-generator/delay";
 import gotoUrl from "./action-generator/gotoUrl";
 import input from "./action-generator/input";
 import inputByCode from "./action-generator/inputByCode";
-import run from "./action-generator/run";
 import selectOption from "./action-generator/selectOption";
-import verify from "./action-generator/verify";
 import verifyAttribute from "./action-generator/verifyAttribute";
 import verifyHasText from "./action-generator/verifyHasText";
 import verifyHasValue from "./action-generator/verifyHasValue";
 import verifyIsHidden from "./action-generator/verifyIsHidden";
 import verifyTitle from "./action-generator/verifyTitle";
-import verifyTitleContain from "./action-generator/verifyTitleContain";
+import verifyTitleContains from "./action-generator/verifyTitleContains";
 import verifyUrl from "./action-generator/verifyUrl";
 
 export const actionRegisty = new Map<ActionType, (params: IActionTemplateParam) => string>();
@@ -32,11 +30,10 @@ actionRegisty
   .set(ActionType.InputByCode, inputByCode)
   //.set(ActionType.Run, run)
   .set(ActionType.SelectOption, selectOption)
-  .set(ActionType.Verify, verify)
   .set(ActionType.VerifyAttribute, verifyAttribute)
   .set(ActionType.VerifyHasText, verifyHasText)
   .set(ActionType.VerifyHasValue, verifyHasValue)
   .set(ActionType.VerifyIsHidden, verifyIsHidden)
   .set(ActionType.VerifyTitle, verifyTitle)
-  .set(ActionType.VerifyTitleContain, verifyTitleContain)
+  .set(ActionType.VerifyTitleContains, verifyTitleContains)
   .set(ActionType.VerifyUrl, verifyUrl);

@@ -167,7 +167,7 @@ Sample of testSpec
             type: "testStep",
             page: "searchResult",
             element: "",
-            action: "VerifyTitleContain",
+            action: "VerifyTitleContains",
             data: "playwright",
           },
           {
@@ -286,44 +286,6 @@ public static class LocatorHelper
     public static async Task ClickOutsideAsync(this IPage page)
     {
         await page.Locator("xpath=//body >> nth=0").ClickAsync();
-    }
-
-    /// <summary>
-    /// Helper to detect locator type and call right function
-    /// </summary>
-    /// <param name="testCase">Test case</param>
-    /// <param name="locator">Locator</param>
-    /// <param name="data">Data</param>
-    public static async Task VerifyAsync(this PlaywrightTest testCase, ILocator locator, string data)
-    {
-        switch (data.ToLower())
-        {
-            case "visible":
-                await testCase.Expect(locator).ToBeVisibleAsync();
-                break;
-            case "hidden":
-                await testCase.Expect(locator).ToBeHiddenAsync();
-                break;
-            case "readonly":
-                await testCase.Expect(locator).ToBeDisabledAsync();
-                break;
-            case "edittable":
-                await testCase.Expect(locator).ToBeEditableAsync();
-                break;
-            default:
-                // Otherwise we just compare the text contain base on element type
-                string tagName = await locator.GetLocatorTagTypeAsync();
-                switch (tagName.ToLower())
-                {
-                    case "input":
-                        await testCase.Expect(locator).ToHaveValueAsync(data);
-                        break;
-                    default:
-                        await testCase.Expect(locator).ToHaveTextAsync(data);
-                        break;
-                }
-                break;
-        }
     }
 }
         `.trim(),

@@ -1,7 +1,7 @@
 import { ILocatorTemplateParam } from "../../types";
-import { escapeStr } from "../../utils/stringUtils";
+import { upperCaseFirstChar } from "../../utils/stringUtils";
 
 export default (params: ILocatorTemplateParam) => {
   let [referenceLocator, referencePath] = params.locatorStr.split(":");
-  return `this.${referenceLocator}().Locator(\"${referencePath}\")`;
+  return `this.${upperCaseFirstChar(referenceLocator)}().Locator(\"${referencePath}\")`;
 };

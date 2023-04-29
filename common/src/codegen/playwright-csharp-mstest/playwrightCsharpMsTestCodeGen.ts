@@ -64,7 +64,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     // Filename: PageDefinitions.cs
     await writeFile(
       `${StandardOutputFile.PageDefinitions}${this._outputFileExt}`,
-      this.peneratePageDefinitions(this._projMeta.pages.map((p) => p.content))
+      this.generatePageDefinitions(this._projMeta.pages.map((p) => p.content))
     );
 
     // # Generate TestCases
@@ -129,7 +129,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     return "";
   }
 
-  peneratePageDefinitions(pages: IPage[]): string {
+  generatePageDefinitions(pages: IPage[]): string {
     let usingDirectives: string[] = [];
     for (let page of pages) {
       let pageNamespace = this._outProjMeta.get(page.id)!.outputFileFullNamespace;
