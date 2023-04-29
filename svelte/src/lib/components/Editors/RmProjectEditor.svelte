@@ -95,6 +95,12 @@
                 min: 1,
                 max: 8,
             },
+            testIdAttributeName: {
+                dataType: FieldDataType.Text,
+                dataPath: 'testIdAttributeName',
+                isRequired: false,
+                initialValue: 'data-testid',
+            },
         },
     };
 
@@ -248,6 +254,9 @@
                 />
                 <TextField name="rootNamespace" />
                 <NumberField name="indentSize" />
+            </FormGroupColumn>
+            <FormGroupColumn>
+                <TextField name="testIdAttributeName" />
             </FormGroupColumn>
         </FormGroup>
 

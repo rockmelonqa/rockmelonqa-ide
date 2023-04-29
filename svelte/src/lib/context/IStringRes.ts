@@ -165,6 +165,7 @@ export interface IProjectStringRes {
     output: string;
     rootNamespace: string;
     testFramework: string;
+    testIdAttributeName: string;
 }
 
 export interface IRunTestDialogStringRes {
