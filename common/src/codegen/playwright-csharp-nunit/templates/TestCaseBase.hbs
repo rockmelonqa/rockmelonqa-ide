@@ -3,7 +3,7 @@ namespace {{{rootNamespace}}}.Support;
 /// <summary>
 /// Base class for RM "Single case" test suite 
 /// </summary>
-public abstract class RmSingleCaseSuiteBase : PageTest
+public abstract class TestCaseBase : PageTest
 {
     protected PageTest? TestSuiteInstance;
 
@@ -15,20 +15,15 @@ public abstract class RmSingleCaseSuiteBase : PageTest
     /// <summary>
     /// Default constructor
     /// </summary>
-    public RmSingleCaseSuiteBase()
+    public TestCaseBase()
     {
     }
 
     /// <summary>
-    /// Create new instance of RmSingleCaseSuiteBase with the provided "caller" testSuiteInstance
+    /// Create new instance of TestCaseBase with the provided "caller" testSuiteInstance
     /// </summary>
-    public RmSingleCaseSuiteBase(PageTest testSuiteInstance)
+    public TestCaseBase(PageTest testSuiteInstance)
     {
         this.TestSuiteInstance = testSuiteInstance;
-    }
-
-    public ILocatorAssertions Expect(IFrameLocator locator)
-    {
-        return base.Expect(locator.Locator(":root"));
     }
 }

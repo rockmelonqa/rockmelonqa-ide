@@ -13,7 +13,7 @@ export class NunitTemplateCollection {
   public USINGS_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public RUNSETTINGS_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public COMMENT_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public SINGLE_CASE_SUITE_BASE: HandlebarsTemplateDelegate<any>;
+  public TEST_CASE_BASE: HandlebarsTemplateDelegate<any>;
   public TEST_CASE_FILE_TEMPLATE: HandlebarsTemplateDelegate<any>;
 
   constructor(templatesDir: string, customTemplatesDir: string, fileExtension: string) {
@@ -30,7 +30,7 @@ export class NunitTemplateCollection {
     this.USINGS_TEMPLATE = loadAndCompile("Usings");
     this.RUNSETTINGS_TEMPLATE = loadAndCompile("RunSettings");
     this.COMMENT_TEMPLATE = loadAndCompile("Comment");
-    this.SINGLE_CASE_SUITE_BASE = loadAndCompile("RmSingleCaseSuiteBase");
+    this.TEST_CASE_BASE = loadAndCompile("TestCaseBase");
     this.TEST_CASE_FILE_TEMPLATE = loadAndCompile("TestCaseFile");
   }
 }

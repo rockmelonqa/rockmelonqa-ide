@@ -84,7 +84,7 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
 
   private async writeBaseClassesFile(writeFile: WriteFileFn) {
     await writeFile(
-      `Support/${StandardOutputFile.RmSingleCaseSuiteBase}${this._outputFileExt}`,
+      `Support/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
       this._templateProvider.getBaseClasses(this._rmprojFile.content.rootNamespace)
     );
   }

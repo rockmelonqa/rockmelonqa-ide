@@ -14,7 +14,7 @@ export class MsTestTemplateCollection {
   public USINGS_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public RUNSETTINGS_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public COMMENT: HandlebarsTemplateDelegate<any>;
-  public TEST_SUITE_BASE: HandlebarsTemplateDelegate<any>;
+  public TEST_CASE_BASE: HandlebarsTemplateDelegate<any>;
 
   constructor(templatesDir: string, customTemplatesDir: string, fileExtension: string) {
     const loadAndCompile = (templateFileName: string) =>
@@ -31,6 +31,6 @@ export class MsTestTemplateCollection {
     this.USINGS_TEMPLATE = loadAndCompile("Usings");
     this.RUNSETTINGS_TEMPLATE = loadAndCompile("RunSettings");
     this.COMMENT = loadAndCompile("Comment");
-    this.TEST_SUITE_BASE = loadAndCompile("RmSingleCaseSuiteBase");
+    this.TEST_CASE_BASE = loadAndCompile("TestCaseBase");
   }
 }

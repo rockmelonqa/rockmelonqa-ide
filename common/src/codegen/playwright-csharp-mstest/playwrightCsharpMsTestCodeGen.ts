@@ -102,7 +102,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     );
 
     await writeFile(
-      `Support/${StandardOutputFile.RmSingleCaseSuiteBase}${this._outputFileExt}`,
+      `Support/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
       this._templateProvider.GetRmTestSuiteBase(this._rmprojFile.content.rootNamespace)
     );
 

@@ -92,10 +92,10 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
       `Support/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
       this._templateProvider.getLocatorHelper(this._rmprojFile.content.rootNamespace)
     );
-    // Filename: Support/RmSingleCaseSuiteBase.cs
+    // Filename: Support/TestCaseBase.cs
     await writeFile(
-      `Support/${StandardOutputFile.RmSingleCaseSuiteBase}${this._outputFileExt}`,
-      this._templateProvider.getSingleCaseSuiteBase(this._rmprojFile.content.rootNamespace)
+      `Support/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
+      this._templateProvider.getTestCaseBase(this._rmprojFile.content.rootNamespace)
     );
 
     // # Generate full project files
