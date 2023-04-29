@@ -17,9 +17,11 @@ const getApi = (apiKey?: string) => {
 const genCode = (rmprojFile: IRmProjFile, options?: { apiKey?: string }) => {
     getApi(options?.apiKey).send('genCode', rmprojFile);
 };
+const onCopyCustomCode = (fn: (data: IProgressDetail) => void, options?: {apiKey?: string}): Action | undefined => 
+    getApi(options?.apiKey).on('gen-code:copy-custom-code', fn);
 
 const onValidateInput = (fn: (data: IProgressDetail) => void, options?: { apiKey?: string }): Action | undefined =>
-    getApi(options?.apiKey).on('gen-code:validate-input', fn);
+    getApi(options?.apiKey).on('gen-code:validate-input', fn); 
 
 const onParseData = (fn: (data: IProgressDetail) => void, options?: { apiKey?: string }): Action | undefined =>
     getApi(options?.apiKey).on('gen-code:parse-data', fn);
@@ -84,6 +86,7 @@ export const codeGenerator = {
     generateSourceProjectMetadata,
     onBuild,
     onCleanFolder,
+    onCopyCustomCode,
     onFinish,
     onGenerateCode,
     onInstallDependencies,

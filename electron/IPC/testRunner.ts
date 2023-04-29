@@ -40,7 +40,7 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
   // Main action
   try {
     // create storage folder first
-    await fileSystem.createFoler(path.join(projFile.folderPath, storageFolder));
+    await fileSystem.createFolder(path.join(projFile.folderPath, storageFolder));
 
     // Copy .code-metadata file to test run folder of this run
     console.log("Copy '.code-metadata' file to test-result-storage folder");

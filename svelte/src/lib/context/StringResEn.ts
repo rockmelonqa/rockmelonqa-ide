@@ -43,6 +43,7 @@ export const stringResEn: IStringRes = {
         buildMsg: 'Compile',
         checkPrerequisites: 'Check prerequisites',
         cleanFolderMsg: 'Cleaning folder',
+        copyCustomCodeMsg: 'Copy Custom Code',
         dialogMsg: 'Do you want to generate automation testing code?',
         dialogTitle: 'Code Generation',
         errorMsg: 'There are errors with following logs.',

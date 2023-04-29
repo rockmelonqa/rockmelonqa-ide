@@ -143,6 +143,27 @@ export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: (eve
     fse.emptyDirSync(outputDir);
   }
 
+  // Copy Custom Code
+  info(``);
+  info(``);
+  info(`--------------------------------------------------`);
+  info(`-- Copy custom code`);
+  info("--------------------------------------------------");
+
+  try {
+    const srcFolder = path.join(rmprojFile.folderPath, StandardFolder.CustomCode);
+    const destFolder = path.join(rmprojFile.folderPath, StandardFolder.OutputCode);
+    await fs.promises.cp(srcFolder, destFolder, {
+      recursive: true,
+    });
+    progressNotify({ type: "copy-custom-code", log: `Copy ${srcFolder} to ${destFolder} successfully` });
+    info(`    ---> Copy custom code from ${srcFolder} to ${destFolder} is completed`);
+  } catch (err) {
+    console.log("CANNOT copy to Folder:", path.join(rmprojFile.folderPath, StandardFolder.OutputCode));
+    console.error(err);
+    throw err;
+  }
+  
   const codegen = CodeGenFactory.newInstance(projMeta);
 
   await codegen.generateCode(true, writeFile);

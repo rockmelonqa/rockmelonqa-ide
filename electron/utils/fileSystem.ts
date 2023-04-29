@@ -23,7 +23,7 @@ export function checkExistsSync(filePath: string): boolean {
 /**
  * Create new folder
  */
-export async function createFoler(folderPath: string): Promise<void> {
+export async function createFolder(folderPath: string): Promise<void> {
   let folderExists = await checkExists(folderPath);
   if (!folderExists) {
     try {
