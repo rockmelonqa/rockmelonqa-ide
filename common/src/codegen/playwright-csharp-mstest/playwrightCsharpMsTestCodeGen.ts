@@ -121,7 +121,10 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
         `${this._rmprojFile.content.rootNamespace}.csproj`,
         this._templateProvider.getCsProject(this._rmprojFile.content.rootNamespace)
       );
-      await writeFile(`${StandardOutputFile.Usings}${this._outputFileExt}`, this._templateProvider.getUsings());
+      await writeFile(
+        `${StandardOutputFile.Usings}${this._outputFileExt}`,
+        this._templateProvider.getUsings(this._rmprojFile.content.rootNamespace)
+      );
       await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
     }
 

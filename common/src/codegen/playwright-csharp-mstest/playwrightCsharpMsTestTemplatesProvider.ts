@@ -65,8 +65,8 @@ export class PlaywrightCsharpMsTestTemplatesProvider {
   getCsProject(rootNamespace: string) {
     return this._templateCollection.CSPROJECT_TEMPLATE({ rootNamespace });
   }
-  getUsings() {
-    return this._templateCollection.USINGS_TEMPLATE({});
+  getUsings(rootNamespace: string) {
+    return this._templateCollection.USINGS_TEMPLATE({ rootNamespace });
   }
   getRunSettings() {
     return this._templateCollection.RUNSETTINGS_TEMPLATE({});

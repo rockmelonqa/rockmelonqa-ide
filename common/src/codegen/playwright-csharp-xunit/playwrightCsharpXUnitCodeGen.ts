@@ -85,7 +85,7 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
   private async writeBaseClassesFile(writeFile: WriteFileFn) {
     await writeFile(
       `Support/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
-      this._templateProvider.getBaseClasses(this._rmprojFile.content.rootNamespace)
+      this._templateProvider.getBaseClasses(this._rmprojFile.content.rootNamespace, this._rmprojFile.content.testIdAttributeName)
     );
   }
 
@@ -209,7 +209,7 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
 
   private generateTestSuiteFile(testSuite: ITestSuite, testcases: ITestCase[]) {
     var testcaseMethods = [];
-    var usingItems = [];
+    let usingDirectives: string[] = [];
 
     for (let testcaseId of testSuite.testcases) {
       let testcase = testcases.find((tc) => tc.id === testcaseId);
@@ -219,12 +219,15 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
 
       let fullNamespace = this._outProjMeta.get(testcase.id)!.outputFileFullNamespace;
 
-      usingItems.push(`using ${fullNamespace};`);
+      let usingDirective = `using ${fullNamespace};`;
+      if (!usingDirectives.includes(usingDirective)) {
+        usingDirectives.push(usingDirective);
+      }
 
       let testcaseFunction = this.generateTestCaseFunction(testcase);
       testcaseMethods.push(testcaseFunction);
     }
-    let usings = usingItems.join(EOL);
+    let usings = usingDirectives.join(EOL);
     let classBody = testcaseMethods.join(EOL + EOL);
 
     // Indent test method body with 1 indent;

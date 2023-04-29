@@ -17,7 +17,13 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
   }
 
   getTestCaseFile(testCaseName: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
-    return this._templateCollection.TEST_CASE_FILE_TEMPLATE({ rootNamespace, testCaseName, description, body, fullNamespace });
+    return this._templateCollection.TEST_CASE_FILE_TEMPLATE({
+      rootNamespace,
+      testCaseName,
+      description,
+      body,
+      fullNamespace,
+    });
   }
 
   getAction(params: IActionTemplateParam) {
@@ -61,8 +67,8 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
   getLocatorHelper(rootNamespace: string): string {
     return this._templateCollection.LOCATOR_HELPER_TEMPLATE({ rootNamespace });
   }
-  getBaseClasses(rootNamespace: string): string {
-    return this._templateCollection.BASE_CLASSES_TEMPLATE({ rootNamespace });
+  getBaseClasses(rootNamespace: string, testIdAttributeName: string): string {
+    return this._templateCollection.BASE_CLASSES_TEMPLATE({ rootNamespace, testIdAttributeName });
   }
   getCSProject(rootNamespace: string) {
     return this._templateCollection.CSPROJECT_TEMPLATE({ rootNamespace });

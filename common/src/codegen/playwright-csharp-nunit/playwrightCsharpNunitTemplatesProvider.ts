@@ -66,7 +66,7 @@ export class PlaywrightCsharpNunitTemplatesProvider {
   getCSProject(rootNamespace: string) {
     return this._templateCollection.CSPROJECT_TEMPLATE({ rootNamespace });
   }
-  getNUNitUsing(rootNamespace: string) {
+  getUsings(rootNamespace: string) {
     return this._templateCollection.USINGS_TEMPLATE({ rootNamespace });
   }
   getRunSettings() {

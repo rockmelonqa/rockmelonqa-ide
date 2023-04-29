@@ -115,7 +115,7 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
       );
       await writeFile(
         `${StandardOutputFile.Usings}${this._outputFileExt}`,
-        this._templateProvider.getNUNitUsing(this._rmprojFile.content.rootNamespace)
+        this._templateProvider.getUsings(this._rmprojFile.content.rootNamespace)
       );
       await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
     }
