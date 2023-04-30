@@ -75,6 +75,8 @@ export enum AppActionType {
     SetFiles = 'SetFiles',
     /** Update node info on File Explorer */
     UpdateFile = 'UpdateFile',
+    /** Copy/clone the file */
+    CopyFile = 'CopyFile',
     /** Set the selected node on File Explorer */
     SelectFile = 'SelectFile',
 
@@ -99,6 +101,7 @@ export type AppAction =
     | { type: AppActionType.SetActivity; activity?: ActivityType }
     | { type: AppActionType.SetFiles; files: Node[] }
     | { type: AppActionType.UpdateFile; nodePath: string; value: Partial<Node> }
+    | { type: AppActionType.CopyFile; nodePath: string }
     | { type: AppActionType.SelectFile; nodePath: string | undefined }
     | { type: AppActionType.AddTab; tab: ITab }
     | { type: AppActionType.CloseTab; tabIndex: number }
@@ -153,9 +156,7 @@ export function appContextReducer(state: IAppState, action: AppAction): IAppStat
             };
         }
         case AppActionType.RemoveTestCaseData: {
-            const testCases = new Map(
-                Array.from(state.testCases).filter(([_, value]) => value.filePath !== action.filePath)
-            );
+            const testCases = new Map(Array.from(state.testCases).filter(([_, value]) => value.filePath !== action.filePath));
             return {
                 ...state,
                 testCases: testCases,

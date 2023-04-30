@@ -30,13 +30,15 @@ const deleteFileSystem = async (path: string, options?: { apiKey?: string }): Pr
 };
 
 /**
+ * Copy/clone file or at given path
+ */
+const cloneFileSystem = async (path: string, options?: { apiKey?: string }): Promise<IIpcResponse> => {
+    return await getApi(options?.apiKey).invoke('cloneFileSystem', path);
+};
+/**
  * Get folder info
  */
-const getFolder = async (
-    folderPath: string,
-    includeChildren?: boolean,
-    options?: { apiKey?: string }
-): Promise<IFileSystemInfo | null> => {
+const getFolder = async (folderPath: string, includeChildren?: boolean, options?: { apiKey?: string }): Promise<IFileSystemInfo | null> => {
     return await getApi(options?.apiKey).invoke('getFolder', {
         path: folderPath,
         includeChildren,
@@ -131,6 +133,7 @@ const writeFile = async (filePath: string, fileContent: string, options?: { apiK
 
 export const fileSystem = {
     createFolder,
+    cloneFileSystem,
     deleteFileSystem,
     getFolder,
     pickFolder,
