@@ -39,6 +39,7 @@ export interface IRmProj {
   description: string;
   automationFramework: AutomationFramework;
   testFramework: TestFramework;
+  testIdAttributeName: string;
   language: Language;
   rootNamespace: string;
   indent: Indent;

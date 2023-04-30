@@ -95,6 +95,12 @@
                 min: 1,
                 max: 8,
             },
+            testIdAttributeName: {
+                dataType: FieldDataType.Text,
+                dataPath: 'testIdAttributeName',
+                isRequired: false,
+                initialValue: '',
+            },
         },
     };
 
@@ -238,6 +244,7 @@
                     disabled={$formData.values.language === Language.Typescript}
                 />
                 <DropdownField name="indent" options={indentOptions} />
+                <TextField name="testIdAttributeName" />
             </FormGroupColumn>
             <FormGroupColumn>
                 <TextField name="description" />

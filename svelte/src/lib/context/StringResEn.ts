@@ -170,6 +170,7 @@ export const stringResEn: IStringRes = {
         openProject: 'Open Project',
         output: 'Output',
         rootNamespace: 'Root Namespace',
+        testIdAttributeName: 'Test Id Attribute Name',
         testFramework: 'Test Framework',
     },
     runTestDialog: {

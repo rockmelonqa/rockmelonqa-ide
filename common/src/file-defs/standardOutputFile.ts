@@ -4,7 +4,8 @@ export class StandardOutputFile {
   static readonly Usings: string = "Usings";
   static readonly PageDefinitions: string = "PageDefinitions";
   static readonly LocatorHelper: string = "LocatorHelper";
-  static readonly RmSingleCaseSuiteBase: string = "RmSingleCaseSuiteBase";
+  static readonly TestCaseBase: string = "TestCaseBase";
+  static readonly TestSuiteBase: string = "TestSuiteBase";
   static readonly MetaData: string = ".code-metadata";
 
   // Nodejs
