@@ -102,7 +102,7 @@
 
                 if (!existingNode) {
                     const nodeType = i === parts.length - 1 ? NodeType.Suite : NodeType.Folder;
-                    const newNode = new NodeInfo({ name: part, nodeType, parent: i === 1 ? undefined : currentNode });
+                    const newNode = new NodeInfo({ name: part, nodeType, parent: i === 0 ? undefined : currentNode });
                     if (nodeType === NodeType.Suite) {
                         newNode.name = part;
                         newNode.suiteInfo = suite;
