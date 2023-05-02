@@ -1,5 +1,7 @@
 import chokidar, { FSWatcher } from "chokidar";
 import { BrowserWindow, dialog } from "electron";
+import { existsSync } from "fs";
+import path from "path";
 import {
   IAddFileWatchEventArgs,
   IFileSystemInfo,
@@ -22,7 +24,7 @@ const validSendChannel: IChannels = {
 
 const validInvokeChannel: IChannels = {
   getFolder: getFolder,
-  cloneFileSystem: cloneFileSystem,
+  getCloneFilePath: getCloneFilePath,
   deleteFileSystem: deleteFileSystem,
   pickFolder: pickFolder,
   readFile: readFile,
@@ -71,19 +73,51 @@ async function deleteFileSystem(
     return { isSuccess: false, errorMessage: "Cannot delete file" } as IIpcResponse;
   }
 }
+
+/** Generates cloned file name when pasting the same file at nth time */
+const genClonedFileNameAtNth = (srcFileNameWithoutExt: string, ext: string, n: number) => {
+  if (n === 1) {
+    return `${srcFileNameWithoutExt} - Copy${ext}`;
+  }
+  return `${srcFileNameWithoutExt} - Copy (${n})${ext}`;
+};
+
 /**
- * Delete file or folder at given path
+ * Gets clone file path with Windows copy/paste file in-place convention
  */
-async function cloneFileSystem(
+async function getCloneFilePath(
   browserWindow: BrowserWindow,
   event: Electron.IpcMainEvent,
-  path: string
-): Promise<IIpcResponse> {
+  filePath: string
+): Promise<string | null> {
   try {
-    await fs.cloneFileSystem(path);
-    return { isSuccess: true } as IIpcResponse;
-  } catch (error: any) {
-    return { isSuccess: false, errorMessage: "Cannot clone file" } as IIpcResponse;
+    const srcFileNameWithoutExt = path.parse(filePath).name;
+    const srcFileExt = path.extname(filePath);
+    const srcDir = path.dirname(filePath);
+
+    // Use Windows Explorer file copy/paste naming pattern:
+    // EX:
+    // - Src file name:             Document.txt
+    // - First copied file name:    Document - Copy.txt
+    // - Second copied file name:   Document - Copy (2).txt
+    // - etc...
+
+    let foundExistingClonedFile = false;
+    let pastingTime = 1;
+    while (!foundExistingClonedFile) {
+      let newClonedFileName = genClonedFileNameAtNth(srcFileNameWithoutExt, srcFileExt, pastingTime);
+      let newClonedFilePath = path.join(srcDir, newClonedFileName);
+      let existing = existsSync(newClonedFilePath);
+      if (!existing) {
+        return newClonedFilePath;
+      }
+      pastingTime += 1;
+    }
+    throw new Error("Cannot create clone file path from source file: " + filePath);
+  } catch (error) {
+    console.log("CANNOT clone file:", filePath);
+    console.error(error);
+    throw error;
   }
 }
 

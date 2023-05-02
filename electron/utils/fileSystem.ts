@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import fse from "fs-extra";
 import path from "path";
 import { IFileSystemInfo } from "rockmelonqa.common";
 
@@ -45,51 +44,6 @@ export async function deleteFileSystem(fullPath: string): Promise<void> {
     await fs.promises.rm(fullPath, { recursive: true, force: true });
   } catch (error) {
     console.log("CANNOT delete file:", fullPath);
-    console.error(error);
-    throw error;
-  }
-}
-
-/** Generates cloned file name when pasting the same file at nth time */
-const genClonedFileNameAtNth = (srcFileNameWithoutExt: string, ext: string, n: number) => {
-  if (n === 1) {
-    return `${srcFileNameWithoutExt} - Copy${ext}`;
-  }
-  return `${srcFileNameWithoutExt} - Copy (${n})${ext}`;
-};
-
-/**
- * Copies file at given path and paste it the same folder, i.e clones it.
- */
-export async function cloneFileSystem(fullPath: string): Promise<void> {
-  try {
-    const srcFileNameWithoutExt = path.parse(fullPath).name;
-    const srcFileExt = path.extname(fullPath);
-    const srcDir = path.dirname(fullPath);
-
-    // Use Windows Explorer file copy/paste naming pattern:
-    // EX:
-    // - Src file name:             Document.txt
-    // - First copied file name:    Document - Copy.txt
-    // - Second copied file name:   Document - Copy (2).txt
-    // - etc...
-
-    let foundExistingClonedFile = false;
-    let pastingTime = 1;
-    while (!foundExistingClonedFile) {
-      let newClonedFileName = genClonedFileNameAtNth(srcFileNameWithoutExt, srcFileExt, pastingTime);
-      let newClonedFilePath = path.join(srcDir, newClonedFileName);
-      let existing = fs.existsSync(newClonedFilePath);
-      if (!existing) {
-        // Create the file
-        const newFileName = await fse.copy(fullPath, newClonedFilePath);
-        foundExistingClonedFile = true;
-        return;
-      }
-      pastingTime += 1;
-    }
-  } catch (error) {
-    console.log("CANNOT clone file:", fullPath);
     console.error(error);
     throw error;
   }

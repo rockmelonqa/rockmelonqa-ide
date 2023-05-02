@@ -5,8 +5,10 @@
     import DeleteTestCaseConfirmationDialog from "$lib/dialogs/DeleteTestCaseConfirmationDialog.svelte";
     import { codeGenerator, fileSystem } from "$lib/ipc";
     import type { IFileInfo } from "$lib/models";
-    import { StandardFolder } from "rockmelonqa.common";
+    import { StandardFolder, type ITestCase } from "rockmelonqa.common";
+    import type { IPage } from "rockmelonqa.common/file-defs/pageFile";
     import { getContext } from "svelte";
+    import { v4 as uuidv4 } from "uuid";
     import { getEditor } from "../Editors/Editor";
     import FileIcon from "../FileIcon.svelte";
     import { FileType } from "../FileType";
@@ -15,7 +17,14 @@
     import Menu from "./Menu.svelte";
     import MenuDivider from "./MenuDivider.svelte";
     import MenuItem from "./MenuItem.svelte";
-    import { buildChildrenNodes, combinePath, extractPath, Node as NodeInfo, showMenuAt, toFileSystemPath } from "./Node";
+    import {
+        buildChildrenNodes,
+        combinePath,
+        extractPath,
+        Node as NodeInfo,
+        showMenuAt,
+        toFileSystemPath,
+    } from "./Node";
     import NodeEditor from "./NodeEditor.svelte";
 
     export let node: NodeInfo;
@@ -132,14 +141,32 @@
             value: { editMode: true },
         });
     };
-    const handleMenuCopy = async () => {
-        const response = await fileSystem.cloneFileSystem(fileSystemPath);
-        if (!response.isSuccess) {
-            if (response.errorMessage) {
-                Notify.error(response.errorMessage);
-            }
-            return;
+
+    const getCloneFileContent = async (): Promise<string> => {
+        const srcFileContent = await fileSystem.readFile(fileSystemPath);
+
+        if (!srcFileContent) {
+            return "";
         }
+
+        if (type === FileType.TCase) {
+            const tcase = JSON.parse(srcFileContent) as ITestCase;
+            tcase.id = uuidv4();
+            tcase.steps.forEach((step) => (step.id = uuidv4()));
+            return JSON.stringify(tcase);
+        }
+        if (type === FileType.Page) {
+            const page = JSON.parse(srcFileContent) as IPage;
+            page.id = uuidv4();
+            return JSON.stringify(page);
+        }
+        return "";
+    };
+
+    const handleMenuCopy = async () => {
+        const cloneFileContent = await getCloneFileContent();
+        const cloneFilePath = await fileSystem.getCloneFilePath(fileSystemPath);
+        await fileSystem.writeFile(cloneFilePath, cloneFileContent);
     };
 
     const handleMenuDelete = async () => {
@@ -297,7 +324,9 @@
             return false;
         }
 
-        const testCase = meta.testCases.find((tc) => combinePath([tc.folderPath, tc.fileName], uiContext.pathSeparator) === fileSystemPath);
+        const testCase = meta.testCases.find(
+            (tc) => combinePath([tc.folderPath, tc.fileName], uiContext.pathSeparator) === fileSystemPath
+        );
 
         if (!testCase) {
             return false;
@@ -327,7 +356,12 @@
         <NodeEditor value={node.name} type={node.type} {level} on:cancel={cancelRename} on:submit={submitRename} />
     {:else}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div class={rootItemClass} style={rootItemStyle} on:click={handleClick} on:contextmenu|preventDefault={handleRightClick}>
+        <div
+            class={rootItemClass}
+            style={rootItemStyle}
+            on:click={handleClick}
+            on:contextmenu|preventDefault={handleRightClick}
+        >
             {#if showToggleIcon}
                 <div class="treeview-toggle" />
             {/if}
@@ -354,20 +388,35 @@
 {#if showMenu}
     <Menu {...position} on:click={closeMenu} on:clickoutside={closeMenu}>
         {#if type == FileType.Folder}
-            <MenuItem label={uiContext.str(stringResKeys.fileExplorer.newFolder)} on:click={() => handleMenuNew(FileType.Folder)} />
+            <MenuItem
+                label={uiContext.str(stringResKeys.fileExplorer.newFolder)}
+                on:click={() => handleMenuNew(FileType.Folder)}
+            />
             {#if nodePath.includes(StandardFolder.PageDefinitions)}
-                <MenuItem label={uiContext.str(stringResKeys.fileExplorer.newPage)} on:click={() => handleMenuNew(FileType.Page)} />
+                <MenuItem
+                    label={uiContext.str(stringResKeys.fileExplorer.newPage)}
+                    on:click={() => handleMenuNew(FileType.Page)}
+                />
             {:else if nodePath.includes(StandardFolder.TestCases)}
-                <MenuItem label={uiContext.str(stringResKeys.fileExplorer.newTestCase)} on:click={() => handleMenuNew(FileType.TCase)} />
+                <MenuItem
+                    label={uiContext.str(stringResKeys.fileExplorer.newTestCase)}
+                    on:click={() => handleMenuNew(FileType.TCase)}
+                />
             {:else if nodePath.includes(StandardFolder.TestRoutines)}
                 <MenuItem
                     label={uiContext.str(stringResKeys.fileExplorer.newTestRoutine)}
                     on:click={() => handleMenuNew(FileType.TRoutine)}
                 />
             {:else if nodePath.includes(StandardFolder.TestSuites)}
-                <MenuItem label={uiContext.str(stringResKeys.fileExplorer.newTestSuite)} on:click={() => handleMenuNew(FileType.TSuite)} />
+                <MenuItem
+                    label={uiContext.str(stringResKeys.fileExplorer.newTestSuite)}
+                    on:click={() => handleMenuNew(FileType.TSuite)}
+                />
             {:else}
-                <MenuItem label={uiContext.str(stringResKeys.fileExplorer.newFile)} on:click={() => handleMenuNew(FileType.File)} />
+                <MenuItem
+                    label={uiContext.str(stringResKeys.fileExplorer.newFile)}
+                    on:click={() => handleMenuNew(FileType.File)}
+                />
             {/if}
         {/if}
         {#if node.parent}
