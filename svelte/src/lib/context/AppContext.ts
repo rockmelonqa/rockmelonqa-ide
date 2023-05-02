@@ -1,10 +1,10 @@
-import { ActivityType } from '$lib/components/ActivityBar';
-import type { ITab } from '$lib/components/Tab/Tab';
-import _ from 'lodash';
-import type { IRmProjFile } from 'rockmelonqa.common';
-import { writable, type Readable } from 'svelte/store';
-import { Node } from '../components/FileExplorer/Node';
-import type { IPageData, ITestCaseData } from './AppContext.model';
+import { ActivityType } from "$lib/components/ActivityBar";
+import type { ITab } from "$lib/components/Tab/Tab";
+import _ from "lodash";
+import type { IRmProjFile } from "rockmelonqa.common";
+import { writable, type Readable } from "svelte/store";
+import { Node } from "../components/FileExplorer/Node";
+import type { IPageData, ITestCaseData } from "./AppContext.model";
 
 /**
  * Application level context
@@ -59,33 +59,31 @@ export const initialAppContext: IAppState = {
  * Actions supported
  */
 export enum AppActionType {
-    LoadProject = 'LoadProject',
-    SetProject = 'SetProject',
+    LoadProject = "LoadProject",
+    SetProject = "SetProject",
 
-    SetPageData = 'LoadPageData',
-    RemovePageData = 'RemovePageData',
+    SetPageData = "LoadPageData",
+    RemovePageData = "RemovePageData",
 
-    SetTestCaseData = 'SetTestCaseData',
-    RemoveTestCaseData = 'RemoveTestCaseData',
+    SetTestCaseData = "SetTestCaseData",
+    RemoveTestCaseData = "RemoveTestCaseData",
 
     /** Set the selection on Activity Bar */
-    SetActivity = 'SetActivity',
+    SetActivity = "SetActivity",
 
     /** Set the file hierarchy for File Explorer */
-    SetFiles = 'SetFiles',
+    SetFiles = "SetFiles",
     /** Update node info on File Explorer */
-    UpdateFile = 'UpdateFile',
-    /** Copy/clone the file */
-    CopyFile = 'CopyFile',
+    UpdateFile = "UpdateFile",
     /** Set the selected node on File Explorer */
-    SelectFile = 'SelectFile',
+    SelectFile = "SelectFile",
 
-    AddTab = 'AddTab',
-    CloseTab = 'CloseTab',
-    CloseTabs = 'CloseTabs',
-    SelectTab = 'SelectTab',
-    UpdateTab = 'UpdateTab',
-    SetTabDirty = 'SetTabDirty',
+    AddTab = "AddTab",
+    CloseTab = "CloseTab",
+    CloseTabs = "CloseTabs",
+    SelectTab = "SelectTab",
+    UpdateTab = "UpdateTab",
+    SetTabDirty = "SetTabDirty",
 }
 
 /**
@@ -101,7 +99,6 @@ export type AppAction =
     | { type: AppActionType.SetActivity; activity?: ActivityType }
     | { type: AppActionType.SetFiles; files: Node[] }
     | { type: AppActionType.UpdateFile; nodePath: string; value: Partial<Node> }
-    | { type: AppActionType.CopyFile; nodePath: string }
     | { type: AppActionType.SelectFile; nodePath: string | undefined }
     | { type: AppActionType.AddTab; tab: ITab }
     | { type: AppActionType.CloseTab; tabIndex: number }
@@ -156,7 +153,9 @@ export function appContextReducer(state: IAppState, action: AppAction): IAppStat
             };
         }
         case AppActionType.RemoveTestCaseData: {
-            const testCases = new Map(Array.from(state.testCases).filter(([_, value]) => value.filePath !== action.filePath));
+            const testCases = new Map(
+                Array.from(state.testCases).filter(([_, value]) => value.filePath !== action.filePath)
+            );
             return {
                 ...state,
                 testCases: testCases,
