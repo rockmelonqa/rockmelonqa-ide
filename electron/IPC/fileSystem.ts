@@ -1,6 +1,5 @@
 import chokidar, { FSWatcher } from 'chokidar';
 import { BrowserWindow, dialog } from 'electron';
-import { existsSync } from 'fs';
 import path from 'path';
 import {
   IAddFileWatchEventArgs,
@@ -23,9 +22,9 @@ const validSendChannel: IChannels = {
 };
 
 const validInvokeChannel: IChannels = {
-  getFolder: getFolder,
-  getCloneFilePath: getCloneFilePath,
   deleteFileSystem: deleteFileSystem,
+  getCloneFilePath: getCloneFilePath,
+  getFolder: getFolder,
   pickFolder: pickFolder,
   readFile: readFile,
   rename: rename,
@@ -106,7 +105,7 @@ async function getCloneFilePath(
     while (true) {
       let newClonedFileName = genClonedFileNameAtNth(srcFileNameWithoutExt, srcFileExt, pastingTries);
       let newClonedFilePath = path.join(srcDir, newClonedFileName);
-      let existing = existsSync(newClonedFilePath);
+      let existing = await fs.checkExists(newClonedFilePath);
       if (!existing) {
         return newClonedFilePath;
       }

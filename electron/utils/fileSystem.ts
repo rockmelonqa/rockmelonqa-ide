@@ -16,10 +16,6 @@ export async function checkExists(filePath: string): Promise<boolean> {
   }
 }
 
-export function checkExistsSync(filePath: string): boolean {
-  return fs.existsSync(filePath);
-}
-
 /**
  * Create new folder
  */

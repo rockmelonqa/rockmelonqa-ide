@@ -41,10 +41,10 @@ export const runTest = async function (
             }
         });
 
-        worker.on('error', (error: Error) => {
+        worker.on('error', async (error: Error) => {
             console.error(error);
             rs(
-                prepareActionRs(context, {
+                await prepareActionRs(context, {
                     isSuccess: true,
                     errorMessage: String(error),
                 })
@@ -58,12 +58,12 @@ export const runTest = async function (
     });
 };
 
-const prepareActionRs = (context: IRunTestContext, actionRs: IRunTestActionResult): IRunTestActionResult => {
+const prepareActionRs = async (context: IRunTestContext, actionRs: IRunTestActionResult): Promise<IRunTestActionResult> => {
     const resultFileName = toResultFileName(context.rmProjFile);
     const fileSystemPath = path.join(context.rmProjFile.folderPath, context.storageFolder, resultFileName);
 
     // only return result-file-name if it does exist
-    if (fileSystem.checkExistsSync(fileSystemPath)) {
+    if (await fileSystem.checkExists(fileSystemPath)) {
         actionRs.data = { resultFileName: resultFileName };
     }
 
