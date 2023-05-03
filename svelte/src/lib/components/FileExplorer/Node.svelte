@@ -163,7 +163,7 @@
         return "";
     };
 
-    const handleMenuCopy = async () => {
+    const handleMenuClone = async () => {
         const cloneFileContent = await getCloneFileContent();
         const cloneFilePath = await fileSystem.getCloneFilePath(fileSystemPath);
         await fileSystem.writeFile(cloneFilePath, cloneFileContent);
@@ -425,7 +425,7 @@
             {/if}
             <MenuItem label="Rename" on:click={handleMenuRename} />
             {#if type == FileType.Page || type == FileType.TCase}
-                <MenuItem label="Copy" on:click={handleMenuCopy} />
+                <MenuItem label="Clone" on:click={handleMenuClone} />
             {/if}
             <MenuDivider />
             <MenuItem label="Delete" on:click={handleMenuDelete} />

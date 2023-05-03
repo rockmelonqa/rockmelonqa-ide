@@ -30,7 +30,7 @@ const deleteFileSystem = async (path: string, options?: { apiKey?: string }): Pr
 };
 
 /**
- * Copy/clone file or at given path
+ * Gets clone file path with Windows copy/paste file in-place convention
  */
 const getCloneFilePath = async (filePath: string, options?: { apiKey?: string }): Promise<string> => {
     return await getApi(options?.apiKey).invoke("getCloneFilePath", filePath);
@@ -137,8 +137,8 @@ const writeFile = async (filePath: string, fileContent: string, options?: { apiK
 
 export const fileSystem = {
     createFolder,
-    getCloneFilePath,
     deleteFileSystem,
+    getCloneFilePath,
     getFolder,
     pickFolder,
     readFile,
