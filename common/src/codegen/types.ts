@@ -47,6 +47,18 @@ export interface ITestCaseInfo {
   isValid: boolean;
 }
 
+export interface IPageInfo {
+  name: string;
+  fullyQualifiedName: string;
+  inputFileName: string;
+  inputFilePath: string;
+  inputFileRelPath: string;
+  outputFileName: string;
+  outputFilePath: string;
+  outputFileRelPath: string;
+  isValid: boolean;
+}
+
 export interface IOutputFileFileInfo {
   inputFileName: string;
   inputFilePath: string;

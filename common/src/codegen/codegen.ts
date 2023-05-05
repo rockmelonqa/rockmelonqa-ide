@@ -20,6 +20,8 @@ import { IPage, IPageFile } from "../file-defs/pageFile";
 import { ITestCase, ITestCaseFile } from "../file-defs/testCaseFile";
 import { IProgressEvent } from "../ipc-defs";
 import { CodeGenFactory } from "./codegenFactory";
+import { CodeGenMetaFactory } from "./codegenMetaFactory";
+import { IOutputProjectMetadata } from "./playwright-charp/outputProjectMetadata";
 
 /** Parses the json string. If parse successfully, return the [content, true]; If not, return [{<empty object>}, false] */
 const parseContent = <TContent>(contentStr: string): [TContent, boolean] => {
@@ -268,4 +270,11 @@ export const createCodeGenMeta = async (
   };
 
   return projMeta;
+};
+
+export const generateOutputProjectMeta = async (projFile: IRmProjFile): Promise<IOutputProjectMetadata> => {
+  const inProjMeta = await createCodeGenMeta(projFile);
+  const outProjMeta = CodeGenMetaFactory.newInstance(inProjMeta);
+  const meta = outProjMeta.generateOutputProjectMeta();
+  return meta;
 };

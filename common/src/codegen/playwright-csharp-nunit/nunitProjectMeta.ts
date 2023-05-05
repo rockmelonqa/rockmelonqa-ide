@@ -1,5 +1,6 @@
 import { ISourceProjectMeta, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
+import { generateDotnetOutputProjectMeta } from "../playwright-charp/generateDotnetOutputProjectMeta";
 import {
   IOutputProjMetaGenerator,
   createMapForPages,
@@ -8,7 +9,7 @@ import {
   createMapForTestSuites,
 } from "../playwright-charp/outProjMeta";
 import { IOutputProjectMetadata } from "../playwright-charp/outputProjectMetadata";
-import { IOutputFileFileInfo, ISuiteInfo, ITestCaseInfo } from "../types";
+import { IOutputFileFileInfo } from "../types";
 
 export class NunitProjectMeta implements IOutputProjMetaGenerator {
   private _projMeta: ISourceProjectMeta;
@@ -32,42 +33,7 @@ export class NunitProjectMeta implements IOutputProjMetaGenerator {
   }
 
   public generateOutputProjectMeta(): IOutputProjectMetadata {
-    const suites: ISuiteInfo[] = [];
-
-    for (let { content: testsuite, isValid } of this._projMeta.testSuites) {
-      let testCases = this._projMeta.testCases.filter((c) => testsuite.testcases.includes(c.content.id));
-      let suiteMeta = this.suiteNameMap.get(testsuite)!;
-
-      let suiteInfo: ISuiteInfo = {
-        name: suiteMeta.outputFileClassName,
-        fullyQualifiedName: `${suiteMeta.outputFileFullNamespace}.${suiteMeta.outputFileClassName}`,
-        inputFileName: suiteMeta.inputFileName,
-        inputFilePath: suiteMeta.inputFilePath,
-        inputFileRelPath: suiteMeta.inputFileRelPath,
-        outputFileName: suiteMeta.outputFileName,
-        outputFilePath: suiteMeta.outputFilePath,
-        outputFileRelPath: suiteMeta.outputFileRelPath,
-        isValid: suiteMeta.isValid,
-        testCases: testCases.map((tc) => {
-          let caseMeta = this.caseNameMap.get(tc.content)!;
-          let caseInfo: ITestCaseInfo = {
-            name: caseMeta.outputFileClassName,
-            fullyQualifiedName: `${suiteMeta.outputFileFullNamespace}.${suiteMeta.outputFileClassName}.${caseMeta.outputFileClassName}`,
-            inputFileName: caseMeta.inputFileName,
-            inputFilePath: caseMeta.inputFilePath,
-            inputFileRelPath: caseMeta.inputFileRelPath,
-            outputFileName: caseMeta.outputFileName,
-            outputFilePath: caseMeta.outputFilePath,
-            outputFileRelPath: caseMeta.outputFileRelPath,
-            isValid: caseMeta.isValid,
-          };
-          return caseInfo;
-        }),
-      };
-      suites.push(suiteInfo);
-    }
-
-    return { suites };
+    return generateDotnetOutputProjectMeta(this._projMeta);
   }
 
   private verifyDuplication() {
