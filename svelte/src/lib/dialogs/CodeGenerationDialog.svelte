@@ -103,21 +103,30 @@
             })
         );
 
-        let duplicateObjects = await findDuplicatedObjects();
-        if (duplicateObjects.length) {
-            dialogMessage = `"${duplicateObjects[0]}" ${uiContext.str(stringResKeys.general.and)} "${
-                duplicateObjects[1]
-            }" ${uiContext.str(stringResKeys.codeGenerationDialog.duplicateFileNameMessage)}`;
-            isPrerequiring = false;
-            showWarning = true;
-            showStartBtn = false;
-            return;
-        }
+        let hasIssue = false;
+        try {
+            // verify environments
+            prerequisites = await codeGenerator.prerequire($appState.projectFile!);
+            if (prerequisites.length) {
+                hasIssue = true;
+                return;
+            }
 
-        prerequisites = await codeGenerator.prerequire($appState.projectFile!);
-        isPrerequiring = false;
-        showWarning = prerequisites.length > 0;
-        showStartBtn = prerequisites.length === 0;
+            // verify duplicated objects
+            let duplicateObjects = await findDuplicatedObjects();
+            if (duplicateObjects.length) {
+                dialogMessage = `"${duplicateObjects[0]}" ${uiContext.str(stringResKeys.general.and)} "${
+                    duplicateObjects[1]
+                }" ${uiContext.str(stringResKeys.codeGenerationDialog.duplicateFileNameMessage)}`;
+
+                hasIssue = true;
+                return;
+            }
+        } finally {
+            showWarning = hasIssue;
+            showStartBtn = !hasIssue;
+            isPrerequiring = false;
+        }
     });
 
     /** Returns the first pair duplicated items (cases, pages, suites) by outputFilePath */
