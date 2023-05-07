@@ -1,6 +1,6 @@
 import { createCodeGenMeta, generateCode, generateOutputProjectMeta } from "./codegen";
 import { CodeGenMetaFactory } from "./codegenMetaFactory";
-import { IOutputProjMetaGenerator } from "./playwright-charp/outProjMeta";
+import { IOutputProjectMetadataGenerator } from "./playwright-charp/outputProjectMetadataGenenrator";
 import { ICodeGen } from "./types";
 
 export {
@@ -8,6 +8,6 @@ export {
   generateCode,
   createCodeGenMeta,
   CodeGenMetaFactory,
-  IOutputProjMetaGenerator as OutProjMeta,
+  IOutputProjectMetadataGenerator,
   ICodeGen,
 };

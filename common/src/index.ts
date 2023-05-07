@@ -1,4 +1,4 @@
-import { IOutputProjectMetadata } from "./codegen/playwright-charp/outputProjectMetadata";
+import { IOutputProjectMetadata } from "./codegen/types";
 import {
   ActionType,
   AutomationFramework,
@@ -7,7 +7,7 @@ import {
   IRecentFile,
   IRmProj,
   IRmProjFile,
-  ISourceProjectMeta,
+  ISourceProjectMetadata,
   ITestCase,
   ITestCaseFile,
   ITestCaseStep,
@@ -52,7 +52,7 @@ export {
   fileDefFactory,
   IAddFileWatchEventArgs,
   IAppInfo,
-  ISourceProjectMeta,
+  ISourceProjectMetadata,
   IDataSet,
   IEnvironmentInfo,
   IFileDef,

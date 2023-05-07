@@ -8,7 +8,7 @@ import path from "path";
 
 import {
   IRmProjFile,
-  ISourceProjectMeta,
+  ISourceProjectMetadata,
   ITestRoutine,
   ITestRoutineFile,
   ITestSuite,
@@ -21,7 +21,7 @@ import { ITestCase, ITestCaseFile } from "../file-defs/testCaseFile";
 import { IProgressEvent } from "../ipc-defs";
 import { CodeGenFactory } from "./codegenFactory";
 import { CodeGenMetaFactory } from "./codegenMetaFactory";
-import { IOutputProjectMetadata } from "./playwright-charp/outputProjectMetadata";
+import { IOutputProjectMetadata } from "./types";
 
 /** Parses the json string. If parse successfully, return the [content, true]; If not, return [{<empty object>}, false] */
 const parseContent = <TContent>(contentStr: string): [TContent, boolean] => {
@@ -161,7 +161,7 @@ export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: (eve
 export const createCodeGenMeta = async (
   rmprojFile: IRmProjFile,
   progressNotify?: (event: IProgressEvent) => void
-): Promise<ISourceProjectMeta> => {
+): Promise<ISourceProjectMetadata> => {
   const notify = (event: IProgressEvent) => progressNotify && progressNotify(event);
 
   // Print out information about the context
@@ -261,7 +261,7 @@ export const createCodeGenMeta = async (
 
   let routines: ITestRoutineFile[] = [];
 
-  let projMeta: ISourceProjectMeta = {
+  let projMeta: ISourceProjectMetadata = {
     project: rmprojFile,
     pages: pages,
     testCases: cases,
@@ -275,6 +275,6 @@ export const createCodeGenMeta = async (
 export const generateOutputProjectMeta = async (projFile: IRmProjFile): Promise<IOutputProjectMetadata> => {
   const inProjMeta = await createCodeGenMeta(projFile);
   const outProjMeta = CodeGenMetaFactory.newInstance(inProjMeta);
-  const meta = outProjMeta.generateOutputProjectMeta();
+  const meta = outProjMeta.generateOutputProjectMetadata();
   return meta;
 };

@@ -5,7 +5,7 @@ import type {
     IProgressDetail,
     IRmProjFile,
 } from "rockmelonqa.common";
-import type { ISourceProjectMeta } from "rockmelonqa.common/file-defs/sourceProjectMeta";
+import type { ISourceProjectMetadata } from "rockmelonqa.common/file-defs/sourceProjectMetadata";
 import { DefaultApiKey } from "./shared";
 
 const nameAPI = "codeGenerator";
@@ -54,7 +54,7 @@ const prerequire = async (rmprojFile: IRmProjFile, options?: { apiKey?: string }
 const generateSourceProjectMetadata = async (
     projFile: IRmProjFile,
     options?: { apiKey?: string }
-): Promise<ISourceProjectMeta | null> => {
+): Promise<ISourceProjectMetadata | null> => {
     const response = await getApi(options?.apiKey).invoke("generateSourceProjectMetadata", projFile);
     if (response.isSuccess) {
         return response.data;

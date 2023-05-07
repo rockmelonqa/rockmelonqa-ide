@@ -1,26 +1,25 @@
-import { ISourceProjectMeta, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
+import { ISourceProjectMetadata, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
-import { generateDotnetOutputProjectMeta } from "../playwright-charp/generateDotnetOutputProjectMeta";
+import { createDotnetProjectMetadata } from "../playwright-charp/createDotnetProjectMetadata";
 import {
-  IOutputProjMetaGenerator,
+  IOutputProjectMetadataGenerator,
   createMapForPages,
   createMapForTestCases,
   createMapForTestRoutines,
   createMapForTestSuites,
-} from "../playwright-charp/outProjMeta";
-import { IOutputProjectMetadata } from "../playwright-charp/outputProjectMetadata";
-import { IOutputFileFileInfo } from "../types";
+} from "../playwright-charp/outputProjectMetadataGenenrator";
+import { IOutputFileInfo, IOutputProjectMetadata } from "../types";
 
 /** MsTest project meta: Contains info of all files and other resources */
-export class MsTestProjMeta implements IOutputProjMetaGenerator {
-  private _projMeta: ISourceProjectMeta;
+export class MsTestProjMeta implements IOutputProjectMetadataGenerator {
+  private _projMeta: ISourceProjectMetadata;
 
-  public readonly pageMetaMap: Map<IPage, IOutputFileFileInfo> = new Map<IPage, IOutputFileFileInfo>();
-  public readonly suiteMetaMap: Map<ITestSuite, IOutputFileFileInfo> = new Map<ITestSuite, IOutputFileFileInfo>();
-  public readonly caseMetaMap: Map<ITestCase, IOutputFileFileInfo> = new Map<ITestCase, IOutputFileFileInfo>();
-  public readonly routineMetaMap: Map<ITestRoutine, IOutputFileFileInfo> = new Map<ITestRoutine, IOutputFileFileInfo>();
+  public readonly pageMetaMap: Map<IPage, IOutputFileInfo> = new Map<IPage, IOutputFileInfo>();
+  public readonly suiteMetaMap: Map<ITestSuite, IOutputFileInfo> = new Map<ITestSuite, IOutputFileInfo>();
+  public readonly caseMetaMap: Map<ITestCase, IOutputFileInfo> = new Map<ITestCase, IOutputFileInfo>();
+  public readonly routineMetaMap: Map<ITestRoutine, IOutputFileInfo> = new Map<ITestRoutine, IOutputFileInfo>();
 
-  constructor(codegenMeta: ISourceProjectMeta) {
+  constructor(codegenMeta: ISourceProjectMetadata) {
     this._projMeta = codegenMeta;
 
     const rmprojFile = codegenMeta.project;
@@ -33,8 +32,8 @@ export class MsTestProjMeta implements IOutputProjMetaGenerator {
     this.verifyDuplication();
   }
 
-  public generateOutputProjectMeta(): IOutputProjectMetadata {
-    return generateDotnetOutputProjectMeta(this._projMeta);
+  public generateOutputProjectMetadata(): IOutputProjectMetadata {
+    return createDotnetProjectMetadata(this._projMeta);
   }
 
   private verifyDuplication() {
@@ -44,7 +43,7 @@ export class MsTestProjMeta implements IOutputProjMetaGenerator {
     this.findDuplication(this.routineMetaMap.values());
   }
 
-  private findDuplication(nameInfo: IterableIterator<IOutputFileFileInfo>) {
+  private findDuplication(nameInfo: IterableIterator<IOutputFileInfo>) {
     const allFilePath = Array.from(nameInfo).map((x) => x.outputFilePath);
     const firstDuplication = allFilePath.find((x) => allFilePath.indexOf(x) !== allFilePath.lastIndexOf(x));
     if (firstDuplication) {
@@ -53,7 +52,7 @@ export class MsTestProjMeta implements IOutputProjMetaGenerator {
   }
 
   /** Get an instance of OutputFileFileInfo with the provided guid of an item in the rmProj  */
-  public get(guid: string): IOutputFileFileInfo {
+  public get(guid: string): IOutputFileInfo {
     // IPage
     for (let page of this.pageMetaMap.keys()) {
       if (page.id === guid) {

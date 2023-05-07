@@ -7,14 +7,14 @@ import path from 'path';
 import {
   IIpcGenericResponse,
   IIpcResponse,
+  IOutputProjectMetadata,
   IProgressDetail,
   IProgressEvent,
   IRmProjFile,
   Language,
   StandardFolder,
 } from 'rockmelonqa.common';
-import { IOutputProjectMetadata } from 'rockmelonqa.common/codegen/playwright-charp/outputProjectMetadata';
-import { ISourceProjectMeta, StandardOutputFile } from 'rockmelonqa.common/file-defs';
+import { ISourceProjectMetadata, StandardOutputFile } from 'rockmelonqa.common/file-defs';
 import * as fileSystem from '../utils/fileSystem';
 import { StringBuilder } from '../utils/stringBuilder';
 import { IActionResult, extractMajorMinorVersion, generateCode } from '../worker/actions';
@@ -230,7 +230,7 @@ async function genSourceProjectMetadata(
   browserWindow: BrowserWindow,
   event: Electron.IpcMainEvent,
   projectFile: IRmProjFile
-): Promise<IIpcGenericResponse<ISourceProjectMeta>> {
+): Promise<IIpcGenericResponse<ISourceProjectMetadata>> {
   try {
     const actionRs = await generateSourceProjectMetadata(projectFile);
     return { isSuccess: true, data: actionRs.data } as IIpcResponse;

@@ -1,9 +1,8 @@
-import { IOutputProjectMetadata } from "../..";
-import { ISourceProjectMeta } from "../../file-defs";
-import { IPageInfo, ISuiteInfo, ITestCaseInfo } from "../types";
-import { createMapForPages, createMapForTestCases, createMapForTestRoutines, createMapForTestSuites } from "./outProjMeta";
+import { ISourceProjectMetadata } from "../../file-defs";
+import { IOutputProjectMetadata, IPageInfo, ISuiteInfo, ITestCaseInfo } from "../types";
+import { createMapForPages, createMapForTestCases, createMapForTestRoutines, createMapForTestSuites } from "./outputProjectMetadataGenenrator";
 
-export const generateDotnetOutputProjectMeta = (projMeta: ISourceProjectMeta): IOutputProjectMetadata => {
+export const createDotnetProjectMetadata = (projMeta: ISourceProjectMetadata): IOutputProjectMetadata => {
   const rmprojFile = projMeta.project;
   const suites: ISuiteInfo[] = [];
 
