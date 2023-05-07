@@ -1,5 +1,3 @@
-import { CodeGen } from "./src/codegen/codegen";
-import { StandardFileExtension, StandardFolder, StandardOutputFolder } from "./src/codegen/utils";
 import {
   ActionType,
   AutomationFramework,
@@ -8,12 +6,11 @@ import {
   IRecentFile,
   IRmProj,
   IRmProjFile,
-  ISourceProjectMeta,
+  ISourceProjectMetadata,
   ITestCase,
   ITestCaseFile,
   ITestRoutine,
   ITestRoutineFile,
-  ITestStep,
   ITestSuite,
   ITestSuiteFile,
   IUserSettings,
@@ -23,6 +20,9 @@ import {
   LocatorType,
   TestFramework,
   fileDefFactory,
+  StandardFileExtension,
+  StandardFolder,
+  StandardOutputFolder,
 } from "./src/file-defs";
 import {
   Action,
@@ -43,10 +43,9 @@ export {
   AutomationFramework,
   fileDefFactory,
   Action,
-  CodeGen,
   IAddFileWatchEventArgs,
   IAppInfo,
-  ISourceProjectMeta,
+  ISourceProjectMetadata,
   IDataSet,
   IFileDef,
   IFileSystemInfo,
@@ -66,7 +65,6 @@ export {
   ITestRoutineFile,
   IUserSettings,
   IUserSettingsFile,
-  ITestStep,
   ITestSuite,
   ITestSuiteFile,
   IWriteFileRequest,

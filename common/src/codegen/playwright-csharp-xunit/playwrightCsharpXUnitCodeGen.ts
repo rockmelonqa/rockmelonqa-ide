@@ -1,10 +1,9 @@
 import { EOL } from "os";
 import path from "path";
-import { ActionType, IRmProjFile, ISourceProjectMeta, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
+import { ActionType, IRmProjFile, ISourceProjectMetadata, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
-import { createCodeGenMeta } from "../codegen";
-import { CodeGenMetaFactory } from "../codegenMetaFactory";
+import { createOutputProjectMetadata } from "../codegen";
 import { ICodeGen } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
@@ -14,7 +13,7 @@ import { XUnitProjectMeta } from "./xunitProjectMeta";
 type WriteFileFn = (path: string, content: string) => Promise<void>;
 
 export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
-  private _projMeta: ISourceProjectMeta;
+  private _projMeta: ISourceProjectMetadata;
   private _rmprojFile: IRmProjFile;
   private _rootNamespace: string;
   private _templateProvider: PlaywrightCsharpXUnitTemplatesProvider;
@@ -26,7 +25,7 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
 
   private _outProjMeta: XUnitProjectMeta;
 
-  constructor(projMeta: ISourceProjectMeta) {
+  constructor(projMeta: ISourceProjectMetadata) {
     const rmprojFile = projMeta.project;
 
     this._projMeta = projMeta;
@@ -64,10 +63,8 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
   }
 
   private async writeMetaFile(writeFile: WriteFileFn) {
-    const inProjMeta = await createCodeGenMeta(this._rmprojFile);
-    const outProjMeta = CodeGenMetaFactory.newInstance(inProjMeta);
-    const data = outProjMeta.generateOutputProjectMeta();
-    await writeFile(StandardOutputFile.MetaData, JSON.stringify(data, null, 2));
+    const outputProjectMetadata = await createOutputProjectMetadata(this._rmprojFile);
+    await writeFile(StandardOutputFile.MetaData, JSON.stringify(outputProjectMetadata, null, 2));
   }
 
   private async writeProjectFiles(writeFile: WriteFileFn) {

@@ -1,10 +1,9 @@
 import { EOL } from "os";
 import path from "path";
-import { ActionType, IRmProjFile, ISourceProjectMeta, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
+import { ActionType, IRmProjFile, ISourceProjectMetadata, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
-import { createCodeGenMeta } from "../codegen";
-import { CodeGenMetaFactory } from "../codegenMetaFactory";
+import { createOutputProjectMetadata } from "../codegen";
 import { ICodeGen } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
@@ -12,7 +11,7 @@ import { NunitProjectMeta } from "./nunitProjectMeta";
 import { PlaywrightCsharpNunitTemplatesProvider } from "./playwrightCsharpNunitTemplatesProvider";
 
 export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
-  private _projMeta: ISourceProjectMeta;
+  private _projMeta: ISourceProjectMetadata;
   private _rmprojFile: IRmProjFile;
   private _rootNamespace: string;
   private _templateProvider: PlaywrightCsharpNunitTemplatesProvider;
@@ -24,7 +23,7 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
 
   private _outProjMeta: NunitProjectMeta;
 
-  constructor(projMeta: ISourceProjectMeta) {
+  constructor(projMeta: ISourceProjectMetadata) {
     const rmprojFile = projMeta.project;
 
     this._projMeta = projMeta;
@@ -120,11 +119,9 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
       await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
     }
 
-    // Write suites meta
-    const inProjMeta = await createCodeGenMeta(this._rmprojFile);
-    const outProjMeta = CodeGenMetaFactory.newInstance(inProjMeta);
-    const data = outProjMeta.generateOutputProjectMeta();
-    await writeFile(StandardOutputFile.MetaData, JSON.stringify(data, null, 2));
+    // Write output project metadata
+    const outputProjectMetadata = await createOutputProjectMetadata(this._rmprojFile);
+    await writeFile(StandardOutputFile.MetaData, JSON.stringify(outputProjectMetadata, null, 2));
 
     return "";
   }
