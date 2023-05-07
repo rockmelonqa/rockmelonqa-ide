@@ -215,7 +215,7 @@ async function genCode(browserWindow: BrowserWindow, event: Electron.IpcMainEven
     sb.appendLine(JSON.stringify(ipcRs, null, 4));
 
     const logsFolder = path.join(rmprojFile.folderPath, StandardFolder.Logs);
-    await fileSystem.createFoler(logsFolder);
+    await fileSystem.createFolder(logsFolder);
 
     const logFileName = `gen-code.${moment(startTime).format('YYYYMMDD_HHmmss')}.log`;
     const logFilePath = path.join(logsFolder, logFileName);
