@@ -40,8 +40,6 @@
     let showLogs: boolean = false;
     let logFile: string = "";
 
-    let duplicateObjectNames: string[] = [];
-
     onMount(async () => {
         registerListener(
             codeGenerator.onValidateInput((data: IProgressDetail) => {
@@ -105,26 +103,50 @@
             })
         );
 
-        duplicateObjectNames = await findFilesWithSameOutputName();
-        if (duplicateObjectNames.length) {
-            showWarning = true;
-            showStartBtn = false;
-            dialogMessage = `"${duplicateObjectNames[0]}" ${uiContext.str(stringResKeys.general.and)} "${
-                duplicateObjectNames[1]
+        let duplicateObjects = await findDuplicatedObjects();
+        if (duplicateObjects.length) {
+            dialogMessage = `"${duplicateObjects[0]}" ${uiContext.str(stringResKeys.general.and)} "${
+                duplicateObjects[1]
             }" ${uiContext.str(stringResKeys.codeGenerationDialog.duplicateFileNameMessage)}`;
             isPrerequiring = false;
+            showWarning = true;
+            showStartBtn = false;
             return;
         }
 
         prerequisites = await codeGenerator.prerequire($appState.projectFile!);
         isPrerequiring = false;
-
         showWarning = prerequisites.length > 0;
         showStartBtn = prerequisites.length === 0;
     });
 
+    /** Returns the first pair duplicated items (cases, pages, suites) by outputFilePath */
+    const findDuplicatedObjects = async (): Promise<string[]> => {
+        const meta = await codeGenerator.generateOutputProjectMetadata($appState.projectFile!);
+        if (!meta) {
+            return [];
+        }
+
+        const duplicateTestCases = findDuplicatedItems(meta.cases);
+        if (duplicateTestCases.length) {
+            return duplicateTestCases;
+        }
+
+        const duplicatePages = findDuplicatedItems(meta.pages);
+        if (duplicatePages.length) {
+            return duplicatePages;
+        }
+
+        const duplicateTestSuites = findDuplicatedItems(meta.suites);
+        if (duplicateTestSuites.length) {
+            return duplicateTestSuites;
+        }
+
+        return [];
+    };
+
     /** Returns the first pair duplicated items by outputFilePath */
-    const findDuplicateInArray = (items: { outputFilePath: string; inputFileRelPath: string }[]): string[] => {
+    const findDuplicatedItems = (items: { outputFilePath: string; inputFileRelPath: string }[]): string[] => {
         // Group the items by "outputFilePath", the find the first group that has more than 1 item.
         const groups = _(
             items.map((item) => ({
@@ -146,31 +168,6 @@
             const [file1Name, file2Name] = duplicateGroup?.inputFileRelPaths;
             return [file1Name, file2Name];
         }
-        return [];
-    };
-
-    /** Returns the first pair duplicated items (cases, pages, suites) by outputFilePath */
-    const findFilesWithSameOutputName = async (): Promise<string[]> => {
-        const meta = await codeGenerator.genOutputProjectMetadata($appState.projectFile!);
-        if (!meta) {
-            return [];
-        }
-
-        const duplicateTestCases = findDuplicateInArray(meta.cases);
-        if (duplicateTestCases.length) {
-            return duplicateTestCases;
-        }
-
-        const duplicatePages = findDuplicateInArray(meta.pages);
-        if (duplicatePages.length) {
-            return duplicatePages;
-        }
-
-        const duplicateTestSuites = findDuplicateInArray(meta.suites);
-        if (duplicateTestSuites.length) {
-            return duplicateTestSuites;
-        }
-
         return [];
     };
 

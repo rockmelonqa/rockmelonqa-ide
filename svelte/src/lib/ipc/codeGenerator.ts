@@ -50,7 +50,7 @@ const prerequire = async (rmprojFile: IRmProjFile, options?: { apiKey?: string }
     return await getApi(options?.apiKey).invoke("prerequire", rmprojFile);
 };
 
-/** Gen metadata of source project */
+/** Generate metadata of source project */
 const generateSourceProjectMetadata = async (
     projFile: IRmProjFile,
     options?: { apiKey?: string }
@@ -64,12 +64,12 @@ const generateSourceProjectMetadata = async (
     }
 };
 
-/** Generates metadata of output project */
-const genOutputProjectMetadata = async (
+/** Generate metadata of output project */
+const generateOutputProjectMetadata = async (
     projFile: IRmProjFile,
     options?: { apiKey?: string }
 ): Promise<IOutputProjectMetadata | null> => {
-    const response = await getApi(options?.apiKey).invoke("genOutputProjectMetadata", projFile);
+    const response = await getApi(options?.apiKey).invoke("generateOutputProjectMetadata", projFile);
     if (response.isSuccess) {
         return response.data;
     } else {
@@ -78,7 +78,7 @@ const genOutputProjectMetadata = async (
     }
 };
 
-/** Get metadata of all test suites */
+/** Read metadata file of output project */
 const getOutputProjectMetadata = async (
     projFile: IRmProjFile,
     options?: { apiKey?: string }
@@ -94,9 +94,9 @@ const getOutputProjectMetadata = async (
 
 export const codeGenerator = {
     genCode,
-    getOutputProjectMetadata,
-    genOutputProjectMetadata,
+    generateOutputProjectMetadata,
     generateSourceProjectMetadata,
+    getOutputProjectMetadata,
     onBuild,
     onCleanFolder,
     onFinish,

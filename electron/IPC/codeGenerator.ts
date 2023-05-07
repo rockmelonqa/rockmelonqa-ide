@@ -31,9 +31,9 @@ const validSendChannel: IChannels = { genCode: genCode };
 
 const validInvokeChannel: IChannels = {
   prerequire: prerequire,
-  getOutputProjectMetadata: getOutputProjectMetadata,
   generateSourceProjectMetadata: genSourceProjectMetadata,
-  genOutputProjectMetadata: genOutputProjectMetadata,
+  generateOutputProjectMetadata: genOutputProjectMetadata,
+  getOutputProjectMetadata: getOutputProjectMetadata,
 };
 
 // from Main
@@ -226,6 +226,7 @@ async function genCode(browserWindow: BrowserWindow, event: Electron.IpcMainEven
   }
 }
 
+/** Compile metadata of source project */
 async function genSourceProjectMetadata(
   browserWindow: BrowserWindow,
   event: Electron.IpcMainEvent,
@@ -239,6 +240,7 @@ async function genSourceProjectMetadata(
   }
 }
 
+/** Compile metadata of output project */
 async function genOutputProjectMetadata(
   browserWindow: BrowserWindow,
   event: Electron.IpcMainEvent,
@@ -252,6 +254,7 @@ async function genOutputProjectMetadata(
   }
 }
 
+/** Read metadata file of output project */
 async function getOutputProjectMetadata(
   browserWindow: BrowserWindow,
   event: Electron.IpcMainEvent,
