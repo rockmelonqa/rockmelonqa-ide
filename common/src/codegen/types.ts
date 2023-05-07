@@ -47,7 +47,19 @@ export interface ITestCaseInfo {
   isValid: boolean;
 }
 
-export interface IOutputFileFileInfo {
+export interface IPageInfo {
+  name: string;
+  fullyQualifiedName: string;
+  inputFileName: string;
+  inputFilePath: string;
+  inputFileRelPath: string;
+  outputFileName: string;
+  outputFilePath: string;
+  outputFileRelPath: string;
+  isValid: boolean;
+}
+
+export interface IOutputFileInfo {
   inputFileName: string;
   inputFilePath: string;
   inputFileRelPath: string;
@@ -61,4 +73,14 @@ export interface IOutputFileFileInfo {
   isValid: boolean;
 }
 
+/** Contains meta data for output project */
+export interface IOutputProjectMetadata {
+  suites: ISuiteInfo[];
+  cases: ITestCaseInfo[];
+  pages: IPageInfo[];
+  error?: { message: string };
+}
+
+
 export type ReturnedLocatorType = "IFrameLocator" | "ILocator" | "FrameLocator" | "Locator";
+

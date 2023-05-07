@@ -1,5 +1,6 @@
-import chokidar, { FSWatcher } from "chokidar";
-import { BrowserWindow, dialog } from "electron";
+import chokidar, { FSWatcher } from 'chokidar';
+import { BrowserWindow, dialog } from 'electron';
+import path from 'path';
 import {
   IAddFileWatchEventArgs,
   IFileSystemInfo,
@@ -7,12 +8,12 @@ import {
   IIpcResponse,
   IRenameFileRequest,
   IWriteFileRequest,
-} from "rockmelonqa.common";
-import * as fs from "../utils/fileSystem";
-import { IChannels } from "./core/channelsInterface";
-import IPC from "./core/ipc";
+} from 'rockmelonqa.common';
+import * as fs from '../utils/fileSystem';
+import { IChannels } from './core/channelsInterface';
+import IPC from './core/ipc';
 
-const nameAPI = "fileSystem";
+const nameAPI = 'fileSystem';
 
 // to Main
 const validSendChannel: IChannels = {
@@ -21,8 +22,9 @@ const validSendChannel: IChannels = {
 };
 
 const validInvokeChannel: IChannels = {
-  getFolder: getFolder,
   deleteFileSystem: deleteFileSystem,
+  getCloneFilePath: getCloneFilePath,
+  getFolder: getFolder,
   pickFolder: pickFolder,
   readFile: readFile,
   rename: rename,
@@ -31,7 +33,7 @@ const validInvokeChannel: IChannels = {
 };
 
 // from Main
-const validReceiveChannel: string[] = ["watch:add", "watch:unlink", "watch:addDir", "watch:unlinkDir", "watch:change"];
+const validReceiveChannel: string[] = ['watch:add', 'watch:unlink', 'watch:addDir', 'watch:unlinkDir', 'watch:change'];
 
 const fileSystem = new IPC({
   nameAPI,
@@ -67,7 +69,52 @@ async function deleteFileSystem(
     await fs.deleteFileSystem(path);
     return { isSuccess: true } as IIpcResponse;
   } catch (error: any) {
-    return { isSuccess: false, errorMessage: "Cannot delete file" } as IIpcResponse;
+    return { isSuccess: false, errorMessage: 'Cannot delete file' } as IIpcResponse;
+  }
+}
+
+/** Generates cloned file name when pasting the same file at nth time */
+const genClonedFileNameAtNth = (srcFileNameWithoutExt: string, ext: string, n: number) => {
+  if (n === 1) {
+    return `${srcFileNameWithoutExt} - Copy${ext}`;
+  }
+  return `${srcFileNameWithoutExt} - Copy (${n})${ext}`;
+};
+
+/**
+ * Gets clone file path with Windows copy/paste file in-place convention
+ */
+async function getCloneFilePath(
+  browserWindow: BrowserWindow,
+  event: Electron.IpcMainEvent,
+  filePath: string
+): Promise<string | null> {
+  try {
+    const srcFileNameWithoutExt = path.parse(filePath).name;
+    const srcFileExt = path.extname(filePath);
+    const srcDir = path.dirname(filePath);
+
+    // Use Windows Explorer file copy/paste naming pattern:
+    // EX:
+    // - Src file name:             Document.txt
+    // - First copied file name:    Document - Copy.txt
+    // - Second copied file name:   Document - Copy (2).txt
+    // - etc...
+
+    let pastingTries = 1;
+    while (true) {
+      let newClonedFileName = genClonedFileNameAtNth(srcFileNameWithoutExt, srcFileExt, pastingTries);
+      let newClonedFilePath = path.join(srcDir, newClonedFileName);
+      let existing = await fs.checkExists(newClonedFilePath);
+      if (!existing) {
+        return newClonedFilePath;
+      }
+      pastingTries += 1;
+    }
+  } catch (error) {
+    console.log('CANNOT clone file:', filePath);
+    console.error(error);
+    throw error;
   }
 }
 
@@ -86,7 +133,7 @@ async function getFolder(
  * Invoke OS folder picker to select a folder
  */
 async function pickFolder(browserWindow: BrowserWindow, event: Electron.IpcMainEvent): Promise<string | void> {
-  const { canceled, filePaths } = await dialog.showOpenDialog(browserWindow, { properties: ["openDirectory"] });
+  const { canceled, filePaths } = await dialog.showOpenDialog(browserWindow, { properties: ['openDirectory'] });
   if (canceled) {
     return;
   } else {
@@ -121,7 +168,7 @@ async function rename(
     await fs.rename(data.oldPath, data.newPath);
     return { isSuccess: true } as IIpcResponse;
   } catch (error: any) {
-    return { isSuccess: false, errorMessage: "Cannot rename file" } as IIpcResponse;
+    return { isSuccess: false, errorMessage: 'Cannot rename file' } as IIpcResponse;
   }
 }
 
@@ -137,7 +184,7 @@ async function walkFolder(
     const files = await fs.walkFolder(folderPath);
     return { isSuccess: true, data: files } as IIpcResponse;
   } catch (error) {
-    return { isSuccess: false, errorMessage: "Cannot walk folder" };
+    return { isSuccess: false, errorMessage: 'Cannot walk folder' };
   }
 }
 
@@ -156,33 +203,33 @@ async function watch(browserWindow: BrowserWindow, event: Electron.IpcMainEvent,
   let isReady = false;
   fsWatcher = chokidar.watch(path);
   fsWatcher
-    .on("add", function (path) {
-      browserWindow.webContents.send("watch:add", {
+    .on('add', function (path) {
+      browserWindow.webContents.send('watch:add', {
         path,
         isReady,
       } as IAddFileWatchEventArgs);
     })
-    .on("unlink", function (path) {
+    .on('unlink', function (path) {
       if (isReady) {
-        browserWindow.webContents.send("watch:unlink", path);
+        browserWindow.webContents.send('watch:unlink', path);
       }
     })
-    .on("addDir", function (path) {
+    .on('addDir', function (path) {
       if (isReady) {
-        browserWindow.webContents.send("watch:addDir", path);
+        browserWindow.webContents.send('watch:addDir', path);
       }
     })
-    .on("unlinkDir", function (path) {
+    .on('unlinkDir', function (path) {
       if (isReady) {
-        browserWindow.webContents.send("watch:unlinkDir", path);
+        browserWindow.webContents.send('watch:unlinkDir', path);
       }
     })
-    .on("change", function (path) {
+    .on('change', function (path) {
       if (isReady) {
-        browserWindow.webContents.send("watch:change", path);
+        browserWindow.webContents.send('watch:change', path);
       }
     })
-    .on("ready", function () {
+    .on('ready', function () {
       isReady = true;
     });
 }

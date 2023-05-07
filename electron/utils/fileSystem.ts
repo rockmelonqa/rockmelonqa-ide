@@ -16,10 +16,6 @@ export async function checkExists(filePath: string): Promise<boolean> {
   }
 }
 
-export function checkExistsSync(filePath: string): boolean {
-  return fs.existsSync(filePath);
-}
-
 /**
  * Create new folder
  */
@@ -39,11 +35,11 @@ export async function createFolder(folderPath: string): Promise<void> {
 /**
  * Delete file or folder at given path
  */
-export async function deleteFileSystem(path: string): Promise<void> {
+export async function deleteFileSystem(fullPath: string): Promise<void> {
   try {
-    await fs.promises.rm(path, { recursive: true, force: true });
+    await fs.promises.rm(fullPath, { recursive: true, force: true });
   } catch (error) {
-    console.log("CANNOT delete file:", path);
+    console.log("CANNOT delete file:", fullPath);
     console.error(error);
     throw error;
   }

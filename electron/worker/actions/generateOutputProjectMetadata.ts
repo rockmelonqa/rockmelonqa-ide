@@ -2,12 +2,12 @@ import path from 'path';
 import { Worker } from 'worker_threads';
 
 import { IProgressEvent, IRmProjFile } from 'rockmelonqa.common';
-import { createSourceProjectMetadata } from 'rockmelonqa.common/codegen/codegen';
+import { createOutputProjectMetadata } from 'rockmelonqa.common/codegen/codegen';
 import { MessagePort } from 'worker_threads';
 import { WorkerAction, WorkerMessage } from '../worker';
 import { IActionResult } from './shared';
 
-export const generateSourceProjectMetadata = async function (rmprojFile: IRmProjFile): Promise<IActionResult> {
+export const generateOutputProjectMetadata = async function (rmprojFile: IRmProjFile): Promise<IActionResult> {
   return await new Promise<IActionResult>((rs, _) => {
     const workerPath = path.join(__dirname, '../worker.js');
     const worker = new Worker(workerPath);
@@ -24,14 +24,14 @@ export const generateSourceProjectMetadata = async function (rmprojFile: IRmProj
     });
 
     worker.postMessage({
-      action: WorkerAction.GenProjectMetadata,
+      action: WorkerAction.GenOutputProjectMetadata,
       rmProjectFile: rmprojFile,
     } as WorkerMessage);
   });
 };
 
-export const doGenerateSourceProjectMetadata = async (port: MessagePort | null, rmProjectFile: IRmProjFile) => {
-  const meta = await createSourceProjectMetadata(rmProjectFile, (event: IProgressEvent) => port?.postMessage(event));
+export const doGenerateOutputProjectMetadata = async (port: MessagePort | null, rmProjectFile: IRmProjFile) => {
+  const meta = await createOutputProjectMetadata(rmProjectFile);
 
   port?.postMessage({ type: 'finish', data: meta } as IProgressEvent);
 };

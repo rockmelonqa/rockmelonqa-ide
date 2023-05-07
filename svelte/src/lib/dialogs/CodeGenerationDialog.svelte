@@ -1,17 +1,18 @@
 <script lang="ts">
-    import PrimaryButton from '$lib/components/PrimaryButton.svelte';
-    import Spinner from '$lib/components/Spinner.svelte';
-    import StandardButton from '$lib/components/StandardButton.svelte';
-    import { appContextKey, type IAppContext } from '$lib/context/AppContext';
-    import { stringResKeys } from '$lib/context/StringResKeys';
-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import type { IUiTheme } from '$lib/context/UiTheme';
-    import TextField from '$lib/controls/TextField.svelte';
-    import WarningIcon from '$lib/icons/WarningIcon.svelte';
-    import { codeGenerator } from '$lib/ipc';
-    import type { Action, IIpcGenericResponse, IProgressDetail } from 'rockmelonqa.common';
-    import { getContext, onDestroy, onMount } from 'svelte';
-    import { writable } from 'svelte/store';
+    import PrimaryButton from "$lib/components/PrimaryButton.svelte";
+    import Spinner from "$lib/components/Spinner.svelte";
+    import StandardButton from "$lib/components/StandardButton.svelte";
+    import { appContextKey, type IAppContext } from "$lib/context/AppContext";
+    import { stringResKeys } from "$lib/context/StringResKeys";
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import type { IUiTheme } from "$lib/context/UiTheme";
+    import TextField from "$lib/controls/TextField.svelte";
+    import WarningIcon from "$lib/icons/WarningIcon.svelte";
+    import { codeGenerator } from "$lib/ipc";
+    import _ from "lodash";
+    import type { Action, IIpcGenericResponse, IProgressDetail } from "rockmelonqa.common";
+    import { getContext, onDestroy, onMount } from "svelte";
+    import { writable } from "svelte/store";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -37,7 +38,7 @@
     const logs = writable<string[]>([]);
     $: hasLogs = $logs.length > 0;
     let showLogs: boolean = false;
-    let logFile: string = '';
+    let logFile: string = "";
 
     onMount(async () => {
         registerListener(
@@ -96,7 +97,7 @@
                     dialogMessage = uiContext.str(stringResKeys.codeGenerationDialog.finishedMsg);
                 } else {
                     dialogMessage = uiContext.str(stringResKeys.codeGenerationDialog.errorMsg);
-                    addLog(errorMessage ?? 'Unknown error');
+                    addLog(errorMessage ?? "Unknown error");
                     showLogs = true;
                 }
 
@@ -109,12 +110,82 @@
             })
         );
 
-        prerequisites = await codeGenerator.prerequire($appState.projectFile!);
-        isPrerequiring = false;
+        let hasIssue = false;
+        try {
+            // verify environments
+            prerequisites = await codeGenerator.prerequire($appState.projectFile!);
+            if (prerequisites.length) {
+                hasIssue = true;
+                return;
+            }
 
-        showWarning = prerequisites.length > 0;
-        showStartBtn = prerequisites.length === 0;
+            // verify duplicated objects
+            let duplicateObjects = await findDuplicatedObjects();
+            if (duplicateObjects.length) {
+                dialogMessage = `"${duplicateObjects[0]}" ${uiContext.str(stringResKeys.general.and)} "${
+                    duplicateObjects[1]
+                }" ${uiContext.str(stringResKeys.codeGenerationDialog.duplicateFileNameMessage)}`;
+
+                hasIssue = true;
+                return;
+            }
+        } finally {
+            showWarning = hasIssue;
+            showStartBtn = !hasIssue;
+            isPrerequiring = false;
+        }
     });
+
+    /** Returns the first pair duplicated items (cases, pages, suites) by outputFilePath */
+    const findDuplicatedObjects = async (): Promise<string[]> => {
+        const meta = await codeGenerator.generateOutputProjectMetadata($appState.projectFile!);
+        if (!meta) {
+            return [];
+        }
+
+        const duplicateTestCases = findDuplicatedItems(meta.cases);
+        if (duplicateTestCases.length) {
+            return duplicateTestCases;
+        }
+
+        const duplicatePages = findDuplicatedItems(meta.pages);
+        if (duplicatePages.length) {
+            return duplicatePages;
+        }
+
+        const duplicateTestSuites = findDuplicatedItems(meta.suites);
+        if (duplicateTestSuites.length) {
+            return duplicateTestSuites;
+        }
+
+        return [];
+    };
+
+    /** Returns the first pair duplicated items by outputFilePath */
+    const findDuplicatedItems = (items: { outputFilePath: string; inputFileRelPath: string }[]): string[] => {
+        // Group the items by "outputFilePath", the find the first group that has more than 1 item.
+        const groups = _(
+            items.map((item) => ({
+                inputFileRelPath: item.inputFileRelPath,
+                outputFilePath: item.outputFilePath.toLocaleLowerCase(),
+            }))
+        )
+            .groupBy("outputFilePath")
+            .map(function (items, outputFilePath) {
+                return {
+                    outputFilePath,
+                    inputFileRelPaths: _.map(items, "inputFileRelPath"),
+                };
+            })
+            .value();
+
+        const duplicateGroup = groups.find((g) => g.inputFileRelPaths.length > 1);
+        if (duplicateGroup) {
+            const [file1Name, file2Name] = duplicateGroup?.inputFileRelPaths;
+            return [file1Name, file2Name];
+        }
+        return [];
+    };
 
     onDestroy(() => {
         cleanupFns.forEach((listener) => listener());
@@ -146,14 +217,14 @@
 
     const toPrerequisiteText = (item: string) => {
         switch (item) {
-            case 'dotnet':
-                return 'Dotnet 6.0 or higher';
-            case 'node':
-                return 'Node version 16.16 or higher';
-            case 'pwsh':
-                return 'Powershell (pwsh)';
+            case "dotnet":
+                return "Dotnet 6.0 or higher";
+            case "node":
+                return "Node version 16.16 or higher";
+            case "pwsh":
+                return "Powershell (pwsh)";
             default:
-                return '';
+                return "";
         }
     };
 
@@ -169,7 +240,7 @@
             <div class="flex items-end sm:items-center justify-center min-h-full p-4 sm:p-0 text-center">
                 <div
                     class={`modal-panel relative bg-white rounded-lg p-4 sm:p-6
-                    text-left shadow-xl transform transition-all ${showLogs ? 'max-w-5xl' : 'max-w-xl'} w-full`}
+                    text-left shadow-xl transform transition-all ${showLogs ? "max-w-5xl" : "max-w-xl"} w-full`}
                 >
                     <div class="modal-title text-xl leading-6 font-bold mb-8">
                         <div class="flex items-center gap-x-2">
@@ -199,7 +270,7 @@
                             <div class="flex flex-col mt-4 gap-y-4">
                                 <div class="logs h-96 overflow-y-auto border-y py-4 flex flex-col gap-y-2">
                                     {#each $logs as log}
-                                        <p>{@html log.replace(new RegExp(uiContext.eol, 'g'), '<br/>')}</p>
+                                        <p>{@html log.replace(new RegExp(uiContext.eol, "g"), "<br/>")}</p>
                                     {/each}
                                 </div>
                                 {#if logFile}
@@ -216,8 +287,8 @@
                     </div>
                     <div class="modal-buttons flex justify-start items-center gap-x-4">
                         {#if hasLogs}
-                            <a href={'#'} on:click={toggleLogs} class="underline">
-                                <span>{showLogs ? 'Hide ' : 'Show '} Details</span>
+                            <a href={"#"} on:click={toggleLogs} class="underline">
+                                <span>{showLogs ? "Hide " : "Show "} Details</span>
                             </a>
                         {/if}
                         <div class="ml-auto">

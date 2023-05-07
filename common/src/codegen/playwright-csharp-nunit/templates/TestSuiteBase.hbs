@@ -1,0 +1,14 @@
+namespace {{{rootNamespace}}}.Support;
+
+[TestFixture]
+public abstract class TestSuiteBase : PageTest
+{
+{{#if testIdAttributeName}}
+    [SetUp]
+    public new async Task PageSetup()
+    {        
+        using var playwright = await Microsoft.Playwright.Playwright.CreateAsync();   
+        playwright.Selectors.SetTestIdAttribute("{{testIdAttributeName}}");
+    }
+{{/if}}
+}

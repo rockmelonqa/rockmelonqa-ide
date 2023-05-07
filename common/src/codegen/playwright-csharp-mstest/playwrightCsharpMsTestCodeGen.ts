@@ -1,10 +1,9 @@
 import { EOL } from "os";
 import path from "path";
-import { ActionType, IRmProjFile, ISourceProjectMeta, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
+import { ActionType, IRmProjFile, ISourceProjectMetadata, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
-import { createCodeGenMeta } from "../codegen";
-import { CodeGenMetaFactory } from "../codegenMetaFactory";
+import { createOutputProjectMetadata } from "../codegen";
 import { ICodeGen } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
@@ -12,7 +11,7 @@ import { MsTestProjMeta } from "./msTestProjMeta";
 import { PlaywrightCsharpMsTestTemplatesProvider } from "./playwrightCsharpMsTestTemplatesProvider";
 
 export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
-  private _projMeta: ISourceProjectMeta;
+  private _projMeta: ISourceProjectMetadata;
   private _rmprojFile: IRmProjFile;
   private _rootNamespace: string;
   private _templateProvider: PlaywrightCsharpMsTestTemplatesProvider;
@@ -27,7 +26,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
   /**
    * Constructor
    */
-  constructor(projMeta: ISourceProjectMeta) {
+  constructor(projMeta: ISourceProjectMetadata) {
     const rmprojFile = projMeta.project;
 
     this._projMeta = projMeta;
@@ -86,7 +85,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
 
     for (let { content: testsuite } of this._projMeta.testSuites) {
       let outputFileRelPath = this._outProjMeta.get(testsuite.id)!.outputFileRelPath;
-      let testClassContent = this.generateTestSuite(
+      let testClassContent = this.generateTestSuiteFile(
         testsuite,
         this._projMeta.testCases.map((tc) => tc.content)
       );
@@ -102,8 +101,13 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     );
 
     await writeFile(
-      `Support/${StandardOutputFile.RmSingleCaseSuiteBase}${this._outputFileExt}`,
-      this._templateProvider.GetRmTestSuiteBase(this._rmprojFile.content.rootNamespace)
+      `Support/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
+      this._templateProvider.getTestCaseBase(this._rmprojFile.content.rootNamespace)
+    );
+
+    await writeFile(
+      `Support/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
+      this._templateProvider.getTestSuiteBase(this._rmprojFile.content.rootNamespace, this._rmprojFile.content.testIdAttributeName)
     );
 
     // # Generate full project files
@@ -114,17 +118,18 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     if (full) {
       await writeFile(
         `${this._rmprojFile.content.rootNamespace}.csproj`,
-        this._templateProvider.GetCSProject(this._rmprojFile.content.rootNamespace)
+        this._templateProvider.getCsProject(this._rmprojFile.content.rootNamespace)
       );
-      await writeFile(`${StandardOutputFile.Usings}${this._outputFileExt}`, this._templateProvider.GetUsings());
-      await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.GetRunSettings());
+      await writeFile(
+        `${StandardOutputFile.Usings}${this._outputFileExt}`,
+        this._templateProvider.getUsings(this._rmprojFile.content.rootNamespace)
+      );
+      await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
     }
 
-    // Write suites meta
-    const inProjMeta = await createCodeGenMeta(this._rmprojFile);
-    const outProjMeta = CodeGenMetaFactory.newInstance(inProjMeta);
-    const data = outProjMeta.generateOutputProjectMeta();
-    await writeFile(StandardOutputFile.MetaData, JSON.stringify(data, null, 2));
+    // Write output project metadata
+    const outputProjectMetadata = await createOutputProjectMetadata(this._rmprojFile);
+    await writeFile(StandardOutputFile.MetaData, JSON.stringify(outputProjectMetadata, null, 2));
 
     return "";
   }
@@ -190,7 +195,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
       }
 
       if (element.type === "comment") {
-        pageItems.push(this._templateProvider.GetComment(element.comment!));
+        pageItems.push(this._templateProvider.getComment(element.comment!));
       }
     }
 
@@ -205,9 +210,9 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     return this._templateProvider.GetPage(fullNamespace, pageClassName, page.description || "", pageBody);
   }
 
-  generateTestSuite(testSuite: ITestSuite, testcases: ITestCase[]) {
-    var testcaseMethods: string[] = [];
-    var usingDirectives: string[] = [];
+  generateTestSuiteFile(testSuite: ITestSuite, testcases: ITestCase[]) {
+    const testcaseMethods: string[] = [];
+    const usingDirectives: string[] = [];
 
     for (let testcaseId of testSuite.testcases) {
       let testcase = testcases.find((tc) => tc.id === testcaseId);
@@ -232,7 +237,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     // Indent test method body with 1 indent;
     classBody = addIndent(classBody, this._indentString);
 
-    let testClass = this._templateProvider.getTestClass(
+    let testClass = this._templateProvider.getTestSuiteFile(
       usings,
       this._outProjMeta.get(testSuite.id)!.outputFileClassName,
       testSuite.description,
@@ -258,7 +263,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
 
   generateTestCaseFunction(testCase: ITestCase) {
     const testcaseName = this._outProjMeta.get(testCase.id)!.outputFileClassName;
-    const testCaseMethod = this._templateProvider.GetTestFunction(upperCaseFirstChar(testcaseName), testCase.description);
+    const testCaseMethod = this._templateProvider.getTestFunction(upperCaseFirstChar(testcaseName), testCase.description);
     return testCaseMethod;
   }
 
@@ -300,7 +305,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
       if (step.type === "comment") {
         // Add an empty line before the comment
         stepItems.push("");
-        stepItems.push(this._templateProvider.GetComment(step.comment!));
+        stepItems.push(this._templateProvider.getComment(step.comment!));
       }
     }
 

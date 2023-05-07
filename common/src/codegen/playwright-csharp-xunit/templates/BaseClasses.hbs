@@ -3,19 +3,6 @@ using System.Xml.Serialization;
 namespace {{{rootNamespace}}}.Support;
 
 /// <summary>
-/// Base class for page
-/// </summary>
-public abstract class PageBase
-{
-    protected IPage _page;
-
-    public PageBase(IPage page)
-    {
-        _page = page;
-    }
-}
-
-/// <summary>
 /// Base class for test case
 /// </summary>
 public abstract class TestCaseBase : PageTest
@@ -28,9 +15,7 @@ public abstract class TestCaseBase : PageTest
     /// <summary>
     /// Default constructor
     /// </summary>
-    public TestCaseBase()
-    {
-    }
+    public TestCaseBase() { }
 
     /// <summary>
     /// Create new instance of RmTestSuiteBase with the provided testSuiteInstance
@@ -38,14 +23,27 @@ public abstract class TestCaseBase : PageTest
     public TestCaseBase(PageTest testSuiteInstance) : base(testSuiteInstance)
     {
     }
+
+    /// <summary>
+    /// Custom Expect method that works from IFrameLocator
+    /// </summary>
+    public ILocatorAssertions Expect(IFrameLocator locator)
+    {
+        return Expect(locator.Locator(":root"));
+    }
 }
 
 /// <summary>
-/// Base class for test fixture
+/// Base class for test suite
 /// </summary>
-public abstract class TestFixtureBase : PageTest
+public abstract class TestSuiteBase : PageTest
 {
-
+    public TestSuiteBase() : base() 
+    {
+{{#if testIdAttributeName}}
+        Playwright.Selectors.SetTestIdAttribute("{{testIdAttributeName}}");
+{{/if}}
+    }
 }
 
 
@@ -54,39 +52,42 @@ public abstract class TestFixtureBase : PageTest
 /// </summary>
 public abstract class PageTest
 {
-    private IBrowser Browser { get; }
-    private IPlaywright PlaywrightInstance { get; }
+    protected IPlaywright Playwright {get; }
+    private IBrowser Browser {get;}
     public IPage Page { get; }
+
     protected PageTest? TestSuiteInstance;
+
+    BrowserTypeLaunchOptions LaunchOptions {get;}
 
     public PageTest()
     {
-        RunSettings runSettings = LoadFromRunSettings();
+         RunSettings runSettings = LoadFromRunSettings();
 
-        BrowserTypeLaunchOptions launchOptions = new BrowserTypeLaunchOptions
+        LaunchOptions = new BrowserTypeLaunchOptions
         {
             Headless = runSettings.Playwright.LaunchOptions.Headless
         };
 
-        PlaywrightInstance = Playwright.CreateAsync().Result;
-        Browser = GetBrowser(runSettings.Playwright.BrowserName).LaunchAsync(launchOptions).Result;
+        Playwright = Microsoft.Playwright.Playwright.CreateAsync().Result;
+        Browser = Playwright.Chromium.LaunchAsync(LaunchOptions).Result;
         Page = Browser.NewPageAsync().Result;
-
     }
 
     public PageTest(PageTest testSuiteInstance)
     {
+        LaunchOptions = testSuiteInstance.LaunchOptions;
+        Playwright = testSuiteInstance.Playwright;
         TestSuiteInstance = testSuiteInstance;
         Page = TestSuiteInstance.Page;
         Browser = TestSuiteInstance.Browser;
-        PlaywrightInstance = TestSuiteInstance.PlaywrightInstance;
     }
 
     public async Task Dispose()
     {
         await Page.CloseAsync();
         await Browser.DisposeAsync();
-        PlaywrightInstance.Dispose();
+        Playwright.Dispose();
     }
 
     public ILocatorAssertions Expect(ILocator locator)
@@ -108,11 +109,11 @@ public abstract class PageTest
     {
         switch (browserName)
         {
-            case "chromium": return PlaywrightInstance.Chromium;
-            case "firefox": return PlaywrightInstance.Firefox;
-            case "webkit": return PlaywrightInstance.Webkit;
+            case "chromium": return Playwright.Chromium;
+            case "firefox": return Playwright.Firefox;
+            case "webkit": return Playwright.Webkit;
         }
-        return PlaywrightInstance.Chromium;
+        return Playwright.Chromium;
     }
 
     private RunSettings LoadFromRunSettings()
@@ -130,24 +131,19 @@ public abstract class PageTest
             return runSettings;
         }
     }
-
-    public string ToXML(object obj)
-    {
-        using (var stringwriter = new System.IO.StringWriter())
-        {
-            var serializer = new XmlSerializer(obj.GetType());
-            serializer.Serialize(stringwriter, obj);
-            string xml = stringwriter.ToString();
-            return xml;
-        }
-    }
 }
 
+/// <summary>
+/// Run Settings. Used for generating .runsettings file
+/// </summary>
 public class RunSettings
 {
     public PlaywrightSetting Playwright { get; set; } = new PlaywrightSetting();
 }
 
+/// <summary>
+/// Playwright Setting tag in the .runsettings file
+/// </summary>
 public class PlaywrightSetting
 {
     public string BrowserName { get; set; } = "";
@@ -156,6 +152,9 @@ public class PlaywrightSetting
     public PlaywrightLaunchOptionsSetting LaunchOptions { get; set; } = new PlaywrightLaunchOptionsSetting();
 }
 
+/// <summary>
+/// PlaywrightLaunchOptions Setting tag in the .runsettings file
+/// </summary>
 public class PlaywrightLaunchOptionsSetting
 {
     public bool Headless { get; set; }

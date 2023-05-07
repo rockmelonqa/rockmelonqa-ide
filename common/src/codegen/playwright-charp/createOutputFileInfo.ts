@@ -1,11 +1,17 @@
 import path from "path";
 import { ExtensionToNameMap, IFileDef } from "../../file-defs";
 import { IRmProjFile } from "../../file-defs/rmProjFile";
-import { StandardFolder } from "../../file-defs/standardFolder";
-import { IOutputFileFileInfo } from "../types";
+import { StandardFolder, StandardOutputFolder } from "../../file-defs";
+import { IOutputFileInfo } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { upperCaseFirstChar } from "../utils/stringUtils";
-import { inputOutputFolderMap } from "./inputOutputFolderMap";
+
+const inputOutputFolderMap = new Map<string, string>([
+  [StandardFolder.PageDefinitions, StandardOutputFolder.Pages],
+  [StandardFolder.TestCases, StandardOutputFolder.TestCases],
+  [StandardFolder.TestSuites, StandardOutputFolder.TestSuites],
+  [StandardFolder.TestRoutines, StandardOutputFolder.TestRoutines]
+]);
 
 const getContainerFolder = (inputFolderPath: string, projDir: string) => {
   let inputRelPath = inputFolderPath.replace(projDir, "").substring(1);
@@ -31,9 +37,9 @@ const createName = (relativePath: string) => {
   return `${filenameWithoutExt}${extName}`;
 };
 
-export type IMetaParams = Pick<IFileDef, "folderPath" | "fileName" | "isValid">;
+type IMetaParams = Pick<IFileDef, "folderPath" | "fileName" | "isValid">;
 
-const createCsharpFileMeta = (metaParams: IMetaParams, proj: IRmProjFile): IOutputFileFileInfo => {
+const createOutputFileInfo = (metaParams: IMetaParams, proj: IRmProjFile): IOutputFileInfo => {
   const { folderPath, fileName, isValid } = metaParams;
 
   const inputFileStandardFolder = getContainerFolder(folderPath, proj.folderPath);
@@ -74,4 +80,4 @@ const createCsharpFileMeta = (metaParams: IMetaParams, proj: IRmProjFile): IOutp
   };
 };
 
-export { createCsharpFileMeta, createName };
+export { createOutputFileInfo };

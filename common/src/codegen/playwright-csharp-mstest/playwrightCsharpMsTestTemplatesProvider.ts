@@ -1,10 +1,8 @@
-import { EOL } from "os";
 import path from "path";
 import { IActionTemplateParam, ILocatorTemplateParam } from "../types";
 import { actionRegistyDotnet } from "../utils/action-registry-dotnet";
 import { locatorRegistyDotnet } from "../utils/locator-registry-dotnet";
-import { ActionType, Indent, LocatorType } from "./../../file-defs";
-import { getParameters, hasPlaceholder, escapeStr, upperCaseFirstChar, indentCharMap } from "./../utils/stringUtils";
+import { upperCaseFirstChar } from "./../utils/stringUtils";
 import { MsTestTemplateCollection } from "./templateCollection";
 
 export class PlaywrightCsharpMsTestTemplatesProvider {
@@ -14,8 +12,12 @@ export class PlaywrightCsharpMsTestTemplatesProvider {
     this._templateCollection = new MsTestTemplateCollection(path.resolve(__dirname, "./templates"), customTemplatesDir, ".hbs");
   }
 
-  getTestClass(usings: string, name: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
-    return this._templateCollection.TEST_CLASS_TEMPLATE({ usings, rootNamespace, name, description, body, fullNamespace });
+  getTestSuiteFile(usings: string, name: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
+    return this._templateCollection.TEST_SUITE_FILE({ usings, rootNamespace, name, description, body, fullNamespace });
+  }
+
+  getTestSuiteBase(rootNamespace: string, testIdAttributeName: string) {
+    return this._templateCollection.TEST_SUITE_BASE({ rootNamespace, testIdAttributeName });
   }
 
   getTestCaseFile(testCaseName: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
@@ -52,26 +54,26 @@ export class PlaywrightCsharpMsTestTemplatesProvider {
     return output;
   }
 
-  GetComment(message: string) {
+  getComment(message: string) {
     return this._templateCollection.COMMENT({ message });
   }
 
-  GetTestFunction(name: string, description: string) {
+  getTestFunction(name: string, description: string) {
     return this._templateCollection.TEST_FUNCTION_TEMPLATE({ name, description });
   }
 
-  GetCSProject(rootNamespace: string) {
+  getCsProject(rootNamespace: string) {
     return this._templateCollection.CSPROJECT_TEMPLATE({ rootNamespace });
   }
-  GetUsings() {
-    return this._templateCollection.USINGS_TEMPLATE({});
+  getUsings(rootNamespace: string) {
+    return this._templateCollection.USINGS_TEMPLATE({ rootNamespace });
   }
-  GetRunSettings() {
+  getRunSettings() {
     return this._templateCollection.RUNSETTINGS_TEMPLATE({});
   }
 
-  GetRmTestSuiteBase(rootNamespace: string) {
-    return this._templateCollection.TEST_SUITE_BASE({ rootNamespace });
+  getTestCaseBase(rootNamespace: string) {
+    return this._templateCollection.TEST_CASE_BASE({ rootNamespace });
   }
 
   getPageDefinitions(rootNamespace: string, usings: string, pageDeclaration: string, body: string) {

@@ -1,4 +1,4 @@
-import type { ICultureStringRes, IFormStringRes } from '$lib/context/UiStringResKeys';
+import type { ICultureStringRes, IFormStringRes } from "$lib/context/UiStringResKeys";
 
 export interface IStringRes {
     aboutDialog: IAboutDialogStringRes;
@@ -72,6 +72,7 @@ export interface ICodeGenerationDialogStringRes {
     copyCustomCodeMsg: string;
     dialogMsg: string;
     dialogTitle: string;
+    duplicateFileNameMessage: string;
     errorMsg: string;
     finishedMsg: string;
     generateCodeMsg: string;
@@ -92,6 +93,7 @@ export interface IFileExplorerStringRes {
 
 export interface IGeneralStringRes {
     add: string;
+    and: string;
     cancel: string;
     close: string;
     confirmation: string;
@@ -166,6 +168,7 @@ export interface IProjectStringRes {
     output: string;
     rootNamespace: string;
     testFramework: string;
+    testIdAttributeName: string;
 }
 
 export interface IRunTestDialogStringRes {

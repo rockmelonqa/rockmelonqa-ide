@@ -1,1 +1,1 @@
-# Contains common code for playwright-csharp codegens: including MsTest, Nunit
+# Contains common code for playwright-csharp codegens: including MsTest, Nunit, xUnit

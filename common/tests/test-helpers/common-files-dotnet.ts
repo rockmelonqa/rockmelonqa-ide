@@ -229,11 +229,11 @@ global using AutomationTests.Support;
     `.trim(),
   },
   {
-    fileRelPath: "Support/RmSingleCaseSuiteBase.cs",
+    fileRelPath: "Support/TestCaseBase.cs",
     fileContent: `
 namespace AutomationTests.Support;
 
-public abstract class RmSingleCaseSuiteBase : PageTest
+public abstract class TestCaseBase : PageTest
 {
     protected PageTest? TestSuiteInstance;
 
@@ -245,14 +245,14 @@ public abstract class RmSingleCaseSuiteBase : PageTest
     /// <summary>
     /// Default constructor
     /// </summary>
-    public RmSingleCaseSuiteBase()
+    public TestCaseBase()
     {
     }
 
     /// <summary>
     /// Create new instance of RmTestSuiteBase with the provided testSuiteInstance
     /// </summary>
-    public RmSingleCaseSuiteBase(PageTest testSuiteInstance)
+    public TestCaseBase(PageTest testSuiteInstance)
     {
         this.TestSuiteInstance = testSuiteInstance;
     }

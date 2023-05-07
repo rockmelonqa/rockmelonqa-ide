@@ -1,10 +1,9 @@
 import { EOL } from "os";
 import path from "path";
-import { ActionType, IRmProjFile, ISourceProjectMeta, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
+import { ActionType, IRmProjFile, ISourceProjectMetadata, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
-import { createCodeGenMeta } from "../codegen";
-import { CodeGenMetaFactory } from "../codegenMetaFactory";
+import { createOutputProjectMetadata } from "../codegen";
 import { ICodeGen } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
@@ -14,7 +13,7 @@ import { XUnitProjectMeta } from "./xunitProjectMeta";
 type WriteFileFn = (path: string, content: string) => Promise<void>;
 
 export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
-  private _projMeta: ISourceProjectMeta;
+  private _projMeta: ISourceProjectMetadata;
   private _rmprojFile: IRmProjFile;
   private _rootNamespace: string;
   private _templateProvider: PlaywrightCsharpXUnitTemplatesProvider;
@@ -26,7 +25,7 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
 
   private _outProjMeta: XUnitProjectMeta;
 
-  constructor(projMeta: ISourceProjectMeta) {
+  constructor(projMeta: ISourceProjectMetadata) {
     const rmprojFile = projMeta.project;
 
     this._projMeta = projMeta;
@@ -64,10 +63,8 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
   }
 
   private async writeMetaFile(writeFile: WriteFileFn) {
-    const inProjMeta = await createCodeGenMeta(this._rmprojFile);
-    const outProjMeta = CodeGenMetaFactory.newInstance(inProjMeta);
-    const data = outProjMeta.generateOutputProjectMeta();
-    await writeFile(StandardOutputFile.MetaData, JSON.stringify(data, null, 2));
+    const outputProjectMetadata = await createOutputProjectMetadata(this._rmprojFile);
+    await writeFile(StandardOutputFile.MetaData, JSON.stringify(outputProjectMetadata, null, 2));
   }
 
   private async writeProjectFiles(writeFile: WriteFileFn) {
@@ -84,8 +81,8 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
 
   private async writeBaseClassesFile(writeFile: WriteFileFn) {
     await writeFile(
-      `Support/${StandardOutputFile.RmSingleCaseSuiteBase}${this._outputFileExt}`,
-      this._templateProvider.getBaseClasses(this._rmprojFile.content.rootNamespace)
+      `Support/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
+      this._templateProvider.getBaseClasses(this._rmprojFile.content.rootNamespace, this._rmprojFile.content.testIdAttributeName)
     );
   }
 
@@ -100,7 +97,7 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
     // Filename: Tests/{TestClassName}.cs
     for (let testSuite of this._projMeta.testSuites) {
       let fileRelPath = this._outProjMeta.get(testSuite.content.id)!.outputFileRelPath;
-      let classContent = this.generateTestSuite(
+      let classContent = this.generateTestSuiteFile(
         testSuite.content,
         this._projMeta.testCases.map((tcFile) => tcFile.content)
       );
@@ -207,9 +204,9 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
     );
   }
 
-  private generateTestSuite(testSuite: ITestSuite, testcases: ITestCase[]) {
+  private generateTestSuiteFile(testSuite: ITestSuite, testcases: ITestCase[]) {
     var testcaseMethods = [];
-    var usingItems = [];
+    let usingDirectives: string[] = [];
 
     for (let testcaseId of testSuite.testcases) {
       let testcase = testcases.find((tc) => tc.id === testcaseId);
@@ -219,18 +216,21 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
 
       let fullNamespace = this._outProjMeta.get(testcase.id)!.outputFileFullNamespace;
 
-      usingItems.push(`using ${fullNamespace};`);
+      let usingDirective = `using ${fullNamespace};`;
+      if (!usingDirectives.includes(usingDirective)) {
+        usingDirectives.push(usingDirective);
+      }
 
       let testcaseFunction = this.generateTestCaseFunction(testcase);
       testcaseMethods.push(testcaseFunction);
     }
-    let usings = usingItems.join(EOL);
+    let usings = usingDirectives.join(EOL);
     let classBody = testcaseMethods.join(EOL + EOL);
 
     // Indent test method body with 1 indent;
     classBody = addIndent(classBody, this._indentString);
 
-    let testClass = this._templateProvider.getTestClass(
+    let testClass = this._templateProvider.getTestSuiteFile(
       usings,
       this._outProjMeta.get(testSuite.id)!.outputFileClassName,
       testSuite.description,

@@ -1,10 +1,8 @@
-import { EOL } from "os";
 import path from "path";
-import { ActionType, Indent, LocatorType } from "../../file-defs";
 import { IActionTemplateParam, ILocatorTemplateParam } from "../types";
 import { actionRegistyDotnet } from "../utils/action-registry-dotnet";
 import { locatorRegistyDotnet } from "../utils/locator-registry-dotnet";
-import { getParameters, escapeStr, hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
+import { upperCaseFirstChar } from "../utils/stringUtils";
 import { NunitTemplateCollection } from "./templateCollection";
 
 export class PlaywrightCsharpNunitTemplatesProvider {
@@ -14,8 +12,8 @@ export class PlaywrightCsharpNunitTemplatesProvider {
     this._templateCollection = new NunitTemplateCollection(path.resolve(__dirname, "./templates"), customTemplatesDir, ".hbs");
   }
 
-  getTestClass(usings: string, name: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
-    return this._templateCollection.TEST_CLASS_TEMPLATE({ usings, name, description, body, rootNamespace, fullNamespace });
+  getTestSuiteFile(usings: string, name: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
+    return this._templateCollection.TEST_SUITE_FILE({ usings, name, description, body, rootNamespace, fullNamespace });
   }
 
   getTestCaseFile(testCaseName: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
@@ -59,13 +57,16 @@ export class PlaywrightCsharpNunitTemplatesProvider {
   getLocatorHelper(rootNamespace: string): string {
     return this._templateCollection.LOCATOR_HELPER_TEMPLATE({ rootNamespace });
   }
-  getSingleCaseSuiteBase(rootNamespace: string): string {
-    return this._templateCollection.SINGLE_CASE_SUITE_BASE({ rootNamespace });
+  getTestSuiteBase(rootNamespace: string, testIdAttributeName: string): string {
+    return this._templateCollection.TEST_SUITE_BASE({ rootNamespace, testIdAttributeName });
+  }
+  getTestCaseBase(rootNamespace: string): string {
+    return this._templateCollection.TEST_CASE_BASE({ rootNamespace });
   }
   getCSProject(rootNamespace: string) {
     return this._templateCollection.CSPROJECT_TEMPLATE({ rootNamespace });
   }
-  getNUNitUsing(rootNamespace: string) {
+  getUsings(rootNamespace: string) {
     return this._templateCollection.USINGS_TEMPLATE({ rootNamespace });
   }
   getRunSettings() {

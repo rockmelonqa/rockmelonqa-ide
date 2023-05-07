@@ -1,10 +1,9 @@
 import { EOL } from "os";
 import path from "path";
-import { ActionType, IRmProjFile, ISourceProjectMeta, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
+import { ActionType, IRmProjFile, ISourceProjectMetadata, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
-import { createCodeGenMeta } from "../codegen";
-import { CodeGenMetaFactory } from "../codegenMetaFactory";
+import { createOutputProjectMetadata } from "../codegen";
 import { ICodeGen } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
@@ -12,7 +11,7 @@ import { NunitProjectMeta } from "./nunitProjectMeta";
 import { PlaywrightCsharpNunitTemplatesProvider } from "./playwrightCsharpNunitTemplatesProvider";
 
 export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
-  private _projMeta: ISourceProjectMeta;
+  private _projMeta: ISourceProjectMetadata;
   private _rmprojFile: IRmProjFile;
   private _rootNamespace: string;
   private _templateProvider: PlaywrightCsharpNunitTemplatesProvider;
@@ -24,7 +23,7 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
 
   private _outProjMeta: NunitProjectMeta;
 
-  constructor(projMeta: ISourceProjectMeta) {
+  constructor(projMeta: ISourceProjectMetadata) {
     const rmprojFile = projMeta.project;
 
     this._projMeta = projMeta;
@@ -78,7 +77,7 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
     // Filename: Tests/{TestClassName}.cs
     for (let testSuite of this._projMeta.testSuites) {
       let fileRelPath = this._outProjMeta.get(testSuite.content.id)!.outputFileRelPath;
-      let classContent = this.generateTestSuite(
+      let classContent = this.generateTestSuiteFile(
         testSuite.content,
         this._projMeta.testCases.map((tcFile) => tcFile.content)
       );
@@ -92,12 +91,17 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
       `Support/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
       this._templateProvider.getLocatorHelper(this._rmprojFile.content.rootNamespace)
     );
-    // Filename: Support/RmSingleCaseSuiteBase.cs
+    // Filename: Support/TestCaseBase.cs
     await writeFile(
-      `Support/${StandardOutputFile.RmSingleCaseSuiteBase}${this._outputFileExt}`,
-      this._templateProvider.getSingleCaseSuiteBase(this._rmprojFile.content.rootNamespace)
+      `Support/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
+      this._templateProvider.getTestCaseBase(this._rmprojFile.content.rootNamespace)
     );
 
+    // Filename: Support/TestSuiteBase.cs
+    await writeFile(
+      `Support/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
+      this._templateProvider.getTestSuiteBase(this._rmprojFile.content.rootNamespace, this._rmprojFile.content.testIdAttributeName)
+    );
     // # Generate full project files
     // Files:
     //     - {Namespace}.csproj
@@ -110,16 +114,14 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
       );
       await writeFile(
         `${StandardOutputFile.Usings}${this._outputFileExt}`,
-        this._templateProvider.getNUNitUsing(this._rmprojFile.content.rootNamespace)
+        this._templateProvider.getUsings(this._rmprojFile.content.rootNamespace)
       );
       await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
     }
 
-    // Write suites meta
-    const inProjMeta = await createCodeGenMeta(this._rmprojFile);
-    const outProjMeta = CodeGenMetaFactory.newInstance(inProjMeta);
-    const data = outProjMeta.generateOutputProjectMeta();
-    await writeFile(StandardOutputFile.MetaData, JSON.stringify(data, null, 2));
+    // Write output project metadata
+    const outputProjectMetadata = await createOutputProjectMetadata(this._rmprojFile);
+    await writeFile(StandardOutputFile.MetaData, JSON.stringify(outputProjectMetadata, null, 2));
 
     return "";
   }
@@ -199,9 +201,9 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
     );
   }
 
-  generateTestSuite(testSuite: ITestSuite, testcases: ITestCase[]) {
-    var testcaseMethods = [];
-    var usingItems = [];
+  generateTestSuiteFile(testSuite: ITestSuite, testcases: ITestCase[]) {
+    const testcaseMethods: string[] = [];
+    const usingDirectives: string[] = [];
 
     for (let testcaseId of testSuite.testcases) {
       let testcase = testcases.find((tc) => tc.id === testcaseId);
@@ -211,18 +213,21 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
 
       let fullNamespace = this._outProjMeta.get(testcase.id)!.outputFileFullNamespace;
 
-      usingItems.push(`using ${fullNamespace};`);
+      let usingDirective = `using ${fullNamespace};`;
+      if (!usingDirectives.includes(usingDirective)) {
+        usingDirectives.push(usingDirective);
+      }
 
       let testcaseFunction = this.generateTestCaseFunction(testcase);
       testcaseMethods.push(testcaseFunction);
     }
-    let usings = usingItems.join(EOL);
+    let usings = usingDirectives.join(EOL);
     let classBody = testcaseMethods.join(EOL + EOL);
 
     // Indent test method body with 1 indent;
     classBody = addIndent(classBody, this._indentString);
 
-    let testClass = this._templateProvider.getTestClass(
+    let testClass = this._templateProvider.getTestSuiteFile(
       usings,
       this._outProjMeta.get(testSuite.id)!.outputFileClassName,
       testSuite.description,

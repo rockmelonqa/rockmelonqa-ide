@@ -1,27 +1,27 @@
-import { ISourceProjectMeta, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
+import { ISourceProjectMetadata, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
+import { createDotnetProjectMetadata } from "../playwright-charp/createDotnetProjectMetadata";
 import {
-  IOutputProjMetaGenerator,
+  IOutputProjectMetadataProcessor,
   createMapForPages,
   createMapForTestCases,
   createMapForTestRoutines,
   createMapForTestSuites,
-} from "../playwright-charp/outProjMeta";
-import { IOutputProjectMetadata } from "../playwright-charp/outputProjectMetadata";
-import { IOutputFileFileInfo, ISuiteInfo, ITestCaseInfo } from "../types";
+} from "../playwright-charp/outputProjectMetadataProcessor";
+import { IOutputFileInfo, IOutputProjectMetadata } from "../types";
 
-export class NunitProjectMeta implements IOutputProjMetaGenerator {
-  private _projMeta: ISourceProjectMeta;
+export class NunitProjectMeta implements IOutputProjectMetadataProcessor {
+  private _projMeta: ISourceProjectMetadata;
 
-  public readonly pageNameMap: Map<IPage, IOutputFileFileInfo> = new Map<IPage, IOutputFileFileInfo>();
-  public readonly suiteNameMap: Map<ITestSuite, IOutputFileFileInfo> = new Map<ITestSuite, IOutputFileFileInfo>();
-  public readonly caseNameMap: Map<ITestCase, IOutputFileFileInfo> = new Map<ITestCase, IOutputFileFileInfo>();
-  public readonly routineNameMap: Map<ITestRoutine, IOutputFileFileInfo> = new Map<ITestRoutine, IOutputFileFileInfo>();
+  public readonly pageNameMap: Map<IPage, IOutputFileInfo> = new Map<IPage, IOutputFileInfo>();
+  public readonly suiteNameMap: Map<ITestSuite, IOutputFileInfo> = new Map<ITestSuite, IOutputFileInfo>();
+  public readonly caseNameMap: Map<ITestCase, IOutputFileInfo> = new Map<ITestCase, IOutputFileInfo>();
+  public readonly routineNameMap: Map<ITestRoutine, IOutputFileInfo> = new Map<ITestRoutine, IOutputFileInfo>();
 
   /**
    *
    */
-  constructor(codegenMeta: ISourceProjectMeta) {
+  constructor(codegenMeta: ISourceProjectMetadata) {
     this._projMeta = codegenMeta;
     const rmprojFile = codegenMeta.project;
 
@@ -29,45 +29,12 @@ export class NunitProjectMeta implements IOutputProjMetaGenerator {
     this.suiteNameMap = createMapForTestSuites(rmprojFile, codegenMeta.testSuites);
     this.caseNameMap = createMapForTestCases(rmprojFile, codegenMeta.testCases);
     this.routineNameMap = createMapForTestRoutines(rmprojFile, codegenMeta.testRoutines);
+
+    this.verifyDuplication();
   }
 
-  public generateOutputProjectMeta(): IOutputProjectMetadata {
-    const suites: ISuiteInfo[] = [];
-
-    for (let { content: testsuite, isValid } of this._projMeta.testSuites) {
-      let testCases = this._projMeta.testCases.filter((c) => testsuite.testcases.includes(c.content.id));
-      let suiteMeta = this.suiteNameMap.get(testsuite)!;
-
-      let suiteInfo: ISuiteInfo = {
-        name: suiteMeta.outputFileClassName,
-        fullyQualifiedName: `${suiteMeta.outputFileFullNamespace}.${suiteMeta.outputFileClassName}`,
-        inputFileName: suiteMeta.inputFileName,
-        inputFilePath: suiteMeta.inputFilePath,
-        inputFileRelPath: suiteMeta.inputFileRelPath,
-        outputFileName: suiteMeta.outputFileName,
-        outputFilePath: suiteMeta.outputFilePath,
-        outputFileRelPath: suiteMeta.outputFileRelPath,
-        isValid: suiteMeta.isValid,
-        testCases: testCases.map((tc) => {
-          let caseMeta = this.caseNameMap.get(tc.content)!;
-          let caseInfo: ITestCaseInfo = {
-            name: caseMeta.outputFileClassName,
-            fullyQualifiedName: `${suiteMeta.outputFileFullNamespace}.${suiteMeta.outputFileClassName}.${caseMeta.outputFileClassName}`,
-            inputFileName: caseMeta.inputFileName,
-            inputFilePath: caseMeta.inputFilePath,
-            inputFileRelPath: caseMeta.inputFileRelPath,
-            outputFileName: caseMeta.outputFileName,
-            outputFilePath: caseMeta.outputFilePath,
-            outputFileRelPath: caseMeta.outputFileRelPath,
-            isValid: caseMeta.isValid,
-          };
-          return caseInfo;
-        }),
-      };
-      suites.push(suiteInfo);
-    }
-
-    return { suites };
+  public createOutputProjectMetadata(): IOutputProjectMetadata {
+    return createDotnetProjectMetadata(this._projMeta);
   }
 
   private verifyDuplication() {
@@ -77,7 +44,7 @@ export class NunitProjectMeta implements IOutputProjMetaGenerator {
     this.findDuplication(this.routineNameMap.values());
   }
 
-  private findDuplication(nameInfo: IterableIterator<IOutputFileFileInfo>) {
+  private findDuplication(nameInfo: IterableIterator<IOutputFileInfo>) {
     const allFilePath = Array.from(nameInfo).map((x) => x.outputFilePath);
     const firstDuplication = allFilePath.find((x) => allFilePath.indexOf(x) !== allFilePath.lastIndexOf(x));
     if (firstDuplication) {
@@ -85,8 +52,8 @@ export class NunitProjectMeta implements IOutputProjMetaGenerator {
     }
   }
 
-  /** Get an instance of OutputFileFileInfo with the provided guid of an item in the rmProj  */
-  public get(guid: string): IOutputFileFileInfo {
+  /** Get an instance of IOutputFileInfo with the provided guid of an item in the rmProj  */
+  public get(guid: string): IOutputFileInfo {
     // IPage
     for (let [page, info] of this.pageNameMap) {
       if (page.id === guid) {
