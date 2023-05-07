@@ -1,6 +1,6 @@
 import { ISourceProjectMetadata } from "../../file-defs";
 import { IOutputProjectMetadata, IPageInfo, ISuiteInfo, ITestCaseInfo } from "../types";
-import { createMapForPages, createMapForTestCases, createMapForTestRoutines, createMapForTestSuites } from "./outputProjectMetadataGenenrator";
+import { createMapForPages, createMapForTestCases, createMapForTestRoutines, createMapForTestSuites } from "./outputProjectMetadataProcessor";
 
 export const createDotnetProjectMetadata = (projMeta: ISourceProjectMetadata): IOutputProjectMetadata => {
   const rmprojFile = projMeta.project;

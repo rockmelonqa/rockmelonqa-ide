@@ -2,15 +2,15 @@ import { ISourceProjectMetadata, ITestCase, ITestRoutine, ITestSuite } from "../
 import { IPage } from "../../file-defs/pageFile";
 import { createDotnetProjectMetadata } from "../playwright-charp/createDotnetProjectMetadata";
 import {
-  IOutputProjectMetadataGenerator,
+  IOutputProjectMetadataProcessor,
   createMapForPages,
   createMapForTestCases,
   createMapForTestRoutines,
   createMapForTestSuites,
-} from "../playwright-charp/outputProjectMetadataGenenrator";
+} from "../playwright-charp/outputProjectMetadataProcessor";
 import { IOutputFileInfo, IOutputProjectMetadata } from "../types";
 
-export class XUnitProjectMeta implements IOutputProjectMetadataGenerator {
+export class XUnitProjectMeta implements IOutputProjectMetadataProcessor {
   private _projMeta: ISourceProjectMetadata;
 
   public readonly pageNameMap: Map<IPage, IOutputFileInfo> = new Map<IPage, IOutputFileInfo>();
@@ -33,7 +33,7 @@ export class XUnitProjectMeta implements IOutputProjectMetadataGenerator {
     this.verifyDuplication();
   }
 
-  public generateOutputProjectMetadata(): IOutputProjectMetadata {
+  public createOutputProjectMetadata(): IOutputProjectMetadata {
     return createDotnetProjectMetadata(this._projMeta);
   }
 
@@ -52,7 +52,7 @@ export class XUnitProjectMeta implements IOutputProjectMetadataGenerator {
     }
   }
 
-  /** Get an instance of OutputFileFileInfo with the provided guid of an item in the rmProj  */
+  /** Get an instance of IOutputFileInfo with the provided guid of an item in the rmProj  */
   public get(guid: string): IOutputFileInfo {
     // IPage
     for (let [page, info] of this.pageNameMap) {

@@ -3,8 +3,7 @@ import path from "path";
 import { ActionType, IRmProjFile, ISourceProjectMetadata, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
-import { createCodeGenMeta } from "../codegen";
-import { CodeGenMetaFactory } from "../codegenMetaFactory";
+import { createOutputProjectMetadata } from "../codegen";
 import { ICodeGen } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
@@ -128,11 +127,9 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
       await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
     }
 
-    // Write suites meta
-    const inProjMeta = await createCodeGenMeta(this._rmprojFile);
-    const outProjMeta = CodeGenMetaFactory.newInstance(inProjMeta);
-    const data = outProjMeta.generateOutputProjectMetadata();
-    await writeFile(StandardOutputFile.MetaData, JSON.stringify(data, null, 2));
+    // Write output project metadata
+    const outputProjectMetadata = await createOutputProjectMetadata(this._rmprojFile);
+    await writeFile(StandardOutputFile.MetaData, JSON.stringify(outputProjectMetadata, null, 2));
 
     return "";
   }

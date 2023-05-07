@@ -3,8 +3,8 @@ import { IPage, IPageFile } from "../../file-defs/pageFile";
 import { IOutputFileInfo, IOutputProjectMetadata } from "../types";
 import { createOutputFileInfo } from "./createOutputFileInfo";
 
-export interface IOutputProjectMetadataGenerator {
-  generateOutputProjectMetadata: () => IOutputProjectMetadata;
+export interface IOutputProjectMetadataCreator {
+  createOutputProjectMetadata: () => IOutputProjectMetadata;
 }
 
 export const createMapForPages = (proj: IRmProjFile, pageFiles: IPageFile[]): Map<IPage, IOutputFileInfo> => {

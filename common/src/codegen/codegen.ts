@@ -121,7 +121,7 @@ export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: (eve
   info("# GENERATE CODE", rmprojFile);
   info("#################");
 
-  const projMeta = await createCodeGenMeta(rmprojFile, progressNotify);
+  const projMeta = await createSourceProjectMetadata(rmprojFile, progressNotify);
 
   const writeFile = async (relativeFilePath: string, content: string) => {
     progressNotify({ type: "generate-code", log: `Creating file: '${relativeFilePath}'` });
@@ -158,7 +158,7 @@ export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: (eve
   info(`Finish generating code!`);
 };
 
-export const createCodeGenMeta = async (
+export const createSourceProjectMetadata = async (
   rmprojFile: IRmProjFile,
   progressNotify?: (event: IProgressEvent) => void
 ): Promise<ISourceProjectMetadata> => {
@@ -272,9 +272,9 @@ export const createCodeGenMeta = async (
   return projMeta;
 };
 
-export const generateOutputProjectMeta = async (projFile: IRmProjFile): Promise<IOutputProjectMetadata> => {
-  const inProjMeta = await createCodeGenMeta(projFile);
+export const createOutputProjectMetadata = async (projFile: IRmProjFile): Promise<IOutputProjectMetadata> => {
+  const inProjMeta = await createSourceProjectMetadata(projFile);
   const outProjMeta = CodeGenMetaFactory.newInstance(inProjMeta);
-  const meta = outProjMeta.generateOutputProjectMetadata();
+  const meta = outProjMeta.createOutputProjectMetadata();
   return meta;
 };

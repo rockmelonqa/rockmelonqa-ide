@@ -2,7 +2,7 @@ import path from 'path';
 import { Worker } from 'worker_threads';
 
 import { IProgressEvent, IRmProjFile } from 'rockmelonqa.common';
-import { generateOutputProjectMeta } from 'rockmelonqa.common/codegen/codegen';
+import { createOutputProjectMetadata } from 'rockmelonqa.common/codegen/codegen';
 import { MessagePort } from 'worker_threads';
 import { WorkerAction, WorkerMessage } from '../worker';
 import { IActionResult } from './shared';
@@ -31,7 +31,7 @@ export const generateOutputProjectMetadata = async function (rmprojFile: IRmProj
 };
 
 export const doGenerateOutputProjectMetadata = async (port: MessagePort | null, rmProjectFile: IRmProjFile) => {
-  const meta = await generateOutputProjectMeta(rmProjectFile);
+  const meta = await createOutputProjectMetadata(rmProjectFile);
 
   port?.postMessage({ type: 'finish', data: meta } as IProgressEvent);
 };
