@@ -43,7 +43,6 @@
     import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
     import { toTitle } from "./Editor";
-    import AddComment from "$lib/icons/AddComment.svelte";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -436,7 +435,7 @@
                             on:click={() => handleInsertComment(index)}
                             title={uiContext.str(stringResKeys.general.add)}
                         >
-                            <svelte:fragment slot="icon"><AddComment /></svelte:fragment>
+                            <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
                         </IconLinkButton>
                         <IconLinkButton
                             on:click={() => handleDeleteClick(index)}
