@@ -109,7 +109,7 @@ async function createNewProject(
   }
 
   await Promise.all([
-    //fileSystem.createFolder(path.join(project.folderPath, StandardFolder.CustomCode)),
+    fileSystem.createFolder(path.join(project.folderPath, StandardFolder.CustomCode)),
     fileSystem.createFolder(path.join(project.folderPath, StandardFolder.Logs)),
     fileSystem.createFolder(path.join(project.folderPath, StandardFolder.OutputCode)),
     fileSystem.createFolder(path.join(project.folderPath, StandardFolder.PageDefinitions)),
