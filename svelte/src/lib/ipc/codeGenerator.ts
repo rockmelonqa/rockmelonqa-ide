@@ -17,8 +17,6 @@ const getApi = (apiKey?: string) => {
 const genCode = (rmprojFile: IRmProjFile, options?: { apiKey?: string }) => {
     getApi(options?.apiKey).send("genCode", rmprojFile);
 };
-const onCopyCustomCode = (fn: (data: IProgressDetail) => void, options?: {apiKey?: string}): Action | undefined => 
-    getApi(options?.apiKey).on('gen-code:copy-custom-code', fn);
 
 const onValidateInput = (fn: (data: IProgressDetail) => void, options?: { apiKey?: string }): Action | undefined =>
     getApi(options?.apiKey).on("gen-code:validate-input", fn);
@@ -31,6 +29,9 @@ const onCleanFolder = (fn: (data: IProgressDetail) => void, options?: { apiKey?:
 
 const onGenerateCode = (fn: (data: IProgressDetail) => void, options?: { apiKey?: string }): Action | undefined =>
     getApi(options?.apiKey).on("gen-code:generate-code", fn);
+
+const onCopyCustomCode = (fn: (data: IProgressDetail) => void, options?: {apiKey?: string}): Action | undefined => 
+    getApi(options?.apiKey).on('gen-code:copy-custom-code', fn);
 
 const onBuild = (fn: (data: IProgressDetail) => void, options?: { apiKey?: string }): Action | undefined =>
     getApi(options?.apiKey).on("build:build", fn);
