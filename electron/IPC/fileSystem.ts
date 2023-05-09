@@ -54,7 +54,7 @@ export default fileSystem;
  * Create new folder
  */
 async function createFolder(browserWindow: BrowserWindow, event: Electron.IpcMainEvent, path: string): Promise<void> {
-  await fs.createFoler(path);
+  await fs.createFolder(path);
 }
 
 /**

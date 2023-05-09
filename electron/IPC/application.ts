@@ -74,7 +74,7 @@ async function getUserSettings(browserWindow: BrowserWindow, event: Electron.Ipc
   const fileExists = await fileSystem.checkExists(filePath);
   if (!fileExists) {
     // create empty file
-    await fileSystem.createFoler(dirPath);
+    await fileSystem.createFolder(dirPath);
     await fileSystem.writeFile(filePath, JSON.stringify(fileDefFactory.newUserSetting(), null, 4));
   }
 
@@ -88,7 +88,7 @@ async function setUserSettings(browserWindow: BrowserWindow, event: Electron.Ipc
   const dirPath = path.join(app.getPath(USER_DATA));
   const folderExists = await fileSystem.checkExists(dirPath);
   if (!folderExists) {
-    await fileSystem.createFoler(dirPath);
+    await fileSystem.createFolder(dirPath);
   }
 
   const filePath = path.join(dirPath, USER_SETTINGS_FILE);
@@ -109,14 +109,14 @@ async function createNewProject(
   }
 
   await Promise.all([
-    //fileSystem.createFoler(path.join(project.folderPath, StandardFolder.CustomCode)),
-    fileSystem.createFoler(path.join(project.folderPath, StandardFolder.Logs)),
-    fileSystem.createFoler(path.join(project.folderPath, StandardFolder.OutputCode)),
-    fileSystem.createFoler(path.join(project.folderPath, StandardFolder.PageDefinitions)),
-    fileSystem.createFoler(path.join(project.folderPath, StandardFolder.TestCases)),
-    //fileSystem.createFoler(path.join(project.folderPath, StandardFolder.TestRoutines)),
-    fileSystem.createFoler(path.join(project.folderPath, StandardFolder.TestRuns)),
-    fileSystem.createFoler(path.join(project.folderPath, StandardFolder.TestSuites)),
+    //fileSystem.createFolder(path.join(project.folderPath, StandardFolder.CustomCode)),
+    fileSystem.createFolder(path.join(project.folderPath, StandardFolder.Logs)),
+    fileSystem.createFolder(path.join(project.folderPath, StandardFolder.OutputCode)),
+    fileSystem.createFolder(path.join(project.folderPath, StandardFolder.PageDefinitions)),
+    fileSystem.createFolder(path.join(project.folderPath, StandardFolder.TestCases)),
+    //fileSystem.createFolder(path.join(project.folderPath, StandardFolder.TestRoutines)),
+    fileSystem.createFolder(path.join(project.folderPath, StandardFolder.TestRuns)),
+    fileSystem.createFolder(path.join(project.folderPath, StandardFolder.TestSuites)),
     fileSystem.writeFile(path.join(project.folderPath, project.fileName), JSON.stringify(project.content, null, 4)),
   ]);
 

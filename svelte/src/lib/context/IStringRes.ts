@@ -69,6 +69,7 @@ export interface ICodeGenerationDialogStringRes {
     buildMsg: string;
     checkPrerequisites: string;
     cleanFolderMsg: string;
+    copyCustomCodeMsg: string;
     dialogMsg: string;
     dialogTitle: string;
     duplicateFileNameMessage: string;

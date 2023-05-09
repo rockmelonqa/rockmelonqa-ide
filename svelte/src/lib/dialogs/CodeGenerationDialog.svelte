@@ -70,6 +70,13 @@
         );
 
         registerListener(
+            codeGenerator.onCopyCustomCode((data: IProgressDetail) => {
+                spinnerText = uiContext.str(stringResKeys.codeGenerationDialog.copyCustomCodeMsg);
+                addLog(data.log);
+            })
+        )
+
+        registerListener(
             codeGenerator.onBuild((data: IProgressDetail) => {
                 spinnerText = uiContext.str(stringResKeys.codeGenerationDialog.buildMsg);
                 addLog(data.log);

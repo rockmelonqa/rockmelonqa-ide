@@ -38,13 +38,14 @@ const validInvokeChannel: IChannels = {
 
 // from Main
 const validReceiveChannel: string[] = [
-  'gen-code:validate-input',
-  'gen-code:parse-data',
-  'gen-code:clean-folder',
-  'gen-code:generate-code',
-  'build:build',
-  'build:install-dependencies',
-  'finish',
+    'gen-code:validate-input',
+    'gen-code:parse-data',
+    'gen-code:clean-folder',
+    'gen-code:generate-code',
+    'gen-code:copy-custom-code',
+    'build:build',
+    'build:install-dependencies',
+    'finish',
 ];
 
 const codeGenearator = new IPC({
@@ -214,7 +215,7 @@ async function genCode(browserWindow: BrowserWindow, event: Electron.IpcMainEven
     sb.appendLine(JSON.stringify(ipcRs, null, 4));
 
     const logsFolder = path.join(rmprojFile.folderPath, StandardFolder.Logs);
-    await fileSystem.createFoler(logsFolder);
+    await fileSystem.createFolder(logsFolder);
 
     const logFileName = `gen-code.${moment(startTime).format('YYYYMMDD_HHmmss')}.log`;
     const logFilePath = path.join(logsFolder, logFileName);

@@ -18,6 +18,7 @@ export const stringResKeys = {
         buildMsg: "codeGenerationDialog.buildMsg",
         checkPrerequisites: "codeGenerationDialog.checkPrerequisites",
         cleanFolderMsg: "codeGenerationDialog.cleanFolderMsg",
+        copyCustomCodeMsg: 'codeGenerationDialog.copyCustomCodeMsg',
         dialogMsg: "codeGenerationDialog.dialogMsg",
         dialogTitle: "codeGenerationDialog.dialogTitle",
         duplicateFileNameMessage: "codeGenerationDialog.duplicateFileNameMessage",
