@@ -109,25 +109,14 @@ async function createNewProject(
   }
 
   await Promise.all([
-<<<<<<< HEAD
-    fileSystem.createFolder(path.join(project.folderPath, StandardFolder.CustomCode)),
+    //fileSystem.createFolder(path.join(project.folderPath, StandardFolder.CustomCode)),
     fileSystem.createFolder(path.join(project.folderPath, StandardFolder.Logs)),
     fileSystem.createFolder(path.join(project.folderPath, StandardFolder.OutputCode)),
     fileSystem.createFolder(path.join(project.folderPath, StandardFolder.PageDefinitions)),
     fileSystem.createFolder(path.join(project.folderPath, StandardFolder.TestCases)),
-    fileSystem.createFolder(path.join(project.folderPath, StandardFolder.TestRoutines)),
+    //fileSystem.createFolder(path.join(project.folderPath, StandardFolder.TestRoutines)),
     fileSystem.createFolder(path.join(project.folderPath, StandardFolder.TestRuns)),
     fileSystem.createFolder(path.join(project.folderPath, StandardFolder.TestSuites)),
-=======
-    //fileSystem.createFoler(path.join(project.folderPath, StandardFolder.CustomCode)),
-    fileSystem.createFoler(path.join(project.folderPath, StandardFolder.Logs)),
-    fileSystem.createFoler(path.join(project.folderPath, StandardFolder.OutputCode)),
-    fileSystem.createFoler(path.join(project.folderPath, StandardFolder.PageDefinitions)),
-    fileSystem.createFoler(path.join(project.folderPath, StandardFolder.TestCases)),
-    //fileSystem.createFoler(path.join(project.folderPath, StandardFolder.TestRoutines)),
-    fileSystem.createFoler(path.join(project.folderPath, StandardFolder.TestRuns)),
-    fileSystem.createFoler(path.join(project.folderPath, StandardFolder.TestSuites)),
->>>>>>> main
     fileSystem.writeFile(path.join(project.folderPath, project.fileName), JSON.stringify(project.content, null, 4)),
   ]);
 

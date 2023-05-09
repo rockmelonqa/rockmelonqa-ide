@@ -329,11 +329,7 @@
             <ListTableHeaderCell type={ListTableCellType.Last} class="text-left w-3/12">
                 {uiContext.str(stringResKeys.pageDefinitionEditor.description)}
             </ListTableHeaderCell>
-<<<<<<< HEAD
-            <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-1/12">
-=======
             <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-40">
->>>>>>> main
                 {uiContext.str(stringResKeys.pageDefinitionEditor.actions)}
             </ListTableHeaderCell>
         </svelte:fragment>
