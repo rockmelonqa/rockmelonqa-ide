@@ -427,13 +427,13 @@
                     <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">
                         <IconLinkButton
                             on:click={() => handleInsertStep(index)}
-                            title={uiContext.str(stringResKeys.general.add)}
+                            title={uiContext.str(stringResKeys.testCaseEditor.addStep)}
                         >
                             <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
                         </IconLinkButton>
                         <IconLinkButton
                             on:click={() => handleInsertComment(index)}
-                            title={uiContext.str(stringResKeys.general.add)}
+                            title={uiContext.str(stringResKeys.testCaseEditor.addComment)}
                         >
                             <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
                         </IconLinkButton>
