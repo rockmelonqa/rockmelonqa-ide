@@ -1,7 +1,6 @@
 <script lang="ts">
     import { AppActionType, appContextKey, type IAppContext } from '$lib/context/AppContext';
     import SettingsIcon from '$lib/icons/SettingsIcon.svelte';
-    import {} from 'os';
     import { getContext } from 'svelte';
     import { ActivityType, type IActivityBarItem } from './ActivityBar';
     import ActivityBarItemIcon from './ActivityBarItemIcon.svelte';
