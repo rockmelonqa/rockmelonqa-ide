@@ -399,22 +399,24 @@
                             />
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Normal}>
-                            <FancyDropdownField
-                                name={`${formContext.formName}_${index}_page`}
-                                value={item.page}
-                                options={pageDefinitionOptions}
-                                disabled={isPagelessAction(item.action)}
-                                on:change={(event) => handleItemChange(index, ITEM_KEY_PAGE, event.detail.value)}
-                            />
+                            {#if !isPagelessAction(item.action)}
+                                <FancyDropdownField
+                                    name={`${formContext.formName}_${index}_page`}
+                                    value={item.page}
+                                    options={pageDefinitionOptions}
+                                    on:change={(event) => handleItemChange(index, ITEM_KEY_PAGE, event.detail.value)}
+                                />
+                            {/if}
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Normal}>
-                            <FancyDropdownField
-                                name={`${formContext.formName}_${index}_element`}
-                                value={item.element}
-                                options={pageElementsMap.get(item.page) ?? []}
-                                disabled={isPagelessAction(item.action)}
-                                on:change={(event) => handleItemChange(index, ITEM_KEY_ELEMENT, event.detail.value)}
-                            />
+                            {#if !isPagelessAction(item.action)}
+                                <FancyDropdownField
+                                    name={`${formContext.formName}_${index}_element`}
+                                    value={item.element}
+                                    options={pageElementsMap.get(item.page) ?? []}
+                                    on:change={(event) => handleItemChange(index, ITEM_KEY_ELEMENT, event.detail.value)}
+                                />
+                            {/if}
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Last}>
                             <TextField
