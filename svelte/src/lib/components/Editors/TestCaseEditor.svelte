@@ -183,6 +183,9 @@
         ActionType.Delay.toString(),
         ActionType.GoToUrl.toString(),
         ActionType.RunCode.toString(),
+        ActionType.VerifyTitle.toString(),
+        ActionType.VerifyTitleContains.toString(),
+        ActionType.VerifyUrl.toString()
     ];
     const isPagelessAction = (action: string) => {
         return pagelessActions.includes(action);
