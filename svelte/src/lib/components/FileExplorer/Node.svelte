@@ -207,10 +207,21 @@
         addMode = false;
     };
 
-    const submitNew = async (e: any) => {
-        // after creating new file/folder, we want to expand parent node if it was collapsed
-        // must do it here, because FileExplorer-addNode cannot distinguish event from ide or from Windows Explorer
-        // let's expand it with current child nodes and leave FileExplorer-addNode handles new node event later
+    const submitNew = async (e: any) => {      
+        // create file or folder
+        const { value } = e.detail;
+        if (value) {
+            let newPath = fileSystemPath + uiContext.pathSeparator + value;
+            if (typeToAdd === FileType.Folder) {
+                fileSystem.createFolder(newPath);
+            } else {
+                await fileSystem.writeFile(newPath, "");
+            }
+        }
+
+        // after creating new file/folder, has to expand parent node if it was collapsed
+        // if not loaded children yet, let's do it
+        // if already loaded children, leave FileExplorer-addNode append new node
         if (!node.expanded) {
             if (hasChildren && children == null) {
                 node.setChildren(NodeInfo.sort(await buildChildrenNodes(fileSystemPath)));
@@ -221,17 +232,6 @@
                 nodePath: nodePath,
                 value: { expanded: true, hasChildren: node.hasChildren, children: node.children ?? [] },
             });
-        }
-
-        // create file or folder
-        const { value } = e.detail;
-        if (value) {
-            let newPath = fileSystemPath + uiContext.pathSeparator + value;
-            if (typeToAdd === FileType.Folder) {
-                fileSystem.createFolder(newPath);
-            } else {
-                await fileSystem.writeFile(newPath, "");
-            }
         }
 
         // turn of add mode

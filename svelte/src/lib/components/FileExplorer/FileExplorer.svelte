@@ -147,8 +147,8 @@
             // now it has new child
             newValue.hasChildren = true;
         }
-        // if parentNode.children is null (not lazy load), then leave it for next expanding action
-        // if already loads children, then add new node manually if required
+        // if parentNode.children is null/undefined (not lazy load), then leave it for next expanding action
+        // if already loads children (not null/undefined), then append new node manually
         if (parentNode.children) {
             const newNode = await buildNode(fileSystemPath, name, isDir, parentNode, true);
             newValue.children = NodeInfo.sort([...parentNode.children, newNode!]);
