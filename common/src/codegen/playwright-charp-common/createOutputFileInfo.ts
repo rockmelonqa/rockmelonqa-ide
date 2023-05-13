@@ -1,24 +1,29 @@
 import path from "path";
-import { ExtensionToNameMap, IFileDef } from "../../file-defs";
+import { ExtensionToNameMap, IFileDef, StandardFolder, StandardOutputFolder } from "../../file-defs";
 import { IRmProjFile } from "../../file-defs/rmProjFile";
-import { StandardFolder, StandardOutputFolder } from "../../file-defs";
 import { IOutputFileInfo } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { upperCaseFirstChar } from "../utils/stringUtils";
 
+/** Map from standard input folder to standard output folder */
 const inputOutputFolderMap = new Map<string, string>([
   [StandardFolder.PageDefinitions, StandardOutputFolder.Pages],
   [StandardFolder.TestCases, StandardOutputFolder.TestCases],
   [StandardFolder.TestSuites, StandardOutputFolder.TestSuites],
-  [StandardFolder.TestRoutines, StandardOutputFolder.TestRoutines]
+  [StandardFolder.TestRoutines, StandardOutputFolder.TestRoutines],
 ]);
 
+/** Gets the standard folder name (e.g "test-suites", "test-cases", etc...) from the provided folder path */
 const getContainerFolder = (inputFolderPath: string, projDir: string) => {
+  // Remove the projectDir from the inputFolderPath: eg. "D:\Insurance\test-suites\Insurance.tsuite" => "test-suites\Insurance.tsuite"
   let inputRelPath = inputFolderPath.replace(projDir, "").substring(1);
+  // The standard input folder name should be the first path segment: "test-suites\Insurance.tsuite" => "test-suites"
   let standardFolder = inputRelPath.split(path.sep)[0];
+
   return standardFolder;
 };
 
+/** Creates a valid name (with extension) from the input file relative path */
 const createName = (relativePath: string) => {
   let ext = path.extname(relativePath).toLocaleLowerCase();
   let extName = upperCaseFirstChar(ExtensionToNameMap[ext]);
@@ -37,8 +42,10 @@ const createName = (relativePath: string) => {
   return `${filenameWithoutExt}${extName}`;
 };
 
+/** The input metadata needed to generate valid output file metadata */
 type IMetaParams = Pick<IFileDef, "folderPath" | "fileName" | "isValid">;
 
+/** Creates output file info with the provided input file meta*/
 const createOutputFileInfo = (metaParams: IMetaParams, proj: IRmProjFile): IOutputFileInfo => {
   const { folderPath, fileName, isValid } = metaParams;
 
@@ -53,7 +60,7 @@ const createOutputFileInfo = (metaParams: IMetaParams, proj: IRmProjFile): IOutp
   // Path relative to the "standand folder", not the project root path;
   let inputFileRelPath = inputFilePath.substring(inputContainerFolder.length + 1);
   let outputFileCleanName = createName(inputFileRelPath);
-  let outputFilePath = path.join(outputContainerFolder, outputFileCleanName.replaceAll("_", path.sep) + outputFileExt);
+  let outputFilePath = path.join(outputContainerFolder, outputFileCleanName + outputFileExt);
 
   const nameSegments = outputFileCleanName.split("_");
   const namespaceSegments = [...nameSegments];
