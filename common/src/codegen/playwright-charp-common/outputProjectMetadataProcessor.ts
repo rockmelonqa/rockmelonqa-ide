@@ -3,10 +3,12 @@ import { IPage, IPageFile } from "../../file-defs/pageFile";
 import { IOutputFileInfo, IOutputProjectMetadata } from "../types";
 import { createOutputFileInfo } from "./createOutputFileInfo";
 
+/** For generating output project metadata */
 export interface IOutputProjectMetadataProcessor {
   createOutputProjectMetadata: () => IOutputProjectMetadata;
 }
 
+/** Creates Map with the Page as keys and Output File Infor as values */
 export const createMapForPages = (proj: IRmProjFile, pageFiles: IPageFile[]): Map<IPage, IOutputFileInfo> => {
   const map = new Map<IPage, IOutputFileInfo>();
 
@@ -18,6 +20,7 @@ export const createMapForPages = (proj: IRmProjFile, pageFiles: IPageFile[]): Ma
   return map;
 };
 
+/** Creates Map with the TestCase as keys and Output File Infor as values */
 export const createMapForTestCases = (proj: IRmProjFile, testCaseFiles: ITestCaseFile[]): Map<ITestCase, IOutputFileInfo> => {
   const map = new Map<ITestCase, IOutputFileInfo>();
 
@@ -29,6 +32,7 @@ export const createMapForTestCases = (proj: IRmProjFile, testCaseFiles: ITestCas
   return map;
 };
 
+/** Creates Map with the Test Suite as keys and Output File Infor as values */
 export const createMapForTestSuites = (proj: IRmProjFile, testSuiteFiles: ITestSuiteFile[]): Map<ITestSuite, IOutputFileInfo> => {
   const map = new Map<ITestSuite, IOutputFileInfo>();
 
@@ -40,10 +44,8 @@ export const createMapForTestSuites = (proj: IRmProjFile, testSuiteFiles: ITestS
   return map;
 };
 
-export const createMapForTestRoutines = (
-  proj: IRmProjFile,
-  testRoutineFiles: ITestRoutineFile[]
-): Map<ITestRoutine, IOutputFileInfo> => {
+/** Creates Map with the Test Routine as keys and Output File Infor as values */
+export const createMapForTestRoutines = (proj: IRmProjFile, testRoutineFiles: ITestRoutineFile[]): Map<ITestRoutine, IOutputFileInfo> => {
   const map = new Map<ITestRoutine, IOutputFileInfo>();
 
   for (let testRoutineFile of testRoutineFiles) {

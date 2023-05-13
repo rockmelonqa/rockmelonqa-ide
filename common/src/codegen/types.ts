@@ -59,17 +59,30 @@ export interface IPageInfo {
   isValid: boolean;
 }
 
+/** Contains metadata of an output file */
 export interface IOutputFileInfo {
+  /** Input file name without extension */
   inputFileName: string;
+  /** Full input file path */
   inputFilePath: string;
+  /** File path relative to the  "standand input folder" ("test-cases", "test-suites", etc...), not the project root path */
   inputFileRelPath: string;
+  /** Output file name with only a-A0-9 chars */
   outputFileCleanName: string;
+  /** Output file name WITH extension */
   outputFileName: string;
+  /** Output file full path */
   outputFilePath: string;
+  /** Output file relatative path. Relative to the "output-code" folder */
   outputFileRelPath: string;
+  /** Class name of the output file (class) */
   outputFileClassName: string;
+
+  /** The part of the namespace after the RootNamespace */
   outputFileSubNamespace: string;
+  /** The full namespace of the class */
   outputFileFullNamespace: string;
+  /** Indicates that the input file is valid and so the ouput file should be also valid */
   isValid: boolean;
 }
 
@@ -81,6 +94,4 @@ export interface IOutputProjectMetadata {
   error?: { message: string };
 }
 
-
 export type ReturnedLocatorType = "IFrameLocator" | "ILocator" | "FrameLocator" | "Locator";
-
