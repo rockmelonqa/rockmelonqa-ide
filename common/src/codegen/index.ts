@@ -1,6 +1,6 @@
-import { createSourceProjectMetadata, generateCode, createOutputProjectMetadata } from "./codegen";
+import { createOutputProjectMetadata, createSourceProjectMetadata, generateCode } from "./codegen";
 import { CodeGenMetaFactory } from "./codegenMetaFactory";
-import { IOutputProjectMetadataProcessor } from "./playwright-charp/outputProjectMetadataProcessor";
+import { IOutputProjectMetadataProcessor } from "./playwright-charp-common/outputProjectMetadataProcessor";
 import { ICodeGen } from "./types";
 
 export {

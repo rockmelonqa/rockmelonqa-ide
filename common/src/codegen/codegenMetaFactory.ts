@@ -1,5 +1,5 @@
 import { AutomationFramework, ISourceProjectMetadata, TestFramework } from "../file-defs";
-import { IOutputProjectMetadataProcessor } from "./playwright-charp/outputProjectMetadataProcessor";
+import { IOutputProjectMetadataProcessor } from "./playwright-charp-common/outputProjectMetadataProcessor";
 import { MsTestProjMeta } from "./playwright-csharp-mstest/msTestProjMeta";
 import { NunitProjectMeta } from "./playwright-csharp-nunit/nunitProjectMeta";
 import { XUnitProjectMeta } from "./playwright-csharp-xunit/xunitProjectMeta";

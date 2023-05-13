@@ -1,13 +1,13 @@
 import { ISourceProjectMetadata, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
-import { createDotnetProjectMetadata } from "../playwright-charp/createDotnetProjectMetadata";
+import { createDotnetProjectMetadata } from "../playwright-charp-common/createDotnetProjectMetadata";
 import {
   IOutputProjectMetadataProcessor,
   createMapForPages,
   createMapForTestCases,
   createMapForTestRoutines,
   createMapForTestSuites,
-} from "../playwright-charp/outputProjectMetadataProcessor";
+} from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { IOutputFileInfo, IOutputProjectMetadata } from "../types";
 
 export class XUnitProjectMeta implements IOutputProjectMetadataProcessor {
