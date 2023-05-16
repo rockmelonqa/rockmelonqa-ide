@@ -8,7 +8,7 @@
   "main": "dist/index.js",
   "scripts": {
     "nodemon": "nodemon",
-    "start": "npm run compile && electron .",
+    "start": "npm run compile && electron --inspect=5858 .",
     "svelte:dev": "cd svelte && npm run dev",
     "svelte:build": "cd svelte && npm run build",
     "common:build": "cd common && npm run build",

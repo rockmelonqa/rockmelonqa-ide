@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog } from "electron";
+import { app, BrowserWindow, dialog, Menu, MenuItem } from "electron";
 import os from "os";
 import path from "path";
 import {
@@ -17,6 +17,10 @@ import {
 import * as fileSystem from "../utils/fileSystem";
 import { IChannels } from "./core/channelsInterface";
 import IPC from "./core/ipc";
+import { store } from "../utils/appStore";
+import applicationMenu from "../applicationMenu";
+import getMenuTemplate from "../applicationMenu";
+import isDev from "electron-is-dev";
 
 const nameAPI = "application";
 
@@ -42,6 +46,9 @@ const validReceiveChannel: string[] = ["createNewProject", "loadProject", "quit"
 class ApplicationIPC extends IPC {
   async openProject(browserWindow: BrowserWindow) {
     await openProject(browserWindow);
+  }
+  closeProject(browserWindow: BrowserWindow) {
+
   }
   quit(browserWindow: BrowserWindow) {
     quit(browserWindow);
@@ -180,6 +187,30 @@ async function openProject(browserWindow: BrowserWindow, event?: Electron.IpcMai
     };
 
     response = { isSuccess: true, data: data };
+    
+    let menu = Menu.getApplicationMenu();
+    let closeProjectMenu = menu?.items.find(i => i.role?.toLowerCase() == 'filemenu')?.submenu?.items.find(i => i.label == "Close Project");
+    if(closeProjectMenu != null ) {
+      (closeProjectMenu as MenuItem).enabled = true;
+    }
+    Menu.setApplicationMenu(menu);
+    debugger;
+    //let template = getMenuTemplate(isDev, true);
+    //let applicationMenu = Menu.buildFromTemplate();
+    // try {
+    // const applicationMenu = Menu.buildFromTemplate(getMenuTemplate(isDev, true));
+    // Menu.setApplicationMenu(applicationMenu);
+    // } catch(ex) {
+    //   console.info(ex);
+    // }
+
+    //store.set("openSelectedProject", true);
+    //let menu = applicationMenu;
+    //if(menu != null) {
+      // let closeProjectMenuItem = (menu.items.find((item) => item.role == "fileMenu")?.submenu?.items.find((item) => item.label == "Close Project"));
+      // (closeProjectMenuItem as MenuItem).enabled = true;
+      // Menu.setApplicationMenu(menu);
+    //}
   } catch (error) {
     response = { isSuccess: false, errorCode: "InvalidFile", errorMessage: "Invalid file" };
   }
@@ -188,6 +219,7 @@ async function openProject(browserWindow: BrowserWindow, event?: Electron.IpcMai
 }
 
 async function quit(browserWindow: BrowserWindow) {
+  store.set("openSelectedProject", false);
   browserWindow.webContents.send("quit");
 }
 
