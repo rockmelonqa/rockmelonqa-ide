@@ -225,6 +225,11 @@
         });
 
         dispatchChange();
+        
+        setTimeout(() => {
+            document.getElementById(`${formContext.formName}_${$listData.items.length - 1}_name_input`)?.focus();
+        }, 1);
+        
     };
     const handleInsertElement = (index: number) => {
         listDataDispatch({
@@ -234,6 +239,9 @@
         });
 
         dispatchChange();
+        setTimeout(() => {
+            document.getElementById(`${formContext.formName}_${index + 1}_name_input`)?.focus();
+        }, 1);
     };
     const newElement = (): IPageElement => {
         return {
@@ -293,6 +301,7 @@
         formDataDispatch({ type: FormDataActionType.ShowAllErrors });
         return false;
     };
+
 </script>
 
 <div class="page-definition-editor p-8">
