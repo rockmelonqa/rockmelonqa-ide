@@ -156,6 +156,7 @@ export const stringResEn: IStringRes = {
         deleteRowConfirmation: "Are you sure to delete this row?",
         description: "Description",
         elementName: "Element Name",
+        elementNameValidateMessage: "Cannot contain spaces or special characters",
         findBy: "Find By",
         locator: "Locator",
         name: "Name",

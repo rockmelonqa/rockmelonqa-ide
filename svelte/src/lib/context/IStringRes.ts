@@ -148,6 +148,7 @@ export interface IPageDefinitionEditorStringRes {
     deleteRowConfirmation: string;
     description: string;
     elementName: string;
+    elementNameValidateMessage: string;
     findBy: string;
     locator: string;
     name: string;
