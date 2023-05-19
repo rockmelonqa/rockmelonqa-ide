@@ -87,9 +87,6 @@
                 dataType: FieldDataType.Text,
                 dataPath: "name",
                 maxLength: 200,
-                onValidate(fieldName, fieldValue, fieldValues, uiContext) {
-                    return validateElementName(fieldValue);
-                },
             },
             findBy: {
                 dataType: FieldDataType.Dropdown,
@@ -280,7 +277,7 @@
     };
 
     const doSave = async (): Promise<boolean> => {
-        if ($formData.isValid && !hasInvalidElementName()) {
+        if (isDataValid) {
             const serializer = new FormSerializer(uiContext);
             const model = serializer.serialize($formData.values, formDef.fields);
 
@@ -297,17 +294,13 @@
         return false;
     };
 
-    const validateElementName = (elementName: string) => {
-        const specialCharacters = [" "];
-        const fieldValueInArray = Array.from(elementName);
-        if (specialCharacters.some((c) => fieldValueInArray.indexOf(c) >= 0)) {
-            return uiContext.str(stringResKeys.pageDefinitionEditor.elementNameValidateMessage);
-        }
-
-        return "";
+    const isElementNameValid = (elementName: string) => {
+        const regex = /^[A-Za-z0-9]+$/;
+        return regex.test(elementName);
     };
 
-    $: hasInvalidElementName = () => $listData.items.find(item => validateElementName(item.name)) != null;
+    $: isListDataValid = $listData.items.every((item) => isElementNameValid(item.name));
+    $: isDataValid = $formData.isValid && isListDataValid;
 </script>
 
 <div class="page-definition-editor p-8">
@@ -366,7 +359,9 @@
                                 name={`${formContext.formName}_${index}_name`}
                                 value={item.name}
                                 on:input={(event) => handleItemChange(index, "name", event.detail.value)}
-                                errorMessage={validateElementName(item.name)}
+                                errorMessage={isElementNameValid(item.name)
+                                    ? ""
+                                    : uiContext.str(stringResKeys.pageDefinitionEditor.elementNameInvalidMessage)}
                             />
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Normal}>
@@ -449,11 +444,7 @@
         </IconLinkButton>
 
         <div class="ml-auto">
-            <PrimaryButton
-                on:click={handleSave}
-                disabled={hasInvalidElementName()}
-                class={hasInvalidElementName() ? "disabled" : ""}
-            >
+            <PrimaryButton on:click={handleSave} disabled={!isDataValid}>
                 <span class="flex items-center gap-x-2">
                     <SaveIcon class="w-5 h-5" />
                     {uiContext.str(stringResKeys.general.save)}

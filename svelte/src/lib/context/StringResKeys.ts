@@ -112,7 +112,7 @@ export const stringResKeys = {
         deleteRowConfirmation: "pageDefinitionEditor.deleteRowConfirmation",
         description: "pageDefinitionEditor.description",
         elementName: "pageDefinitionEditor.elementName",
-        elementNameValidateMessage: "pageDefinitionEditor.elementNameValidateMessage",
+        elementNameInvalidMessage: "pageDefinitionEditor.elementNameInvalidMessage",
         findBy: "pageDefinitionEditor.findBy",
         locator: "pageDefinitionEditor.locator",
         name: "pageDefinitionEditor.name",
