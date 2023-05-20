@@ -358,6 +358,7 @@
                             <TextField
                                 name={`${formContext.formName}_${index}_name`}
                                 value={item.name}
+                                autoFocus={true}
                                 on:input={(event) => handleItemChange(index, "name", event.detail.value)}
                                 errorMessage={isElementNameValid(item.name)
                                     ? ""

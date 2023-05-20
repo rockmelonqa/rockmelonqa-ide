@@ -16,6 +16,7 @@
     export let readonly: boolean = false;
     export let disabled: boolean = false;
     export let errorMessage: string = '';
+    export let autoFocus: boolean = false;
 
     $: displayLabel = label.length > 0;
 
@@ -46,6 +47,16 @@
         const value = inputElement.value;
         dispatch("input", { value });
     };
+
+    /**
+     * On init TextField
+     * @param el
+     */
+    const onInit = (el: any) => {
+        if(autoFocus) {
+            el.focus();
+        }
+    }
 </script>
 
 <div id={rootId} class="text-field-root {thisTheme.root}">
@@ -71,6 +82,7 @@
             {...$$restProps}
             on:input={handleInput}
             on:keyup
+            use:onInit
         />
         {#if $$slots.suffix}
             <div class={thisTheme?.suffixContainer}>
