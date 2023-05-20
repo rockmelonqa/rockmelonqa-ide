@@ -14,6 +14,7 @@
     export let name: string;
     export let value: string;
     export let placeholder = '';
+    export let autoFocus: boolean = false;
 
     //*****************************************
     // Init
@@ -39,6 +40,16 @@
         const value = inputElement.value;
         dispatch('input', { value });
     };
+
+    /**
+     * On init CommentTextField
+     * @param el Input Element
+     */
+    const onInit= (el: any) => {
+        if(autoFocus) {
+            el.focus();
+        }
+    }
 </script>
 
 <div id={rootId} class="text-field-root {thisTheme.root}">
@@ -66,6 +77,7 @@
                 on:focus={() => (isFocus = true)}
                 on:blur={() => (isFocus = false)}
                 on:keyup
+                use:onInit
             />
         </div>
     </div>

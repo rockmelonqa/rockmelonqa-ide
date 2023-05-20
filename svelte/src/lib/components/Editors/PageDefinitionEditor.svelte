@@ -351,6 +351,7 @@
                                 value={item.comment}
                                 placeholder={uiContext.str(stringResKeys.pageDefinitionEditor.comment)}
                                 on:input={(event) => handleItemChange(index, "comment", event.detail.value)}
+                                autoFocus={true}
                             />
                         </ListTableBodyCell>
                     {:else}
