@@ -26,7 +26,7 @@
     import { getLocatorTypeDropDownOptions } from "$lib/utils/dropdowns";
     import { fileDefFactory } from "rockmelonqa.common";
     import type { IPage, IPageElement } from "rockmelonqa.common/file-defs/pageFile";
-    import { createEventDispatcher, getContext, onMount } from "svelte";
+    import { createEventDispatcher, getContext, onMount, tick } from "svelte";
     import { v4 as uuidv4 } from "uuid";
     import { AlertDialogButtons, AlertDialogType } from "../Alert";
     import AlertDialog from "../AlertDialog.svelte";
@@ -117,6 +117,8 @@
 
     const { registerOnSaveHandler, unregisterOnSaveHandler } = getContext(appActionContextKey) as IAppActionContext;
     const dispatch = createEventDispatcher();
+
+    let focusFieldId = '';
 
     onMount(async () => {
         // default/empty data
@@ -218,6 +220,8 @@
     };
 
     const handleAddElement = () => {
+        focusFieldId = `pageDefinitionEditor_${$listData.items.length}_name_input`;
+
         listDataDispatch({
             type: ListDataActionType.AppendItems,
             items: [newElement()],
@@ -227,6 +231,8 @@
         dispatchChange();
     };
     const handleInsertElement = (index: number) => {
+        focusFieldId = `pageDefinitionEditor_${index + 1}_name_input`;
+
         listDataDispatch({
             type: ListDataActionType.InsertItem,
             item: newElement(),
@@ -247,6 +253,8 @@
     };
 
     const handleAddComment = () => {
+        focusFieldId = `pageDefinitionEditor_${$listData.items.length}_comment_input`;
+
         listDataDispatch({
             type: ListDataActionType.AppendItems,
             items: [{ id: uuidv4(), type: "comment", comment: "" } as IPageElement],
@@ -255,7 +263,9 @@
 
         dispatchChange();
     };
-    const handleInsertComment = (index: number) => {
+    const handleInsertComment = async (index: number) => {
+        focusFieldId = `pageDefinitionEditor_${index + 1}_comment_input`;
+        
         listDataDispatch({
             type: ListDataActionType.InsertItem,
             item: newComment(),
@@ -277,7 +287,7 @@
     };
 
     const doSave = async (): Promise<boolean> => {
-        if (isDataValid) {
+        if ($formData.isValid) {
             const serializer = new FormSerializer(uiContext);
             const model = serializer.serialize($formData.values, formDef.fields);
 
@@ -293,14 +303,6 @@
         formDataDispatch({ type: FormDataActionType.ShowAllErrors });
         return false;
     };
-
-    const isElementNameValid = (elementName: string) => {
-        const regex = /^[A-Za-z0-9]+$/;
-        return regex.test(elementName);
-    };
-
-    $: isListDataValid = $listData.items.every((item) => isElementNameValid(item.name));
-    $: isDataValid = $formData.isValid && isListDataValid;
 </script>
 
 <div class="page-definition-editor p-8">
@@ -342,7 +344,7 @@
             </ListTableHeaderCell>
         </svelte:fragment>
         <svelte:fragment slot="body">
-            {#each $listData.items as item, index}
+            {#each $listData.items as item, index (item.id)}
                 <ListTableBodyRow>
                     {#if isComment(item)}
                         <ListTableBodyCell type={ListTableCellType.First} colspan={4}>
@@ -351,6 +353,7 @@
                                 value={item.comment}
                                 placeholder={uiContext.str(stringResKeys.pageDefinitionEditor.comment)}
                                 on:input={(event) => handleItemChange(index, "comment", event.detail.value)}
+                                focus={`${formContext.formName}_${index}_comment_input` === focusFieldId}
                             />
                         </ListTableBodyCell>
                     {:else}
@@ -359,9 +362,7 @@
                                 name={`${formContext.formName}_${index}_name`}
                                 value={item.name}
                                 on:input={(event) => handleItemChange(index, "name", event.detail.value)}
-                                errorMessage={isElementNameValid(item.name)
-                                    ? ""
-                                    : uiContext.str(stringResKeys.pageDefinitionEditor.elementNameInvalidMessage)}
+                                focus={`${formContext.formName}_${index}_name_input` === focusFieldId}
                             />
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Normal}>
@@ -444,7 +445,7 @@
         </IconLinkButton>
 
         <div class="ml-auto">
-            <PrimaryButton on:click={handleSave} disabled={!isDataValid}>
+            <PrimaryButton on:click={handleSave}>
                 <span class="flex items-center gap-x-2">
                     <SaveIcon class="w-5 h-5" />
                     {uiContext.str(stringResKeys.general.save)}
