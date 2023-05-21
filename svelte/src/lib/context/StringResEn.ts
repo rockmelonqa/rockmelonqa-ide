@@ -73,7 +73,7 @@ export const stringResEn: IStringRes = {
     },
     deleteTestCaseConfirmationDialog: {
         dialogTitle: "Delete test case",
-        relatedSuitesMessage: "Test case is being used by following test suites. Do you want to remove it?",
+        relatedSuitesMessage: "This test case is being used by the following test suites. Do you want to remove it?",
     },
     fileExplorer: {
         newFile: "New File",
