@@ -1,4 +1,4 @@
-import type { LocatorType } from 'rockmelonqa.common';
+import type { LocatorType } from "rockmelonqa.common";
 
 export interface IPageElementData {
     id: string;
@@ -15,6 +15,12 @@ export interface IPageData {
 }
 
 export interface ITestCaseData {
+    id: string;
+    name: string;
+    filePath: string;
+}
+
+export interface ITestRoutineData {
     id: string;
     name: string;
     filePath: string;

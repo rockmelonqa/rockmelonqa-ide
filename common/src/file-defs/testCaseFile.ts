@@ -14,7 +14,9 @@ export interface ITestCaseFile extends Omit<IFileDef, "content"> {
 
 export interface ITestStep {
   id: string;
-  type: "testStep" | "comment";
+  type: "testStep" | "comment" | "routine";
+  routine?: string;
+  dataset?: string;
   page?: string;
   element?: string;
   action?: string;
