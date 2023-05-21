@@ -189,6 +189,7 @@ export interface ITestCaseEditorStringRes {
     action: string;
     actions: string;
     addComment: string;
+    addRoutine: string;
     addStep: string;
     comment: string;
     data: string;
@@ -197,6 +198,7 @@ export interface ITestCaseEditorStringRes {
     element: string;
     name: string;
     page: string;
+    routine: string;
 }
 
 export interface ITestRoutineStringRes {
@@ -210,6 +212,7 @@ export interface ITestRoutineStringRes {
     element: string;
     name: string;
     page: string;
+    routine: string;
     steps: string;
 }
 
