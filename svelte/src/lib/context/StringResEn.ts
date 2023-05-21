@@ -73,7 +73,7 @@ export const stringResEn: IStringRes = {
     },
     deleteTestCaseConfirmationDialog: {
         dialogTitle: "Delete test case",
-        relatedSuitesMessage: "Test case is being used by following test suites. Do you want to remove it?",
+        relatedSuitesMessage: "This test case is being used by the following test suites. Do you want to remove it?",
     },
     fileExplorer: {
         newFile: "New File",
@@ -156,6 +156,7 @@ export const stringResEn: IStringRes = {
         deleteRowConfirmation: "Are you sure to delete this row?",
         description: "Description",
         elementName: "Element Name",
+        elementNameInvalidMessage: "Only accepts a-z, A-Z, 0-9 characters",
         findBy: "Find By",
         locator: "Locator",
         name: "Name",

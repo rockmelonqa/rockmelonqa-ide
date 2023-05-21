@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import type { ITextFieldTheme, IUiTheme } from '$lib/context/UiTheme';
-    import { createEventDispatcher, getContext } from 'svelte';
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import type { ITextFieldTheme, IUiTheme } from "$lib/context/UiTheme";
+    import { createEventDispatcher, getContext, onMount } from "svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -10,11 +10,13 @@
     //*****************************************
     export let name: string;
     export let value: string;
-    export let label = '';
-    export let placeholder = '';
-    export let type = 'text';
+    export let label = "";
+    export let placeholder = "";
+    export let type = "text";
     export let readonly: boolean = false;
     export let disabled: boolean = false;
+    export let errorMessage: string = '';
+    export let focus: boolean = false;
 
     $: displayLabel = label.length > 0;
 
@@ -41,9 +43,16 @@
     //*****************************************
     // Events
     //*****************************************
+    onMount(() => {
+        if (focus) {
+            inputElement.focus();
+            inputElement.select();
+        }
+    });
+
     const handleInput = (e: any) => {
         const value = inputElement.value;
-        dispatch('input', { value });
+        dispatch("input", { value });
     };
 </script>
 
@@ -77,4 +86,7 @@
             </div>
         {/if}
     </div>
+    {#if errorMessage}
+        <p id={`${inputId}-error`} class="text-field-error absolute {thisTheme?.errorMessage}">{errorMessage}</p>
+    {/if}
 </div>
