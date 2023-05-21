@@ -41,6 +41,7 @@
     import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
     import { toTitle } from "./Editor";
+    import { FieldValidator } from "$lib/form/FieldValidator";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -87,14 +88,20 @@
                 dataType: FieldDataType.Text,
                 dataPath: "name",
                 maxLength: 200,
+                isRequired: true,
+                isRequiredErrorMessage: uiContext.str(stringResKeys.form.isRequiredError)
             },
             findBy: {
                 dataType: FieldDataType.Dropdown,
                 dataPath: "findBy",
+                isRequired: true,
+                isRequiredErrorMessage: uiContext.str(stringResKeys.form.isRequiredError)
             },
             locator: {
                 dataType: FieldDataType.Text,
                 dataPath: "locator",
+                isRequired: true,
+                isRequiredErrorMessage: uiContext.str(stringResKeys.form.isRequiredError)
             },
             description: {
                 dataType: FieldDataType.Text,
@@ -117,7 +124,7 @@
 
     const { registerOnSaveHandler, unregisterOnSaveHandler } = getContext(appActionContextKey) as IAppActionContext;
     const dispatch = createEventDispatcher();
-
+    const fieldValidator = new FieldValidator(uiContext);
     let focusFieldId = '';
 
     onMount(async () => {
@@ -363,6 +370,7 @@
                                 value={item.name}
                                 on:input={(event) => handleItemChange(index, "name", event.detail.value)}
                                 focus={`${formContext.formName}_${index}_name_input` === focusFieldId}
+                                errorMessage={fieldValidator.validateField('name', item.name, listDef.fields['name'], item) ?? ''}
                             />
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Normal}>
@@ -371,6 +379,7 @@
                                 value={item.findBy}
                                 options={locatorTypeOptions}
                                 on:change={(event) => handleItemChange(index, "findBy", event.detail.value)}
+                                errorMessage={fieldValidator.validateField('findBy', item.findBy, listDef.fields['findBy'], item) ?? ''}
                             />
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Normal}>
@@ -378,6 +387,7 @@
                                 name={`${formContext.formName}_${index}_locator`}
                                 value={item.locator}
                                 on:input={(event) => handleItemChange(index, "locator", event.detail.value)}
+                                errorMessage={fieldValidator.validateField('locator', item.locator, listDef.fields['locator'], item) ?? ''}
                             />
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Last}>
