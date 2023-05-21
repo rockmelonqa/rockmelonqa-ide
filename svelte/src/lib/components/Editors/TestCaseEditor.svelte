@@ -23,6 +23,7 @@
     import DeleteIcon from "$lib/icons/DeleteIcon.svelte";
     import MoveDownIcon from "$lib/icons/MoveDownIcon.svelte";
     import MoveUpIcon from "$lib/icons/MoveUpIcon.svelte";
+    import RoutineIcon from "$lib/icons/RoutineIcon.svelte";
     import SaveIcon from "$lib/icons/SaveIcon.svelte";
     import { fileSystem } from "$lib/ipc";
     import { getActionTypeDropDownOptions } from "$lib/utils/dropdowns";
@@ -42,6 +43,7 @@
     import ListTableBodyRow from "../ListTableBodyRow.svelte";
     import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
+    import RoutineDropDown from "../RoutineDropDown.svelte";
     import { toTitle } from "./Editor";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
@@ -113,6 +115,14 @@
                 dataType: FieldDataType.Text,
                 dataPath: "comment",
             },
+            routine: {
+                dataType: FieldDataType.Text,
+                dataPath: "routine",
+            },
+            dataset: {
+                dataType: FieldDataType.Text,
+                dataPath: "dataset",
+            },
         },
     };
     let listDataContext = createListDataContext(listDef, uiContext);
@@ -165,6 +175,7 @@
         formDataDispatch({ type: FormDataActionType.Load, newValues: fieldValues });
 
         const items = serializer.deserializeList(model.steps, listDef.fields);
+        console.log("Initial data", items);
         listDataDispatch({ type: ListDataActionType.SetItems, items: items, hasMoreItems: false });
 
         registerOnSaveHandler(contentIndex, doSave);
@@ -178,12 +189,17 @@
         return (item as ITestStep).type === "comment";
     };
 
+    const isTestRoutine = (item: IDictionary) => {
+        return (item as ITestStep).type === "routine";
+    };
+
     const pagelessActions = [
         ActionType.ClosePopup.toString(),
         ActionType.Delay.toString(),
         ActionType.GoToUrl.toString(),
         ActionType.RunCode.toString(),
     ];
+
     const isPagelessAction = (action: string) => {
         return pagelessActions.includes(action);
     };
@@ -325,6 +341,17 @@
 
         dispatchChange();
     };
+
+    const handleAddRoutine = () => {
+        listDataDispatch({
+            type: ListDataActionType.AppendItems,
+            items: [newRoutine()],
+            hasMoreItems: false,
+        });
+
+        dispatchChange();
+    };
+
     const handleInsertComment = (index: number) => {
         listDataDispatch({
             type: ListDataActionType.InsertItem,
@@ -336,6 +363,9 @@
     };
     const newComment = (): ITestStep => {
         return { id: uuidv4(), type: "comment", comment: "" } as ITestStep;
+    };
+    const newRoutine = (): ITestStep => {
+        return { id: uuidv4(), type: "routine", routine: "" } as ITestStep;
     };
 </script>
 
@@ -387,6 +417,16 @@
                                 value={item.comment}
                                 placeholder={uiContext.str(stringResKeys.testCaseEditor.comment)}
                                 on:input={(event) => handleItemChange(index, "comment", event.detail.value)}
+                            />
+                        </ListTableBodyCell>
+                    {:else if isTestRoutine(item)}
+                        <ListTableBodyCell type={ListTableCellType.First} colspan={4}>
+                            <RoutineDropDown
+                                name={`${formContext.formName}_${index}_routine`}
+                                routine={item.routine}
+                                dataset={item.dataset}
+                                on:selectRoutine={(event) => handleItemChange(index, "routine", event.detail.value)}
+                                on:selectDataset={(event) => handleItemChange(index, "dataset", event.detail.value)}
                             />
                         </ListTableBodyCell>
                     {:else}
@@ -473,8 +513,15 @@
             </svelte:fragment>
         </IconLinkButton>
         <span>|</span>
+        <IconLinkButton on:click={handleAddRoutine}>
+            <svelte:fragment slot="icon"><RoutineIcon /></svelte:fragment>
+            <svelte:fragment slot="label">
+                {uiContext.str(stringResKeys.testCaseEditor.addRoutine)}
+            </svelte:fragment>
+        </IconLinkButton>
+        <span>|</span>
         <IconLinkButton on:click={handleAddComment}>
-            <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
+            <svelte:fragment slot="icon"><RoutineIcon /></svelte:fragment>
             <svelte:fragment slot="label">
                 {uiContext.str(stringResKeys.testCaseEditor.addComment)}
             </svelte:fragment>
