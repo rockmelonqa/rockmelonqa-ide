@@ -4,7 +4,7 @@ import fs from "fs";
 import fse from "fs-extra";
 import { v4 as uuidv4 } from "uuid";
 import { StandardFolder } from "../../src/file-defs/standardFolder";
-import { IPage, ITestCase, ITestSuite, OutputCodeFile, RmpSpec } from "./rm-project-spec.types";
+import { IPage, ITestCase, ITestSuite, ITestRoutine, OutputCodeFile, RmpSpec } from "./rm-project-spec.types";
 import { IRmProj, IRmProjFile, StandardFileExtension } from "../../src";
 import { createDir, writeFile } from "./fsHelpers";
 
@@ -17,10 +17,11 @@ export const createRmTestProject = (rmpSpec: RmpSpec, projectDir: string): IRmPr
     fileName: "test.rmproj",
     folderPath: projectDir,
   };
+
   writeCustomCode(projectDir);
   writePages(rmpSpec.pages, projectDir);
+  writeTestRoutines(rmpSpec.testroutines, rmpSpec.pages, rmpSpec.testcases, projectDir);
   writeTestCases(rmpSpec.testcases, rmpSpec.pages, rmpSpec.testsuites, projectDir);
-  wrriteTestRoutines(projectDir);
   writeTestSuites(rmpSpec.testsuites, projectDir);
   wrriteTestProjectFile(rmpSpec.content, rmpSpec.projectName, projectDir);
 
@@ -33,11 +34,6 @@ const writeCustomCode = (projectDir: string) => {
   const dir = path.join(projectDir, StandardFolder.CustomCode);
   createDir(dir);
   // TODO: not test custom code yet
-};
-const wrriteTestRoutines = (projectDir: string) => {
-  const dir = path.join(projectDir, StandardFolder.TestRoutines);
-  createDir(dir);
-  // TODO: not test routines yet
 };
 
 const wrriteTestProjectFile = (rmProj: IRmProj, projectName: string, projectDir: string) => {
@@ -88,6 +84,7 @@ const writeTestCases = (cases: ITestCase[], pages: IPage[], suites: ITestSuite[]
     tcase.id = newCaseId;
 
     for (let step of tcase.steps) {
+      if (step.type !== "testStep") continue;
       step.id = uuidv4();
       step.element = step.page && step.element ? elementMapOfMap.get(step.page)?.get(step.element) : "";
       step.page = step.page ? pageIdHashMap.get(step.page) : "";
@@ -120,6 +117,86 @@ const updateTestCaseIdInSuite = (suites: ITestSuite[], caseName: string, newCase
   }
 };
 
+const writeTestRoutines = (routines: ITestRoutine[], pages: IPage[], testcases: ITestCase[], projectDir: string) => {
+  const dir = path.join(projectDir, StandardFolder.TestRoutines);
+  createDir(dir);
+
+  const pageIdHashMap = new Map(pages.map((p) => [p.name, p.id]));
+  const elementMapOfMap = new Map(pages.map((p) => [p.name, new Map(p.elements.map((el) => [el.name, el.id]))]));
+
+  for (let routine of routines) {
+    let newId = uuidv4();
+    updateTestRoutineIdInTestCases(testcases, routine.name!, newId);
+    routine.id = newId;
+
+    for (let dataset of routine.dataSets) {
+      dataset.id = uuidv4();
+    }
+
+    for (let step of routine.steps) {
+      if (step.type !== "testStep") continue;
+      step.id = uuidv4();
+      step.element = step.page && step.element ? elementMapOfMap.get(step.page)?.get(step.element) : "";
+      step.page = step.page ? pageIdHashMap.get(step.page) : "";
+
+      let newData = new Map<string, string>();
+
+      for (const [key, value] of Object.entries(step.data!)) {
+        let datasetId = "";
+        for (let dataset of routine.dataSets) {
+          if (dataset.name === key) {
+            datasetId = dataset.id;
+          }
+        }
+        newData.set(datasetId, value);
+      }
+
+      step.data = Object.fromEntries(newData);
+    }
+
+    updateDataSetIdInTestCases(testcases, routine);
+
+    let routinePath = path.join(dir, routine.name!.replaceAll("_", path.sep) + StandardFileExtension.TestRoutine);
+    let targetDir = path.dirname(routinePath);
+    createDir(targetDir);
+    let c = clone(routine);
+    delete c.name;
+
+    // To test for empty file
+    if (routine.name?.startsWith("empty")) {
+      fs.writeFileSync(routinePath, "");
+      continue;
+    }
+
+    writeFile(c, routinePath);
+  }
+};
+
+const updateDataSetIdInTestCases = (testcases: ITestCase[], routine: ITestRoutine) => {
+  for (let testcase of testcases) {
+    for (let step of testcase.steps) {
+      if (step.type != "routine") continue;
+      if (step.routine === routine.id) {
+        for (let dataset of routine.dataSets) {
+          if (dataset.name === step.dataset) {
+            step.dataset = dataset.id;
+            return;
+          }
+        }
+      }
+    }
+  }
+};
+const updateTestRoutineIdInTestCases = (testcases: ITestCase[], manualName: string, newRoutineId: string) => {
+  for (let testcase of testcases) {
+    for (let step of testcase.steps) {
+      if (step.type !== "routine") continue;
+      if (step.routine === manualName) {
+        step.routine = newRoutineId;
+      }
+    }
+  }
+};
 const writeTestSuites = (suites: ITestSuite[], projectDir: string) => {
   const suitesDir = path.join(projectDir, StandardFolder.TestSuites);
   createDir(suitesDir);
@@ -131,7 +208,7 @@ const writeTestSuites = (suites: ITestSuite[], projectDir: string) => {
     createDir(targetDir);
     let c = clone(suite);
     delete c.name;
-    
+
     // To test for empty file
     if (suite.name?.startsWith("empty")) {
       fs.writeFileSync(suitePath, "");

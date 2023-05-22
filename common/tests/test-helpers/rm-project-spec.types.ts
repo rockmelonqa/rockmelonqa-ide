@@ -1,4 +1,4 @@
-import { AutomationFramework, Indent, IRmProj, ITestStep, Language, LocatorType, TestFramework } from "../../src/file-defs";
+import { AutomationFramework, Indent, IRmProj, ITestCaseStep, Language, LocatorType, TestFramework } from "../../src/file-defs";
 import { IPageElement } from "../../src/file-defs/pageFile";
 
 export interface RmpSpec {
@@ -7,6 +7,7 @@ export interface RmpSpec {
   pages: IPage[];
   testcases: ITestCase[];
   testsuites: ITestSuite[];
+  testroutines: ITestRoutine[];
   outputFiles?: OutputCodeFile[];
 }
 
@@ -26,7 +27,15 @@ export interface ITestCase {
   id: string;
   name?: string;
   description: string;
-  steps: ITestStep[];
+  steps: ITestCaseStep[];
+}
+
+export interface ITestRoutine {
+  id: string;
+  name?: string;
+  description: string;
+  steps: ITestCaseStep[];
+  dataSets: { id: string; name: string; description: string }[];
 }
 
 export interface ITestSuite {

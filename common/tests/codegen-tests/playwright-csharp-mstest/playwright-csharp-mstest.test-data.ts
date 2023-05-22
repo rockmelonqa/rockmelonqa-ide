@@ -17,6 +17,7 @@ export const createPlaywrightMsTestTestData = (): RmpSpec => {
       rootNamespace: "",
       indent: Indent.Spaces,
       indentSize: 4,
+      testIdAttributeName: "",
     },
     // The page collection:
     // - Don't have to specify id (guid) for pages or elements. It will be auto-generated during test Arrange
@@ -60,6 +61,12 @@ export const createPlaywrightMsTestTestData = (): RmpSpec => {
         name: "click",
         description: "Do click",
         steps: [
+          {
+            id: "",
+            type: "routine",
+            routine: "R1Login",
+            dataset: "DataSet2",
+          },
           {
             id: "",
             type: "testStep",
@@ -113,7 +120,44 @@ export const createPlaywrightMsTestTestData = (): RmpSpec => {
         id: "",
         name: "empty",
         description: "",
+        steps: [],
+      },
+    ],
+    testroutines: [
+      {
+        id: "",
+        name: "R1Login",
+        description: "R1 Login",
         steps: [
+          {
+            id: "",
+            type: "testStep",
+            page: "google/home",
+            element: "input",
+            action: "Clear",
+            data: {
+              DataSet1: "AAA",
+              DataSet2: "BBB",
+              DataSet3: "CCC",
+            },
+          },
+        ],
+        dataSets: [
+          {
+            id: "",
+            name: "DataSet1",
+            description: "One",
+          },
+          {
+            id: "",
+            name: "DataSet2",
+            description: "Two",
+          },
+          {
+            id: "",
+            name: "DataSet3",
+            description: "Three",
+          },
         ],
       },
     ],
