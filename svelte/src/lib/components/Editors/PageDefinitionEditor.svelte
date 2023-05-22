@@ -26,7 +26,7 @@
     import { getLocatorTypeDropDownOptions } from "$lib/utils/dropdowns";
     import { fileDefFactory } from "rockmelonqa.common";
     import type { IPage, IPageElement } from "rockmelonqa.common/file-defs/pageFile";
-    import { createEventDispatcher, getContext, onMount, tick } from "svelte";
+    import { createEventDispatcher, getContext, onMount } from "svelte";
     import { v4 as uuidv4 } from "uuid";
     import { AlertDialogButtons, AlertDialogType } from "../Alert";
     import AlertDialog from "../AlertDialog.svelte";
@@ -270,9 +270,9 @@
 
         dispatchChange();
     };
-    const handleInsertComment = async (index: number) => {
+    const handleInsertComment = (index: number) => {
         focusFieldId = `pageDefinitionEditor_${index + 1}_comment_input`;
-        
+
         listDataDispatch({
             type: ListDataActionType.InsertItem,
             item: newComment(),
@@ -294,7 +294,7 @@
     };
 
     const doSave = async (): Promise<boolean> => {
-        if ($formData.isValid) {
+        if (isDataValid) {
             const serializer = new FormSerializer(uiContext);
             const model = serializer.serialize($formData.values, formDef.fields);
 
@@ -310,6 +310,39 @@
         formDataDispatch({ type: FormDataActionType.ShowAllErrors });
         return false;
     };
+
+    const isElementNameValid = (elementName: string) => {
+        if (elementName) {
+            const regex = /^[A-Za-z0-9]+$/;
+            return regex.test(elementName);
+        }
+
+        return true;
+    };
+
+    const elementNameErrorMessage = (item: IDictionary) => {
+        const isNameValid = isElementNameValid(item.name);
+        if(!isNameValid) {
+            return uiContext.str(stringResKeys.pageDefinitionEditor.elementNameInvalidMessage);
+        }
+        return fieldValidator.validateField('name', item.name, listDef.fields['name'], item)
+    }
+
+    const locatorErrorMessage = (item: IDictionary) => {
+        return fieldValidator.validateField('locator', item.locator, listDef.fields['locator'], item);
+    }
+
+    const findByErrorMessage = (item: IDictionary) => {
+        return fieldValidator.validateField('findBy', item.findBy, listDef.fields['findBy'], item);
+    }
+
+    $: isListDataValid = $listData.items.every((item) => 
+        isElementNameValid(item.name) 
+        && elementNameErrorMessage(item)
+        && locatorErrorMessage(item)
+        && findByErrorMessage(item));
+
+    $: isDataValid = $formData.isValid && isListDataValid;
 </script>
 
 <div class="page-definition-editor p-8">
@@ -369,8 +402,8 @@
                                 name={`${formContext.formName}_${index}_name`}
                                 value={item.name}
                                 on:input={(event) => handleItemChange(index, "name", event.detail.value)}
+                                errorMessage={elementNameErrorMessage(item) ?? ''}
                                 focus={`${formContext.formName}_${index}_name_input` === focusFieldId}
-                                errorMessage={fieldValidator.validateField('name', item.name, listDef.fields['name'], item) ?? ''}
                             />
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Normal}>
@@ -379,7 +412,7 @@
                                 value={item.findBy}
                                 options={locatorTypeOptions}
                                 on:change={(event) => handleItemChange(index, "findBy", event.detail.value)}
-                                errorMessage={fieldValidator.validateField('findBy', item.findBy, listDef.fields['findBy'], item) ?? ''}
+                                errorMessage={findByErrorMessage(item) ?? ''}
                             />
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Normal}>
@@ -387,7 +420,7 @@
                                 name={`${formContext.formName}_${index}_locator`}
                                 value={item.locator}
                                 on:input={(event) => handleItemChange(index, "locator", event.detail.value)}
-                                errorMessage={fieldValidator.validateField('locator', item.locator, listDef.fields['locator'], item) ?? ''}
+                                errorMessage={locatorErrorMessage(item) ?? ''}
                             />
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Last}>
@@ -455,7 +488,7 @@
         </IconLinkButton>
 
         <div class="ml-auto">
-            <PrimaryButton on:click={handleSave}>
+            <PrimaryButton on:click={handleSave} disabled={!isDataValid}>
                 <span class="flex items-center gap-x-2">
                     <SaveIcon class="w-5 h-5" />
                     {uiContext.str(stringResKeys.general.save)}
