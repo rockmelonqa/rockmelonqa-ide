@@ -113,7 +113,7 @@
             projectFile.content.name,
             `${projectFile.folderPath}${uiContext.pathSeparator}${projectFile.fileName}`
         );
-
+        application.onProjectLoaded();
         goto(NavRoute.HOME);
     };
 

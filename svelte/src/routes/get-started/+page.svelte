@@ -59,6 +59,7 @@
                     folderPath: parentPath,
                 };
                 await loadProject(projectFile);
+                application.onProjectLoaded();
                 return; // exit as success
             } catch (error) {
                 errorMessage = 'Invalid file';

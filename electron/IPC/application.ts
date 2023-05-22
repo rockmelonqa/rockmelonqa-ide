@@ -38,17 +38,18 @@ const validInvokeChannel: IChannels = {
   getEnvironmentInfo: getEnvironmentInfo,
   getUserSettings: getUserSettings,
   createNewProject: createNewProject,
+  onProjectLoaded: onProjectLoaded
 };
 
 // from Main
-const validReceiveChannel: string[] = ["createNewProject", "loadProject", "quit"];
+const validReceiveChannel: string[] = ["createNewProject", "loadProject", "quit", "closeProject"];
 
 class ApplicationIPC extends IPC {
   async openProject(browserWindow: BrowserWindow) {
     await openProject(browserWindow);
   }
   closeProject(browserWindow: BrowserWindow) {
-
+    closeProject(browserWindow);
   }
   quit(browserWindow: BrowserWindow) {
     quit(browserWindow);
@@ -100,6 +101,11 @@ async function setUserSettings(browserWindow: BrowserWindow, event: Electron.Ipc
 
   const filePath = path.join(dirPath, USER_SETTINGS_FILE);
   await fileSystem.writeFile(filePath, JSON.stringify(data, null, 4));
+}
+function onProjectLoaded(
+  browserWindow: BrowserWindow,
+  event: Electron.IpcMainEvent){
+    enableCloseProjectMenu(true);
 }
 
 async function createNewProject(
@@ -187,30 +193,9 @@ async function openProject(browserWindow: BrowserWindow, event?: Electron.IpcMai
     };
 
     response = { isSuccess: true, data: data };
-    
-    let menu = Menu.getApplicationMenu();
-    let closeProjectMenu = menu?.items.find(i => i.role?.toLowerCase() == 'filemenu')?.submenu?.items.find(i => i.label == "Close Project");
-    if(closeProjectMenu != null ) {
-      (closeProjectMenu as MenuItem).enabled = true;
-    }
-    Menu.setApplicationMenu(menu);
-    debugger;
-    //let template = getMenuTemplate(isDev, true);
-    //let applicationMenu = Menu.buildFromTemplate();
-    // try {
-    // const applicationMenu = Menu.buildFromTemplate(getMenuTemplate(isDev, true));
-    // Menu.setApplicationMenu(applicationMenu);
-    // } catch(ex) {
-    //   console.info(ex);
-    // }
 
-    //store.set("openSelectedProject", true);
-    //let menu = applicationMenu;
-    //if(menu != null) {
-      // let closeProjectMenuItem = (menu.items.find((item) => item.role == "fileMenu")?.submenu?.items.find((item) => item.label == "Close Project"));
-      // (closeProjectMenuItem as MenuItem).enabled = true;
-      // Menu.setApplicationMenu(menu);
-    //}
+    enableCloseProjectMenu(true);
+
   } catch (error) {
     response = { isSuccess: false, errorCode: "InvalidFile", errorMessage: "Invalid file" };
   }
@@ -218,9 +203,22 @@ async function openProject(browserWindow: BrowserWindow, event?: Electron.IpcMai
   browserWindow.webContents.send("loadProject", response);
 }
 
+function enableCloseProjectMenu(enabled: boolean) {
+  let menu = Menu.getApplicationMenu();
+  let closeProjectMenu = menu?.items.find(i => i.role?.toLowerCase() == 'filemenu')?.submenu?.items.find(i => i.label == "Close Project");
+  if(closeProjectMenu != null ) {
+    (closeProjectMenu as MenuItem).enabled = enabled;
+  }
+  Menu.setApplicationMenu(menu);
+}
+
 async function quit(browserWindow: BrowserWindow) {
-  store.set("openSelectedProject", false);
   browserWindow.webContents.send("quit");
+}
+
+async function closeProject(browserWindow: BrowserWindow) {
+  enableCloseProjectMenu(false);
+  browserWindow.webContents.send("closeProject");
 }
 
 /**

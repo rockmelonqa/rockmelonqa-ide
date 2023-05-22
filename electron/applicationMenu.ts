@@ -35,7 +35,7 @@ const template = [
         enabled: false,
         click: async (menuItem: MenuItem, browserWindow: BrowserWindow | undefined) => {
           if (browserWindow) {
-            application.openProject(browserWindow);
+            application.closeProject(browserWindow);
           }
         },
       },

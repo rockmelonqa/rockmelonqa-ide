@@ -12,6 +12,9 @@
     import FileIcon from '../FileIcon.svelte';
     import { getFileType } from '../FileType';
     import type { ITab } from './Tab';
+    import { NavRoute } from '$lib/utils/NavRoute';
+    import { beforeNavigate, goto } from '$app/navigation';
+    import type { Navigation } from '@sveltejs/kit';
 
     const window = getWindow();
 
@@ -28,15 +31,19 @@
     let tabToClose: number;
 
     let closeAllDialogType: AlertDialogType = AlertDialogType.None;
+    let isClosingProject = false;
+    let noSaveWhenClosingProject = false;
 
     $: tabTitleContainerCss = 'tab-item-title-container pl-4 pr-2 py-3 flex items-center gap-x-3';
     $: tabContentCss = 'tab-item-content flex-1 overflow-y-auto';
 
     let cleanupFn: Action | undefined;
+    let cleanupOnCloseFn: Action | undefined;
 
     onMount(() => {
         cleanupFn = application.onQuit(quit);
-
+        cleanupOnCloseFn = application.onCloseProject(closeProject);
+        
         window!.addEventListener('beforeunload', handleBeforeUnload);
 
         // Enable horizontal scroll
@@ -48,6 +55,12 @@
         mounted = true;
     });
 
+    beforeNavigate((to: Navigation & { cancel: () => void }) => { 
+        if(noSaveWhenClosingProject) { return; }
+        isClosingProject = true;
+        handleBeforeNavigate(to);
+    })
+
     /** Determine whether there is dirty tab, to display save pending changes dialog */
     const handleBeforeUnload = (event: any) => {
         const hasDirtyTab = tabs.some((x) => x.isDirty);
@@ -58,6 +71,16 @@
             quit();
         }
     };
+
+    const handleBeforeNavigate = (to: Navigation & { cancel: () => void }) => {
+        const hasDirtyTab = tabs.some((x) => x.isDirty);
+        if (hasDirtyTab) {
+            to.cancel();
+            closeAllDialogType = AlertDialogType.Question;
+        } else {
+            closeProject();
+        }
+    }
 
     onDestroy(() => {
         if (cleanupFn) {
@@ -139,7 +162,13 @@
         if (button === 'no') {
             // Clear dirtay tab checking before quit
             window?.removeEventListener('beforeunload', handleBeforeUnload);
-            quit();
+            if(isClosingProject) {
+                tabs.forEach(tab => tab.isDirty = false);
+                noSaveWhenClosingProject = true;
+                closeProject();
+            } else {
+                quit();
+            }
             return;
         }
 
@@ -161,7 +190,11 @@
         }
 
         if (tabsToClose.length === tabs.length) {
-            quit();
+            if(isClosingProject) {
+                closeProject();
+            } else { 
+                quit();
+            }
         } else {
             appStateDispatch({ type: AppActionType.CloseTabs, tabIndexes: tabsToClose });
         }
@@ -170,6 +203,10 @@
     const quit = () => {
         window!.close();
     };
+
+    const closeProject = async () => {
+        goto(NavRoute.GET_STARTED);
+    }
 
     const setTabDirty = (tabIndex: number, isDirty: boolean) => {
         const needUpdate = tabs[tabIndex].isDirty !== isDirty;

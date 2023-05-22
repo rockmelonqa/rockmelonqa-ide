@@ -42,8 +42,19 @@ const onLoadProject = (
     return getApi(options?.apiKey).on('loadProject', fn);
 };
 
+const onProjectLoaded = (    
+    options?: { apiKey?: string }
+): Action | undefined => {
+    debugger;
+    return getApi(options?.apiKey).invoke('onProjectLoaded');
+};
+
 const onQuit = (fn: Action, options?: { apiKey?: string }): Action | undefined => {
     return getApi(options?.apiKey).on('quit', fn);
+};
+
+const onCloseProject = (fn: Action, options?: {apiKey?: string}) : Action | undefined => {
+    return getApi(options?.apiKey).on('closeProject', fn);
 };
 
 /**
@@ -61,5 +72,7 @@ export const application = {
     createNewProject,
     openProject,
     onLoadProject,
+    onProjectLoaded,
     onQuit,
+    onCloseProject
 };
