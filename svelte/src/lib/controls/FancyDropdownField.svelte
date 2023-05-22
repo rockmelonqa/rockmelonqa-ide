@@ -15,7 +15,7 @@
     export let name: string;
     export let value: string;
     export let options: IDropdownOption[];
-    export let errorMessage: string;
+    export let errorMessage: string = '';
 
     //*****************************************
     // Init
@@ -63,6 +63,6 @@
         />
     </div>
     {#if errorMessage}
-    <p id={`${selectId}-error`} class="dropdown-field-error absolute {dropdownTheme?.errorMessage}">{errorMessage}</p>
-{/if}
+        <p id={`${selectId}-error`} class="dropdown-field-error absolute {dropdownTheme?.errorMessage}">{errorMessage}</p>
+    {/if}
 </div>

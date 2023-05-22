@@ -38,6 +38,8 @@
     import ListTableHeaderCell from '../ListTableHeaderCell.svelte';
     import PrimaryButton from '../PrimaryButton.svelte';
     import { toTitle } from './Editor';
+    import { FieldValidator } from '$lib/form/FieldValidator';
+    import TestSuite from './TrxViewer/TestSuite.svelte';
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -78,6 +80,8 @@
             id: {
                 dataType: FieldDataType.Dropdown,
                 dataPath: 'id',
+                isRequired: true,
+                isRequiredErrorMessage: uiContext.str(stringResKeys.form.isRequiredError)
             },
         },
     };
@@ -89,6 +93,7 @@
     let indexToDelete: number;
 
     let testCaseOptions: IDropdownOption[] = [];
+    const fieldValidator = new FieldValidator(uiContext);
 
     const { registerOnSaveHandler, unregisterOnSaveHandler } = getContext(appActionContextKey) as IAppActionContext;
     const dispatch = createEventDispatcher();
@@ -134,7 +139,7 @@
     };
 
     const doSave = async (): Promise<boolean> => {
-        if ($formData.isValid) {
+        if (isDataValid) {
             const serializer = new FormSerializer(uiContext);
             const model = serializer.serialize($formData.values, formDef.fields);
 
@@ -237,6 +242,13 @@
 
         dispatchChange();
     };
+
+    const testCaseErrorMessage = (item: IDictionary) => {
+        return fieldValidator.validateField('id', item.id, listDef.fields['id'], item) ?? '';
+    }
+
+    $: isListDataValid = $listData.items.every((item) => testCaseErrorMessage(item));
+    $: isDataValid = $formData.isValid && isListDataValid;
 </script>
 
 <div class="test-case-editor p-8">
@@ -277,6 +289,7 @@
                             value={item.id}
                             options={testCaseOptions}
                             on:change={(event) => handleSelectTestCase(index, 'id', event.detail.value)}
+                            errorMessage={testCaseErrorMessage(item)}
                         />
                     </ListTableBodyCell>
 
@@ -318,7 +331,7 @@
         </IconLinkButton>
 
         <div class="ml-auto">
-            <PrimaryButton on:click={handleSave}>
+            <PrimaryButton on:click={handleSave} disabled={!isDataValid}>
                 <span class="flex items-center gap-x-2">
                     <SaveIcon class="w-5 h-5" />
                     {uiContext.str(stringResKeys.general.save)}

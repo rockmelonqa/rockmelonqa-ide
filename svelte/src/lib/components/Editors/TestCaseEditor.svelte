@@ -43,6 +43,7 @@
     import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
     import { toTitle } from "./Editor";
+    import { FieldValidator } from "$lib/form/FieldValidator";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -96,14 +97,24 @@
             page: {
                 dataType: FieldDataType.Dropdown,
                 dataPath: "page",
+                isRequired: (item: IDictionary) => {
+                    return !isPagelessAction(item.action);
+                },
+                isRequiredErrorMessage: uiContext.str(stringResKeys.form.isRequiredError)
             },
             element: {
                 dataType: FieldDataType.Dropdown,
                 dataPath: "element",
+                isRequired: (item: IDictionary) => {
+                    return !isPagelessAction(item.action);
+                },
+                isRequiredErrorMessage: uiContext.str(stringResKeys.form.isRequiredError)
             },
             action: {
                 dataType: FieldDataType.Dropdown,
                 dataPath: "action",
+                isRequired: true,
+                isRequiredErrorMessage: uiContext.str(stringResKeys.form.isRequiredError)
             },
             data: {
                 dataType: FieldDataType.Text,
@@ -126,6 +137,8 @@
     // Key: page id.  Value: page element options
     let pageElementsMap: Map<string, IDropdownOption[]>;
     let actionTypeOptions: IDropdownOption[] = getActionTypeDropDownOptions(uiContext);
+    
+    const fieldValidator = new FieldValidator(uiContext);
 
     const { registerOnSaveHandler, unregisterOnSaveHandler } = getContext(appActionContextKey) as IAppActionContext;
     const dispatch = createEventDispatcher();
@@ -196,7 +209,7 @@
     };
 
     const doSave = async (): Promise<boolean> => {
-        if ($formData.isValid) {
+        if (isDataValid) {
             const serializer = new FormSerializer(uiContext);
             const model = serializer.serialize($formData.values, formDef.fields);
 
@@ -340,6 +353,25 @@
     const newComment = (): ITestStep => {
         return { id: uuidv4(), type: "comment", comment: "" } as ITestStep;
     };
+    
+    const actionErrorMessage = (item: IDictionary) => {
+        return fieldValidator.validateField('action', item.action, listDef.fields['action'], item) ?? '';
+    }
+
+    const pageErrorMessage = (item: IDictionary) => {
+        return fieldValidator.validateField('page', item.page, listDef.fields['page'], item) ?? '';
+    }
+
+    const elementErrorMessage =(item: IDictionary) => {
+        return fieldValidator.validateField('element', item.element, listDef.fields['element'], item) ?? '';
+    }
+
+    $: isListDataValid = $listData.items.every((item) => 
+        elementErrorMessage(item)
+        && actionErrorMessage(item)
+        && pageErrorMessage(item));
+
+    $: isDataValid = $formData.isValid && isListDataValid;
 </script>
 
 <div class="test-case-editor p-8">
@@ -399,7 +431,9 @@
                                 value={item.action}
                                 options={actionTypeOptions}
                                 on:change={(event) => handleItemChange(index, ITEM_KEY_ACTION, event.detail.value)}
+                                errorMessage={fieldValidator.validateField('action', item.action, listDef.fields['action'], item) ?? ''}
                             />
+                            
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Normal}>
                             {#if !isPagelessAction(item.action)}
@@ -408,6 +442,7 @@
                                     value={item.page}
                                     options={pageDefinitionOptions}
                                     on:change={(event) => handleItemChange(index, ITEM_KEY_PAGE, event.detail.value)}
+                                    errorMessage={fieldValidator.validateField('page', item.page, listDef.fields['page'], item) ?? ''}
                                 />
                             {/if}
                         </ListTableBodyCell>
@@ -418,6 +453,7 @@
                                     value={item.element}
                                     options={pageElementsMap.get(item.page) ?? []}
                                     on:change={(event) => handleItemChange(index, ITEM_KEY_ELEMENT, event.detail.value)}
+                                    errorMessage={fieldValidator.validateField('element', item.element, listDef.fields['element'], item) ?? ''}
                                 />
                             {/if}
                         </ListTableBodyCell>
@@ -486,7 +522,7 @@
         </IconLinkButton>
 
         <div class="ml-auto">
-            <PrimaryButton on:click={handleSave}>
+            <PrimaryButton on:click={handleSave} disabled={!isDataValid}>
                 <span class="flex items-center gap-x-2">
                     <SaveIcon class="w-5 h-5" />
                     {uiContext.str(stringResKeys.general.save)}
