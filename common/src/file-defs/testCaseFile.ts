@@ -12,15 +12,28 @@ export interface ITestCaseFile extends Omit<IFileDef, "content"> {
   content: ITestCase;
 }
 
-export interface ITestStep {
+export type ITestStep = ITestStepRegular | ITestStepComment | ITestStepRoutine;
+
+export interface ITestStepBase {
   id: string;
-  type: "testStep" | "comment" | "routine";
-  routine?: string;
-  dataset?: string;
+  type: "";
+}
+
+export interface ITestStepRegular extends Omit<ITestStepBase, "type"> {
+  type: "testStep";
   page?: string;
   element?: string;
   action?: string;
-  data?: string;
+  data?: string | { [datasetId: string]: string };
   parameters?: string[];
+}
+export interface ITestStepComment extends Omit<ITestStepBase, "type"> {
+  type: "comment";
   comment?: string;
+}
+
+export interface ITestStepRoutine extends Omit<ITestStepBase, "type"> {
+  type: "routine";
+  routine?: string;
+  dataset?: string;
 }

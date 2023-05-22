@@ -11,7 +11,7 @@ export interface IDataSet {
 export interface ITestRoutine {
   id: string;
   description: string;
-  steps: ITestStep[];
+  steps: ITestRoutineStep[];
   dataSets: IDataSet[];
 }
 
@@ -20,7 +20,7 @@ export interface ITestRoutineFile extends Omit<IFileDef, "content"> {
   content: ITestRoutine;
 }
 
-export interface ITestStep {
+export interface ITestRoutineStep {
   id: string;
   type: "testStep" | "comment";
   page?: string;
