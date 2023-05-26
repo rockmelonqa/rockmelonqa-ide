@@ -2,8 +2,10 @@ import path from "path";
 import { IActionTemplateParam, ILocatorTemplateParam } from "../types";
 import { actionRegistyDotnet } from "../utils/action-registry-dotnet";
 import { locatorRegistyDotnet } from "../utils/locator-registry-dotnet";
-import { upperCaseFirstChar } from "./../utils/stringUtils";
+import { escapeStr, upperCaseFirstChar } from "./../utils/stringUtils";
 import { MsTestTemplateCollection } from "./templateCollection";
+import { routineActionRegistry } from "../playwright-charp-common/routine-action-registry";
+import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 
 export class PlaywrightCsharpMsTestTemplatesProvider {
   private _templateCollection: MsTestTemplateCollection;
@@ -24,8 +26,35 @@ export class PlaywrightCsharpMsTestTemplatesProvider {
     return this._templateCollection.TEST_CASE_FILE_TEMPLATE({ rootNamespace, testCaseName, description, body, fullNamespace });
   }
 
-  getAction(params: IActionTemplateParam) {
+  getTestRoutineFile(
+    testRoutineName: string,
+    description: string,
+    body: string,
+    rootNamespace: string,
+    fullNamespace: string,
+    datasets: IDataSetInfo[]
+  ) {
+    return this._templateCollection.TEST_ROUTINE_FILE_TEMPLATE({
+      rootNamespace,
+      testRoutineName,
+      description,
+      body,
+      fullNamespace,
+      datasets,
+    });
+  }
+
+  getTestCaseAction(params: IActionTemplateParam) {
     const actionGenerate = actionRegistyDotnet.get(params.action);
+    if (!actionGenerate) {
+      throw new Error("(DEV) Action is not support: " + params.action);
+    }
+    params.data = `"${escapeStr(params.data)}"`;
+    return actionGenerate(params);
+  }
+
+  getRoutineAction(params: IActionTemplateParam) {
+    const actionGenerate = routineActionRegistry.get(params.action);
     if (!actionGenerate) {
       throw new Error("(DEV) Action is not support: " + params.action);
     }
@@ -80,11 +109,11 @@ export class PlaywrightCsharpMsTestTemplatesProvider {
     return this._templateCollection.PAGE_DEFINITIONS_TEMPLATE({ rootNamespace, usings, pageDeclaration, body });
   }
 
-  GetLocatorHelper(rootNamespace: string) {
+  getLocatorHelper(rootNamespace: string) {
     return this._templateCollection.LOCATOR_HELPER_TEMPLATE({ rootNamespace });
   }
 
-  GetPage(fullNamespace: string, pageClassName: string, pageDescription: string, pageBody: string) {
+  getPage(fullNamespace: string, pageClassName: string, pageDescription: string, pageBody: string) {
     return this._templateCollection.PAGE_TEMPLATE({ fullNamespace, pageClassName, pageDescription, pageBody });
   }
 }

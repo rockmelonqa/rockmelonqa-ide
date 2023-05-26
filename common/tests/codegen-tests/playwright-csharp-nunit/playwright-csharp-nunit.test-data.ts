@@ -15,6 +15,7 @@ export const createPlaywrightNunitTestData = (): RmpSpec => {
       rootNamespace: "",
       indent: Indent.Spaces,
       indentSize: 4,
+      testIdAttributeName: "",
     },
     pages: [
       {
@@ -44,16 +45,21 @@ export const createPlaywrightNunitTestData = (): RmpSpec => {
         id: "",
         name: "empty",
         description: "",
-        elements: [
-        ],
+        elements: [],
       },
     ],
     testcases: [
       {
         id: "",
         name: "click",
-        description: "Do click",
+        description: "Do click and Execute Routine",
         steps: [
+          {
+            id: "",
+            type: "routine",
+            routine: "R1Login",
+            dataset: "DataSet Number Two",
+          },
           {
             id: "",
             type: "testStep",
@@ -69,6 +75,12 @@ export const createPlaywrightNunitTestData = (): RmpSpec => {
             element: "button",
             action: "Click",
             data: "",
+          },
+          {
+            id: "",
+            type: "routine",
+            routine: "R1Login",
+            dataset: "DataSet Number One",
           },
         ],
       },
@@ -95,6 +107,62 @@ export const createPlaywrightNunitTestData = (): RmpSpec => {
           },
         ],
       },
+      {
+        id: "",
+        name: "empty",
+        description: "",
+        steps: [],
+      },
+    ],
+    testroutines: [
+      {
+        id: "",
+        name: "R1Login",
+        description: "R1 Login",
+        steps: [
+          {
+            id: "",
+            type: "testStep",
+            page: "google/home",
+            element: "input",
+            action: "Input",
+            data: {
+              "DataSet Number One": "AAA",
+              "DataSet Number Two": "BBB",
+              "DataSet Number Three": "CCC",
+            },
+          },
+          {
+            id: "",
+            type: "testStep",
+            page: "google/home",
+            element: "input",
+            action: "VerifyHasText",
+            data: {
+              "DataSet Number One": "XXX",
+              "DataSet Number Two": "YYY",
+              "DataSet Number Three": "ZZZ",
+            },
+          },
+        ],
+        dataSets: [
+          {
+            id: "",
+            name: "DataSet Number One",
+            description: "One One One",
+          },
+          {
+            id: "",
+            name: "DataSet Number Two",
+            description: "Two Two Two",
+          },
+          {
+            id: "",
+            name: "DataSet Number Three",
+            description: "Three Three Three",
+          },
+        ],
+      },
     ],
     testsuites: [
       {
@@ -108,6 +176,12 @@ export const createPlaywrightNunitTestData = (): RmpSpec => {
         name: "another/anotherHome",
         description: "Another HomePage test suite",
         testcases: ["actions/simple/clear"],
+      },
+      {
+        id: "",
+        name: "empty",
+        description: "",
+        testcases: [],
       },
     ],
 
@@ -136,7 +210,8 @@ public class PageDefinitions
         Popup_AdsPage = new Popup_AdsPage(page);
         SearchResultPage = new SearchResultPage(page);
     }
-}`.trim(),
+}
+        `.trim(),
       },
       {
         fileRelPath: "Pages/HomePage.cs",
@@ -257,13 +332,13 @@ namespace AutomationTests.Tests;
 /// <summary>
 /// HomePage test suite
 /// </summary>
-[TestFixture]
+[TestClass]
 public partial class HomeTestSuite : PageTest
 {
     /// <summary>
     /// Search for 'playwright'
     /// </summary>
-    [Test]
+    [TestMethod]
     public async Task SearchForPlaywrightTestCase()
     {
         PageDefinitions defs = new PageDefinitions(this.Page);

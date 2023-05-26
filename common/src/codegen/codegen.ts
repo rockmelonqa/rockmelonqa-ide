@@ -71,6 +71,25 @@ const parseTestCase = async (parentDir: string, fileRelPath: string): Promise<IT
   };
 };
 
+const parseTestRoutine = async (parentDir: string, fileRelPath: string): Promise<ITestRoutineFile> => {
+  let filePath = path.join(parentDir, fileRelPath);
+  let fileContent = fs.readFileSync(filePath, "utf-8");
+  let [routine, isValid] = parseContent<ITestRoutine>(fileContent);
+
+  // Provide an empty steps array so that codegen can generate a Routine class with no step
+  if (!isValid) {
+    routine.id = uuidv4();
+    routine.steps = [];
+  }
+
+  return {
+    content: routine,
+    fileName: path.basename(filePath),
+    folderPath: path.dirname(filePath),
+    isValid,
+  };
+};
+
 const parseTestSuite = async (parentDir: string, fileRelPath: string): Promise<ITestSuiteFile> => {
   let filePath = path.join(parentDir, fileRelPath);
   let fileContent = fs.readFileSync(filePath, "utf-8");
@@ -84,18 +103,6 @@ const parseTestSuite = async (parentDir: string, fileRelPath: string): Promise<I
 
   return {
     content: testsuite,
-    fileName: path.basename(filePath),
-    folderPath: path.dirname(filePath),
-    isValid,
-  };
-};
-
-const parseTestRoutine = async (parentDir: string, fileRelPath: string): Promise<ITestRoutineFile> => {
-  let filePath = path.join(parentDir, fileRelPath);
-  let fileContent = fs.readFileSync(filePath, "utf-8");
-  let [testRoutine, isValid] = parseContent<ITestRoutine>(fileContent);
-  return {
-    content: testRoutine,
     fileName: path.basename(filePath),
     folderPath: path.dirname(filePath),
     isValid,
@@ -280,7 +287,24 @@ export const createSourceProjectMetadata = async (
     info(`    ---> Found test case file: ${testCaseDefFile}`);
   }
 
+  // Parsing test case definitions
+  info(``);
+  info(``);
+  info(`--------------------------------------------------`);
+  info(`-- Parsing test routine definitions`);
+  info("--------------------------------------------------");
+
   let routines: ITestRoutineFile[] = [];
+
+  let testRoutineFolderPath = path.join(rmprojFile.folderPath, StandardFolder.TestRoutines);
+
+  let testRoutineFileRelPaths = await readDirRecursive(testRoutineFolderPath);
+
+  for (let testRoutineDefFile of testRoutineFileRelPaths) {
+    routines.push(await parseTestRoutine(testRoutineFolderPath, testRoutineDefFile));
+    notify({ type: "parse-data", log: `Parsing: ${testRoutineDefFile}` });
+    info(`    ---> Found test routine file: ${testRoutineDefFile}`);
+  }
 
   let projMeta: ISourceProjectMetadata = {
     project: rmprojFile,

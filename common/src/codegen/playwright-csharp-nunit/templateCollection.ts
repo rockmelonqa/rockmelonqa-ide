@@ -16,6 +16,7 @@ export class NunitTemplateCollection {
   public TEST_CASE_BASE: HandlebarsTemplateDelegate<any>;
   public TEST_SUITE_BASE: HandlebarsTemplateDelegate<any>;
   public TEST_CASE_FILE_TEMPLATE: HandlebarsTemplateDelegate<any>;
+  public TEST_ROUTINE_FILE_TEMPLATE: HandlebarsTemplateDelegate<any>;
 
   constructor(templatesDir: string, customTemplatesDir: string, fileExtension: string) {
     const loadAndCompile = (templateFileName: string) =>
@@ -34,5 +35,6 @@ export class NunitTemplateCollection {
     this.TEST_CASE_BASE = loadAndCompile("TestCaseBase");
     this.TEST_SUITE_BASE = loadAndCompile("TestSuiteBase");
     this.TEST_CASE_FILE_TEMPLATE = loadAndCompile("TestCaseFile");
+    this.TEST_ROUTINE_FILE_TEMPLATE = loadAndCompile("TestRoutineFile");
   }
 }

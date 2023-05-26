@@ -15,6 +15,7 @@ export class XUnitTemplateCollection {
   public COMMENT_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public BASE_CLASSES_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public TEST_CASE_FILE_TEMPLATE: HandlebarsTemplateDelegate<any>;
+  public TEST_ROUTINE_FILE_TEMPLATE: HandlebarsTemplateDelegate<any>;
 
   constructor(templatesDir: string, customTemplatesDir: string, fileExtension: string) {
     const loadAndCompile = (templateFileName: string) =>
@@ -32,5 +33,6 @@ export class XUnitTemplateCollection {
     this.COMMENT_TEMPLATE = loadAndCompile("Comment");
     this.BASE_CLASSES_TEMPLATE = loadAndCompile("BaseClasses");
     this.TEST_CASE_FILE_TEMPLATE = loadAndCompile("TestCaseFile");
+    this.TEST_ROUTINE_FILE_TEMPLATE = loadAndCompile("TestRoutineFile");
   }
 }

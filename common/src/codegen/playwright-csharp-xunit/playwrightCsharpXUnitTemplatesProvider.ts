@@ -4,6 +4,8 @@ import { actionRegistyDotnet } from "../utils/action-registry-dotnet";
 import { locatorRegistyDotnet } from "../utils/locator-registry-dotnet";
 import { upperCaseFirstChar } from "../utils/stringUtils";
 import { XUnitTemplateCollection } from "./templateCollection";
+import { routineActionRegistry } from "../playwright-charp-common/routine-action-registry";
+import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 
 export class PlaywrightCsharpXUnitTemplatesProvider {
   private _templateCollection: XUnitTemplateCollection;
@@ -26,8 +28,35 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
     });
   }
 
-  getAction(params: IActionTemplateParam) {
+  getTestCaseAction(params: IActionTemplateParam) {
     const actionGenerate = actionRegistyDotnet.get(params.action);
+    if (!actionGenerate) {
+      throw new Error("(DEV) Action is not support: " + params.action);
+    }
+
+    return actionGenerate(params);
+  }
+
+  getTestRoutineFile(
+    testRoutineName: string,
+    description: string,
+    body: string,
+    rootNamespace: string,
+    fullNamespace: string,
+    datasets: IDataSetInfo[]
+  ) {
+    return this._templateCollection.TEST_ROUTINE_FILE_TEMPLATE({
+      rootNamespace,
+      testRoutineName,
+      description,
+      body,
+      fullNamespace,
+      datasets,
+    });
+  }
+
+  getRoutineAction(params: IActionTemplateParam) {
+    const actionGenerate = routineActionRegistry.get(params.action);
     if (!actionGenerate) {
       throw new Error("(DEV) Action is not support: " + params.action);
     }

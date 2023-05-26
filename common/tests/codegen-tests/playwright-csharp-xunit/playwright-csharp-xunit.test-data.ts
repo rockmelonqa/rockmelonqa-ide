@@ -15,13 +15,22 @@ export const createPlaywrightXUnitTestData = (): RmpSpec => {
       rootNamespace: "",
       indent: Indent.Spaces,
       indentSize: 4,
+      testIdAttributeName: "",
     },
     pages: [
       {
         id: "",
-        name: "actions/InputPage",
-        description: "Input Page",
+        name: "google/home",
+        description: "Home page",
         elements: [
+          {
+            id: "",
+            type: "pageElement",
+            name: "button",
+            findBy: LocatorType.Css,
+            locator: "button",
+            description: "Button",
+          },
           {
             id: "",
             type: "pageElement",
@@ -32,12 +41,53 @@ export const createPlaywrightXUnitTestData = (): RmpSpec => {
           },
         ],
       },
+      {
+        id: "",
+        name: "empty",
+        description: "",
+        elements: [],
+      },
     ],
     testcases: [
       {
         id: "",
-        name: "input",
-        description: "Do input",
+        name: "click",
+        description: "Do click and Execute Routine",
+        steps: [
+          {
+            id: "",
+            type: "routine",
+            routine: "R1Login",
+            dataset: "DataSet Number Two",
+          },
+          {
+            id: "",
+            type: "testStep",
+            page: "",
+            element: "",
+            action: "GoToUrl",
+            data: "http://localhost:3000/actions/click.html",
+          },
+          {
+            id: "",
+            type: "testStep",
+            page: "google/home",
+            element: "button",
+            action: "Click",
+            data: "",
+          },
+          {
+            id: "",
+            type: "routine",
+            routine: "R1Login",
+            dataset: "DataSet Number One",
+          },
+        ],
+      },
+      {
+        id: "",
+        name: "actions/simple/clear",
+        description: "Do clear",
         steps: [
           {
             id: "",
@@ -45,15 +95,71 @@ export const createPlaywrightXUnitTestData = (): RmpSpec => {
             page: "",
             element: "",
             action: "GoToUrl",
-            data: "http://localhost:3000/actions/input.html",
+            data: "http://localhost:3000/actions/click.html",
           },
           {
             id: "",
             type: "testStep",
-            page: "actions/InputPage",
+            page: "google/home",
+            element: "input",
+            action: "VerifyHasValue",
+            data: "Hello",
+          },
+        ],
+      },
+      {
+        id: "",
+        name: "empty",
+        description: "",
+        steps: [],
+      },
+    ],
+    testroutines: [
+      {
+        id: "",
+        name: "R1Login",
+        description: "R1 Login",
+        steps: [
+          {
+            id: "",
+            type: "testStep",
+            page: "google/home",
             element: "input",
             action: "Input",
-            data: "Hello World",
+            data: {
+              "DataSet Number One": "AAA",
+              "DataSet Number Two": "BBB",
+              "DataSet Number Three": "CCC",
+            },
+          },
+          {
+            id: "",
+            type: "testStep",
+            page: "google/home",
+            element: "input",
+            action: "VerifyHasText",
+            data: {
+              "DataSet Number One": "XXX",
+              "DataSet Number Two": "YYY",
+              "DataSet Number Three": "ZZZ",
+            },
+          },
+        ],
+        dataSets: [
+          {
+            id: "",
+            name: "DataSet Number One",
+            description: "One One One",
+          },
+          {
+            id: "",
+            name: "DataSet Number Two",
+            description: "Two Two Two",
+          },
+          {
+            id: "",
+            name: "DataSet Number Three",
+            description: "Three Three Three",
           },
         ],
       },
@@ -63,7 +169,19 @@ export const createPlaywrightXUnitTestData = (): RmpSpec => {
         id: "",
         name: "home",
         description: "HomePage test suite",
-        testcases: ["input"],
+        testcases: ["click"],
+      },
+      {
+        id: "",
+        name: "another/anotherHome",
+        description: "Another HomePage test suite",
+        testcases: ["actions/simple/clear"],
+      },
+      {
+        id: "",
+        name: "empty",
+        description: "",
+        testcases: [],
       },
     ],
 
@@ -92,7 +210,8 @@ public class PageDefinitions
         Popup_AdsPage = new Popup_AdsPage(page);
         SearchResultPage = new SearchResultPage(page);
     }
-}`.trim(),
+}
+        `.trim(),
       },
       {
         fileRelPath: "Pages/HomePage.cs",
@@ -213,13 +332,13 @@ namespace AutomationTests.Tests;
 /// <summary>
 /// HomePage test suite
 /// </summary>
-[TestFixture]
+[TestClass]
 public partial class HomeTestSuite : PageTest
 {
     /// <summary>
     /// Search for 'playwright'
     /// </summary>
-    [Test]
+    [TestMethod]
     public async Task SearchForPlaywrightTestCase()
     {
         PageDefinitions defs = new PageDefinitions(this.Page);

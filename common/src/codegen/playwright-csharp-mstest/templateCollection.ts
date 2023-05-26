@@ -8,6 +8,7 @@ export class MsTestTemplateCollection {
   public LOCATOR_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public TEST_FUNCTION_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public TEST_CASE_FILE_TEMPLATE: HandlebarsTemplateDelegate<any>;
+  public TEST_ROUTINE_FILE_TEMPLATE: HandlebarsTemplateDelegate<any>;
   public TEST_SUITE_FILE: HandlebarsTemplateDelegate<any>;
   public TEST_SUITE_BASE: HandlebarsTemplateDelegate<any>;
   public LOCATOR_HELPER_TEMPLATE: HandlebarsTemplateDelegate<any>;
@@ -26,6 +27,7 @@ export class MsTestTemplateCollection {
     this.LOCATOR_TEMPLATE = loadAndCompile("Locator");
     this.TEST_FUNCTION_TEMPLATE = loadAndCompile("TestFunction");
     this.TEST_CASE_FILE_TEMPLATE = loadAndCompile("TestCaseFile");
+    this.TEST_ROUTINE_FILE_TEMPLATE = loadAndCompile("TestRoutineFile");
     this.TEST_SUITE_BASE = loadAndCompile("TestSuiteBase");
     this.TEST_SUITE_FILE = loadAndCompile("TestSuiteFile");
     this.LOCATOR_HELPER_TEMPLATE = loadAndCompile("LocatorHelper");

@@ -1,6 +1,15 @@
 import { EOL } from "os";
 import path from "path";
-import { ActionType, IRmProjFile, ISourceProjectMetadata, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
+import {
+  ActionType,
+  IRmProjFile,
+  ISourceProjectMetadata,
+  ITestCase,
+  ITestRoutine,
+  ITestSuite,
+  LocatorType,
+  StandardFolder,
+} from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { createOutputProjectMetadata } from "../codegen";
@@ -9,6 +18,8 @@ import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
 import { PlaywrightCsharpXUnitTemplatesProvider } from "./playwrightCsharpXUnitTemplatesProvider";
 import { XUnitProjectMeta } from "./xunitProjectMeta";
+import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
+import { createNameWithoutExt } from "../utils/createName";
 
 type WriteFileFn = (path: string, content: string) => Promise<void>;
 
@@ -50,6 +61,7 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
     await this.writePageDefinitionsFile(writeFile);
     await this.writePageFiles(writeFile);
     await this.writeTestCaseFiles(writeFile);
+    await this.writeTestRoutineFiles(writeFile);
     await this.writeTestSuiteFiles(writeFile);
     await this.writeLocatorHelperFiles(writeFile);
     await this.writeBaseClassesFile(writeFile);
@@ -91,6 +103,19 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
       `Support/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
       this._templateProvider.getLocatorHelper(this._rmprojFile.content.rootNamespace)
     );
+  }
+
+  private async writeTestRoutineFiles(writeFile: WriteFileFn) {
+    // Filename: TestRoutines/{TestRoutineName}.cs
+    for (let { content: routine } of this._projMeta.testRoutines) {
+      let testRoutineContent = this.generateTestRoutineFile(
+        routine,
+        this._projMeta.pages.map((p) => p.content)
+      );
+      let outputFileRelPath = this._outProjMeta.get(routine.id)!.outputFileRelPath;
+
+      await writeFile(outputFileRelPath, testRoutineContent);
+    }
   }
 
   private async writeTestSuiteFiles(writeFile: WriteFileFn) {
@@ -260,6 +285,36 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
     return testCaseMethod;
   }
 
+  generateTestRoutineFile(testRoutine: ITestRoutine, pages: IPage[]) {
+    const testRoutineBody = this.generateTestRoutineBody(testRoutine, pages);
+
+    const datasets: IDataSetInfo[] = testRoutine.dataSets.map((dataset) => {
+      const dsName = createNameWithoutExt(dataset.name);
+
+      const dsInfo: IDataSetInfo = {
+        name: dsName,
+        description: dataset.description,
+
+        // Obtain dataset values from data of each step
+        values: testRoutine.steps.map((step) => {
+          return step.data[dataset.id];
+        }),
+      };
+
+      return dsInfo;
+    });
+
+    let routineFileContent = this._templateProvider.getTestRoutineFile(
+      this._outProjMeta.get(testRoutine.id)!.outputFileClassName,
+      testRoutine.description,
+      testRoutineBody,
+      this._rootNamespace,
+      this._outProjMeta.get(testRoutine.id)!.outputFileFullNamespace,
+      datasets
+    );
+    return routineFileContent;
+  }
+
   private generateTestCaseBody(testCase: ITestCase, pages: IPage[]) {
     let stepItems = [];
     for (let step of testCase.steps) {
@@ -268,27 +323,29 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
         let elementName = "";
 
         if (step.page) {
-          let page = pages.find((p) => p.id === step.page);
+          let pageId = step.page;
+          let page = pages.find((p) => p.id === pageId);
           if (!page) {
-            throw new Error("DEV ERROR: " + `Cannot find page with ID ${step.page}`);
+            throw new Error("DEV ERROR: " + `Cannot find page with ID ${pageId}`);
           }
           pageName = this._outProjMeta.get(page.id)!.outputFileClassName;
 
           if (step.element) {
-            let element = page.elements.find((e) => e.id === step.element);
+            let elementId = step.element;
+            let element = page.elements.find((e) => e.id === elementId);
             if (!element) {
-              throw new Error("DEV ERROR: " + `Cannot find element with ID ${step.element} on page ${pageName}`);
+              throw new Error("DEV ERROR: " + `Cannot find element with ID ${elementId} on page ${pageName}`);
             }
             elementName = element.name || "";
           }
         }
 
         stepItems.push(
-          this._templateProvider.getAction({
+          this._templateProvider.getTestCaseAction({
             pageName: pageName,
             elementName: upperCaseFirstChar(elementName),
             action: step.action! as unknown as ActionType,
-            data: step.data || "",
+            data: step.data?.toString() || "",
             parameters: step.parameters || [],
           })
         );
@@ -303,6 +360,64 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
     }
 
     let testcaseBody = stepItems.join(EOL);
+
+    // Indent test method body with 1 indent;
+    testcaseBody = addIndent(testcaseBody, this._indentString.repeat(2));
+    return testcaseBody;
+  }
+
+  generateTestRoutineBody(testCase: ITestRoutine, pages: IPage[]) {
+    let stepItems = [];
+    for (let step of testCase.steps) {
+      let index = testCase.steps.indexOf(step);
+
+      if (step.type === "testStep") {
+        let pageName = "";
+        let elementName = "";
+
+        if (step.page) {
+          let pageId = step.page;
+          let page = pages.find((p) => p.id === pageId);
+          if (!page) {
+            throw new Error("DEV ERROR: " + `Cannot find page with ID ${step.page}`);
+          }
+          pageName = this._outProjMeta.get(page.id)!.outputFileClassName;
+
+          if (step.element) {
+            let elementId = step.element;
+            let element = page.elements.find((e) => e.id === elementId);
+            if (!element) {
+              throw new Error("DEV ERROR: " + `Cannot find element with ID ${elementId} on page ${pageName}`);
+            }
+            elementName = element.name || "";
+          }
+        }
+
+        stepItems.push(
+          this._templateProvider.getRoutineAction({
+            pageName: pageName,
+            elementName: upperCaseFirstChar(elementName),
+            action: step.action! as unknown as ActionType,
+            data: `ds[${index}]`,
+            parameters: step.parameters || [],
+          })
+        );
+        continue;
+      }
+
+      if (step.type === "comment") {
+        // Add an empty line before the comment
+        stepItems.push("");
+        stepItems.push(this._templateProvider.getComment(step.comment!));
+      }
+    }
+
+    let testcaseBody = stepItems.join(EOL);
+
+    // If there is no step, we add an `await` so that there is no build warning about `async` method
+    if (testcaseBody.length === 0) {
+      testcaseBody = `await Task.CompletedTask;`;
+    }
 
     // Indent test method body with 1 indent;
     testcaseBody = addIndent(testcaseBody, this._indentString.repeat(2));

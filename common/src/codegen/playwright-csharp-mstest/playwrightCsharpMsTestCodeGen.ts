@@ -1,6 +1,15 @@
 import { EOL } from "os";
 import path from "path";
-import { ActionType, IRmProjFile, ISourceProjectMetadata, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
+import {
+  ActionType,
+  IRmProjFile,
+  ISourceProjectMetadata,
+  ITestCase,
+  ITestRoutine,
+  ITestSuite,
+  LocatorType,
+  StandardFolder,
+} from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { createOutputProjectMetadata } from "../codegen";
@@ -9,6 +18,8 @@ import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
 import { MsTestProjMeta } from "./msTestProjMeta";
 import { PlaywrightCsharpMsTestTemplatesProvider } from "./playwrightCsharpMsTestTemplatesProvider";
+import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
+import createName, { createNameWithoutExt } from "../utils/createName";
 
 export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
   private _projMeta: ISourceProjectMetadata;
@@ -72,11 +83,23 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     for (let { content: testCase } of this._projMeta.testCases) {
       let testClassContent = this.generateTestCaseFile(
         testCase,
-        this._projMeta.pages.map((p) => p.content)
+        this._projMeta.pages.map((p) => p.content),
+        this._projMeta.testRoutines.map((p) => p.content)
       );
       let outputFileRelPath = this._outProjMeta.get(testCase.id)!.outputFileRelPath;
 
       await writeFile(outputFileRelPath, testClassContent);
+    }
+
+    // Filename: TestRoutines/{TestRoutineName}.cs
+    for (let { content: routine } of this._projMeta.testRoutines) {
+      let testRoutineContent = this.generateTestRoutineFile(
+        routine,
+        this._projMeta.pages.map((p) => p.content)
+      );
+      let outputFileRelPath = this._outProjMeta.get(routine.id)!.outputFileRelPath;
+
+      await writeFile(outputFileRelPath, testRoutineContent);
     }
 
     // # Generate TestSuites
@@ -97,7 +120,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     // Filename: LocatorHelper.cs
     await writeFile(
       `Support/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
-      this._templateProvider.GetLocatorHelper(this._rmprojFile.content.rootNamespace)
+      this._templateProvider.getLocatorHelper(this._rmprojFile.content.rootNamespace)
     );
 
     await writeFile(
@@ -207,7 +230,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     let fullNamespace = this._outProjMeta.get(page.id)!.outputFileFullNamespace;
     let pageClassName = this._outProjMeta.get(page.id)!.outputFileClassName;
 
-    return this._templateProvider.GetPage(fullNamespace, pageClassName, page.description || "", pageBody);
+    return this._templateProvider.getPage(fullNamespace, pageClassName, page.description || "", pageBody);
   }
 
   generateTestSuiteFile(testSuite: ITestSuite, testcases: ITestCase[]) {
@@ -248,8 +271,38 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     return testClass;
   }
 
-  generateTestCaseFile(testCase: ITestCase, pages: IPage[]) {
-    const testcaseBody = this.generateTestCaseBody(testCase, pages);
+  generateTestRoutineFile(testRoutine: ITestRoutine, pages: IPage[]) {
+    const testRoutineBody = this.generateTestRoutineBody(testRoutine, pages);
+
+    const datasets: IDataSetInfo[] = testRoutine.dataSets.map((dataset) => {
+      const dsName = createNameWithoutExt(dataset.name);
+
+      const dsInfo: IDataSetInfo = {
+        name: dsName,
+        description: dataset.description,
+
+        // Obtain dataset values from data of each step
+        values: testRoutine.steps.map((step) => {
+          return step.data[dataset.id];
+        }),
+      };
+
+      return dsInfo;
+    });
+
+    let routineFileContent = this._templateProvider.getTestRoutineFile(
+      this._outProjMeta.get(testRoutine.id)!.outputFileClassName,
+      testRoutine.description,
+      testRoutineBody,
+      this._rootNamespace,
+      this._outProjMeta.get(testRoutine.id)!.outputFileFullNamespace,
+      datasets
+    );
+    return routineFileContent;
+  }
+
+  generateTestCaseFile(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {
+    const testcaseBody = this.generateTestCaseBody(testCase, pages, routines);
 
     let testFile = this._templateProvider.getTestCaseFile(
       this._outProjMeta.get(testCase.id)!.outputFileClassName,
@@ -267,7 +320,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     return testCaseMethod;
   }
 
-  generateTestCaseBody(testCase: ITestCase, pages: IPage[]) {
+  generateTestCaseBody(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {
     let stepItems = [];
     for (let step of testCase.steps) {
       if (step.type === "testStep") {
@@ -275,27 +328,99 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
         let elementName = "";
 
         if (step.page) {
-          let page = pages.find((p) => p.id === step.page);
+          let pageId = step.page;
+          let page = pages.find((p) => p.id === pageId);
           if (!page) {
             throw new Error("DEV ERROR: " + `Cannot find page with ID ${step.page}`);
           }
           pageName = this._outProjMeta.get(page.id)!.outputFileClassName;
 
           if (step.element) {
-            let element = page.elements.find((e) => e.id === step.element);
+            let elementId = step.element;
+            let element = page.elements.find((e) => e.id === elementId);
             if (!element) {
-              throw new Error("DEV ERROR: " + `Cannot find element with ID ${step.element} on page ${pageName}`);
+              throw new Error("DEV ERROR: " + `Cannot find element with ID ${elementId} on page ${pageName}`);
             }
             elementName = element.name || "";
           }
         }
 
         stepItems.push(
-          this._templateProvider.getAction({
+          this._templateProvider.getTestCaseAction({
             pageName: pageName,
             elementName: upperCaseFirstChar(elementName),
             action: step.action! as unknown as ActionType,
-            data: step.data || "",
+            data: step.data?.toString() || "",
+            parameters: step.parameters || [],
+          })
+        );
+        continue;
+      }
+
+      if (step.type === "comment") {
+        // Add an empty line before the comment
+        stepItems.push("");
+        stepItems.push(this._templateProvider.getComment(step.comment!));
+        continue;
+      }
+
+      if (step.type === "routine") {
+        stepItems.push("// Routine " + step.id);
+        let routineId = step.routine!;
+        let datasetId = step.dataset!;
+        let routine = routines.find((r) => r.id === routineId)!;
+        let routineName = this._outProjMeta.get(routineId)!.outputFileClassName;
+        let dataset = routine.dataSets.find((ds) => ds.id === datasetId)!;
+        let datasetName = createNameWithoutExt(dataset.name);
+        stepItems.push(`await new ${routineName}(this).RunAsync(${routineName}.${datasetName});`);
+      }
+    }
+
+    let testcaseBody = stepItems.join(EOL);
+
+    // If there is no step, we add an `await` so that there is no build warning about `async` method
+    if (testcaseBody.length === 0) {
+      testcaseBody = `await Task.CompletedTask;`;
+    }
+
+    // Indent test method body with 1 indent;
+    testcaseBody = addIndent(testcaseBody, this._indentString.repeat(2));
+    return testcaseBody;
+  }
+
+  generateTestRoutineBody(testCase: ITestRoutine, pages: IPage[]) {
+    let stepItems = [];
+    for (let step of testCase.steps) {
+      let index = testCase.steps.indexOf(step);
+
+      if (step.type === "testStep") {
+        let pageName = "";
+        let elementName = "";
+
+        if (step.page) {
+          let pageId = step.page;
+          let page = pages.find((p) => p.id === pageId);
+          if (!page) {
+            throw new Error("DEV ERROR: " + `Cannot find page with ID ${step.page}`);
+          }
+          pageName = this._outProjMeta.get(page.id)!.outputFileClassName;
+
+          if (step.element) {
+            let elementId = step.element;
+            let element = page.elements.find((e) => e.id === elementId);
+            if (!element) {
+              throw new Error("DEV ERROR: " + `Cannot find element with ID ${elementId} on page ${pageName}`);
+            }
+            elementName = element.name || "";
+          }
+        }
+
+        stepItems.push(
+          this._templateProvider.getRoutineAction({
+            pageName: pageName,
+            elementName: upperCaseFirstChar(elementName),
+            action: step.action! as unknown as ActionType,
+            data: `ds[${index}]`,
             parameters: step.parameters || [],
           })
         );
