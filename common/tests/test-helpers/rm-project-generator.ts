@@ -133,6 +133,8 @@ const writeTestRoutines = (routines: ITestRoutine[], pages: IPage[], testcases: 
       dataset.id = uuidv4();
     }
 
+    updateDataSetIdInTestCases(testcases, routine);
+
     for (let step of routine.steps) {
       if (step.type !== "testStep") continue;
       step.id = uuidv4();
@@ -153,8 +155,6 @@ const writeTestRoutines = (routines: ITestRoutine[], pages: IPage[], testcases: 
 
       step.data = Object.fromEntries(newData);
     }
-
-    updateDataSetIdInTestCases(testcases, routine);
 
     let routinePath = path.join(dir, routine.name!.replaceAll("_", path.sep) + StandardFileExtension.TestRoutine);
     let targetDir = path.dirname(routinePath);
@@ -180,7 +180,7 @@ const updateDataSetIdInTestCases = (testcases: ITestCase[], routine: ITestRoutin
         for (let dataset of routine.dataSets) {
           if (dataset.name === step.dataset) {
             step.dataset = dataset.id;
-            return;
+            break;
           }
         }
       }
