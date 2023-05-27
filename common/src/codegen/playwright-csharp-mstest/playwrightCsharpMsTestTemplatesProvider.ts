@@ -77,14 +77,14 @@ export class PlaywrightCsharpMsTestTemplatesProvider implements IPlaywrightCshar
   }
 
   getTestFunction(name: string, description: string) {
-    return this._templateCollection.TEST_FUNCTION_TEMPLATE({ name, description });
+    return this._templateCollection.TEST_FUNCTION({ name, description });
   }
 
   getCsProject(rootNamespace: string) {
-    return this._templateCollection.CSPROJECT_TEMPLATE({ rootNamespace });
+    return this._templateCollection.CSPROJECT_FILE({ rootNamespace });
   }
   getUsings(rootNamespace: string) {
-    return this._templateCollection.USINGS_TEMPLATE({ rootNamespace });
+    return this._templateCollection.USINGS_FILE({ rootNamespace });
   }
   getRunSettings() {
     return this._templateCollection.RUNSETTINGS_FILE({});
@@ -95,7 +95,7 @@ export class PlaywrightCsharpMsTestTemplatesProvider implements IPlaywrightCshar
   }
 
   getPageDefinitions(rootNamespace: string, usings: string, pageDeclaration: string, body: string) {
-    return this._templateCollection.PAGE_DEFINITIONS_TEMPLATE({ rootNamespace, usings, pageDeclaration, body });
+    return this._templateCollection.PAGE_DEFINITIONS_FILE({ rootNamespace, usings, pageDeclaration, body });
   }
 
   getLocatorHelper(rootNamespace: string) {

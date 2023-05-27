@@ -18,7 +18,7 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
   }
 
   getTestCaseFile(testCaseName: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
-    return this._templateCollection.TEST_CASE_FILE_TEMPLATE({
+    return this._templateCollection.TEST_CASE_FILE({
       rootNamespace,
       testCaseName,
       description,
@@ -44,7 +44,7 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
     fullNamespace: string,
     datasets: IDataSetInfo[]
   ) {
-    return this._templateCollection.TEST_ROUTINE_FILE_TEMPLATE({
+    return this._templateCollection.TEST_ROUTINE_FILE({
       rootNamespace,
       testRoutineName,
       description,
@@ -77,7 +77,7 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
     }
     const getter = generateGetter(params);
 
-    let output = this._templateCollection.LOCATOR_TEMPLATE({
+    let output = this._templateCollection.PAGE_ELEMENT_PROPERTY({
       hasParams: params.hasParams,
       elementName: upperCaseFirstChar(elementName),
       getter,
@@ -89,34 +89,34 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
   }
 
   getTestFunction(name: string, description: string) {
-    return this._templateCollection.TEST_FUNCTION_TEMPLATE({ name, description });
+    return this._templateCollection.TEST_FUNCTION({ name, description });
   }
 
   getLocatorHelper(rootNamespace: string): string {
-    return this._templateCollection.LOCATOR_HELPER_TEMPLATE({ rootNamespace });
+    return this._templateCollection.LOCATOR_HELPER_FILE({ rootNamespace });
   }
   getBaseClasses(rootNamespace: string, testIdAttributeName: string): string {
-    return this._templateCollection.BASE_CLASSES_TEMPLATE({ rootNamespace, testIdAttributeName });
+    return this._templateCollection.BASE_CLASSES_FILE({ rootNamespace, testIdAttributeName });
   }
   getCSProject(rootNamespace: string) {
-    return this._templateCollection.CSPROJECT_TEMPLATE({ rootNamespace });
+    return this._templateCollection.CSPROJECT_FILE({ rootNamespace });
   }
   getUsings(rootNamespace: string) {
-    return this._templateCollection.USINGS_TEMPLATE({ rootNamespace });
+    return this._templateCollection.USINGS_FILE({ rootNamespace });
   }
   getRunSettings() {
-    return this._templateCollection.RUNSETTINGS_TEMPLATE({});
+    return this._templateCollection.RUNSETTINGS_FILE({});
   }
 
   getPageDefinitions(usings: string, rootNamespace: string, pageDeclaration: string, body: string) {
-    return this._templateCollection.PAGE_DEFINITIONS_TEMPLATE({ usings, rootNamespace, pageDeclaration, body });
+    return this._templateCollection.PAGE_DEFINITIONS_FILE({ usings, rootNamespace, pageDeclaration, body });
   }
 
   getPage(fullNamespace: string, pageName: string, pageDescription: string, pageBody: string) {
-    return this._templateCollection.PAGE_TEMPLATE({ fullNamespace, pageName, pageDescription, pageBody });
+    return this._templateCollection.PAGE_FILE({ fullNamespace, pageName, pageDescription, pageBody });
   }
 
   getComment(message: string) {
-    return this._templateCollection.COMMENT_TEMPLATE({ message });
+    return this._templateCollection.COMMENT({ message });
   }
 }

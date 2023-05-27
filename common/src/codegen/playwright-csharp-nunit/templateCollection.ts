@@ -1,40 +1,43 @@
 import { compile } from "handlebars";
 import { loadTemplate } from "../utils/templateLoader";
+import { ICsharpTemplateCollection } from "../playwright-charp-common/csharpTemplateCollection";
 
 /** Templates collection for Playwright Csharp Nunit codegen*/
-export class NunitTemplateCollection {
-  public PAGE_DEFINITIONS_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public PAGE_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public LOCATOR_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public TEST_FUNCTION_TEMPLATE: HandlebarsTemplateDelegate<any>;
+export class NunitTemplateCollection implements ICsharpTemplateCollection {
+  public COMMENT: HandlebarsTemplateDelegate<any>;
+  public CSPROJECT_FILE: HandlebarsTemplateDelegate<any>;
+  public PAGE_DEFINITIONS_FILE: HandlebarsTemplateDelegate<any>;
+  public PAGE_FILE: HandlebarsTemplateDelegate<any>;
+  public PAGE_ELEMENT_PROPERTY: HandlebarsTemplateDelegate<any>;
+  public TEST_FUNCTION: HandlebarsTemplateDelegate<any>;
   public TEST_SUITE_FILE: HandlebarsTemplateDelegate<any>;
-  public LOCATOR_HELPER_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public CSPROJECT_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public USINGS_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public RUNSETTINGS_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public COMMENT_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public TEST_CASE_BASE: HandlebarsTemplateDelegate<any>;
-  public TEST_SUITE_BASE: HandlebarsTemplateDelegate<any>;
-  public TEST_CASE_FILE_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public TEST_ROUTINE_FILE_TEMPLATE: HandlebarsTemplateDelegate<any>;
+  public LOCATOR_HELPER_FILE: HandlebarsTemplateDelegate<any>;
+  public USINGS_FILE: HandlebarsTemplateDelegate<any>;
+  public RUNSETTINGS_FILE: HandlebarsTemplateDelegate<any>;
+  public TEST_CASE_BASE_FILE: HandlebarsTemplateDelegate<any>;
+  public TEST_SUITE_BASE_FILE: HandlebarsTemplateDelegate<any>;
+  public TEST_CASE_FILE: HandlebarsTemplateDelegate<any>;
+  public TEST_ROUTINE_FILE: HandlebarsTemplateDelegate<any>;
+  public BASE_CLASSES_FILE: HandlebarsTemplateDelegate<any>;
 
   constructor(templatesDir: string, customTemplatesDir: string, fileExtension: string) {
     const loadAndCompile = (templateFileName: string) =>
       compile(loadTemplate(templatesDir, customTemplatesDir, templateFileName + fileExtension));
 
-    this.PAGE_DEFINITIONS_TEMPLATE = loadAndCompile("PageDefinitions");
-    this.PAGE_TEMPLATE = loadAndCompile("Page");
-    this.LOCATOR_TEMPLATE = loadAndCompile("Locator");
-    this.TEST_FUNCTION_TEMPLATE = loadAndCompile("TestFunction");
+    this.COMMENT = loadAndCompile("Comment");
+    this.CSPROJECT_FILE = loadAndCompile("CsProjectFile");
+    this.LOCATOR_HELPER_FILE = loadAndCompile("LocatorHelperFile");
+    this.PAGE_FILE = loadAndCompile("PageFile");
+    this.PAGE_DEFINITIONS_FILE = loadAndCompile("PageDefinitionsFile");
+    this.PAGE_ELEMENT_PROPERTY = loadAndCompile("PageElementProperty");
+    this.TEST_FUNCTION = loadAndCompile("TestFunction");
     this.TEST_SUITE_FILE = loadAndCompile("TestSuiteFile");
-    this.LOCATOR_HELPER_TEMPLATE = loadAndCompile("LocatorHelper");
-    this.CSPROJECT_TEMPLATE = loadAndCompile("CsProject");
-    this.USINGS_TEMPLATE = loadAndCompile("Usings");
-    this.RUNSETTINGS_TEMPLATE = loadAndCompile("RunSettings");
-    this.COMMENT_TEMPLATE = loadAndCompile("Comment");
-    this.TEST_CASE_BASE = loadAndCompile("TestCaseBase");
-    this.TEST_SUITE_BASE = loadAndCompile("TestSuiteBase");
-    this.TEST_CASE_FILE_TEMPLATE = loadAndCompile("TestCaseFile");
-    this.TEST_ROUTINE_FILE_TEMPLATE = loadAndCompile("TestRoutineFile");
+    this.RUNSETTINGS_FILE = loadAndCompile("RunSettingsFile");
+    this.TEST_CASE_BASE_FILE = loadAndCompile("TestCaseBaseFile");
+    this.TEST_SUITE_BASE_FILE = loadAndCompile("TestSuiteBaseFile");
+    this.TEST_CASE_FILE = loadAndCompile("TestCaseFile");
+    this.TEST_ROUTINE_FILE = loadAndCompile("TestRoutineFile");
+    this.USINGS_FILE = loadAndCompile("UsingsFile");
+    this.BASE_CLASSES_FILE = compile("");
   }
 }

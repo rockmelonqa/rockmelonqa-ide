@@ -1,38 +1,39 @@
 import { compile } from "handlebars";
 import { loadTemplate } from "../utils/templateLoader";
+import { ICsharpTemplateCollection } from "../playwright-charp-common/csharpTemplateCollection";
 
 /** Templates collection for Playwright Csharp Nunit codegen*/
-export class XUnitTemplateCollection {
-  public PAGE_DEFINITIONS_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public PAGE_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public LOCATOR_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public TEST_FUNCTION_TEMPLATE: HandlebarsTemplateDelegate<any>;
+export class XUnitTemplateCollection implements ICsharpTemplateCollection {
+  public PAGE_DEFINITIONS_FILE: HandlebarsTemplateDelegate<any>;
+  public PAGE_FILE: HandlebarsTemplateDelegate<any>;
+  public PAGE_ELEMENT_PROPERTY: HandlebarsTemplateDelegate<any>;
+  public TEST_FUNCTION: HandlebarsTemplateDelegate<any>;
   public TEST_SUITE_FILE: HandlebarsTemplateDelegate<any>;
-  public LOCATOR_HELPER_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public CSPROJECT_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public USINGS_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public RUNSETTINGS_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public COMMENT_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public BASE_CLASSES_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public TEST_CASE_FILE_TEMPLATE: HandlebarsTemplateDelegate<any>;
-  public TEST_ROUTINE_FILE_TEMPLATE: HandlebarsTemplateDelegate<any>;
+  public LOCATOR_HELPER_FILE: HandlebarsTemplateDelegate<any>;
+  public CSPROJECT_FILE: HandlebarsTemplateDelegate<any>;
+  public USINGS_FILE: HandlebarsTemplateDelegate<any>;
+  public RUNSETTINGS_FILE: HandlebarsTemplateDelegate<any>;
+  public COMMENT: HandlebarsTemplateDelegate<any>;
+  public BASE_CLASSES_FILE: HandlebarsTemplateDelegate<any>;
+  public TEST_CASE_FILE: HandlebarsTemplateDelegate<any>;
+  public TEST_ROUTINE_FILE: HandlebarsTemplateDelegate<any>;
 
   constructor(templatesDir: string, customTemplatesDir: string, fileExtension: string) {
     const loadAndCompile = (templateFileName: string) =>
       compile(loadTemplate(templatesDir, customTemplatesDir, templateFileName + fileExtension));
 
-    this.PAGE_DEFINITIONS_TEMPLATE = loadAndCompile("PageDefinitions");
-    this.PAGE_TEMPLATE = loadAndCompile("Page");
-    this.LOCATOR_TEMPLATE = loadAndCompile("Locator");
-    this.TEST_FUNCTION_TEMPLATE = loadAndCompile("TestFunction");
+    this.PAGE_DEFINITIONS_FILE = loadAndCompile("PageDefinitions");
+    this.PAGE_FILE = loadAndCompile("Page");
+    this.PAGE_ELEMENT_PROPERTY = loadAndCompile("PageElementProperty");
+    this.TEST_FUNCTION = loadAndCompile("TestFunction");
     this.TEST_SUITE_FILE = loadAndCompile("TestSuiteFile");
-    this.LOCATOR_HELPER_TEMPLATE = loadAndCompile("LocatorHelper");
-    this.CSPROJECT_TEMPLATE = loadAndCompile("CsProject");
-    this.USINGS_TEMPLATE = loadAndCompile("Usings");
-    this.RUNSETTINGS_TEMPLATE = loadAndCompile("RunSettings");
-    this.COMMENT_TEMPLATE = loadAndCompile("Comment");
-    this.BASE_CLASSES_TEMPLATE = loadAndCompile("BaseClasses");
-    this.TEST_CASE_FILE_TEMPLATE = loadAndCompile("TestCaseFile");
-    this.TEST_ROUTINE_FILE_TEMPLATE = loadAndCompile("TestRoutineFile");
+    this.LOCATOR_HELPER_FILE = loadAndCompile("LocatorHelper");
+    this.CSPROJECT_FILE = loadAndCompile("CsProjectFile");
+    this.USINGS_FILE = loadAndCompile("UsingsFile");
+    this.RUNSETTINGS_FILE = loadAndCompile("RunSettingsFile");
+    this.COMMENT = loadAndCompile("Comment");
+    this.BASE_CLASSES_FILE = loadAndCompile("BaseClassesFile");
+    this.TEST_CASE_FILE = loadAndCompile("TestCaseFile");
+    this.TEST_ROUTINE_FILE = loadAndCompile("TestRoutineFile");
   }
 }
