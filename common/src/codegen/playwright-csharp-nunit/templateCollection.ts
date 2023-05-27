@@ -17,6 +17,7 @@ export class NunitTemplateCollection implements ICsharpTemplateCollection {
   public TEST_CASE_BASE_FILE: HandlebarsTemplateDelegate<any>;
   public TEST_SUITE_BASE_FILE: HandlebarsTemplateDelegate<any>;
   public TEST_CASE_FILE: HandlebarsTemplateDelegate<any>;
+  public TEST_ROUTINE_CLASS: HandlebarsTemplateDelegate<any>;
   public TEST_ROUTINE_FILE: HandlebarsTemplateDelegate<any>;
   public BASE_CLASSES_FILE: HandlebarsTemplateDelegate<any>;
 
@@ -37,6 +38,7 @@ export class NunitTemplateCollection implements ICsharpTemplateCollection {
     this.TEST_SUITE_BASE_FILE = loadAndCompile("TestSuiteBaseFile");
     this.TEST_CASE_FILE = loadAndCompile("TestCaseFile");
     this.TEST_ROUTINE_FILE = loadAndCompile("TestRoutineFile");
+    this.TEST_ROUTINE_CLASS = loadAndCompile("TestRoutineClass");
     this.USINGS_FILE = loadAndCompile("UsingsFile");
     this.BASE_CLASSES_FILE = compile("");
   }

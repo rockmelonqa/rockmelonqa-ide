@@ -30,11 +30,11 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     super(projMeta);
   }
 
-  protected getOutProjMeta(): IOutputProjectMetadataProcessor {
+  protected override getOutProjMeta(): IOutputProjectMetadataProcessor {
     return new MsTestProjMeta(this._projMeta);
   }
 
-  protected getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {
+  protected override getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {
     return new PlaywrightCsharpMsTestTemplatesProvider(path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates"));
   }
 

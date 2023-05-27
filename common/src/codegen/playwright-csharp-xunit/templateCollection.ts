@@ -17,6 +17,9 @@ export class XUnitTemplateCollection implements ICsharpTemplateCollection {
   public BASE_CLASSES_FILE: HandlebarsTemplateDelegate<any>;
   public TEST_CASE_FILE: HandlebarsTemplateDelegate<any>;
   public TEST_ROUTINE_FILE: HandlebarsTemplateDelegate<any>;
+  public TEST_ROUTINE_CLASS: HandlebarsTemplateDelegate<any>;
+  public TEST_SUITE_BASE_FILE: HandlebarsTemplateDelegate<any>;
+  public TEST_CASE_BASE_FILE: HandlebarsTemplateDelegate<any>;
 
   constructor(templatesDir: string, customTemplatesDir: string, fileExtension: string) {
     const loadAndCompile = (templateFileName: string) =>
@@ -35,5 +38,8 @@ export class XUnitTemplateCollection implements ICsharpTemplateCollection {
     this.BASE_CLASSES_FILE = loadAndCompile("BaseClassesFile");
     this.TEST_CASE_FILE = loadAndCompile("TestCaseFile");
     this.TEST_ROUTINE_FILE = loadAndCompile("TestRoutineFile");
+    this.TEST_ROUTINE_CLASS = loadAndCompile("TestRoutineClass");
+    this.TEST_SUITE_BASE_FILE = loadAndCompile("TestRoutineClass");
+    this.TEST_CASE_BASE_FILE = loadAndCompile("TestCaseBaseFile");
   }
 }

@@ -5,8 +5,9 @@ import { NunitTemplateCollection } from "./templateCollection";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import { actionRegistyDotnet } from "../playwright-charp-common/action-registry-dotnet";
 import { locatorRegistyDotnet } from "../playwright-charp-common/locator-registry-dotnet";
+import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 
-export class PlaywrightCsharpNunitTemplatesProvider {
+export class PlaywrightCsharpNunitTemplatesProvider implements IPlaywrightCsharpTemplatesProvider {
   private _templateCollection: NunitTemplateCollection;
 
   constructor(customTemplatesDir: string) {
@@ -21,7 +22,7 @@ export class PlaywrightCsharpNunitTemplatesProvider {
     return this._templateCollection.TEST_CASE_FILE({ rootNamespace, testCaseName, description, body, fullNamespace });
   }
 
-  getTestCaseAction(params: IActionTemplateParam) {
+  getAction(params: IActionTemplateParam) {
     const actionGenerate = actionRegistyDotnet.get(params.action);
     if (!actionGenerate) {
       throw new Error("(DEV) Action is not support: " + params.action);
@@ -30,21 +31,19 @@ export class PlaywrightCsharpNunitTemplatesProvider {
     return actionGenerate(params);
   }
 
-  getTestRoutineFile(
-    testRoutineName: string,
-    description: string,
-    body: string,
-    rootNamespace: string,
-    fullNamespace: string,
-    datasets: IDataSetInfo[]
-  ) {
-    return this._templateCollection.TEST_ROUTINE_FILE({
-      rootNamespace,
+  getTestRoutineClass(testRoutineName: string, description: string, body: string) {
+    return this._templateCollection.TEST_ROUTINE_CLASS({
       testRoutineName,
       description,
       body,
+    });
+  }
+
+  getTestRoutineFile(rootNamespace: string, fullNamespace: string, testRoutineClasses: string[]) {
+    return this._templateCollection.TEST_ROUTINE_FILE({
+      rootNamespace,
       fullNamespace,
-      datasets,
+      testRoutineClasses,
     });
   }
 
@@ -91,7 +90,7 @@ export class PlaywrightCsharpNunitTemplatesProvider {
   getTestCaseBase(rootNamespace: string): string {
     return this._templateCollection.TEST_CASE_BASE_FILE({ rootNamespace });
   }
-  getCSProject(rootNamespace: string) {
+  getCsProject(rootNamespace: string) {
     return this._templateCollection.CSPROJECT_FILE({ rootNamespace });
   }
   getUsings(rootNamespace: string) {
