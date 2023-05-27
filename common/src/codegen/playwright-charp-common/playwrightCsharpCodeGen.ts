@@ -3,7 +3,7 @@ import { ActionType, IRmProjFile, ISourceProjectMetadata, ITestCase, ITestRoutin
 import { IPage } from "../../file-defs/pageFile";
 import { addIndent, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
 import { IOutputProjectMetadataProcessor } from "./outputProjectMetadataProcessor";
-import { createNameWithoutExt } from "../utils/createName";
+import { createCleanName } from "../utils/createName";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { IDataSetInfo } from "./dataSetInfo";
 import { IPlaywrightCsharpTemplatesProvider } from "./playwrightCsharpTemplatesProvider";
@@ -99,7 +99,7 @@ export class PlaywrightCsharpCodeGen {
         let routine = routines.find((r) => r.id === routineId)!;
         let routineName = this._outProjMeta.get(routineId)!.outputFileClassName;
         let dataset = routine.dataSets.find((ds) => ds.id === datasetId)!;
-        let datasetName = createNameWithoutExt(dataset.name);
+        let datasetName = createCleanName(dataset.name);
         let finalRoutineClassName = `${routineName}${datasetName}`;
         stepItems.push(`await new ${finalRoutineClassName}(this).RunAsync();`);
       }

@@ -21,17 +21,17 @@ export default (relativePath: string) => {
   return `${filenameWithoutExt}${extName}`;
 };
 
-export const createNameWithoutExt = (sourceName: string) => {
-  let filenameWithoutExt = sourceName
+export const createCleanName = (sourceName: string) => {
+  let cleanName = sourceName
     .replace(/\..+$/, "") // Remove the extension
     .replaceAll(path.sep, "_") // Replace path separator with underscore
     .replace(/\W/g, "") // Removing non-alphanumeric chars
     .replace(/ +/g, ""); // Remove space(s)
 
-  filenameWithoutExt = filenameWithoutExt
+  let csharpCleanName = cleanName
     .split("_")
     .map((w) => upperCaseFirstChar(w))
     .join("_");
 
-  return `${filenameWithoutExt}`;
+  return `${csharpCleanName}`;
 };

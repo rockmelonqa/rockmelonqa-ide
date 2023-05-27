@@ -1,10 +1,10 @@
 import { ITestRoutine } from "../../file-defs";
-import { createNameWithoutExt } from "../utils/createName";
+import { createCleanName } from "../utils/createName";
 import { IDataSetInfo } from "./dataSetInfo";
 
 const generateDatasetInfos = (testRoutine: ITestRoutine): IDataSetInfo[] => {
   const datasets: IDataSetInfo[] = testRoutine.dataSets.map((dataset) => {
-    const dsName = createNameWithoutExt(dataset.name);
+    const dsName = createCleanName(dataset.name);
 
     const dsInfo: IDataSetInfo = {
       name: dsName,

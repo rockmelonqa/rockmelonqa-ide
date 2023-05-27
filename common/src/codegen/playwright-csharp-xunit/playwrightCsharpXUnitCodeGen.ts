@@ -19,7 +19,7 @@ import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "..
 import { PlaywrightCsharpXUnitTemplatesProvider } from "./playwrightCsharpXUnitTemplatesProvider";
 import { XUnitProjectMeta } from "./xunitProjectMeta";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
-import { createNameWithoutExt } from "../utils/createName";
+import { createCleanName } from "../utils/createName";
 
 type WriteFileFn = (path: string, content: string) => Promise<void>;
 
@@ -289,7 +289,7 @@ export class PlaywrightCsharpXUnitCodeGen implements ICodeGen {
     const testRoutineBody = this.generateTestRoutineBody(testRoutine, pages);
 
     const datasets: IDataSetInfo[] = testRoutine.dataSets.map((dataset) => {
-      const dsName = createNameWithoutExt(dataset.name);
+      const dsName = createCleanName(dataset.name);
 
       const dsInfo: IDataSetInfo = {
         name: dsName,
