@@ -24,7 +24,7 @@ export interface ITestStepRegular extends Omit<ITestStepBase, "type"> {
   page?: string;
   element?: string;
   action?: string;
-  data?: string | { [datasetId: string]: string };
+  data: string | { [datasetId: string]: string };
   parameters?: string[];
 }
 export interface ITestStepComment extends Omit<ITestStepBase, "type"> {

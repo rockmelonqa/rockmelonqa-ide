@@ -1,85 +1,128 @@
 import { EOL } from "os";
 import path from "path";
 import {
-  ActionType,
-  IRmProjFile,
   ISourceProjectMetadata,
   ITestCase,
   ITestRoutine,
   ITestSuite,
   LocatorType,
   StandardFolder,
+  StandardOutputFolder,
 } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { createOutputProjectMetadata } from "../codegen";
 import { ICodeGen } from "../types";
-import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
 import { MsTestProjMeta } from "./msTestProjMeta";
 import { PlaywrightCsharpMsTestTemplatesProvider } from "./playwrightCsharpMsTestTemplatesProvider";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
-import createName, { createNameWithoutExt } from "../utils/createName";
+import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfos";
+import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCsharpCodeGen";
+import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
+import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 
-export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
-  private _projMeta: ISourceProjectMetadata;
-  private _rmprojFile: IRmProjFile;
-  private _rootNamespace: string;
-  private _templateProvider: PlaywrightCsharpMsTestTemplatesProvider;
-  private _outputFileExt: string;
-
-  private _indentChar: string;
-  private _indentSize: number;
-  private _indentString: string;
-
-  private _outProjMeta: MsTestProjMeta;
-
+export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen implements ICodeGen {
   /**
    * Constructor
    */
   constructor(projMeta: ISourceProjectMetadata) {
-    const rmprojFile = projMeta.project;
+    super(projMeta);
+  }
 
-    this._projMeta = projMeta;
-    this._rmprojFile = rmprojFile;
-    this._rootNamespace = rmprojFile.content.rootNamespace;
-    this._templateProvider = new PlaywrightCsharpMsTestTemplatesProvider(
-      path.join(rmprojFile.folderPath, StandardFolder.CustomCode, "templates")
-    );
-    this._outputFileExt = languageExtensionMap[rmprojFile.content.language];
+  protected getOutProjMeta(): IOutputProjectMetadataProcessor {
+    return new MsTestProjMeta(this._projMeta);
+  }
 
-    /** Space char of tab char */
-    this._indentChar = indentCharMap.get(rmprojFile.content.indent)!;
-    /** Size of 1 index: eg. 2 spaces or 4 spaces */
-    this._indentSize = rmprojFile.content.indentSize;
-    /** String representing 1 indent */
-    this._indentString = this._indentChar.repeat(this._indentSize);
-
-    this._outProjMeta = new MsTestProjMeta(projMeta);
+  protected getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {
+    return new PlaywrightCsharpMsTestTemplatesProvider(path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates"));
   }
 
   /** Generate MsTest project */
-  async generateCode(full: boolean, writeFile: (path: string, content: string) => Promise<void>): Promise<string> {
-    // # Build PageDefinitions
+  public async generateCode(full: boolean, writeFile: (path: string, content: string) => Promise<void>): Promise<string> {
+    await this.generatePageFiles(writeFile);
+    await this.generateCaseFiles(writeFile);
+    await this.generateRoutineFiles(writeFile);
+    await this.generateSuiteFiles(writeFile);
+    await this.generateSupportFiles(writeFile);
 
-    // # Generate Page definition for each page
-    // Filename: Pages/{PageName}.cs
-    for (let page of this._projMeta.pages) {
-      let pageContent = this.generatePage(page.content);
-      let fileRelPath = this._outProjMeta.get(page.content.id)!.outputFileRelPath;
-      await writeFile(fileRelPath, pageContent);
+    if (full) {
+      await this.generateProjectFiles(writeFile);
     }
 
-    // Each page definition will be a property
+    await this.generateMetaFiles(writeFile);
+    return "";
+  }
+
+  private async generateProjectFiles(writeFile: (path: string, content: string) => Promise<void>) {
+    // # Generate full project files
+    // Files:
+    //     - {Namespace}.csproj
+    //     - Usings.cs
+    //     - .runsettings
+    await writeFile(
+      `${this._rmprojFile.content.rootNamespace}.csproj`,
+      this._templateProvider.getCsProject(this._rmprojFile.content.rootNamespace)
+    );
+    await writeFile(
+      `${StandardOutputFile.Usings}${this._outputFileExt}`,
+      this._templateProvider.getUsings(this._rmprojFile.content.rootNamespace)
+    );
+    await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
+  }
+
+  private async generateMetaFiles(writeFile: (path: string, content: string) => Promise<void>) {
+    // Write output project metadata
+    const outputProjectMetadata = await createOutputProjectMetadata(this._rmprojFile);
+    await writeFile(StandardOutputFile.MetaData, JSON.stringify(outputProjectMetadata, null, 2));
+  }
+
+  private async generateSupportFiles(writeFile: (path: string, content: string) => Promise<void>) {
     // Filename: PageDefinitions.cs
     await writeFile(
       `${StandardOutputFile.PageDefinitions}${this._outputFileExt}`,
       this.generatePageDefinitions(this._projMeta.pages.map((p) => p.content))
     );
 
-    // # Generate TestCases
+    // # Generate TestLocatorHelper
 
-    // Filename: TestCases/{TestCaseName}.cs
+    // Filename: LocatorHelper.cs
+    await writeFile(
+      `${StandardOutputFolder.Support}/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
+      this._templateProvider.getLocatorHelper(this._rmprojFile.content.rootNamespace)
+    );
+
+    await writeFile(
+      `${StandardOutputFolder.Support}/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
+      this._templateProvider.getTestCaseBase(this._rmprojFile.content.rootNamespace)
+    );
+
+    await writeFile(
+      `${StandardOutputFolder.Support}/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
+      this._templateProvider.getTestSuiteBase(this._rmprojFile.content.rootNamespace, this._rmprojFile.content.testIdAttributeName)
+    );
+  }
+
+  private async generateSuiteFiles(writeFile: (path: string, content: string) => Promise<void>) {
+    for (let { content: testsuite } of this._projMeta.testSuites) {
+      let outputFileRelPath = this._outProjMeta.get(testsuite.id)!.outputFileRelPath;
+      let testClassContent = this.generateTestSuiteFile(
+        testsuite,
+        this._projMeta.testCases.map((tc) => tc.content)
+      );
+      await writeFile(outputFileRelPath, testClassContent);
+    }
+  }
+
+  private async generatePageFiles(writeFile: (path: string, content: string) => Promise<void>) {
+    for (let page of this._projMeta.pages) {
+      let pageContent = this.generatePage(page.content);
+      let fileRelPath = this._outProjMeta.get(page.content.id)!.outputFileRelPath;
+      await writeFile(fileRelPath, pageContent);
+    }
+  }
+
+  private async generateCaseFiles(writeFile: (path: string, content: string) => Promise<void>) {
     for (let { content: testCase } of this._projMeta.testCases) {
       let testClassContent = this.generateTestCaseFile(
         testCase,
@@ -90,74 +133,30 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
 
       await writeFile(outputFileRelPath, testClassContent);
     }
-
-    // Filename: TestRoutines/{TestRoutineName}.cs
-    for (let { content: routine } of this._projMeta.testRoutines) {
-      let testRoutineContent = this.generateTestRoutineFile(
-        routine,
-        this._projMeta.pages.map((p) => p.content)
-      );
-      let outputFileRelPath = this._outProjMeta.get(routine.id)!.outputFileRelPath;
-
-      await writeFile(outputFileRelPath, testRoutineContent);
-    }
-
-    // # Generate TestSuites
-
-    // Filename: TestSuites/{TestSuiteName}.cs
-
-    for (let { content: testsuite } of this._projMeta.testSuites) {
-      let outputFileRelPath = this._outProjMeta.get(testsuite.id)!.outputFileRelPath;
-      let testClassContent = this.generateTestSuiteFile(
-        testsuite,
-        this._projMeta.testCases.map((tc) => tc.content)
-      );
-      await writeFile(outputFileRelPath, testClassContent);
-    }
-
-    // # Generate TestLocatorHelper
-
-    // Filename: LocatorHelper.cs
-    await writeFile(
-      `Support/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
-      this._templateProvider.getLocatorHelper(this._rmprojFile.content.rootNamespace)
-    );
-
-    await writeFile(
-      `Support/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
-      this._templateProvider.getTestCaseBase(this._rmprojFile.content.rootNamespace)
-    );
-
-    await writeFile(
-      `Support/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
-      this._templateProvider.getTestSuiteBase(this._rmprojFile.content.rootNamespace, this._rmprojFile.content.testIdAttributeName)
-    );
-
-    // # Generate full project files
-    // Files:
-    //     - {Namespace}.csproj
-    //     - Usings.cs
-    //     - .runsettings
-    if (full) {
-      await writeFile(
-        `${this._rmprojFile.content.rootNamespace}.csproj`,
-        this._templateProvider.getCsProject(this._rmprojFile.content.rootNamespace)
-      );
-      await writeFile(
-        `${StandardOutputFile.Usings}${this._outputFileExt}`,
-        this._templateProvider.getUsings(this._rmprojFile.content.rootNamespace)
-      );
-      await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
-    }
-
-    // Write output project metadata
-    const outputProjectMetadata = await createOutputProjectMetadata(this._rmprojFile);
-    await writeFile(StandardOutputFile.MetaData, JSON.stringify(outputProjectMetadata, null, 2));
-
-    return "";
   }
 
-  generatePageDefinitions(pages: IPage[]): string {
+  private async generateRoutineFiles(writeFile: (path: string, content: string) => Promise<void>) {
+    for (let { content: testRoutine } of this._projMeta.testRoutines) {
+      const datasets: IDataSetInfo[] = generateDatasetInfos(testRoutine);
+      const testRoutinesClasses: string[] = [];
+
+      // For each dataset, we generate a separate routine class
+      for (let dataset of datasets) {
+        let testRoutineClass = this.generateTestRoutineClass(
+          testRoutine,
+          this._projMeta.pages.map((p) => p.content),
+          dataset
+        );
+        testRoutinesClasses.push(testRoutineClass);
+      }
+
+      let testRoutineFile = this.generateTestRoutineFile(testRoutine, testRoutinesClasses);
+      let outputFileRelPath = this._outProjMeta.get(testRoutine.id)!.outputFileRelPath;
+      await writeFile(outputFileRelPath, testRoutineFile);
+    }
+  }
+
+  private generatePageDefinitions(pages: IPage[]): string {
     let usingDirectives: string[] = [];
     for (let page of pages) {
       let pageNamespace = this._outProjMeta.get(page.id)!.outputFileFullNamespace;
@@ -195,7 +194,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     return this._templateProvider.getPageDefinitions(this._rootNamespace, usings, propertyDeclarations, propertyInits);
   }
 
-  generatePage(page: IPage): string {
+  private generatePage(page: IPage): string {
     let pageItems = [];
     for (let element of page.elements) {
       if (element.type === "pageElement") {
@@ -233,7 +232,7 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     return this._templateProvider.getPage(fullNamespace, pageClassName, page.description || "", pageBody);
   }
 
-  generateTestSuiteFile(testSuite: ITestSuite, testcases: ITestCase[]) {
+  private generateTestSuiteFile(testSuite: ITestSuite, testcases: ITestCase[]) {
     const testcaseMethods: string[] = [];
     const usingDirectives: string[] = [];
 
@@ -271,37 +270,28 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     return testClass;
   }
 
-  generateTestRoutineFile(testRoutine: ITestRoutine, pages: IPage[]) {
-    const testRoutineBody = this.generateTestRoutineBody(testRoutine, pages);
-
-    const datasets: IDataSetInfo[] = testRoutine.dataSets.map((dataset) => {
-      const dsName = createNameWithoutExt(dataset.name);
-
-      const dsInfo: IDataSetInfo = {
-        name: dsName,
-        description: dataset.description,
-
-        // Obtain dataset values from data of each step
-        values: testRoutine.steps.map((step) => {
-          return step.data[dataset.id];
-        }),
-      };
-
-      return dsInfo;
-    });
-
+  private generateTestRoutineFile(testRoutine: ITestRoutine, testRoutineClasses: string[]) {
     let routineFileContent = this._templateProvider.getTestRoutineFile(
-      this._outProjMeta.get(testRoutine.id)!.outputFileClassName,
-      testRoutine.description,
-      testRoutineBody,
       this._rootNamespace,
       this._outProjMeta.get(testRoutine.id)!.outputFileFullNamespace,
-      datasets
+      testRoutineClasses
     );
     return routineFileContent;
   }
 
-  generateTestCaseFile(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {
+  private generateTestRoutineClass(testRoutine: ITestRoutine, pages: IPage[], datasetInfo: IDataSetInfo) {
+    const testRoutineBody = this.generateTestRoutineBody(testRoutine, pages, datasetInfo);
+
+    // Output class name will be "{testRoutineClassName}{datasetName}";
+    const testRoutineName = this._outProjMeta.get(testRoutine.id)!.outputFileClassName;
+    const finalOutputClassName = `${testRoutineName}${datasetInfo.name}`;
+
+    let routineFileContent = this._templateProvider.getTestRoutineClass(finalOutputClassName, testRoutine.description, testRoutineBody);
+
+    return routineFileContent;
+  }
+
+  private generateTestCaseFile(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {
     const testcaseBody = this.generateTestCaseBody(testCase, pages, routines);
 
     let testFile = this._templateProvider.getTestCaseFile(
@@ -314,135 +304,9 @@ export class PlaywrightCsharpMSTestCodeGen implements ICodeGen {
     return testFile;
   }
 
-  generateTestCaseFunction(testCase: ITestCase) {
+  private generateTestCaseFunction(testCase: ITestCase) {
     const testcaseName = this._outProjMeta.get(testCase.id)!.outputFileClassName;
     const testCaseMethod = this._templateProvider.getTestFunction(upperCaseFirstChar(testcaseName), testCase.description);
     return testCaseMethod;
-  }
-
-  generateTestCaseBody(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {
-    let stepItems = [];
-    for (let step of testCase.steps) {
-      if (step.type === "testStep") {
-        let pageName = "";
-        let elementName = "";
-
-        if (step.page) {
-          let pageId = step.page;
-          let page = pages.find((p) => p.id === pageId);
-          if (!page) {
-            throw new Error("DEV ERROR: " + `Cannot find page with ID ${step.page}`);
-          }
-          pageName = this._outProjMeta.get(page.id)!.outputFileClassName;
-
-          if (step.element) {
-            let elementId = step.element;
-            let element = page.elements.find((e) => e.id === elementId);
-            if (!element) {
-              throw new Error("DEV ERROR: " + `Cannot find element with ID ${elementId} on page ${pageName}`);
-            }
-            elementName = element.name || "";
-          }
-        }
-
-        stepItems.push(
-          this._templateProvider.getTestCaseAction({
-            pageName: pageName,
-            elementName: upperCaseFirstChar(elementName),
-            action: step.action! as unknown as ActionType,
-            data: step.data?.toString() || "",
-            parameters: step.parameters || [],
-          })
-        );
-        continue;
-      }
-
-      if (step.type === "comment") {
-        // Add an empty line before the comment
-        stepItems.push("");
-        stepItems.push(this._templateProvider.getComment(step.comment!));
-        continue;
-      }
-
-      if (step.type === "routine") {
-        stepItems.push("// Routine " + step.id);
-        let routineId = step.routine!;
-        let datasetId = step.dataset!;
-        let routine = routines.find((r) => r.id === routineId)!;
-        let routineName = this._outProjMeta.get(routineId)!.outputFileClassName;
-        let dataset = routine.dataSets.find((ds) => ds.id === datasetId)!;
-        let datasetName = createNameWithoutExt(dataset.name);
-        stepItems.push(`await new ${routineName}(this).RunAsync(${routineName}.${datasetName});`);
-      }
-    }
-
-    let testcaseBody = stepItems.join(EOL);
-
-    // If there is no step, we add an `await` so that there is no build warning about `async` method
-    if (testcaseBody.length === 0) {
-      testcaseBody = `await Task.CompletedTask;`;
-    }
-
-    // Indent test method body with 1 indent;
-    testcaseBody = addIndent(testcaseBody, this._indentString.repeat(2));
-    return testcaseBody;
-  }
-
-  generateTestRoutineBody(testCase: ITestRoutine, pages: IPage[]) {
-    let stepItems = [];
-    for (let step of testCase.steps) {
-      let index = testCase.steps.indexOf(step);
-
-      if (step.type === "testStep") {
-        let pageName = "";
-        let elementName = "";
-
-        if (step.page) {
-          let pageId = step.page;
-          let page = pages.find((p) => p.id === pageId);
-          if (!page) {
-            throw new Error("DEV ERROR: " + `Cannot find page with ID ${step.page}`);
-          }
-          pageName = this._outProjMeta.get(page.id)!.outputFileClassName;
-
-          if (step.element) {
-            let elementId = step.element;
-            let element = page.elements.find((e) => e.id === elementId);
-            if (!element) {
-              throw new Error("DEV ERROR: " + `Cannot find element with ID ${elementId} on page ${pageName}`);
-            }
-            elementName = element.name || "";
-          }
-        }
-
-        stepItems.push(
-          this._templateProvider.getRoutineAction({
-            pageName: pageName,
-            elementName: upperCaseFirstChar(elementName),
-            action: step.action! as unknown as ActionType,
-            data: `ds[${index}]`,
-            parameters: step.parameters || [],
-          })
-        );
-        continue;
-      }
-
-      if (step.type === "comment") {
-        // Add an empty line before the comment
-        stepItems.push("");
-        stepItems.push(this._templateProvider.getComment(step.comment!));
-      }
-    }
-
-    let testcaseBody = stepItems.join(EOL);
-
-    // If there is no step, we add an `await` so that there is no build warning about `async` method
-    if (testcaseBody.length === 0) {
-      testcaseBody = `await Task.CompletedTask;`;
-    }
-
-    // Indent test method body with 1 indent;
-    testcaseBody = addIndent(testcaseBody, this._indentString.repeat(2));
-    return testcaseBody;
   }
 }
