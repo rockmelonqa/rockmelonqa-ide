@@ -6,4 +6,5 @@ export class StandardOutputFolder {
   static readonly TestCases: string = "TestCases";
   static readonly TestSuites: string = "TestSuites";
   static readonly TestRoutines: string = "TestRoutines";
+  static readonly Support: string = "Support";
 }
