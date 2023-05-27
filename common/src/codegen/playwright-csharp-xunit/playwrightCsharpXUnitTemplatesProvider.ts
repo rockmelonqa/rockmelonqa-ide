@@ -1,11 +1,10 @@
 import path from "path";
 import { IActionTemplateParam, ILocatorTemplateParam } from "../types";
-import { actionRegistyDotnet } from "../utils/action-registry-dotnet";
-import { locatorRegistyDotnet } from "../utils/locator-registry-dotnet";
 import { upperCaseFirstChar } from "../utils/stringUtils";
 import { XUnitTemplateCollection } from "./templateCollection";
-import { routineActionRegistry } from "../playwright-charp-common/routine-action-registry";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
+import { actionRegistyDotnet } from "../playwright-charp-common/action-registry-dotnet";
+import { locatorRegistyDotnet } from "../playwright-charp-common/locator-registry-dotnet";
 
 export class PlaywrightCsharpXUnitTemplatesProvider {
   private _templateCollection: XUnitTemplateCollection;
@@ -56,7 +55,7 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
   }
 
   getRoutineAction(params: IActionTemplateParam) {
-    const actionGenerate = routineActionRegistry.get(params.action);
+    const actionGenerate = actionRegistyDotnet.get(params.action);
     if (!actionGenerate) {
       throw new Error("(DEV) Action is not support: " + params.action);
     }
