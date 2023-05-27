@@ -20,6 +20,8 @@
     import { combinePath } from './FileExplorer/Node';
     import { Notify } from './Notify';
     import type { IGenericTab } from './Tab/Tab';
+    import AlertDialog from './AlertDialog.svelte';
+    import { AlertDialogButtons, AlertDialogType } from './Alert';
 
     const window = getWindow();
 
@@ -33,6 +35,8 @@
     let showCodeGenerationDialog: boolean = false;
     let showRunTestDialog: boolean = false;
 
+    let closeAllDialogType: AlertDialogType = AlertDialogType.None;
+
     /**
      * List of functions to clean up ipc listener
      */
@@ -43,6 +47,9 @@
         }
     };
 
+    /***********************************************
+     * Event Handlers
+    ************************************************/
     onMount(async () => {
         const env = await application.getEnvironmentInfo();
         uiContext.pathSeparator = env.pathSeparator;
@@ -62,13 +69,21 @@
         );
 
         registerListener(
+            application.onQuit(quit)
+        );
+
+        registerListener(
             windowIpc.onShow((data) => {
                 showNewProjectDialog = data === 'dialog:NewProject';
                 showAboutDialog = data === 'dialog:About';
             })
         );
 
+        // Listen keyup to handle Ctrl+S
         window!.addEventListener('keyup', onKeyUp);
+
+        // Listen to handle closing dirty tab
+        window!.addEventListener('beforeunload', onBeforeUnload);
 
         if (!$appState.projectFile) {
             goto(NavRoute.GET_STARTED);
@@ -80,24 +95,8 @@
         cleanupFns.length = 0; // clear array
 
         window?.removeEventListener('keyup', onKeyUp);
+        window?.removeEventListener('beforeunload', onBeforeUnload);
     });
-
-    const onKeyUp = async (e: KeyboardEvent) => {
-        if (e.ctrlKey && e.key === 's') {
-            if (!$appState.tabs.length) {
-                return;
-            }
-
-            if (!$appState.tabs[$appState.activeTabIndex].isDirty) {
-                return;
-            }
-
-            const handler = tabOnSaveHandlers.get($appState.activeTabIndex);
-            if (handler) {
-                await handler();
-            }
-        }
-    };
 
     /** List of onSave event handlers, from opening tabs
      * Key: tab index
@@ -105,6 +104,9 @@
      */
     let tabOnSaveHandlers: Map<number, OnSaveHandler | undefined> = new Map();
 
+    /***********************************************
+     * Application functions declaration
+    ************************************************/
     const loadProject = async (projectFile: IRmProjFile) => {
         appStateDispatch({ type: AppActionType.LoadProject, projectFile: projectFile });
         tabOnSaveHandlers.clear();
@@ -186,16 +188,100 @@
         node.setChildren(Node.sort(await buildChildrenNodes(fileSystemPath)));
     };
 
+    const handleCloseAllTabs = async (event: any) => {
+        const button = event.detail.button;
+        if (button === 'cancel') {
+            return;
+        }
+
+        if (button === 'no') {
+            // Clear dirtay tab checking before quit
+            window?.removeEventListener('beforeunload', onBeforeUnload);
+            quit();
+            return;
+        }
+
+        // yes
+        const tabsToClose = [];
+        for (let index = 0; index < $appState.tabs.length; index++) {
+            let tab = $appState.tabs[index];
+            if (tab.isDirty) {
+                const handler = tabOnSaveHandlers.get(index);
+                if (handler != null) {
+                    const success = await handler();
+                    if (!success) {
+                        continue; // do not close this tab
+                    }
+                }
+            }
+
+            tabsToClose.push(index);
+        }
+
+        if (tabsToClose.length === $appState.tabs.length) {
+            quit();
+        } else {
+            appStateDispatch({ type: AppActionType.CloseTabs, tabIndexes: tabsToClose });
+        }
+    };
+
+    const quit = () => {
+        window!.close();
+    };
+
+    /***********************************************
+     * Application methods public to children components
+    ************************************************/
     setContext(appActionContextKey, {
-        getOnSaveHandler: (contentIndex: number) => tabOnSaveHandlers.get(contentIndex),
+        /** Load selected *.rmproj file */
         loadProject: loadProject,
+
+        /** Open selected file in new tab */
         openFile: openFile,
+
+        // get, add, delete tab-content on-save handler
+        getOnSaveHandler: (contentIndex: number) => tabOnSaveHandlers.get(contentIndex),
         registerOnSaveHandler: (contentIndex: number, func: OnSaveHandler) => tabOnSaveHandlers.set(contentIndex, func),
+        unregisterOnSaveHandler: (contentIndex: number) => tabOnSaveHandlers.delete(contentIndex),
+        
         showCodeGenerationDialog: () => (showCodeGenerationDialog = true),
         showNewProjectDialog: () => (showNewProjectDialog = true),
         showRunTestDialog: () => (showRunTestDialog = true),
-        unregisterOnSaveHandler: (contentIndex: number) => tabOnSaveHandlers.delete(contentIndex),
+        
+        /** Exit app */
+        quit: quit,
     }) as IAppActionContext;
+
+    /***********************************************
+     * Helpers
+    ************************************************/
+    const onKeyUp = async (e: KeyboardEvent) => {
+        if (e.ctrlKey && e.key === 's') {
+            if (!$appState.tabs.length) {
+                return;
+            }
+
+            if (!$appState.tabs[$appState.activeTabIndex].isDirty) {
+                return;
+            }
+
+            const handler = tabOnSaveHandlers.get($appState.activeTabIndex);
+            if (handler) {
+                await handler();
+            }
+        }
+    };
+
+    /** Determine whether there is dirty tab, to display save pending changes dialog */
+    const onBeforeUnload = (event: any) => {
+        const hasDirtyTab = $appState.tabs.some((x) => x.isDirty);
+        if (hasDirtyTab) {
+            event.returnValue = 'any-value-to-prevent-default';
+            closeAllDialogType = AlertDialogType.Question;
+        } else {
+            quit();
+        }
+    };
 </script>
 
 <slot />
@@ -213,3 +299,13 @@
 {/if}
 
 <AboutDialog bind:showDialog={showAboutDialog} />
+
+<AlertDialog
+    id="dialogCloseAll"
+    bind:type={closeAllDialogType}
+    buttons={AlertDialogButtons.YesNoCancel}
+    on:click={handleCloseAllTabs}
+>
+    <div slot="content">Do you want to save all pending changes?</div>
+</AlertDialog>
+

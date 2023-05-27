@@ -37,7 +37,7 @@ const validInvokeChannel: IChannels = {
 };
 
 // from Main
-const validReceiveChannel: string[] = ["createNewProject", "loadProject", "quit"];
+const validReceiveChannel: string[] = ["loadProject", "quit"];
 
 class ApplicationIPC extends IPC {
   async openProject(browserWindow: BrowserWindow) {

@@ -15,35 +15,27 @@
     const uiContext = getContext(uiContextKey) as IUiContext;
     let recentProjects: IRecentFile[] = [];
 
-    let cleanupFn: Action | undefined;
-
     onMount(async () => {
-        cleanupFn = application.onQuit(window.close);
 
         const data = await application.getUserSettings();
         recentProjects = sliceRecentProjects(data.recentFiles);
     });
 
-    onDestroy(() => {
-        if (cleanupFn) {
-            cleanupFn();
-            cleanupFn = undefined;
-        }
-    });
+    onDestroy(() => {});
 
     const sliceRecentProjects = (projects: IRecentFile[]): IRecentFile[] => {
         // show top-5 latest only
         return projects.slice(0, 5);
     };
 
-    const { showNewProjectDialog, loadProject } = getContext(appActionContextKey) as IAppActionContext;
+    const { showNewProjectDialog, loadProject, quit } = getContext(appActionContextKey) as IAppActionContext;
 
     const handleOpenProjectClick = () => {
         application.openProject();
     };
 
     const handleExitClick = () => {
-        window.close();
+        quit();
     };
 
     const selectRecentProject = async (recentFile: IRecentFile) => {

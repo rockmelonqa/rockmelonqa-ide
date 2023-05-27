@@ -1,5 +1,4 @@
 // https://www.tutorialspoint.com/electron/electron_menus.htm
-// https://livebook.manning.com/book/electron-in-action/chapter-7/43
 // https://github.com/electron/electron/blob/main/lib/browser/api/menu-item-roles.ts
 
 import { BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions } from "electron";
