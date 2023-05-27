@@ -60,6 +60,7 @@ export const initialAppContext: IAppState = {
  */
 export enum AppActionType {
     LoadProject = "LoadProject",
+    UnloadProject = "UnloadProject",
     SetProject = "SetProject",
 
     SetPageData = "LoadPageData",
@@ -91,6 +92,7 @@ export enum AppActionType {
  */
 export type AppAction =
     | { type: AppActionType.LoadProject; projectFile: IRmProjFile }
+    | { type: AppActionType.UnloadProject }
     | { type: AppActionType.SetProject; projectFile: IRmProjFile }
     | { type: AppActionType.SetPageData; data: IPageData }
     | { type: AppActionType.RemovePageData; filePath: string }
@@ -123,6 +125,9 @@ export function appContextReducer(state: IAppState, action: AppAction): IAppStat
                       activity: ActivityType.Files,
                   }
                 : { ...state };
+        }
+        case AppActionType.UnloadProject: {
+            return initialAppContext;
         }
         case AppActionType.SetProject:
             return {

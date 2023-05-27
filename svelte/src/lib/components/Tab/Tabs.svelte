@@ -27,18 +27,10 @@
     let closeTabDialogType: AlertDialogType = AlertDialogType.None;
     let tabToClose: number;
 
-    let closeAllDialogType: AlertDialogType = AlertDialogType.None;
-
     $: tabTitleContainerCss = 'tab-item-title-container pl-4 pr-2 py-3 flex items-center gap-x-3';
     $: tabContentCss = 'tab-item-content flex-1 overflow-y-auto';
 
-    let cleanupFn: Action | undefined;
-
     onMount(() => {
-        cleanupFn = application.onQuit(quit);
-
-        window!.addEventListener('beforeunload', handleBeforeUnload);
-
         // Enable horizontal scroll
         titleBar.addEventListener('wheel', function (e) {
             titleBar.scrollLeft = titleBar.scrollLeft + (e.deltaY > 0 ? 100 : -100);
@@ -48,25 +40,7 @@
         mounted = true;
     });
 
-    /** Determine whether there is dirty tab, to display save pending changes dialog */
-    const handleBeforeUnload = (event: any) => {
-        const hasDirtyTab = tabs.some((x) => x.isDirty);
-        if (hasDirtyTab) {
-            event.returnValue = 'any-value-to-prevent-default';
-            closeAllDialogType = AlertDialogType.Question;
-        } else {
-            quit();
-        }
-    };
-
-    onDestroy(() => {
-        if (cleanupFn) {
-            cleanupFn();
-            cleanupFn = undefined;
-        }
-
-        window?.removeEventListener('beforeunload', handleBeforeUnload);
-    });
+    onDestroy(() => {});
 
     afterUpdate(() => {
         if (mounted) {
@@ -130,47 +104,6 @@
         appStateDispatch({ type: AppActionType.CloseTab, tabIndex: tabToClose });
     };
 
-    const handleCloseAll = async (event: any) => {
-        const button = event.detail.button;
-        if (button === 'cancel') {
-            return;
-        }
-
-        if (button === 'no') {
-            // Clear dirtay tab checking before quit
-            window?.removeEventListener('beforeunload', handleBeforeUnload);
-            quit();
-            return;
-        }
-
-        // yes
-        const tabsToClose = [];
-        for (let index = 0; index < tabs.length; index++) {
-            let tab = tabs[index];
-            if (tab.isDirty) {
-                const handler = getOnSaveHandler(index);
-                if (handler != null) {
-                    const success = await handler();
-                    if (!success) {
-                        continue; // do not close this tab
-                    }
-                }
-            }
-
-            tabsToClose.push(index);
-        }
-
-        if (tabsToClose.length === tabs.length) {
-            quit();
-        } else {
-            appStateDispatch({ type: AppActionType.CloseTabs, tabIndexes: tabsToClose });
-        }
-    };
-
-    const quit = () => {
-        window!.close();
-    };
-
     const setTabDirty = (tabIndex: number, isDirty: boolean) => {
         const needUpdate = tabs[tabIndex].isDirty !== isDirty;
         if (needUpdate) {
@@ -230,11 +163,3 @@
     <div slot="content">Do you want to save pending changes?</div>
 </AlertDialog>
 
-<AlertDialog
-    id="dialogCloseAll"
-    bind:type={closeAllDialogType}
-    buttons={AlertDialogButtons.YesNoCancel}
-    on:click={handleCloseAll}
->
-    <div slot="content">Do you want to save all pending changes?</div>
-</AlertDialog>
