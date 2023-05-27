@@ -16,7 +16,6 @@
     let recentProjects: IRecentFile[] = [];
 
     onMount(async () => {
-
         const data = await application.getUserSettings();
         recentProjects = sliceRecentProjects(data.recentFiles);
     });

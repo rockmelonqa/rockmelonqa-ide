@@ -5,6 +5,7 @@ import type {
     IIpcGenericResponse,
     IIpcResponse,
     IRmProjFile,
+    IShowHideMenuRequest,
     IUserSettings,
 } from 'rockmelonqa.common';
 import { DefaultApiKey } from './shared';
@@ -17,6 +18,13 @@ const getApi = (apiKey?: string) => {
 
 const getAppInfo = async (options?: { apiKey?: string }): Promise<IAppInfo> => {
     return await getApi(options?.apiKey).invoke('getAppInfo');
+};
+
+/**
+ * Get path separator based on OS
+ */
+const getEnvironmentInfo = async (options?: { apiKey?: string }): Promise<IEnvironmentInfo> => {
+    return await getApi(options?.apiKey).invoke('getEnvironmentInfo');
 };
 
 const getUserSettings = async (options?: { apiKey?: string }): Promise<IUserSettings> => {
@@ -42,17 +50,17 @@ const onLoadProject = (
     return getApi(options?.apiKey).on('loadProject', fn);
 };
 
+const onCloseProject = (fn: Action, options?: {apiKey?: string}) : Action | undefined => {
+    return getApi(options?.apiKey).on('closeProject', fn);
+};
+
 const onQuit = (fn: Action, options?: { apiKey?: string }): Action | undefined => {
     return getApi(options?.apiKey).on('quit', fn);
 };
 
-/**
- * Get path separator based on OS
- */
-const getEnvironmentInfo = async (options?: { apiKey?: string }): Promise<IEnvironmentInfo> => {
-    return await getApi(options?.apiKey).invoke('getEnvironmentInfo');
+const showHideMenuItem = (data: IShowHideMenuRequest, options?: { apiKey?: string }) => {
+    getApi(options?.apiKey).send('showHideMenuItem', data);
 };
-
 export const application = {
     getAppInfo,
     getEnvironmentInfo,
@@ -61,5 +69,7 @@ export const application = {
     createNewProject,
     openProject,
     onLoadProject,
+    onCloseProject,
     onQuit,
+    showHideMenuItem
 };

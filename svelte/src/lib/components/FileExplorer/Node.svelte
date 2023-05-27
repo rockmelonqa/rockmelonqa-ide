@@ -35,7 +35,7 @@
     let { state: appState, dispatch: appStateDispatch } = appContext;
 
     $: nodePath = node.toTreePath();
-    $: fileSystemPath = toFileSystemPath(nodePath, $appState.projectFile!.folderPath, uiContext.pathSeparator);
+    $: fileSystemPath = toFileSystemPath(nodePath, $appState.projectFile?.folderPath ?? '', uiContext.pathSeparator);
     $: label = node.name;
     $: type = node.type;
     $: hasChildren = node.hasChildren;

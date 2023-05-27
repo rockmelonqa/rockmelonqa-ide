@@ -21,7 +21,7 @@
   export let suiteFilePaths: string[];
 
   $: suitesFolderPath = combinePath(
-    [$appState.projectFile!.folderPath, StandardFolder.TestSuites],
+    [$appState.projectFile?.folderPath ?? '', StandardFolder.TestSuites],
     uiContext.pathSeparator
   );
   $: suiteRelPaths = suiteFilePaths.map((suiteFilePath) => {

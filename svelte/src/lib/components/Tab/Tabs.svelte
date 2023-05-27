@@ -40,9 +40,7 @@
         mounted = true;
     });
 
-    onDestroy(() => {
-        
-    });
+    onDestroy(() => {});
 
     afterUpdate(() => {
         if (mounted) {
@@ -105,8 +103,6 @@
 
         appStateDispatch({ type: AppActionType.CloseTab, tabIndex: tabToClose });
     };
-
-    
 
     const setTabDirty = (tabIndex: number, isDirty: boolean) => {
         const needUpdate = tabs[tabIndex].isDirty !== isDirty;

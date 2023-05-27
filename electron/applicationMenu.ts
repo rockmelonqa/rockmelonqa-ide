@@ -29,6 +29,15 @@ const template = [
         },
       },
       {
+        label: "Close Project",
+        visible: false,
+        click: async (menuItem: MenuItem, browserWindow: BrowserWindow | undefined) => {
+          if (browserWindow) {
+            application.closeProject(browserWindow);
+          }
+        },
+      },
+      {
         label: "Exit",
         accelerator: "CommandOrControl+Q",
         click: async (menuItem: MenuItem, browserWindow: BrowserWindow | undefined) => {
