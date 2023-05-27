@@ -1,0 +1,14 @@
+namespace {{{rootNamespace}}}.Support;
+
+/// <summary>
+/// Base class for test suite
+/// </summary>
+public abstract class TestSuiteBase : PageTest
+{
+    public TestSuiteBase() : base() 
+    {
+{{#if testIdAttributeName}}
+        Playwright.Selectors.SetTestIdAttribute("{{testIdAttributeName}}");
+{{/if}}
+    }
+}

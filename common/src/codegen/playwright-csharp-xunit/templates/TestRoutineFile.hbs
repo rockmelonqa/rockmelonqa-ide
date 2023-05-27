@@ -2,32 +2,6 @@ using {{{rootNamespace}}}.TestRoutines;
 
 namespace {{{fullNamespace}}};
 
-/// <summary>
-/// {{{description}}}
-/// </summary>
-public partial class {{{testRoutineName}}} : TestRoutineBase
-{
-    public {{{testRoutineName}}}(PageTest testSuiteInstance): base(testSuiteInstance.Page) {}
-
-    public async Task RunAsync(string[] ds)
-    {
-        PageDefinitions defs = new PageDefinitions(this.Page);
-
-{{{body}}}
-    }
-
-    {{#each datasets as |dataset|}}
-    {{#if dataset.description}}
-    /// <summary>
-    /// {{{dataset.description}}}
-    /// </summary>
-    {{/if}}
-    public static readonly string[] {{{dataset.name}}} = new[]
-    {
-        {{#each dataset.values as |value|}}
-        "{{{value}}}",
-        {{/each}}
-    };
-
-    {{/each}}
-}
+{{#each testRoutineClasses as |testRoutineClass|}}
+{{{testRoutineClass}}}
+{{/each}}

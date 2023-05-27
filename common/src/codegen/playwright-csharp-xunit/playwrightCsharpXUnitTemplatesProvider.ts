@@ -5,12 +5,20 @@ import { XUnitTemplateCollection } from "./templateCollection";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import { actionRegistyDotnet } from "../playwright-charp-common/action-registry-dotnet";
 import { locatorRegistyDotnet } from "../playwright-charp-common/locator-registry-dotnet";
+import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 
-export class PlaywrightCsharpXUnitTemplatesProvider {
+export class PlaywrightCsharpXUnitTemplatesProvider implements IPlaywrightCsharpTemplatesProvider {
   private _templateCollection: XUnitTemplateCollection;
 
   constructor(customTemplatesDir: string) {
     this._templateCollection = new XUnitTemplateCollection(path.resolve(__dirname, "./templates"), customTemplatesDir, ".hbs");
+  }
+
+  getTestSuiteBase(rootNamespace: string, testIdAttributeName: string): string {
+    return this._templateCollection.TEST_SUITE_BASE_FILE({ rootNamespace, testIdAttributeName });
+  }
+  getTestCaseBase(rootNamespace: string): string {
+    return this._templateCollection.TEST_CASE_BASE_FILE({ rootNamespace });
   }
 
   getTestSuiteFile(usings: string, name: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
@@ -27,7 +35,7 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
     });
   }
 
-  getTestCaseAction(params: IActionTemplateParam) {
+  getAction(params: IActionTemplateParam) {
     const actionGenerate = actionRegistyDotnet.get(params.action);
     if (!actionGenerate) {
       throw new Error("(DEV) Action is not support: " + params.action);
@@ -36,31 +44,20 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
     return actionGenerate(params);
   }
 
-  getTestRoutineFile(
-    testRoutineName: string,
-    description: string,
-    body: string,
-    rootNamespace: string,
-    fullNamespace: string,
-    datasets: IDataSetInfo[]
-  ) {
-    return this._templateCollection.TEST_ROUTINE_FILE({
-      rootNamespace,
+  getTestRoutineClass(testRoutineName: string, description: string, body: string) {
+    return this._templateCollection.TEST_ROUTINE_CLASS({
       testRoutineName,
       description,
       body,
-      fullNamespace,
-      datasets,
     });
   }
 
-  getRoutineAction(params: IActionTemplateParam) {
-    const actionGenerate = actionRegistyDotnet.get(params.action);
-    if (!actionGenerate) {
-      throw new Error("(DEV) Action is not support: " + params.action);
-    }
-
-    return actionGenerate(params);
+  getTestRoutineFile(rootNamespace: string, fullNamespace: string, testRoutineClasses: string[]) {
+    return this._templateCollection.TEST_ROUTINE_FILE({
+      rootNamespace,
+      fullNamespace,
+      testRoutineClasses,
+    });
   }
 
   getLocator(params: ILocatorTemplateParam) {
@@ -98,7 +95,7 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
   getBaseClasses(rootNamespace: string, testIdAttributeName: string): string {
     return this._templateCollection.BASE_CLASSES_FILE({ rootNamespace, testIdAttributeName });
   }
-  getCSProject(rootNamespace: string) {
+  getCsProject(rootNamespace: string) {
     return this._templateCollection.CSPROJECT_FILE({ rootNamespace });
   }
   getUsings(rootNamespace: string) {

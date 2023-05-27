@@ -1,0 +1,14 @@
+/// <summary>
+/// {{{description}}}
+/// </summary>
+public partial class {{{testRoutineName}}} : TestRoutineBase
+{
+    public {{{testRoutineName}}}(PageTest testSuiteInstance): base(testSuiteInstance.Page) {}
+
+    public async Task RunAsync(string[] ds)
+    {
+        PageDefinitions defs = new PageDefinitions(this.Page);
+
+{{{body}}}
+    }
+}

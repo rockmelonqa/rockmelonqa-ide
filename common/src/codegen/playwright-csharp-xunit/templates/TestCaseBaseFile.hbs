@@ -1,0 +1,32 @@
+namespace {{{rootNamespace}}}.Support;
+
+/// <summary>
+/// Base class for test case
+/// </summary>
+public abstract class TestCaseBase : PageTest
+{
+    /// <summary>
+    /// Returns TestSuiteInstance.Page when TestSuiteInstance is not null, otherwise return the Page of base class (PageTest.Page)
+    /// </summary>
+    public new IPage Page => TestSuiteInstance == null ? base.Page : TestSuiteInstance.Page;
+
+    /// <summary>
+    /// Default constructor
+    /// </summary>
+    public TestCaseBase() { }
+
+    /// <summary>
+    /// Create new instance of RmTestSuiteBase with the provided testSuiteInstance
+    /// </summary>
+    public TestCaseBase(PageTest testSuiteInstance) : base(testSuiteInstance)
+    {
+    }
+
+    /// <summary>
+    /// Custom Expect method that works from IFrameLocator
+    /// </summary>
+    public ILocatorAssertions Expect(IFrameLocator locator)
+    {
+        return Expect(locator.Locator(":root"));
+    }
+}
