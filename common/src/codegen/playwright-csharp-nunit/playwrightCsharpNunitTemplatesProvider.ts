@@ -93,8 +93,8 @@ export class PlaywrightCsharpNunitTemplatesProvider implements IPlaywrightCsharp
   getCsProject(rootNamespace: string) {
     return this._templateCollection.CSPROJECT_FILE({ rootNamespace });
   }
-  getUsings(rootNamespace: string) {
-    return this._templateCollection.USINGS_FILE({ rootNamespace });
+  getUsings(rootNamespace: string, hasRoutines: boolean) {
+    return this._templateCollection.USINGS_FILE({ rootNamespace, hasRoutines });
   }
   getRunSettings() {
     return this._templateCollection.RUNSETTINGS_FILE({});

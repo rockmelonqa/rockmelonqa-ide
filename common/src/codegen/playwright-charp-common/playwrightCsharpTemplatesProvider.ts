@@ -18,7 +18,7 @@ export interface IPlaywrightCsharpTemplatesProvider {
   getComment: (message: string) => string;
   getTestFunction: (name: string, description: string) => string;
   getCsProject: (rootNamespace: string) => string;
-  getUsings: (rootNamespace: string) => string;
+  getUsings: (rootNamespace: string, hasRoutines: boolean) => string;
   getRunSettings: () => string;
   getTestCaseBase: (rootNamespace: string) => string;
   getPageDefinitions: (rootNamespace: string, usings: string, pageDeclaration: string, body: string) => string;

@@ -126,7 +126,7 @@ export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implem
       );
       await writeFile(
         `${StandardOutputFile.Usings}${this._outputFileExt}`,
-        this._templateProvider.getUsings(this._rmprojFile.content.rootNamespace)
+        this._templateProvider.getUsings(this._rmprojFile.content.rootNamespace, this._projMeta.testRoutines.length > 0)
       );
       await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
     }

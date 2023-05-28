@@ -8,6 +8,7 @@ import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { IDataSetInfo } from "./dataSetInfo";
 import { IPlaywrightCsharpTemplatesProvider } from "./playwrightCsharpTemplatesProvider";
 
+/** Base CodeGen for MsTest, Nunit, Xunit CodeGens */
 export class PlaywrightCsharpCodeGen {
   protected _outProjMeta: IOutputProjectMetadataProcessor;
   protected _templateProvider: IPlaywrightCsharpTemplatesProvider;
@@ -101,7 +102,7 @@ export class PlaywrightCsharpCodeGen {
         let dataset = routine.dataSets.find((ds) => ds.id === datasetId)!;
         let datasetName = createCleanName(dataset.name);
         let finalRoutineClassName = `${routineName}${datasetName}`;
-        stepItems.push(`await new ${finalRoutineClassName}(this).RunAsync();`);
+        stepItems.push(`await new ${finalRoutineClassName}(this.Page).RunAsync();`);
       }
     }
 
