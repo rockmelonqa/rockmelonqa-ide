@@ -1,25 +1,22 @@
 import { EOL } from "os";
 import path from "path";
 import {
-  ActionType,
-  IRmProjFile,
   ISourceProjectMetadata,
   ITestCase,
   ITestRoutine,
   ITestSuite,
   LocatorType,
   StandardFolder,
+  StandardOutputFolder,
 } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { createOutputProjectMetadata } from "../codegen";
 import { ICodeGen } from "../types";
-import { languageExtensionMap } from "../utils/languageExtensionMap";
-import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
+import { addIndent, hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
 import { NunitProjectMeta } from "./nunitProjectMeta";
 import { PlaywrightCsharpNunitTemplatesProvider } from "./playwrightCsharpNunitTemplatesProvider";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
-import { createCleanName } from "../utils/createName";
 import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCsharpCodeGen";
 import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfos";
@@ -100,18 +97,18 @@ export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implem
 
     // Filename: Support/LocatorHelper.cs
     await writeFile(
-      `Support/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
+      `${StandardOutputFolder.Support}/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
       this._templateProvider.getLocatorHelper(this._rmprojFile.content.rootNamespace)
     );
     // Filename: Support/TestCaseBase.cs
     await writeFile(
-      `Support/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
+      `${StandardOutputFolder.Support}/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
       this._templateProvider.getTestCaseBase(this._rmprojFile.content.rootNamespace)
     );
 
     // Filename: Support/TestSuiteBase.cs
     await writeFile(
-      `Support/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
+      `${StandardOutputFolder.Support}/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
       this._templateProvider.getTestSuiteBase(this._rmprojFile.content.rootNamespace, this._rmprojFile.content.testIdAttributeName)
     );
     // # Generate full project files

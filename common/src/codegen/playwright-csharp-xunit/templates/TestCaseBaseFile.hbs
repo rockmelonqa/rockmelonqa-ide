@@ -30,3 +30,19 @@ public abstract class TestCaseBase : PageTest
         return Expect(locator.Locator(":root"));
     }
 }
+
+/// <summary>
+/// Base class for RM test routine 
+/// </summary>
+public abstract class TestRoutineBase
+{
+    protected IPage Page { get; init; }
+
+    /// <summary>
+    /// Create new instance of RmTestSuiteBase with the provided Page
+    /// </summary>
+    public TestRoutineBase(IPage page)
+    {
+        this.Page = page;
+    }
+}

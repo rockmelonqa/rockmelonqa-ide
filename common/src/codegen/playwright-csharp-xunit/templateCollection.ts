@@ -39,7 +39,7 @@ export class XUnitTemplateCollection implements ICsharpTemplateCollection {
     this.TEST_CASE_FILE = loadAndCompile("TestCaseFile");
     this.TEST_ROUTINE_FILE = loadAndCompile("TestRoutineFile");
     this.TEST_ROUTINE_CLASS = loadAndCompile("TestRoutineClass");
-    this.TEST_SUITE_BASE_FILE = loadAndCompile("TestRoutineClass");
+    this.TEST_SUITE_BASE_FILE = loadAndCompile("TestSuiteBaseFile");
     this.TEST_CASE_BASE_FILE = loadAndCompile("TestCaseBaseFile");
   }
 }

@@ -9,6 +9,7 @@ import {
   ITestSuite,
   LocatorType,
   StandardFolder,
+  StandardOutputFolder,
 } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
@@ -30,7 +31,6 @@ type WriteFileFn = (path: string, content: string) => Promise<void>;
 export class PlaywrightCsharpXUnitCodeGen extends PlaywrightCsharpCodeGen implements ICodeGen {
   constructor(projMeta: ISourceProjectMetadata) {
     super(projMeta);
-    const rmprojFile = projMeta.project;
   }
 
   protected override getOutProjMeta(): IOutputProjectMetadataProcessor {
@@ -48,7 +48,7 @@ export class PlaywrightCsharpXUnitCodeGen extends PlaywrightCsharpCodeGen implem
     await this.generateRoutineFiles(writeFile);
     await this.generateTestSuiteFiles(writeFile);
     await this.generateLocatorHelperFiles(writeFile);
-    await this.generateBaseClassesFile(writeFile);
+    await this.generateSupportFiles(writeFile);
 
     if (full) {
       await this.writeProjectFiles(writeFile);
@@ -75,19 +75,29 @@ export class PlaywrightCsharpXUnitCodeGen extends PlaywrightCsharpCodeGen implem
     await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
   }
 
-  private async generateBaseClassesFile(writeFile: WriteFileFn) {
+  private async generateSupportFiles(writeFile: WriteFileFn) {
     await writeFile(
-      `Support/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
+      `${StandardOutputFolder.Support}/${"BaseClasses"}${this._outputFileExt}`,
       (this._templateProvider as PlaywrightCsharpXUnitTemplatesProvider).getBaseClasses(
         this._rmprojFile.content.rootNamespace,
         this._rmprojFile.content.testIdAttributeName
       )
     );
+    await writeFile(
+      `${StandardOutputFolder.Support}/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
+      this._templateProvider.getTestCaseBase(this._rmprojFile.content.rootNamespace)
+    );
+
+    // Filename: Support/TestSuiteBase.cs
+    await writeFile(
+      `${StandardOutputFolder.Support}/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
+      this._templateProvider.getTestSuiteBase(this._rmprojFile.content.rootNamespace, this._rmprojFile.content.testIdAttributeName)
+    );
   }
 
   private async generateLocatorHelperFiles(writeFile: WriteFileFn) {
     await writeFile(
-      `Support/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
+      `${StandardOutputFolder.Support}/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
       this._templateProvider.getLocatorHelper(this._rmprojFile.content.rootNamespace)
     );
   }
