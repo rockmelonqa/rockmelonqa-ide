@@ -1,6 +1,6 @@
 import path from "path";
+import { ExtensionToNameMap } from "../../file-defs";
 import { upperCaseFirstChar } from "./stringUtils";
-import { ExtensionToNameMap } from "rockmelonqa.common/file-defs";
 
 /** Creates a valid name (with extension) from the input file relative path */
 export default (relativePath: string) => {
