@@ -4,7 +4,8 @@
 <script lang="ts">
     import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
     import type { IUiTheme } from '$lib/context/UiTheme';
-    import { createEventDispatcher, getContext } from 'svelte';
+    import { createEventDispatcher, getContext, onMount } from 'svelte';
+
 
     const dispatch = createEventDispatcher();
 
@@ -14,6 +15,7 @@
     export let name: string;
     export let value: string;
     export let placeholder = '';
+    export let focus: boolean = false;
 
     //*****************************************
     // Init
@@ -32,9 +34,17 @@
 
     $: inputCssClass = `text-field-input !text-green-500 text-base px-4  
         rounded-md border-l-0 rounded-l-none border-slate-300 focus:ring-0 focus:border-indigo-500 grow`.trim();
+
     //*****************************************
     // Events
     //*****************************************
+    onMount(() => {
+        if (focus) {
+            inputElement.focus();
+            inputElement.select();
+        }
+    });
+
     const handleInput = (e: any) => {
         const value = inputElement.value;
         dispatch('input', { value });

@@ -118,6 +118,8 @@
     const { registerOnSaveHandler, unregisterOnSaveHandler } = getContext(appActionContextKey) as IAppActionContext;
     const dispatch = createEventDispatcher();
 
+    let focusFieldId = "";
+
     onMount(async () => {
         // default/empty data
         let model: IPage = fileDefFactory.newPageDefinition();
@@ -218,6 +220,8 @@
     };
 
     const handleAddElement = () => {
+        focusFieldId = `pageDefinitionEditor_${$listData.items.length}_name_input`;
+
         listDataDispatch({
             type: ListDataActionType.AppendItems,
             items: [newElement()],
@@ -227,6 +231,8 @@
         dispatchChange();
     };
     const handleInsertElement = (index: number) => {
+        focusFieldId = `pageDefinitionEditor_${index + 1}_name_input`;
+
         listDataDispatch({
             type: ListDataActionType.InsertItem,
             item: newElement(),
@@ -247,6 +253,8 @@
     };
 
     const handleAddComment = () => {
+        focusFieldId = `pageDefinitionEditor_${$listData.items.length}_comment_input`;
+
         listDataDispatch({
             type: ListDataActionType.AppendItems,
             items: [{ id: uuidv4(), type: "comment", comment: "" } as IPageElement],
@@ -256,6 +264,8 @@
         dispatchChange();
     };
     const handleInsertComment = (index: number) => {
+        focusFieldId = `pageDefinitionEditor_${index + 1}_comment_input`;
+
         listDataDispatch({
             type: ListDataActionType.InsertItem,
             item: newComment(),
@@ -277,7 +287,7 @@
     };
 
     const doSave = async (): Promise<boolean> => {
-        if ($formData.isValid) {
+        if (isDataValid) {
             const serializer = new FormSerializer(uiContext);
             const model = serializer.serialize($formData.values, formDef.fields);
 
@@ -293,6 +303,17 @@
         formDataDispatch({ type: FormDataActionType.ShowAllErrors });
         return false;
     };
+
+    const isElementNameValid = (elementName: string) => {
+        if (elementName) {
+            const regex = /^[A-Za-z0-9]+$/;
+            return regex.test(elementName);
+        }
+
+        return true;
+    };
+    $: isListDataValid = $listData.items.every((item) => isElementNameValid(item.name));
+    $: isDataValid = $formData.isValid && isListDataValid;
 </script>
 
 <div class="page-definition-editor p-8">
@@ -334,7 +355,7 @@
             </ListTableHeaderCell>
         </svelte:fragment>
         <svelte:fragment slot="body">
-            {#each $listData.items as item, index}
+            {#each $listData.items as item, index (item.id)}
                 <ListTableBodyRow>
                     {#if isComment(item)}
                         <ListTableBodyCell type={ListTableCellType.First} colspan={4}>
@@ -343,6 +364,7 @@
                                 value={item.comment}
                                 placeholder={uiContext.str(stringResKeys.pageDefinitionEditor.comment)}
                                 on:input={(event) => handleItemChange(index, "comment", event.detail.value)}
+                                focus={`${formContext.formName}_${index}_comment_input` === focusFieldId}
                             />
                         </ListTableBodyCell>
                     {:else}
@@ -351,6 +373,10 @@
                                 name={`${formContext.formName}_${index}_name`}
                                 value={item.name}
                                 on:input={(event) => handleItemChange(index, "name", event.detail.value)}
+                                errorMessage={isElementNameValid(item.name)
+                                    ? ""
+                                    : uiContext.str(stringResKeys.pageDefinitionEditor.elementNameInvalidMessage)}
+                                focus={`${formContext.formName}_${index}_name_input` === focusFieldId}
                             />
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Normal}>
@@ -433,7 +459,7 @@
         </IconLinkButton>
 
         <div class="ml-auto">
-            <PrimaryButton on:click={handleSave}>
+            <PrimaryButton on:click={handleSave} disabled={!isDataValid}>
                 <span class="flex items-center gap-x-2">
                     <SaveIcon class="w-5 h-5" />
                     {uiContext.str(stringResKeys.general.save)}

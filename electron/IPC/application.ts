@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog } from "electron";
+import { app, BrowserWindow, dialog, Menu, MenuItem } from "electron";
 import os from "os";
 import path from "path";
 import {
@@ -9,11 +9,13 @@ import {
   IIpcGenericResponse,
   IIpcResponse,
   IRmProjFile,
+  IShowHideMenuRequest,
   IUserSettings,
   Language,
   StandardFolder,
   TestFramework,
 } from "rockmelonqa.common";
+import * as applicationMenu from "../applicationMenu";
 import * as fileSystem from "../utils/fileSystem";
 import { IChannels } from "./core/channelsInterface";
 import IPC from "./core/ipc";
@@ -27,6 +29,7 @@ const USER_SETTINGS_FILE = "user-settings.json";
 const validSendChannel: IChannels = {
   setUserSettings: setUserSettings,
   openProject: openProject,
+  showHideMenuItem: showHideMenuItem
 };
 
 const validInvokeChannel: IChannels = {
@@ -37,11 +40,14 @@ const validInvokeChannel: IChannels = {
 };
 
 // from Main
-const validReceiveChannel: string[] = ["createNewProject", "loadProject", "quit"];
+const validReceiveChannel: string[] = ["loadProject", "closeProject", "quit"];
 
 class ApplicationIPC extends IPC {
   async openProject(browserWindow: BrowserWindow) {
     await openProject(browserWindow);
+  };
+  closeProject(browserWindow: BrowserWindow) {
+    closeProject(browserWindow);
   }
   quit(browserWindow: BrowserWindow) {
     quit(browserWindow);
@@ -66,6 +72,19 @@ export default application;
 function getAppInfo(mainWindow: BrowserWindow, event: Electron.IpcMainEvent, message: any): IAppInfo {
   const version = app.getVersion();
   return { version };
+}
+
+/**
+ * Get environment info
+ */
+async function getEnvironmentInfo(
+  browserWindow: BrowserWindow,
+  event: Electron.IpcMainEvent
+): Promise<IEnvironmentInfo> {
+  return {
+    pathSeparator: path.sep,
+    eol: os.EOL,
+  };
 }
 
 async function getUserSettings(browserWindow: BrowserWindow, event: Electron.IpcMainEvent): Promise<IUserSettings> {
@@ -187,19 +206,37 @@ async function openProject(browserWindow: BrowserWindow, event?: Electron.IpcMai
   browserWindow.webContents.send("loadProject", response);
 }
 
+async function closeProject(browserWindow: BrowserWindow) {
+  browserWindow.webContents.send("closeProject");
+}
+
 async function quit(browserWindow: BrowserWindow) {
   browserWindow.webContents.send("quit");
 }
 
-/**
- * Get environment info
- */
-async function getEnvironmentInfo(
-  browserWindow: BrowserWindow,
-  event: Electron.IpcMainEvent
-): Promise<IEnvironmentInfo> {
-  return {
-    pathSeparator: path.sep,
-    eol: os.EOL,
-  };
+function showHideMenuItem(browserWindow: BrowserWindow, event: Electron.IpcMainEvent, data: IShowHideMenuRequest) {
+  let appMenu = Menu.getApplicationMenu();
+  let foundMenuItem = getMenuItemByPath(data.menuItemPath, appMenu!);
+  if (foundMenuItem != null) {
+    (foundMenuItem as MenuItem).visible = data.visible;
+  }
+  Menu.setApplicationMenu(appMenu);
+}
+const getMenuItemByPath = (path: string, appMenu: Menu): MenuItem | undefined => {
+  const parts = path.split('/');
+
+  let items = appMenu.items;
+  for (const part of parts) {
+    const foundItem = items.find((item: any) => {
+      return item.role?.toLowerCase() === part.toLowerCase() || item.label === part;
+    });
+
+    if (!foundItem || !foundItem.submenu) {
+      return foundItem;
+    }
+
+    items = foundItem.submenu.items;
+  }
+
+  return undefined;
 }

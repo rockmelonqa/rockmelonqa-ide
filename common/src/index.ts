@@ -42,6 +42,7 @@ import {
   IRunTestRequest,
   IRunTestResponseData,
   IRunTestSettings,
+  IShowHideMenuRequest,
   IWriteFileRequest,
 } from "./ipc-defs";
 
@@ -70,6 +71,7 @@ export {
   IRunTestRequest,
   IRunTestResponseData,
   IRunTestSettings,
+  IShowHideMenuRequest,
   ITestCase,
   ITestCaseFile,
   ITestCaseStep,

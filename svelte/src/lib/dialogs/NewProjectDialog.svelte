@@ -1,40 +1,40 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
-    import { AlertLevel } from '$lib/components/Alert';
-    import Alert from '$lib/components/Alert.svelte';
-    import FolderPicker from '$lib/components/FolderPicker.svelte';
-    import PrimaryButton from '$lib/components/PrimaryButton.svelte';
-    import Spinner from '$lib/components/Spinner.svelte';
-    import StandardButton from '$lib/components/StandardButton.svelte';
-    import { AppActionType, appContextKey, type IAppContext } from '$lib/context/AppContext';
-    import { stringResKeys } from '$lib/context/StringResKeys';
-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import type { IDropdownOption } from '$lib/controls/DropdownField';
-    import FormGroup from '$lib/controls/layout/FormGroup.svelte';
-    import FormGroupColumn from '$lib/controls/layout/FormGroupColumn.svelte';
-    import DropdownField from '$lib/form-controls/DropdownField.svelte';
-    import Form from '$lib/form-controls/Form.svelte';
-    import NumberField from '$lib/form-controls/NumberField.svelte';
-    import TextField from '$lib/form-controls/TextField.svelte';
-    import { FieldDataType } from '$lib/form/FieldDef';
-    import { createFormContext } from '$lib/form/FormContext';
-    import { FormDataActionType } from '$lib/form/FormData';
-    import type { IFormDef } from '$lib/form/FormDef';
-    import { FormModeActionType, FormModeState } from '$lib/form/FormMode';
-    import { FormSerializer } from '$lib/form/FormSerializer';
-    import { application } from '$lib/ipc';
+    import { goto } from "$app/navigation";
+    import { AlertLevel } from "$lib/components/Alert";
+    import Alert from "$lib/components/Alert.svelte";
+    import FolderPicker from "$lib/components/FolderPicker.svelte";
+    import PrimaryButton from "$lib/components/PrimaryButton.svelte";
+    import Spinner from "$lib/components/Spinner.svelte";
+    import StandardButton from "$lib/components/StandardButton.svelte";
+    import { AppActionType, appContextKey, type IAppContext } from "$lib/context/AppContext";
+    import { stringResKeys } from "$lib/context/StringResKeys";
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import type { IDropdownOption } from "$lib/controls/DropdownField";
+    import FormGroup from "$lib/controls/layout/FormGroup.svelte";
+    import FormGroupColumn from "$lib/controls/layout/FormGroupColumn.svelte";
+    import DropdownField from "$lib/form-controls/DropdownField.svelte";
+    import Form from "$lib/form-controls/Form.svelte";
+    import NumberField from "$lib/form-controls/NumberField.svelte";
+    import TextField from "$lib/form-controls/TextField.svelte";
+    import { FieldDataType } from "$lib/form/FieldDef";
+    import { createFormContext } from "$lib/form/FormContext";
+    import { FormDataActionType } from "$lib/form/FormData";
+    import type { IFormDef } from "$lib/form/FormDef";
+    import { FormModeActionType, FormModeState } from "$lib/form/FormMode";
+    import { FormSerializer } from "$lib/form/FormSerializer";
+    import { application } from "$lib/ipc";
     import {
         automationFrameworkOptions,
         indentOptions,
         lanugageOptions,
         testFrameworkOptions,
-    } from '$lib/utils/dropdowns';
-    import { NavRoute } from '$lib/utils/NavRoute';
-    import { ProjectNameRegex } from '$lib/utils/Regex';
-    import { registerRecentProject } from '$lib/utils/userSettings';
-    import type { IIpcResponse, IRmProjFile } from 'rockmelonqa.common';
-    import { AutomationFramework, Indent, Language, TestFramework } from 'rockmelonqa.common';
-    import { getContext } from 'svelte';
+    } from "$lib/utils/dropdowns";
+    import { NavRoute } from "$lib/utils/NavRoute";
+    import { ProjectNameRegex } from "$lib/utils/Regex";
+    import { registerRecentProject } from "$lib/utils/userSettings";
+    import type { IIpcResponse, IRmProjFile, IShowHideMenuRequest } from "rockmelonqa.common";
+    import { AutomationFramework, Indent, Language, TestFramework } from "rockmelonqa.common";
+    import { getContext } from "svelte";
 
     export let showDialog: boolean = false;
 
@@ -46,12 +46,12 @@
         fields: {
             fileVersion: {
                 dataType: FieldDataType.Integer,
-                dataPath: 'content.fileVersion',
+                dataPath: "content.fileVersion",
                 initialValue: 1,
             },
             name: {
                 dataType: FieldDataType.Text,
-                dataPath: 'content.name',
+                dataPath: "content.name",
                 isRequired: true,
                 maxLength: 50,
                 pattern: ProjectNameRegex,
@@ -59,41 +59,41 @@
             },
             description: {
                 dataType: FieldDataType.Text,
-                dataPath: 'content.description',
+                dataPath: "content.description",
                 maxLength: 10000,
             },
             automationFramework: {
                 dataType: FieldDataType.Dropdown,
-                dataPath: 'content.automationFramework',
+                dataPath: "content.automationFramework",
                 isRequired: true,
                 initialValue: AutomationFramework.Playwright,
             },
             language: {
                 dataType: FieldDataType.Dropdown,
-                dataPath: 'content.language',
+                dataPath: "content.language",
                 isRequired: true,
                 initialValue: Language.CSharp,
             },
             testFramework: {
                 dataType: FieldDataType.Dropdown,
-                dataPath: 'content.testFramework',
+                dataPath: "content.testFramework",
                 initialValue: TestFramework.MSTest,
                 isRequired: (values) => values.language !== Language.Typescript,
             },
             rootNamespace: {
                 dataType: FieldDataType.Text,
-                dataPath: 'content.rootNamespace',
+                dataPath: "content.rootNamespace",
                 maxLength: 100,
             },
             indent: {
                 dataType: FieldDataType.Dropdown,
-                dataPath: 'content.indent',
+                dataPath: "content.indent",
                 isRequired: true,
                 initialValue: Indent.Spaces,
             },
             indentSize: {
                 dataType: FieldDataType.Integer,
-                dataPath: 'content.indentSize',
+                dataPath: "content.indentSize",
                 isRequired: true,
                 min: 1,
                 max: 8,
@@ -101,13 +101,13 @@
             },
             folder: {
                 dataType: FieldDataType.Text,
-                dataPath: 'folderPath',
+                dataPath: "folderPath",
                 isRequired: true,
             },
         },
     };
 
-    let formContext = createFormContext('project', formDef, uiContext, FormModeState.Add);
+    let formContext = createFormContext("project", formDef, uiContext, FormModeState.Add);
     let {
         mode: formMode,
         modeDispatch: formModeDispatch,
@@ -116,7 +116,7 @@
     } = formContext;
 
     let alertLevel: AlertLevel = AlertLevel.None;
-    let alertMessage = '';
+    let alertMessage = "";
 
     let showAdvancedOptions: boolean = false;
 
@@ -141,9 +141,9 @@
         if (!languageDropdownOptions.some((item) => item.key == $formData.values.language)) {
             formDataDispatch({
                 type: FormDataActionType.SetValues,
-                newValues: { ...$formData.values, language: '' },
+                newValues: { ...$formData.values, language: "" },
             });
-            handleLanguageChange('');
+            handleLanguageChange("");
         }
     };
 
@@ -170,7 +170,7 @@
         if (!testFrameworkDropdownOptions.some((item) => item.key == $formData.values.testFramework)) {
             formDataDispatch({
                 type: FormDataActionType.SetValues,
-                newValues: { ...$formData.values, testFramework: '' },
+                newValues: { ...$formData.values, testFramework: "" },
             });
         }
     };
@@ -191,11 +191,11 @@
             const response: IIpcResponse = await application.createNewProject(model);
             if (!response.isSuccess) {
                 switch (response.errorCode!) {
-                    case 'FolderNotEmpty':
-                        alertError(AlertLevel.Error, 'Selected folder is not empty.');
+                    case "FolderNotEmpty":
+                        alertError(AlertLevel.Error, "Selected folder is not empty.");
                         break;
-                    case 'InvalidFramework':
-                        alertError(AlertLevel.Error, 'Framework and language selection are invalid.');
+                    case "InvalidFramework":
+                        alertError(AlertLevel.Error, "Framework and language selection are invalid.");
                         break;
                 }
                 formModeDispatch({ type: FormModeActionType.Add });
@@ -205,6 +205,10 @@
             // RmProject is created successfully.
             appStateDispatch({ type: AppActionType.LoadProject, projectFile: model });
 
+            application.showHideMenuItem({
+                menuItemPath: "fileMenu/Close Project",
+                visible: true,
+            } as IShowHideMenuRequest);
             await registerRecentProject(
                 model.content.name,
                 `${model.folderPath}${uiContext.pathSeparator}${model.fileName}`
@@ -233,7 +237,7 @@
         <div class="fixed inset-0 overflow-y-auto">
             <div class="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0">
                 <div
-                    class="modal-panel relative bg-white rounded-lg p-4 sm:p-6 
+                    class="modal-panel relative bg-white rounded-lg p-4 sm:p-6
                     text-left shadow-xl transform transition-all max-w-4xl w-full"
                 >
                     <Form {formContext} on:submit={handleSaveClick}>
@@ -292,8 +296,8 @@
                         </div>
                         <div class="modal-buttons flex justify-start items-end gap-x-4">
                             <div class="my-4">
-                                <a href={'#'} on:click={toggleAdvancedOptions} class="underline cursor-pointer">
-                                    <span>{showAdvancedOptions ? 'Hide ' : 'Show '} Advanced Options</span>
+                                <a href={"#"} on:click={toggleAdvancedOptions} class="underline cursor-pointer">
+                                    <span>{showAdvancedOptions ? "Hide " : "Show "} Advanced Options</span>
                                 </a>
                             </div>
                             <div class="ml-auto">

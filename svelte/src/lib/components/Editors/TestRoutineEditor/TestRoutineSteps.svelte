@@ -317,7 +317,7 @@
         </svelte:fragment>
     </IconLinkButton>
 
-    <div class="ml-auto">
+    <div class="ml-auto absolute right-5">
         <PrimaryButton on:click={() => dispatch('save')}>
             <span class="flex items-center gap-x-2">
                 <SaveIcon class="w-5 h-5" />
