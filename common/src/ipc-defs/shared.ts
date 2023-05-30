@@ -17,3 +17,8 @@ export interface IProgressDetail {
 export interface IProgressEvent extends IProgressDetail {
   type: string;
 }
+
+export interface IShowHideMenuRequest {
+  menuItemPath: string;
+  visible: boolean;
+}

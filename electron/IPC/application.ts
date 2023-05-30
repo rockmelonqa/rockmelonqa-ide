@@ -133,7 +133,7 @@ async function createNewProject(
     fileSystem.createFolder(path.join(project.folderPath, StandardFolder.OutputCode)),
     fileSystem.createFolder(path.join(project.folderPath, StandardFolder.PageDefinitions)),
     fileSystem.createFolder(path.join(project.folderPath, StandardFolder.TestCases)),
-    //fileSystem.createFolder(path.join(project.folderPath, StandardFolder.TestRoutines)),
+    fileSystem.createFolder(path.join(project.folderPath, StandardFolder.TestRoutines)),
     fileSystem.createFolder(path.join(project.folderPath, StandardFolder.TestRuns)),
     fileSystem.createFolder(path.join(project.folderPath, StandardFolder.TestSuites)),
     fileSystem.writeFile(path.join(project.folderPath, project.fileName), JSON.stringify(project.content, null, 4)),
@@ -217,7 +217,7 @@ async function quit(browserWindow: BrowserWindow) {
 function showHideMenuItem(browserWindow: BrowserWindow, event: Electron.IpcMainEvent, data: IShowHideMenuRequest) {
   let appMenu = Menu.getApplicationMenu();
   let foundMenuItem = getMenuItemByPath(data.menuItemPath, appMenu!);
-  if (foundMenuItem != null) {
+  if (foundMenuItem) {
     (foundMenuItem as MenuItem).visible = data.visible;
   }
   Menu.setApplicationMenu(appMenu);

@@ -33,8 +33,6 @@
     let { theme } = uiContext;
     let thisTheme = ($theme as IUiTheme).textField ?? {};
 
-    let inputElement: HTMLInputElement;
-
     let rootId = `${name}_root`;
     let isFocus = false;
 
@@ -47,9 +45,6 @@
             .map(([key, { name }]) => ({ key, text: name } as IDropdownOption))
             .sort((a, b) => a.text.localeCompare(b.text));
     });
-
-    $: inputCssClass = `text-field-input  text-base px-4  
-        rounded-md border-l-0 rounded-l-none border-slate-300 focus:ring-0 focus:border-indigo-500 grow`.trim();
 
     onMount(async () => {
         if (routine) {
@@ -65,9 +60,6 @@
         }
 
         const routineData = JSON.parse(fileContent) as ITestRoutine;
-
-        console.log("select routine ", routineData);
-
         datasetOptions = routineData.dataSets.map((ds) => ({ key: ds.id, text: ds.name }));
     };
 
@@ -100,7 +92,6 @@
             <div class="flex-1 flex ps-3 gap-6">
                 <div class="flex-1">
                     <FancyDropdownField
-                        class={inputCssClass}
                         name={name + "_id"}
                         value={routine}
                         options={testRoutineOptions}
@@ -109,7 +100,6 @@
                 </div>
                 <div class="flex-1">
                     <FancyDropdownField
-                        class={inputCssClass}
                         name={name + "_dataset"}
                         value={dataset}
                         options={datasetOptions}
