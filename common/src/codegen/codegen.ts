@@ -287,7 +287,7 @@ export const createSourceProjectMetadata = async (
     info(`    ---> Found test case file: ${testCaseDefFile}`);
   }
 
-  // Parsing test case definitions
+  // Parsing test routine definitions
   info(``);
   info(``);
   info(`--------------------------------------------------`);

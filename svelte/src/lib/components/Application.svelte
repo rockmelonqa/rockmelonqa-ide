@@ -251,7 +251,6 @@
 
     /** Determine whether there is dirty tab, to display save pending changes dialog */
     const onBeforeUnload = (event: any) => {
-        debugger;
         const hasDirtyTab = $appState.tabs.some((x) => x.isDirty);
         if (hasDirtyTab) {
             event.returnValue = "any-value-to-prevent-default";
