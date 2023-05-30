@@ -1,11 +1,9 @@
-namespace {{{fullNamespace}}};
-
 /// <summary>
 /// {{{description}}}
 /// </summary>
-public partial class {{{testCaseName}}} : TestCaseBase
+public partial class {{{testRoutineName}}} : TestRoutineBase
 {
-    public {{{testCaseName}}}(PageTest testSuiteInstance): base(testSuiteInstance) {}
+    public {{{testRoutineName}}}(IPage page) : base(page) { }
 
     public async Task RunAsync()
     {

@@ -1,7 +1,7 @@
 namespace {{{rootNamespace}}}.Support;
 
 /// <summary>
-/// Base class for RM "Single case" test suite 
+/// Base class for RM test case 
 /// </summary>
 public abstract class TestCaseBase : PageTest
 {
@@ -15,7 +15,9 @@ public abstract class TestCaseBase : PageTest
     /// <summary>
     /// Default constructor
     /// </summary>
-    public TestCaseBase() { }
+    public TestCaseBase()
+    {
+    }
 
     /// <summary>
     /// Create new instance of TestCaseBase with the provided "caller" testSuiteInstance
@@ -24,12 +26,28 @@ public abstract class TestCaseBase : PageTest
     {
         this.TestSuiteInstance = testSuiteInstance;
     }
-    
+
     /// <summary>
     /// Custom Expect method that works from IFrameLocator
     /// </summary>
     public ILocatorAssertions Expect(IFrameLocator locator)
     {
         return base.Expect(locator.Locator(":root"));
+    }
+}
+
+/// <summary>
+/// Base class for RM test routine 
+/// </summary>
+public abstract class TestRoutineBase: PageTest
+{
+    protected new IPage Page {get;init;}
+
+    /// <summary>
+    /// Create new instance of RmTestSuiteBase with the provided testSuiteInstance
+    /// </summary>
+    public TestRoutineBase(IPage page)
+    {
+        this.Page = page;
     }
 }

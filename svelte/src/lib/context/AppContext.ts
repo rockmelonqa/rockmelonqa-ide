@@ -4,7 +4,7 @@ import _ from "lodash";
 import type { IRmProjFile } from "rockmelonqa.common";
 import { writable, type Readable } from "svelte/store";
 import { Node } from "../components/FileExplorer/Node";
-import type { IPageData, ITestCaseData } from "./AppContext.model";
+import type { IPageData, ITestCaseData, ITestRoutineData } from "./AppContext.model";
 
 /**
  * Application level context
@@ -22,6 +22,12 @@ export interface IAppState {
      * value: test case data
      */
     testCases: Map<string, ITestCaseData>;
+
+    /** List of test routine data
+     * key: test routine id
+     * value: test routine data
+     */
+    testRoutines: Map<string, ITestRoutineData>;
 
     /** Selection item on Activity Bar */
     activity?: ActivityType;
@@ -44,6 +50,7 @@ export const initialAppContext: IAppState = {
     projectFile: undefined,
     pages: new Map<string, IPageData>(),
     testCases: new Map<string, ITestCaseData>(),
+    testRoutines: new Map<string, ITestRoutineData>(),
 
     activity: undefined,
 
@@ -68,6 +75,9 @@ export enum AppActionType {
 
     SetTestCaseData = "SetTestCaseData",
     RemoveTestCaseData = "RemoveTestCaseData",
+
+    SetTestRoutineData = "SetTestRoutineData",
+    RemoveTestRoutineData = "RemoveTestRoutineData",
 
     /** Set the selection on Activity Bar */
     SetActivity = "SetActivity",
@@ -98,6 +108,8 @@ export type AppAction =
     | { type: AppActionType.RemovePageData; filePath: string }
     | { type: AppActionType.SetTestCaseData; data: ITestCaseData }
     | { type: AppActionType.RemoveTestCaseData; filePath: string }
+    | { type: AppActionType.SetTestRoutineData; data: ITestRoutineData }
+    | { type: AppActionType.RemoveTestRoutineData; filePath: string }
     | { type: AppActionType.SetActivity; activity?: ActivityType }
     | { type: AppActionType.SetFiles; files: Node[] }
     | { type: AppActionType.UpdateFile; nodePath: string; value: Partial<Node> }
@@ -164,6 +176,23 @@ export function appContextReducer(state: IAppState, action: AppAction): IAppStat
             return {
                 ...state,
                 testCases: testCases,
+            };
+        }
+        case AppActionType.SetTestRoutineData: {
+            const testRoutines = new Map<string, ITestRoutineData>([...state.testRoutines]);
+            testRoutines.set(action.data.id, action.data);
+            return {
+                ...state,
+                testRoutines: testRoutines,
+            };
+        }
+        case AppActionType.RemoveTestRoutineData: {
+            const testRoutines = new Map(
+                Array.from(state.testRoutines).filter(([_, value]) => value.filePath !== action.filePath)
+            );
+            return {
+                ...state,
+                testRoutines: testRoutines,
             };
         }
         case AppActionType.SetActivity:

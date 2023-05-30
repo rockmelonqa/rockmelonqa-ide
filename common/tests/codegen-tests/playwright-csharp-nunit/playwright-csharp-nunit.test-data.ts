@@ -1,6 +1,7 @@
 import { AutomationFramework, Indent, IRmProj, ITestCase, ITestSuite, Language, LocatorType, TestFramework } from "../../../src/file-defs";
 import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
 import { commonNunitOutputFiles } from "../../test-helpers/common-files-dotnet";
+import { simpleRoutineTestData } from "../playwright-csharp/simple-routine.test-data";
 
 export const createPlaywrightNunitTestData = (): RmpSpec => {
   return {
@@ -15,101 +16,10 @@ export const createPlaywrightNunitTestData = (): RmpSpec => {
       rootNamespace: "",
       indent: Indent.Spaces,
       indentSize: 4,
+      testIdAttributeName: "",
     },
-    pages: [
-      {
-        id: "",
-        name: "google/home",
-        description: "Home page",
-        elements: [
-          {
-            id: "",
-            type: "pageElement",
-            name: "button",
-            findBy: LocatorType.Css,
-            locator: "button",
-            description: "Button",
-          },
-          {
-            id: "",
-            type: "pageElement",
-            name: "input",
-            findBy: LocatorType.Css,
-            locator: "input",
-            description: "Input",
-          },
-        ],
-      },
-      {
-        id: "",
-        name: "empty",
-        description: "",
-        elements: [
-        ],
-      },
-    ],
-    testcases: [
-      {
-        id: "",
-        name: "click",
-        description: "Do click",
-        steps: [
-          {
-            id: "",
-            type: "testStep",
-            page: "",
-            element: "",
-            action: "GoToUrl",
-            data: "http://localhost:3000/actions/click.html",
-          },
-          {
-            id: "",
-            type: "testStep",
-            page: "google/home",
-            element: "button",
-            action: "Click",
-            data: "",
-          },
-        ],
-      },
-      {
-        id: "",
-        name: "actions/simple/clear",
-        description: "Do clear",
-        steps: [
-          {
-            id: "",
-            type: "testStep",
-            page: "",
-            element: "",
-            action: "GoToUrl",
-            data: "http://localhost:3000/actions/click.html",
-          },
-          {
-            id: "",
-            type: "testStep",
-            page: "google/home",
-            element: "input",
-            action: "VerifyHasValue",
-            data: "Hello",
-          },
-        ],
-      },
-    ],
-    testsuites: [
-      {
-        id: "",
-        name: "home",
-        description: "HomePage test suite",
-        testcases: ["click"],
-      },
-      {
-        id: "",
-        name: "another/anotherHome",
-        description: "Another HomePage test suite",
-        testcases: ["actions/simple/clear"],
-      },
-    ],
+
+    ...simpleRoutineTestData,
 
     outputFiles: [
       ...commonNunitOutputFiles,
@@ -136,7 +46,8 @@ public class PageDefinitions
         Popup_AdsPage = new Popup_AdsPage(page);
         SearchResultPage = new SearchResultPage(page);
     }
-}`.trim(),
+}
+        `.trim(),
       },
       {
         fileRelPath: "Pages/HomePage.cs",
@@ -257,13 +168,13 @@ namespace AutomationTests.Tests;
 /// <summary>
 /// HomePage test suite
 /// </summary>
-[TestFixture]
+[TestClass]
 public partial class HomeTestSuite : PageTest
 {
     /// <summary>
     /// Search for 'playwright'
     /// </summary>
-    [Test]
+    [TestMethod]
     public async Task SearchForPlaywrightTestCase()
     {
         PageDefinitions defs = new PageDefinitions(this.Page);

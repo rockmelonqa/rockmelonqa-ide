@@ -3,7 +3,7 @@ import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
 
 export const createTestData = (): RmpSpec => {
   return {
-    projectName: "rm-playwright-mstest",
+    projectName: "rm-playwright-csharp",
     content: {
       fileVersion: 1,
       name: "",
@@ -14,28 +14,45 @@ export const createTestData = (): RmpSpec => {
       rootNamespace: "",
       indent: Indent.Spaces,
       indentSize: 4,
+      testIdAttributeName: "",
     },
     pages: [
       {
         id: "",
-        name: "google/home",
-        description: "Home page",
+        name: "FillsScreen",
+        description: "Fills page",
         elements: [
           {
             id: "",
             type: "pageElement",
-            name: "button",
+            name: "name",
             findBy: LocatorType.Css,
-            locator: "button",
-            description: "Button",
+            locator: "[name='name']",
+            description: "Name",
           },
           {
             id: "",
             type: "pageElement",
-            name: "input",
+            name: "street",
             findBy: LocatorType.Css,
-            locator: "input",
-            description: "Input",
+            locator: "[name='street']",
+            description: "Street",
+          },
+          {
+            id: "",
+            type: "pageElement",
+            name: "district",
+            findBy: LocatorType.Css,
+            locator: "[name='district']",
+            description: "District",
+          },
+          {
+            id: "",
+            type: "pageElement",
+            name: "bio",
+            findBy: LocatorType.Css,
+            locator: "[name='bio']",
+            description: "Bio",
           },
         ],
       },
@@ -43,8 +60,8 @@ export const createTestData = (): RmpSpec => {
     testcases: [
       {
         id: "",
-        name: "click",
-        description: "Do click",
+        name: "fills",
+        description: "Fills the values on Fills page",
         steps: [
           {
             id: "",
@@ -52,38 +69,123 @@ export const createTestData = (): RmpSpec => {
             page: "",
             element: "",
             action: "GoToUrl",
-            data: "http://localhost:3000/actions/click.html",
+            // Chechkout repo https://dev.azure.com/zapcentral/zap-forks/_git/playwright-test-pages and run the local website
+            data: "http://localhost:3000/routines/fills.html",
+          },
+          {
+            id: "",
+            type: "routine",
+            routine: "FillName",
+            dataset: "DataSet Number Two",
           },
           {
             id: "",
             type: "testStep",
-            page: "google/home",
-            element: "button",
-            action: "Click",
-            data: "",
+            page: "FillsScreen",
+            element: "street",
+            action: "Input",
+            data: "Nguyen Van Linh",
+          },
+          {
+            id: "",
+            type: "testStep",
+            page: "FillsScreen",
+            element: "district",
+            action: "Input",
+            data: "Seven",
+          },
+          {
+            id: "",
+            type: "routine",
+            routine: "FillDistrictAndBio",
+            dataset: "DS One",
+          },
+          {
+            id: "",
+            type: "testStep",
+            page: "",
+            element: "",
+            action: "Delay",
+            data: "2000",
+          },
+        ],
+      },
+    ],
+    testroutines: [
+      {
+        id: "",
+        name: "FillName",
+        description: "Fill the name",
+        steps: [
+          {
+            id: "",
+            type: "testStep",
+            page: "FillsScreen",
+            element: "name",
+            action: "Input",
+            data: {
+              "DataSet Number One": "John",
+              "DataSet Number Two": "Jane",
+              "DataSet Number Three": "Jim",
+            },
+          },
+        ],
+        dataSets: [
+          {
+            id: "",
+            name: "DataSet Number One",
+            description: "One One One",
+          },
+          {
+            id: "",
+            name: "DataSet Number Two",
+            description: "Two Two Two",
+          },
+          {
+            id: "",
+            name: "DataSet Number Three",
+            description: "Three Three Three",
           },
         ],
       },
       {
         id: "",
-        name: "actions/simple/clear",
-        description: "Do clear",
+        name: "FillDistrictAndBio",
+        description: "Fill the district and bio",
         steps: [
           {
             id: "",
             type: "testStep",
-            page: "",
-            element: "",
-            action: "GoToUrl",
-            data: "http://localhost:3000/actions/click.html",
+            page: "FillsScreen",
+            element: "district",
+            action: "Input",
+            data: {
+              "DS One": "Seven",
+              "DS Two": "Eight",
+            },
           },
           {
             id: "",
             type: "testStep",
-            page: "google/home",
-            element: "input",
-            action: "VerifyHasValue",
-            data: "Hello",
+            page: "FillsScreen",
+            element: "bio",
+            action: "Input",
+            data: {
+              "DS One": "Love Reading",
+              "DS Two": "Playing Video games",
+            },
+          },
+        ],
+        dataSets: [
+          {
+            id: "",
+            name: "DS One",
+            description: "One One One",
+          },
+          {
+            id: "",
+            name: "DS Two",
+            description: "Two Two Two",
           },
         ],
       },
@@ -91,15 +193,9 @@ export const createTestData = (): RmpSpec => {
     testsuites: [
       {
         id: "",
-        name: "home",
-        description: "HomePage test suite",
-        testcases: ["click"],
-      },
-      {
-        id: "",
-        name: "another/anotherHome",
-        description: "Another HomePage test suite",
-        testcases: ["actions/simple/clear"],
+        name: "Fills",
+        description: "Test for Fills",
+        testcases: ["fills"],
       },
     ],
   };

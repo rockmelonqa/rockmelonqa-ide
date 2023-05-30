@@ -1,12 +1,10 @@
 namespace {{{rootNamespace}}}.Support;
 
 /// <summary>
-/// Base class for RM test case 
+/// Base class for test case
 /// </summary>
 public abstract class TestCaseBase : PageTest
 {
-    protected PageTest? TestSuiteInstance;
-
     /// <summary>
     /// Returns TestSuiteInstance.Page when TestSuiteInstance is not null, otherwise return the Page of base class (PageTest.Page)
     /// </summary>
@@ -15,16 +13,13 @@ public abstract class TestCaseBase : PageTest
     /// <summary>
     /// Default constructor
     /// </summary>
-    public TestCaseBase()
-    {
-    }
+    public TestCaseBase() { }
 
     /// <summary>
-    /// Create new instance of TestCaseBase with the provided "caller" testSuiteInstance
+    /// Create new instance of RmTestSuiteBase with the provided testSuiteInstance
     /// </summary>
-    public TestCaseBase(PageTest testSuiteInstance)
+    public TestCaseBase(PageTest testSuiteInstance) : base(testSuiteInstance)
     {
-        this.TestSuiteInstance = testSuiteInstance;
     }
 
     /// <summary>
@@ -32,6 +27,22 @@ public abstract class TestCaseBase : PageTest
     /// </summary>
     public ILocatorAssertions Expect(IFrameLocator locator)
     {
-        return base.Expect(locator.Locator(":root"));
+        return Expect(locator.Locator(":root"));
+    }
+}
+
+/// <summary>
+/// Base class for RM test routine 
+/// </summary>
+public abstract class TestRoutineBase
+{
+    protected IPage Page { get; init; }
+
+    /// <summary>
+    /// Create new instance of RmTestSuiteBase with the provided Page
+    /// </summary>
+    public TestRoutineBase(IPage page)
+    {
+        this.Page = page;
     }
 }

@@ -1,6 +1,7 @@
 import { EOL } from "os";
 import { Indent } from "../../file-defs";
 
+/** Escapse double quotes and back slash characters so that the string can be inlined in the output code */
 export const escapeStr = (text: string) => {
   return text.replaceAll("\\", "\\\\").replaceAll('"', '\\"');
 };
@@ -37,15 +38,18 @@ export const getParameters = (parameters: string[]) => {
 export const lowerCaseFirstChar = (str: string) => {
   return str.substring(0, 1).toLowerCase() + str.substring(1);
 };
+
 export const upperCaseFirstChar = (str: string) => {
   return str.substring(0, 1).toUpperCase() + str.substring(1);
 };
 
+/** Map from `Indent` to actual character of that `Indent` */
 export const indentCharMap = new Map<Indent, string>([
   [Indent.Tabs, "\t"],
   [Indent.Spaces, " "],
 ]);
 
+/** Add indent to a block of strings */
 export const addIndent = (sourceStr: string, indentStr: string) => {
   let lines = sourceStr.split(EOL);
   lines = lines.map((l) => (l.trim() ? indentStr + l : l));

@@ -1,11 +1,13 @@
 import path from "path";
 import { IActionTemplateParam, ILocatorTemplateParam } from "../types";
-import { actionRegistyDotnet } from "../utils/action-registry-dotnet";
-import { locatorRegistyDotnet } from "../utils/locator-registry-dotnet";
 import { upperCaseFirstChar } from "../utils/stringUtils";
 import { NunitTemplateCollection } from "./templateCollection";
+import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
+import { actionRegistyDotnet } from "../playwright-charp-common/action-registry-dotnet";
+import { locatorRegistyDotnet } from "../playwright-charp-common/locator-registry-dotnet";
+import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 
-export class PlaywrightCsharpNunitTemplatesProvider {
+export class PlaywrightCsharpNunitTemplatesProvider implements IPlaywrightCsharpTemplatesProvider {
   private _templateCollection: NunitTemplateCollection;
 
   constructor(customTemplatesDir: string) {
@@ -17,10 +19,35 @@ export class PlaywrightCsharpNunitTemplatesProvider {
   }
 
   getTestCaseFile(testCaseName: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
-    return this._templateCollection.TEST_CASE_FILE_TEMPLATE({ rootNamespace, testCaseName, description, body, fullNamespace });
+    return this._templateCollection.TEST_CASE_FILE({ rootNamespace, testCaseName, description, body, fullNamespace });
   }
 
   getAction(params: IActionTemplateParam) {
+    const actionGenerate = actionRegistyDotnet.get(params.action);
+    if (!actionGenerate) {
+      throw new Error("(DEV) Action is not support: " + params.action);
+    }
+
+    return actionGenerate(params);
+  }
+
+  getTestRoutineClass(testRoutineName: string, description: string, body: string) {
+    return this._templateCollection.TEST_ROUTINE_CLASS({
+      testRoutineName,
+      description,
+      body,
+    });
+  }
+
+  getTestRoutineFile(rootNamespace: string, fullNamespace: string, testRoutineClasses: string[]) {
+    return this._templateCollection.TEST_ROUTINE_FILE({
+      rootNamespace,
+      fullNamespace,
+      testRoutineClasses,
+    });
+  }
+
+  getRoutineAction(params: IActionTemplateParam) {
     const actionGenerate = actionRegistyDotnet.get(params.action);
     if (!actionGenerate) {
       throw new Error("(DEV) Action is not support: " + params.action);
@@ -39,7 +66,7 @@ export class PlaywrightCsharpNunitTemplatesProvider {
     }
     const getter = generateGetter(params);
 
-    let output = this._templateCollection.LOCATOR_TEMPLATE({
+    let output = this._templateCollection.PAGE_ELEMENT_PROPERTY({
       hasParams: params.hasParams,
       elementName: upperCaseFirstChar(elementName),
       getter,
@@ -51,37 +78,37 @@ export class PlaywrightCsharpNunitTemplatesProvider {
   }
 
   getTestFunction(name: string, description: string) {
-    return this._templateCollection.TEST_FUNCTION_TEMPLATE({ name, description });
+    return this._templateCollection.TEST_FUNCTION({ name, description });
   }
 
   getLocatorHelper(rootNamespace: string): string {
-    return this._templateCollection.LOCATOR_HELPER_TEMPLATE({ rootNamespace });
+    return this._templateCollection.LOCATOR_HELPER_FILE({ rootNamespace });
   }
   getTestSuiteBase(rootNamespace: string, testIdAttributeName: string): string {
-    return this._templateCollection.TEST_SUITE_BASE({ rootNamespace, testIdAttributeName });
+    return this._templateCollection.TEST_SUITE_BASE_FILE({ rootNamespace, testIdAttributeName });
   }
   getTestCaseBase(rootNamespace: string): string {
-    return this._templateCollection.TEST_CASE_BASE({ rootNamespace });
+    return this._templateCollection.TEST_CASE_BASE_FILE({ rootNamespace });
   }
-  getCSProject(rootNamespace: string) {
-    return this._templateCollection.CSPROJECT_TEMPLATE({ rootNamespace });
+  getCsProject(rootNamespace: string) {
+    return this._templateCollection.CSPROJECT_FILE({ rootNamespace });
   }
-  getUsings(rootNamespace: string) {
-    return this._templateCollection.USINGS_TEMPLATE({ rootNamespace });
+  getUsings(rootNamespace: string, hasRoutines: boolean) {
+    return this._templateCollection.USINGS_FILE({ rootNamespace, hasRoutines });
   }
   getRunSettings() {
-    return this._templateCollection.RUNSETTINGS_TEMPLATE({});
+    return this._templateCollection.RUNSETTINGS_FILE({});
   }
 
   getPageDefinitions(usings: string, rootNamespace: string, pageDeclaration: string, body: string) {
-    return this._templateCollection.PAGE_DEFINITIONS_TEMPLATE({ usings, rootNamespace, pageDeclaration, body });
+    return this._templateCollection.PAGE_DEFINITIONS_FILE({ usings, rootNamespace, pageDeclaration, body });
   }
 
   getPage(fullNamespace: string, pageName: string, pageDescription: string, pageBody: string) {
-    return this._templateCollection.PAGE_TEMPLATE({ fullNamespace, pageName, pageDescription, pageBody });
+    return this._templateCollection.PAGE_FILE({ fullNamespace, pageName, pageDescription, pageBody });
   }
 
   getComment(message: string) {
-    return this._templateCollection.COMMENT_TEMPLATE({ message });
+    return this._templateCollection.COMMENT({ message });
   }
 }

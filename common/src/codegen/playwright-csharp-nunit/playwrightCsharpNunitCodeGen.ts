@@ -1,52 +1,41 @@
 import { EOL } from "os";
 import path from "path";
-import { ActionType, IRmProjFile, ISourceProjectMetadata, ITestCase, ITestSuite, LocatorType, StandardFolder } from "../../file-defs";
+import {
+  ISourceProjectMetadata,
+  ITestCase,
+  ITestRoutine,
+  ITestSuite,
+  LocatorType,
+  StandardFolder,
+  StandardOutputFolder,
+} from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { createOutputProjectMetadata } from "../codegen";
 import { ICodeGen } from "../types";
-import { languageExtensionMap } from "../utils/languageExtensionMap";
-import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
+import { addIndent, hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
 import { NunitProjectMeta } from "./nunitProjectMeta";
 import { PlaywrightCsharpNunitTemplatesProvider } from "./playwrightCsharpNunitTemplatesProvider";
+import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
+import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCsharpCodeGen";
+import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
+import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfos";
+import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 
-export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
-  private _projMeta: ISourceProjectMetadata;
-  private _rmprojFile: IRmProjFile;
-  private _rootNamespace: string;
-  private _templateProvider: PlaywrightCsharpNunitTemplatesProvider;
-  private _outputFileExt: string;
-
-  private _indentChar: string;
-  private _indentSize: number;
-  private _indentString: string;
-
-  private _outProjMeta: NunitProjectMeta;
-
+export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implements ICodeGen {
   constructor(projMeta: ISourceProjectMetadata) {
-    const rmprojFile = projMeta.project;
+    super(projMeta);
+  }
 
-    this._projMeta = projMeta;
-    this._rmprojFile = rmprojFile;
-    this._rootNamespace = rmprojFile.content.rootNamespace;
-    this._templateProvider = new PlaywrightCsharpNunitTemplatesProvider(
-      path.join(rmprojFile.folderPath, StandardFolder.CustomCode, "templates")
-    );
-    this._outputFileExt = languageExtensionMap[rmprojFile.content.language];
+  protected override getOutProjMeta(): IOutputProjectMetadataProcessor {
+    return new NunitProjectMeta(this._projMeta);
+  }
 
-    /** Space char of tab char */
-    this._indentChar = indentCharMap.get(rmprojFile.content.indent)!;
-    /** Size of 1 index: eg. 2 spaces or 4 spaces */
-    this._indentSize = rmprojFile.content.indentSize;
-    /** String representing 1 indent */
-    this._indentString = this._indentChar.repeat(this._indentSize);
-
-    this._outProjMeta = new NunitProjectMeta(projMeta);
+  protected override getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {
+    return new PlaywrightCsharpNunitTemplatesProvider(path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates"));
   }
 
   async generateCode(full: boolean, writeFile: (path: string, content: string) => Promise<void>): Promise<string> {
-    // # Build PageDefinitions
-
     // Each page definition will be a property
     // Filename: PageDefinitions.cs
     await writeFile(
@@ -63,15 +52,35 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
 
     // # Generate TestCase
 
-    // Filename: TestCases/{TestCaseName}.cs
     for (let { content: testCase } of this._projMeta.testCases) {
       let testClassContent = this.generateTestCaseFile(
         testCase,
-        this._projMeta.pages.map((p) => p.content)
+        this._projMeta.pages.map((p) => p.content),
+        this._projMeta.testRoutines.map((p) => p.content)
       );
       let outputFileRelPath = this._outProjMeta.get(testCase.id)!.outputFileRelPath;
 
       await writeFile(outputFileRelPath, testClassContent);
+    }
+
+    // Filename: TestRoutines/{TestRoutineName}.cs
+    for (let { content: testRoutine } of this._projMeta.testRoutines) {
+      const datasets: IDataSetInfo[] = generateDatasetInfos(testRoutine);
+      const testRoutinesClasses: string[] = [];
+
+      // For each dataset, we generate a separate routine class
+      for (let dataset of datasets) {
+        let testRoutineClass = this.generateTestRoutineClass(
+          testRoutine,
+          this._projMeta.pages.map((p) => p.content),
+          dataset
+        );
+        testRoutinesClasses.push(testRoutineClass);
+      }
+
+      let testRoutineFile = this.generateTestRoutineFile(testRoutine, testRoutinesClasses);
+      let outputFileRelPath = this._outProjMeta.get(testRoutine.id)!.outputFileRelPath;
+      await writeFile(outputFileRelPath, testRoutineFile);
     }
 
     // Filename: Tests/{TestClassName}.cs
@@ -88,18 +97,18 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
 
     // Filename: Support/LocatorHelper.cs
     await writeFile(
-      `Support/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
+      `${StandardOutputFolder.Support}/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
       this._templateProvider.getLocatorHelper(this._rmprojFile.content.rootNamespace)
     );
     // Filename: Support/TestCaseBase.cs
     await writeFile(
-      `Support/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
+      `${StandardOutputFolder.Support}/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
       this._templateProvider.getTestCaseBase(this._rmprojFile.content.rootNamespace)
     );
 
     // Filename: Support/TestSuiteBase.cs
     await writeFile(
-      `Support/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
+      `${StandardOutputFolder.Support}/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
       this._templateProvider.getTestSuiteBase(this._rmprojFile.content.rootNamespace, this._rmprojFile.content.testIdAttributeName)
     );
     // # Generate full project files
@@ -110,11 +119,11 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
     if (full) {
       await writeFile(
         `${this._rmprojFile.content.rootNamespace}.csproj`,
-        this._templateProvider.getCSProject(this._rmprojFile.content.rootNamespace)
+        this._templateProvider.getCsProject(this._rmprojFile.content.rootNamespace)
       );
       await writeFile(
         `${StandardOutputFile.Usings}${this._outputFileExt}`,
-        this._templateProvider.getUsings(this._rmprojFile.content.rootNamespace)
+        this._templateProvider.getUsings(this._rmprojFile.content.rootNamespace, this._projMeta.testRoutines.length > 0)
       );
       await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
     }
@@ -162,7 +171,7 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
     return this._templateProvider.getPageDefinitions(usings, this._rootNamespace, pagesDeclarations, pageInits);
   }
 
-  generatePage(page: IPage): string {
+  private generatePage(page: IPage): string {
     let pageItems = [];
 
     for (let element of page.elements) {
@@ -201,7 +210,7 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
     );
   }
 
-  generateTestSuiteFile(testSuite: ITestSuite, testcases: ITestCase[]) {
+  private generateTestSuiteFile(testSuite: ITestSuite, testcases: ITestCase[]) {
     const testcaseMethods: string[] = [];
     const usingDirectives: string[] = [];
 
@@ -238,8 +247,8 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
     return testClass;
   }
 
-  generateTestCaseFile(testCase: ITestCase, pages: IPage[]) {
-    const testcaseBody = this.generateTestCaseBody(testCase, pages);
+  private generateTestCaseFile(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {
+    const testcaseBody = this.generateTestCaseBody(testCase, pages, routines);
 
     let testFile = this._templateProvider.getTestCaseFile(
       this._outProjMeta.get(testCase.id)!.outputFileClassName,
@@ -251,58 +260,30 @@ export class PlaywrightCsharpNunitCodeGen implements ICodeGen {
     return testFile;
   }
 
-  generateTestCaseFunction(testCase: ITestCase) {
+  private generateTestCaseFunction(testCase: ITestCase) {
     const testcaseName = this._outProjMeta.get(testCase.id)!.outputFileClassName;
     const testCaseMethod = this._templateProvider.getTestFunction(testcaseName, testCase.description);
     return testCaseMethod;
   }
 
-  generateTestCaseBody(testCase: ITestCase, pages: IPage[]) {
-    let stepItems = [];
-    for (let step of testCase.steps) {
-      if (step.type === "testStep") {
-        let pageName = "";
-        let elementName = "";
+  private generateTestRoutineClass(testRoutine: ITestRoutine, pages: IPage[], datasetInfo: IDataSetInfo) {
+    const testRoutineBody = this.generateTestRoutineBody(testRoutine, pages, datasetInfo);
 
-        if (step.page) {
-          let page = pages.find((p) => p.id === step.page);
-          if (!page) {
-            throw new Error("DEV ERROR: " + `Cannot find page with ID ${step.page}`);
-          }
-          pageName = this._outProjMeta.get(page.id)!.outputFileClassName;
+    // Output class name will be "{testRoutineClassName}{datasetName}";
+    const testRoutineName = this._outProjMeta.get(testRoutine.id)!.outputFileClassName;
+    const finalOutputClassName = `${testRoutineName}${datasetInfo.name}`;
 
-          if (step.element) {
-            let element = page.elements.find((e) => e.id === step.element);
-            if (!element) {
-              throw new Error("DEV ERROR: " + `Cannot find element with ID ${step.element} on page ${pageName}`);
-            }
-            elementName = element.name || "";
-          }
-        }
+    let routineFileContent = this._templateProvider.getTestRoutineClass(finalOutputClassName, testRoutine.description, testRoutineBody);
 
-        stepItems.push(
-          this._templateProvider.getAction({
-            pageName: pageName,
-            elementName: upperCaseFirstChar(elementName),
-            action: step.action! as unknown as ActionType,
-            data: step.data || "",
-            parameters: step.parameters || [],
-          })
-        );
-        continue;
-      }
+    return routineFileContent;
+  }
 
-      if (step.type === "comment") {
-        // Add an empty line before the comment
-        stepItems.push("");
-        stepItems.push(this._templateProvider.getComment(step.comment!));
-      }
-    }
-
-    let testcaseBody = stepItems.join(EOL);
-
-    // Indent test method body with 1 indent;
-    testcaseBody = addIndent(testcaseBody, this._indentString.repeat(2));
-    return testcaseBody;
+  private generateTestRoutineFile(testRoutine: ITestRoutine, testRoutineClasses: string[]) {
+    let routineFileContent = this._templateProvider.getTestRoutineFile(
+      this._rootNamespace,
+      this._outProjMeta.get(testRoutine.id)!.outputFileFullNamespace,
+      testRoutineClasses
+    );
+    return routineFileContent;
   }
 }

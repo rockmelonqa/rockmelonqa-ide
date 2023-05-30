@@ -1,6 +1,7 @@
 import { AutomationFramework, Indent, IRmProj, ITestCase, ITestSuite, Language, LocatorType, TestFramework } from "../../../src/file-defs";
 import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
 import { commonNunitOutputFiles } from "../../test-helpers/common-files-dotnet";
+import { simpleRoutineTestData } from "../playwright-csharp/simple-routine.test-data";
 
 export const createPlaywrightXUnitTestData = (): RmpSpec => {
   return {
@@ -15,57 +16,10 @@ export const createPlaywrightXUnitTestData = (): RmpSpec => {
       rootNamespace: "",
       indent: Indent.Spaces,
       indentSize: 4,
+      testIdAttributeName: "",
     },
-    pages: [
-      {
-        id: "",
-        name: "actions/InputPage",
-        description: "Input Page",
-        elements: [
-          {
-            id: "",
-            type: "pageElement",
-            name: "input",
-            findBy: LocatorType.Css,
-            locator: "input",
-            description: "Input",
-          },
-        ],
-      },
-    ],
-    testcases: [
-      {
-        id: "",
-        name: "input",
-        description: "Do input",
-        steps: [
-          {
-            id: "",
-            type: "testStep",
-            page: "",
-            element: "",
-            action: "GoToUrl",
-            data: "http://localhost:3000/actions/input.html",
-          },
-          {
-            id: "",
-            type: "testStep",
-            page: "actions/InputPage",
-            element: "input",
-            action: "Input",
-            data: "Hello World",
-          },
-        ],
-      },
-    ],
-    testsuites: [
-      {
-        id: "",
-        name: "home",
-        description: "HomePage test suite",
-        testcases: ["input"],
-      },
-    ],
+
+    ...simpleRoutineTestData,
 
     outputFiles: [
       ...commonNunitOutputFiles,
@@ -92,7 +46,8 @@ public class PageDefinitions
         Popup_AdsPage = new Popup_AdsPage(page);
         SearchResultPage = new SearchResultPage(page);
     }
-}`.trim(),
+}
+        `.trim(),
       },
       {
         fileRelPath: "Pages/HomePage.cs",
@@ -213,13 +168,13 @@ namespace AutomationTests.Tests;
 /// <summary>
 /// HomePage test suite
 /// </summary>
-[TestFixture]
+[TestClass]
 public partial class HomeTestSuite : PageTest
 {
     /// <summary>
     /// Search for 'playwright'
     /// </summary>
-    [Test]
+    [TestMethod]
     public async Task SearchForPlaywrightTestCase()
     {
         PageDefinitions defs = new PageDefinitions(this.Page);

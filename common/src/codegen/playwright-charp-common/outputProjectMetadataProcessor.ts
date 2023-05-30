@@ -6,6 +6,7 @@ import { createOutputFileInfo } from "./createOutputFileInfo";
 /** For generating output project metadata */
 export interface IOutputProjectMetadataProcessor {
   createOutputProjectMetadata: () => IOutputProjectMetadata;
+  get: (guid: string) => IOutputFileInfo;
 }
 
 /** Creates Map with the Page as keys and Output File Infor as values */

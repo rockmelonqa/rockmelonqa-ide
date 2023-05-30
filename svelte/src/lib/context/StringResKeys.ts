@@ -18,7 +18,7 @@ export const stringResKeys = {
         buildMsg: "codeGenerationDialog.buildMsg",
         checkPrerequisites: "codeGenerationDialog.checkPrerequisites",
         cleanFolderMsg: "codeGenerationDialog.cleanFolderMsg",
-        copyCustomCodeMsg: 'codeGenerationDialog.copyCustomCodeMsg',
+        copyCustomCodeMsg: "codeGenerationDialog.copyCustomCodeMsg",
         dialogMsg: "codeGenerationDialog.dialogMsg",
         dialogTitle: "codeGenerationDialog.dialogTitle",
         duplicateFileNameMessage: "codeGenerationDialog.duplicateFileNameMessage",
@@ -150,6 +150,7 @@ export const stringResKeys = {
         action: "testCaseEditor.action",
         actions: "testCaseEditor.actions",
         addComment: "testCaseEditor.addComment",
+        addRoutine: "testCaseEditor.addRoutine",
         addStep: "testCaseEditor.addStep",
         comment: "testCaseEditor.comment",
         data: "testCaseEditor.data",
@@ -158,6 +159,7 @@ export const stringResKeys = {
         element: "testCaseEditor.element",
         name: "testCaseEditor.name",
         page: "testCaseEditor.page",
+        routine: "testCaseEditor.routine",
     },
     testRoutineEditor: {
         actions: "testRoutineEditor.actions",
@@ -170,6 +172,7 @@ export const stringResKeys = {
         element: "testRoutineEditor.element",
         name: "testRoutineEditor.name",
         page: "testRoutineEditor.page",
+        routine: "testRoutineEditor.routine",
         steps: "testRoutineEditor.steps",
     },
     testSuiteEditor: {

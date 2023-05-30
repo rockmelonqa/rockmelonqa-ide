@@ -1,30 +1,31 @@
 <script lang="ts">
-    import { AppActionType, appContextKey, type IAppContext } from '$lib/context/AppContext';
-    import type { IPageData, IPageElementData, ITestCaseData } from '$lib/context/AppContext.model';
-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import { fileSystem } from '$lib/ipc';
-    import lodash from 'lodash';
+    import { AppActionType, appContextKey, type IAppContext } from "$lib/context/AppContext";
+    import type { IPageData, IPageElementData, ITestCaseData, ITestRoutineData } from "$lib/context/AppContext.model";
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import { fileSystem } from "$lib/ipc";
+    import lodash from "lodash";
     import {
         StandardFileExtension,
         StandardFolder,
         type Action,
         type IAddFileWatchEventArgs,
         type ITestCase,
-    } from 'rockmelonqa.common';
-    import type { IPage } from 'rockmelonqa.common/file-defs/pageFile';
-    import { getContext, onDestroy } from 'svelte';
-    import { derived } from 'svelte/store';
-    import { FileType, getFileType } from '../FileType';
-    import CollapsiblePanel from './CollapsiblePanel.svelte';
-    import { buildChildrenNodes, Node as NodeInfo, toFileSystemPath, toTreePath } from './Node';
-    import Nodes from './Nodes.svelte';
+        type ITestRoutine,
+    } from "rockmelonqa.common";
+    import type { IPage } from "rockmelonqa.common/file-defs/pageFile";
+    import { getContext, onDestroy } from "svelte";
+    import { derived } from "svelte/store";
+    import { FileType, getFileType } from "../FileType";
+    import CollapsiblePanel from "./CollapsiblePanel.svelte";
+    import { buildChildrenNodes, Node as NodeInfo, toFileSystemPath, toTreePath } from "./Node";
+    import Nodes from "./Nodes.svelte";
 
     let uiContext = getContext(uiContextKey) as IUiContext;
 
     let appContext = getContext(appContextKey) as IAppContext;
     let { state: appState, dispatch: appStateDispatch } = appContext;
-    $: projectFolderPath = $appState.projectFile?.folderPath ?? '';
-    $: collaspibleHeader = $appState.projectFile?.content.name ?? '';
+    $: projectFolderPath = $appState.projectFile?.folderPath ?? "";
+    $: collaspibleHeader = $appState.projectFile?.content.name ?? "";
     $: nodes = $appState.files;
 
     // Subscribe project folder path to reload tree
@@ -273,6 +274,11 @@
             shortPath.endsWith(StandardFileExtension.TestCase)
         ) {
             await loadTestCaseData(fileSystemPath);
+        } else if (
+            shortPath.startsWith(StandardFolder.TestRoutines + uiContext.pathSeparator) &&
+            shortPath.endsWith(StandardFileExtension.TestRoutine)
+        ) {
+            await loadTestRoutineData(fileSystemPath);
         }
     };
 
@@ -294,7 +300,7 @@
                 data: pageData,
             });
         } catch (error) {
-            console.log('Cannot load file', path);
+            console.log("Cannot load file", path);
             console.error(error);
         }
     };
@@ -313,8 +319,8 @@
                 return map;
             }, new Map<string, IPageElementData>());
 
-        let name = toTreePath(path, $appState.projectFile?.folderPath!, uiContext.pathSeparator) ?? '';
-        name = name.replace(new RegExp(`^${StandardFolder.PageDefinitions}${NodeInfo.PATH_SEPARATOR}`), '');
+        let name = toTreePath(path, $appState.projectFile?.folderPath!, uiContext.pathSeparator) ?? "";
+        name = name.replace(new RegExp(`^${StandardFolder.PageDefinitions}${NodeInfo.PATH_SEPARATOR}`), "");
 
         return {
             id: page.id,
@@ -342,20 +348,54 @@
                 data: testCaseData,
             });
         } catch (error) {
-            console.log('Cannot load file', path);
+            console.log("Cannot load file", path);
+            console.error(error);
+        }
+    };
+
+    const loadTestRoutineData = async (path: string) => {
+        try {
+            const fileContent = await fileSystem.readFile(path);
+            if (!fileContent) {
+                return;
+            }
+
+            const testRoutine = JSON.parse(fileContent) as ITestRoutine;
+            const testRoutineData = buildTestRoutineData(path, testRoutine);
+            if (!testRoutineData) {
+                return;
+            }
+
+            appStateDispatch({
+                type: AppActionType.SetTestRoutineData,
+                data: testRoutineData,
+            });
+        } catch (error) {
+            console.log("Cannot load file", path);
             console.error(error);
         }
     };
 
     const buildTestCaseData = (path: string, testCase: ITestCase): ITestCaseData | null => {
-        let name = toTreePath(path, $appState.projectFile?.folderPath!, uiContext.pathSeparator) ?? '';
-        name = name.replace(new RegExp(`^${StandardFolder.TestCases}${NodeInfo.PATH_SEPARATOR}`), '');
+        let name = toTreePath(path, $appState.projectFile?.folderPath!, uiContext.pathSeparator) ?? "";
+        name = name.replace(new RegExp(`^${StandardFolder.TestCases}${NodeInfo.PATH_SEPARATOR}`), "");
 
         return {
             id: testCase.id,
             name: name,
             filePath: path,
         } as ITestCaseData;
+    };
+
+    const buildTestRoutineData = (path: string, testRoutine: ITestRoutine): ITestRoutineData | null => {
+        let name = toTreePath(path, $appState.projectFile?.folderPath!, uiContext.pathSeparator) ?? "";
+        name = name.replace(new RegExp(`^${StandardFolder.TestRoutines}${NodeInfo.PATH_SEPARATOR}`), "");
+
+        return {
+            id: testRoutine.id,
+            name: name,
+            filePath: path,
+        } as ITestRoutineData;
     };
 
     // Unload file data out of AppContext

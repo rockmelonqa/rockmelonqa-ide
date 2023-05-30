@@ -4,6 +4,7 @@ import { IDictionary } from "./shared";
 /** A data set is set of data to be used for a specific execution of a test routine   */
 export interface IDataSet {
   id: string;
+  name: string;
   description: string;
 }
 
@@ -11,7 +12,7 @@ export interface IDataSet {
 export interface ITestRoutine {
   id: string;
   description: string;
-  steps: ITestStep[];
+  steps: ITestRoutineStep[];
   dataSets: IDataSet[];
 }
 
@@ -20,13 +21,13 @@ export interface ITestRoutineFile extends Omit<IFileDef, "content"> {
   content: ITestRoutine;
 }
 
-export interface ITestStep {
+export interface ITestRoutineStep {
   id: string;
   type: "testStep" | "comment";
   page?: string;
   element?: string;
   action?: string;
-  data: IDictionary<string>[];
+  data: IDictionary<string>;
   parameters?: string[];
   comment?: string;
 }

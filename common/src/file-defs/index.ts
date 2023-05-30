@@ -6,7 +6,7 @@ import { AutomationFramework, Browser, Indent, IRmProj, IRmProjFile, Language, T
 import { ISourceProjectMetadata } from "./sourceProjectMetadata";
 import { StandardOutputFile } from "./standardOutputFile";
 import { ITestCase, ITestCaseFile, ITestStep as ITestCaseStep } from "./testCaseFile";
-import { IDataSet, ITestRoutine, ITestRoutineFile, ITestStep as ITestRoutineStep } from "./testRoutineFile";
+import { IDataSet, ITestRoutine, ITestRoutineFile, ITestRoutineStep } from "./testRoutineFile";
 import { ITestSuite, ITestSuiteFile } from "./testSuiteFile";
 import { IRecentFile, IUserSettings, IUserSettingsFile } from "./userSettingsFile";
 

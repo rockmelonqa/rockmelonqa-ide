@@ -4,6 +4,7 @@ import { IRmProjFile } from "../../file-defs/rmProjFile";
 import { IOutputFileInfo } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { upperCaseFirstChar } from "../utils/stringUtils";
+import createName from "../utils/createName";
 
 /** Map from standard input folder to standard output folder */
 const inputOutputFolderMap = new Map<string, string>([
@@ -21,25 +22,6 @@ const getContainerFolder = (inputFolderPath: string, projDir: string) => {
   let standardFolder = inputRelPath.split(path.sep)[0];
 
   return standardFolder;
-};
-
-/** Creates a valid name (with extension) from the input file relative path */
-const createName = (relativePath: string) => {
-  let ext = path.extname(relativePath).toLocaleLowerCase();
-  let extName = upperCaseFirstChar(ExtensionToNameMap[ext]);
-
-  let filenameWithoutExt = relativePath
-    .replace(/\..+$/, "") // Remove the extension
-    .replaceAll(path.sep, "_") // Replace path separator with underscore
-    .replace(/\W/g, "") // Removing non-alphanumeric chars
-    .replace(/ +/g, ""); // Remove space(s)
-
-  filenameWithoutExt = filenameWithoutExt
-    .split("_")
-    .map((w) => upperCaseFirstChar(w))
-    .join("_");
-
-  return `${filenameWithoutExt}${extName}`;
 };
 
 /** The input metadata needed to generate valid output file metadata */
