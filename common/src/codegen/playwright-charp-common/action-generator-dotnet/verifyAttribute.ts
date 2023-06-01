@@ -1,6 +1,7 @@
 import { IActionTemplateParam } from "../../types";
 import { escapeStr, getParameters } from "../../utils/stringUtils";
 
+/** Generates Csharp code for action Verify Attribute */
 export default (params: IActionTemplateParam) => {
   const { pageName, elementName, parameters, data } = params;
   let temp = data.split("=");

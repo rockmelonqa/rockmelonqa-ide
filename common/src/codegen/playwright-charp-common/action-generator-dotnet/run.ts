@@ -1,6 +1,6 @@
 import { IActionTemplateParam } from "../../types";
-import { getParameters } from "../../utils/stringUtils";
 
+/** Generates Csharp code for action Run */
 export default (params: IActionTemplateParam) => {
   return `// TODO: Action Run`;
 };
