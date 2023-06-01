@@ -29,27 +29,10 @@ export class NunitProjectMeta implements IOutputProjectMetadataProcessor {
     this.suiteNameMap = createMapForTestSuites(rmprojFile, codegenMeta.testSuites);
     this.caseNameMap = createMapForTestCases(rmprojFile, codegenMeta.testCases);
     this.routineNameMap = createMapForTestRoutines(rmprojFile, codegenMeta.testRoutines);
-
-    this.verifyDuplication();
   }
 
   public createOutputProjectMetadata(): IOutputProjectMetadata {
     return createDotnetProjectMetadata(this._projMeta);
-  }
-
-  private verifyDuplication() {
-    this.findDuplication(this.pageNameMap.values());
-    this.findDuplication(this.caseNameMap.values());
-    this.findDuplication(this.suiteNameMap.values());
-    this.findDuplication(this.routineNameMap.values());
-  }
-
-  private findDuplication(nameInfo: IterableIterator<IOutputFileInfo>) {
-    const allFilePath = Array.from(nameInfo).map((x) => x.outputFilePath);
-    const firstDuplication = allFilePath.find((x) => allFilePath.indexOf(x) !== allFilePath.lastIndexOf(x));
-    if (firstDuplication) {
-      throw new Error(`Duplicate output file: ${firstDuplication}`);
-    }
   }
 
   /** Get an instance of IOutputFileInfo with the provided guid of an item in the rmProj  */
