@@ -4,19 +4,19 @@ import { ILocatorTemplateParam } from "../types";
 import attribute from "./locator-generator/attribute";
 import code from "./locator-generator/code";
 import css from "./locator-generator/css";
+import id from "./locator-generator/id";
 import iFrame from "./locator-generator/iframe";
 import iFrameId from "./locator-generator/iframeId";
 import iFrameName from "./locator-generator/iframeName";
-import id from "./locator-generator/id";
 import label from "./locator-generator/label";
 import name from "./locator-generator/name";
 import placeholder from "./locator-generator/placeholder";
-import relative from "./locator-generator/relative";
+import relativeCss from "./locator-generator/relativeCss";
+import relativeXpath from "./locator-generator/relativeXpath";
 import testId from "./locator-generator/testId";
 import text from "./locator-generator/text";
 import title from "./locator-generator/title";
 import xpath from "./locator-generator/xpath";
-
 export const locatorRegisty = new Map<LocatorType, (params: ILocatorTemplateParam) => string>();
 
 locatorRegisty
@@ -30,7 +30,8 @@ locatorRegisty
   .set(LocatorType.Label, label)
   .set(LocatorType.Name, name)
   .set(LocatorType.Placeholder, placeholder)
-  .set(LocatorType.Relative, relative)
+  .set(LocatorType.RelativeCss, relativeCss)
+  .set(LocatorType.RelativeXpath, relativeXpath)
   .set(LocatorType.TestId, testId)
   .set(LocatorType.Text, text)
   .set(LocatorType.Title, title)
