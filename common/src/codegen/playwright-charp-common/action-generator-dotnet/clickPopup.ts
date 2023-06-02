@@ -1,7 +1,6 @@
-import { EOL } from "os";
 import { IActionTemplateParam } from "../../types";
-import { getParameters } from "../../utils/stringUtils";
 
+/** Generates Csharp code for action Click on "Popup" link */
 export default (params: IActionTemplateParam) => {
   const { pageName, elementName } = params;
   return `

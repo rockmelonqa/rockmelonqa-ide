@@ -30,8 +30,8 @@ const onCleanFolder = (fn: (data: IProgressDetail) => void, options?: { apiKey?:
 const onGenerateCode = (fn: (data: IProgressDetail) => void, options?: { apiKey?: string }): Action | undefined =>
     getApi(options?.apiKey).on("gen-code:generate-code", fn);
 
-const onCopyCustomCode = (fn: (data: IProgressDetail) => void, options?: {apiKey?: string}): Action | undefined => 
-    getApi(options?.apiKey).on('gen-code:copy-custom-code', fn);
+const onCopyCustomCode = (fn: (data: IProgressDetail) => void, options?: { apiKey?: string }): Action | undefined =>
+    getApi(options?.apiKey).on("gen-code:copy-custom-code", fn);
 
 const onBuild = (fn: (data: IProgressDetail) => void, options?: { apiKey?: string }): Action | undefined =>
     getApi(options?.apiKey).on("build:build", fn);

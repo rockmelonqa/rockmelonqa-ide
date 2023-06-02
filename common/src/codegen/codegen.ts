@@ -298,12 +298,14 @@ export const createSourceProjectMetadata = async (
 
   let testRoutineFolderPath = path.join(rmprojFile.folderPath, StandardFolder.TestRoutines);
 
-  let testRoutineFileRelPaths = await readDirRecursive(testRoutineFolderPath);
+  if (fs.existsSync(testRoutineFolderPath)) {
+    let testRoutineFileRelPaths = await readDirRecursive(testRoutineFolderPath);
 
-  for (let testRoutineDefFile of testRoutineFileRelPaths) {
-    routines.push(await parseTestRoutine(testRoutineFolderPath, testRoutineDefFile));
-    notify({ type: "parse-data", log: `Parsing: ${testRoutineDefFile}` });
-    info(`    ---> Found test routine file: ${testRoutineDefFile}`);
+    for (let testRoutineDefFile of testRoutineFileRelPaths) {
+      routines.push(await parseTestRoutine(testRoutineFolderPath, testRoutineDefFile));
+      notify({ type: "parse-data", log: `Parsing: ${testRoutineDefFile}` });
+      info(`    ---> Found test routine file: ${testRoutineDefFile}`);
+    }
   }
 
   let projMeta: ISourceProjectMetadata = {

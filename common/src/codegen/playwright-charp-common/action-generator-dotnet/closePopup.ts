@@ -1,8 +1,5 @@
-import { EOL } from "os";
-import { IActionTemplateParam } from "../../types";
-import { getParameters } from "../../utils/stringUtils";
-
-export default (params: IActionTemplateParam) => {
+/** Generates Csharp code for action Closing a "Popup" tab */
+export default () => {
   return `
 await defs.Page.CloseAsync();
 defs = new PageDefinitions(this.Page);

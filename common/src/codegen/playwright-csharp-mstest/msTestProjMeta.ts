@@ -47,7 +47,8 @@ export class MsTestProjMeta implements IOutputProjectMetadataProcessor {
     const allFilePath = Array.from(nameInfo).map((x) => x.outputFilePath);
     const firstDuplication = allFilePath.find((x) => allFilePath.indexOf(x) !== allFilePath.lastIndexOf(x));
     if (firstDuplication) {
-      throw new Error(`Duplicate output file: ${firstDuplication}`);
+      //throw new Error(`Duplicate output file: ${firstDuplication}`);
+      console.error(`Duplicate output file: ${firstDuplication}`);
     }
   }
 

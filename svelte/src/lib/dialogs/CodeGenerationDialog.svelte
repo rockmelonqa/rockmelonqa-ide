@@ -74,7 +74,7 @@
                 spinnerText = uiContext.str(stringResKeys.codeGenerationDialog.copyCustomCodeMsg);
                 addLog(data.log);
             })
-        )
+        );
 
         registerListener(
             codeGenerator.onBuild((data: IProgressDetail) => {

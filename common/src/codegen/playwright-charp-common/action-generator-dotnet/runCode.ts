@@ -1,6 +1,6 @@
 import { IActionTemplateParam } from "../../types";
-import { getParameters } from "../../utils/stringUtils";
 
+/** Generates Csharp code for action RunCode */
 export default (params: IActionTemplateParam) => {
   return params.data;
 };
