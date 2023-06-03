@@ -133,7 +133,8 @@ export interface ILocatorTypeStringRes {
     label: string;
     name: string;
     placeholder: string;
-    relative: string;
+    relativeCss: string;
+    relativeXpath: string;
     testId: string;
     text: string;
     title: string;

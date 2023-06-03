@@ -3,9 +3,9 @@
     import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
     import type { IUiTheme } from "$lib/context/UiTheme";
     import FancyDropdownField from "$lib/controls/FancyDropdownField.svelte";
+    import TextField from "$lib/controls/TextField.svelte";
     import FormGroup from "$lib/controls/layout/FormGroup.svelte";
     import FormGroupColumn from "$lib/controls/layout/FormGroupColumn.svelte";
-    import TextField from "$lib/controls/TextField.svelte";
     import Form from "$lib/form-controls/Form.svelte";
     import FormTextField from "$lib/form-controls/TextField.svelte";
     import { FieldDataType, type IDictionary } from "$lib/form/FieldDef";
@@ -14,7 +14,7 @@
     import type { IFormDef } from "$lib/form/FormDef";
     import { FormModeState } from "$lib/form/FormMode";
     import { FormSerializer } from "$lib/form/FormSerializer";
-    import { createListDataContext, ListDataActionType } from "$lib/form/ListData";
+    import { ListDataActionType, createListDataContext } from "$lib/form/ListData";
     import type { IListDef } from "$lib/form/ListDef";
     import AddIcon from "$lib/icons/AddIcon.svelte";
     import CommentIcon from "$lib/icons/CommentIcon.svelte";
@@ -24,7 +24,7 @@
     import SaveIcon from "$lib/icons/SaveIcon.svelte";
     import { fileSystem } from "$lib/ipc";
     import { getLocatorTypeDropDownOptions } from "$lib/utils/dropdowns";
-    import { fileDefFactory } from "rockmelonqa.common";
+    import { LocatorType, fileDefFactory } from "rockmelonqa.common";
     import type { IPage, IPageElement } from "rockmelonqa.common/file-defs/pageFile";
     import { createEventDispatcher, getContext, onMount } from "svelte";
     import { v4 as uuidv4 } from "uuid";
@@ -389,6 +389,10 @@
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Normal}>
                             <TextField
+                                placeholder={(item.findBy === LocatorType.RelativeCss
+                                    ? "MyField:.css-class-name"
+                                    : "") ||
+                                    (item.findBy === LocatorType.RelativeXpath ? "MyField://div[text() = 'abc']" : "")}
                                 name={`${formContext.formName}_${index}_locator`}
                                 value={item.locator}
                                 on:input={(event) => handleItemChange(index, "locator", event.detail.value)}
