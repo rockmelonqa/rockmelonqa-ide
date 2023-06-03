@@ -53,15 +53,15 @@
     --color-warning--dark: #edeacf;
 
     /* Input Colors */
-    --color-input-border: rgb(209 213 219); /* grey-300 */
+    --color-input-border: rgb(203 213 225); /* border-slate-300 */
     --color-input-border--focus: rgb(99 102 241); /* indigo-500 */
-    --color-input-background--error: rgba(135, 3, 7, 0.08);
     --color-input-border--error: rgba(135, 3, 7, 0.24);
+    --color-input-background--error: rgba(135, 3, 7, 0.08);
     --color-button-border--standard: rgba(81, 122, 189, 0.28);
     --color-button--disabled: rgb(226 232 240); /*text-slate-200*/
 
     /* Others */
-    --color-panel-border: #cbd5e1; /* border-slate-300 */
+    --color-panel-border: rgb(203 213 225); /* border-slate-300 */
 }
 
 /********************************************
@@ -163,7 +163,7 @@ hr {
 }
 
 .dropdown-field-root.fancy .svelte-select.select-error.focused {
-    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 1.25px rgb(239, 68, 68);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 1.25px rgb(239, 68, 68); /* border-red-500  */
 }
 
 .dropdown-field-root.inline-fancy .dropdown-field-select-container {
