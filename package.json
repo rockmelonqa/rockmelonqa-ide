@@ -4,7 +4,7 @@
   "description": "New evolution for automation testing",
   "author": "Rockmelon QA",
   "license": "MIT",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "main": "dist/index.js",
   "scripts": {
     "nodemon": "nodemon",
