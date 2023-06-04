@@ -109,6 +109,7 @@ const parseTestSuite = async (parentDir: string, fileRelPath: string): Promise<I
   };
 };
 
+/** Reads all files in the provided directory recursively */
 const readDirRecursive = async (dir: string) => {
   let paths = await new Promise<string[]>((rs, rj) =>
     recursive(dir, [], function (err: any, files: string[]) {
@@ -119,6 +120,13 @@ const readDirRecursive = async (dir: string) => {
       rs(files.map((f) => f.replace(dir, "").substring(1)));
     })
   );
+  return paths;
+};
+
+/** Reads all files with the provided extension in the provided directory recursively. Extension includes the dot, eg ".page, .tcase" */
+const readDirRecursiveFilterByExt = async (dir: string, ext: string) => {
+  let paths = await readDirRecursive(dir);
+  paths = paths.filter((filePath) => filePath.toLocaleLowerCase().endsWith(ext));
   return paths;
 };
 
@@ -242,9 +250,7 @@ export const createSourceProjectMetadata = async (
 
   let pages: IPageFile[] = [];
   let pageDefFolder = path.join(rmprojFile.folderPath, StandardFolder.PageDefinitions);
-  let pageDefinitionFiles: string[] = (await readDirRecursive(pageDefFolder)).filter((name) =>
-    name.toLocaleLowerCase().endsWith(StandardFileExtension.Page)
-  );
+  let pageDefinitionFiles: string[] = await readDirRecursiveFilterByExt(pageDefFolder, StandardFileExtension.Page);
 
   for (let pageDefinitionFile of pageDefinitionFiles) {
     notify({ type: "parse-data", log: `Parsing: ${pageDefinitionFile}` });
@@ -261,7 +267,7 @@ export const createSourceProjectMetadata = async (
 
   let suites: ITestSuiteFile[] = [];
   let testSuiteFolderPath = path.join(rmprojFile.folderPath, StandardFolder.TestSuites);
-  let testSuiteFilePaths = await readDirRecursive(testSuiteFolderPath);
+  let testSuiteFilePaths = await readDirRecursiveFilterByExt(testSuiteFolderPath, StandardFileExtension.TestSuite);
 
   for (let testSuiteDefFile of testSuiteFilePaths) {
     notify({ type: "parse-data", log: `Parsing: ${testSuiteDefFile}` });
@@ -279,7 +285,7 @@ export const createSourceProjectMetadata = async (
   let cases: ITestCaseFile[] = [];
   let testCaseFolderPath = path.join(rmprojFile.folderPath, StandardFolder.TestCases);
 
-  let testCaseFileRelPaths = await readDirRecursive(testCaseFolderPath);
+  let testCaseFileRelPaths = await readDirRecursiveFilterByExt(testCaseFolderPath, StandardFileExtension.TestCase);
 
   for (let testCaseDefFile of testCaseFileRelPaths) {
     cases.push(await parseTestCase(testCaseFolderPath, testCaseDefFile));
@@ -299,7 +305,7 @@ export const createSourceProjectMetadata = async (
   let testRoutineFolderPath = path.join(rmprojFile.folderPath, StandardFolder.TestRoutines);
 
   if (fs.existsSync(testRoutineFolderPath)) {
-    let testRoutineFileRelPaths = await readDirRecursive(testRoutineFolderPath);
+    let testRoutineFileRelPaths = await readDirRecursiveFilterByExt(testRoutineFolderPath, StandardFileExtension.TestRoutine);
 
     for (let testRoutineDefFile of testRoutineFileRelPaths) {
       routines.push(await parseTestRoutine(testRoutineFolderPath, testRoutineDefFile));
