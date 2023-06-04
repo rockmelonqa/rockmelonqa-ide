@@ -220,14 +220,6 @@
             .some(([key, value]) => (key === 'data' ? value.some((x: any) => x.value) : value));
     };
 
-    // const isEmptyDataSetItem = (item: IDictionary) => {
-    //     const ignoredProperties: string[] = ['id'];
-    //     return Object.entries(item)
-    //         .filter(([key, value]) => !ignoredProperties.includes(key))
-    //         .map(([key, value]) => value)
-    //         .every((x) => !x);
-    // };
-
     const dispatchChange = () => {
         dispatch('change');
     };

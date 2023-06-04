@@ -44,7 +44,7 @@
     import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
     import RoutineDropDown from "../RoutineDropDown.svelte";
-    import { toTitle } from "./Editor";
+    import { toTitle, isPagelessAction } from "./Editor";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -160,6 +160,10 @@
         }
     });
 
+    const lastPageOption = () => {
+        return $listData.items.findLast(item => !isComment(item) && !isPagelessAction(item.action))?.page;
+    };
+
     onMount(async () => {
         // default/empty data
         let model: ITestCase = fileDefFactory.newTestCase();
@@ -191,20 +195,6 @@
 
     const isTestRoutine = (item: IDictionary) => {
         return (item as ITestStep).type === "routine";
-    };
-
-    const pagelessActions = [
-        ActionType.ClosePopup.toString(),
-        ActionType.Delay.toString(),
-        ActionType.GoToUrl.toString(),
-        ActionType.RunCode.toString(),
-        ActionType.VerifyTitle.toString(),
-        ActionType.VerifyTitleContains.toString(),
-        ActionType.VerifyUrl.toString()
-    ];
-
-    const isPagelessAction = (action: string) => {
-        return pagelessActions.includes(action);
     };
 
     const handleSave = async () => {
@@ -332,6 +322,10 @@
         dispatchChange();
     };
     const newStep = (): ITestStep => {
+        const lastPageOptionValue = lastPageOption();
+        if(lastPageOptionValue) {
+            return { id: uuidv4(), type: "testStep", name: "", description: "", data: "", page: lastPageOptionValue } as ITestStep; 
+        }
         return { id: uuidv4(), type: "testStep", name: "", description: "", data: "" } as ITestStep;
     };
 

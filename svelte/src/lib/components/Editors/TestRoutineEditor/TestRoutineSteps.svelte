@@ -28,6 +28,7 @@
     import { createEventDispatcher, getContext } from 'svelte';
     import { derived } from 'svelte/store';
     import { v4 as uuidv4 } from 'uuid';
+    import { isPagelessAction } from '../Editor';
 
     export let formContext: IFormContext;
     let { mode: formMode, formName } = formContext;
@@ -68,6 +69,10 @@
             pageElementsMap.set(pageId, dropdownOptions);
         }
     });
+
+    const lastPageOption = () => {
+        return $listStep.items.findLast(item => !isComment(item) && !isPagelessAction(item.action))?.page;
+    };
 
     const dispatch = createEventDispatcher();
 
@@ -163,11 +168,12 @@
                     type: 'testStep',
                     name: '',
                     description: '',
+                    page: lastPageOption(),
                     data: dataSetItems.map((x) => ({
                         id: x.id,
                         value: '',
                     })),
-                } as ITestStep,
+                } as IDictionary,
             ],
             hasMoreItems: false,
         });
@@ -234,20 +240,24 @@
                     </ListTableBodyCell>
                 {:else}
                     <ListTableBodyCell type={ListTableCellType.First}>
+                        {#if !isPagelessAction(item.action)}
                         <FancyDropdownField
                             name={`${formName}_${index}_page`}
                             value={item.page}
                             options={pageDefinitionOptions}
                             on:change={(event) => handleItemChange(index, 'page', event.detail.value)}
                         />
+                        {/if}
                     </ListTableBodyCell>
                     <ListTableBodyCell type={ListTableCellType.Normal}>
+                        {#if !isPagelessAction(item.action)}
                         <FancyDropdownField
                             name={`${formName}_${index}_element`}
                             value={item.element}
                             options={pageElementsMap.get(item.page) ?? []}
                             on:change={(event) => handleItemChange(index, 'element', event.detail.value)}
                         />
+                        {/if}
                     </ListTableBodyCell>
                     <ListTableBodyCell type={ListTableCellType.Normal}>
                         <FancyDropdownField
