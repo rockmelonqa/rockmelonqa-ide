@@ -1,27 +1,27 @@
 <script lang="ts">
-    import { stringResKeys } from '$lib/context/StringResKeys';
-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import type { IUiTheme } from '$lib/context/UiTheme';
-    import FormGroup from '$lib/controls/layout/FormGroup.svelte';
-    import FormGroupColumn from '$lib/controls/layout/FormGroupColumn.svelte';
-    import Form from '$lib/form-controls/Form.svelte';
-    import FormTextField from '$lib/form-controls/TextField.svelte';
-    import { FieldDataType, type IDictionary } from '$lib/form/FieldDef';
-    import { createFormContext } from '$lib/form/FormContext';
-    import { FormDataActionType } from '$lib/form/FormData';
-    import type { IFormDef } from '$lib/form/FormDef';
-    import { FormModeState } from '$lib/form/FormMode';
-    import { FormSerializer } from '$lib/form/FormSerializer';
-    import { ListDataActionType, createListDataContext } from '$lib/form/ListData';
-    import type { IListDef } from '$lib/form/ListDef';
-    import { fileSystem } from '$lib/ipc';
-    import { fileDefFactory, type ITestRoutine } from 'rockmelonqa.common';
-    import { createEventDispatcher, getContext, onMount } from 'svelte';
-    import { appActionContextKey, type IAppActionContext } from '../../Application';
-    import { combinePath } from '../../FileExplorer/Node';
-    import { toTitle } from '../Editor';
-    import TestRoutineDataSet from './TestRoutineDataSet.svelte';
-    import TestRoutineSteps from './TestRoutineSteps.svelte';
+    import { stringResKeys } from "$lib/context/StringResKeys";
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import type { IUiTheme } from "$lib/context/UiTheme";
+    import FormGroup from "$lib/controls/layout/FormGroup.svelte";
+    import FormGroupColumn from "$lib/controls/layout/FormGroupColumn.svelte";
+    import Form from "$lib/form-controls/Form.svelte";
+    import FormTextField from "$lib/form-controls/TextField.svelte";
+    import { FieldDataType, type IDictionary } from "$lib/form/FieldDef";
+    import { createFormContext } from "$lib/form/FormContext";
+    import { FormDataActionType } from "$lib/form/FormData";
+    import type { IFormDef } from "$lib/form/FormDef";
+    import { FormModeState } from "$lib/form/FormMode";
+    import { FormSerializer } from "$lib/form/FormSerializer";
+    import { ListDataActionType, createListDataContext } from "$lib/form/ListData";
+    import type { IListDef } from "$lib/form/ListDef";
+    import { fileSystem } from "$lib/ipc";
+    import { fileDefFactory, type ITestRoutine } from "rockmelonqa.common";
+    import { createEventDispatcher, getContext, onMount } from "svelte";
+    import { appActionContextKey, type IAppActionContext } from "../../Application";
+    import { combinePath } from "../../FileExplorer/Node";
+    import { toTitle } from "../Editor";
+    import TestRoutineDataSet from "./TestRoutineDataSet.svelte";
+    import TestRoutineSteps from "./TestRoutineSteps.svelte";
 
     export let folderPath: string;
     export let fileName: string;
@@ -38,16 +38,16 @@
         fields: {
             id: {
                 dataType: FieldDataType.Text,
-                dataPath: 'id',
+                dataPath: "id",
                 isRequired: true,
             },
             description: {
                 dataType: FieldDataType.Text,
-                dataPath: 'description',
+                dataPath: "description",
             },
         },
     };
-    let formContext = createFormContext('testRoutineEditor', formDef, uiContext, FormModeState.Edit);
+    let formContext = createFormContext("testRoutineEditor", formDef, uiContext, FormModeState.Edit);
     let {
         mode: formMode,
         modeDispatch: formModeDispatch,
@@ -59,41 +59,41 @@
         fields: {
             id: {
                 dataType: FieldDataType.Text,
-                dataPath: 'id',
+                dataPath: "id",
             },
             type: {
                 dataType: FieldDataType.Text,
-                dataPath: 'type',
+                dataPath: "type",
             },
             page: {
                 dataType: FieldDataType.Dropdown,
-                dataPath: 'page',
+                dataPath: "page",
             },
             element: {
                 dataType: FieldDataType.Dropdown,
-                dataPath: 'element',
+                dataPath: "element",
             },
             action: {
                 dataType: FieldDataType.Dropdown,
-                dataPath: 'action',
+                dataPath: "action",
             },
             data: {
                 dataType: FieldDataType.List,
-                dataPath: 'data',
+                dataPath: "data",
                 fieldDefs: {
                     id: {
                         dataType: FieldDataType.Text,
-                        dataPath: 'id',
+                        dataPath: "id",
                     },
                     value: {
                         dataType: FieldDataType.Text,
-                        dataPath: 'value',
+                        dataPath: "value",
                     },
                 },
             },
             comment: {
                 dataType: FieldDataType.Text,
-                dataPath: 'comment',
+                dataPath: "comment",
             },
         },
     };
@@ -104,15 +104,15 @@
         fields: {
             id: {
                 dataType: FieldDataType.Text,
-                dataPath: 'id',
+                dataPath: "id",
             },
             name: {
                 dataType: FieldDataType.Text,
-                dataPath: 'name',
+                dataPath: "name",
             },
             description: {
                 dataType: FieldDataType.Text,
-                dataPath: 'description',
+                dataPath: "description",
             },
         },
     };
@@ -122,8 +122,8 @@
     const { registerOnSaveHandler, unregisterOnSaveHandler } = getContext(appActionContextKey) as IAppActionContext;
     $: title = toTitle(fileName);
 
-    type tabButton = 'btnDataSets' | 'btnSteps';
-    let activeBtn: tabButton = 'btnDataSets';
+    type tabButton = "btnDataSets" | "btnSteps";
+    let activeBtn: tabButton = "btnDataSets";
 
     onMount(async () => {
         // default/empty data
@@ -151,10 +151,14 @@
          *   { id: "guid-2", value: "value-2" },
          * ]
          * */
-        model.steps.forEach((step) => {
-            step.data = Object.entries(step.data).map(([id, value]) => ({ id, value })) as IDictionary[];
+        const viewModelSteps = model.steps.map((step) => {
+            return {
+                ...step,
+                // 'data' can be null of that is 'comment' row
+                data: step.data ? Object.entries(step.data).map(([id, value]) => ({ id, value })) as IDictionary[] : undefined,
+            };
         });
-        const steps = serializer.deserializeList(model.steps, listStepDef.fields);
+        const steps = serializer.deserializeList(viewModelSteps, listStepDef.fields);
         listStepDispatch({ type: ListDataActionType.SetItems, items: steps, hasMoreItems: false });
 
         const dataSets = serializer.deserializeList(model.dataSets, listDataSetDef.fields);
@@ -192,10 +196,13 @@
              * }
              * */
             steps.forEach((step) => {
-                step.data = step.data.reduce((obj: IDictionary, item: any) => {
-                    obj[item.id] = item.value ?? '';
-                    return obj;
-                }, {});
+                // do not proceed 'Comment' rows which do not have 'data'
+                if (step.data) {
+                    step.data = step.data.reduce((obj: IDictionary, item: any) => {
+                        obj[item.id] = item.value ?? "";
+                        return obj;
+                    }, {});
+                }
             });
 
             // const dataSetItems = $listDataSet.items.filter((r) => !isEmptyDataSetItem(r));
@@ -205,7 +212,7 @@
             const data = { ...model, steps, dataSets };
             await fileSystem.writeFile(filePath, JSON.stringify(data, null, 4));
 
-            dispatch('saved');
+            dispatch("saved");
             return true;
         }
 
@@ -214,14 +221,14 @@
     };
 
     const isEmptyStepItem = (item: IDictionary) => {
-        const ignoredProperties: string[] = ['id', 'type'];
+        const ignoredProperties: string[] = ["id", "type"];
         return !Object.entries(item)
             .filter(([key, value]) => !ignoredProperties.includes(key))
-            .some(([key, value]) => (key === 'data' ? value.some((x: any) => x.value) : value));
+            .some(([key, value]) => (key === "data" ? value.some((x: any) => x.value) : value));
     };
 
     const dispatchChange = () => {
-        dispatch('change');
+        dispatch("change");
     };
 
     const handleDataSetChange = (e: any) => {
@@ -242,7 +249,7 @@
         steps.forEach((step) => {
             step.data = $listDataSet.items.map((ds) => ({
                 id: ds.id,
-                value: step.data.find((x: IDictionary) => x.id === ds.id)?.value ?? '',
+                value: step.data.find((x: IDictionary) => x.id === ds.id)?.value ?? "",
             }));
         });
 
@@ -272,22 +279,22 @@
 
     <div class="mb-8 flex">
         <button
-            class={`tab-switcher px-6 py-4 ${activeBtn === 'btnDataSets' ? 'active' : ''}`}
-            on:click={() => (activeBtn = 'btnDataSets')}
+            class={`tab-switcher px-6 py-4 ${activeBtn === "btnDataSets" ? "active" : ""}`}
+            on:click={() => (activeBtn = "btnDataSets")}
         >
             {uiContext.str(stringResKeys.testRoutineEditor.dataSet)}
         </button>
         <button
-            class={`tab-switcher px-6 py-4 ${activeBtn === 'btnSteps' ? 'active' : ''}`}
-            on:click={() => (activeBtn = 'btnSteps')}
+            class={`tab-switcher px-6 py-4 ${activeBtn === "btnSteps" ? "active" : ""}`}
+            on:click={() => (activeBtn = "btnSteps")}
         >
             {uiContext.str(stringResKeys.testRoutineEditor.steps)}
         </button>
     </div>
 
-    {#if activeBtn === 'btnDataSets'}
+    {#if activeBtn === "btnDataSets"}
         <TestRoutineDataSet {formContext} {listDataSetContext} on:change={handleDataSetChange} on:save={handleSave} />
-    {:else if activeBtn === 'btnSteps'}
+    {:else if activeBtn === "btnSteps"}
         <TestRoutineSteps
             {formContext}
             {listStepContext}

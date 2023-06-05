@@ -29,6 +29,7 @@
     import { derived } from 'svelte/store';
     import { v4 as uuidv4 } from 'uuid';
     import { isPagelessAction } from '../Editor';
+    import CommentTextField from '$lib/components/CommentTextField.svelte';
 
     export let formContext: IFormContext;
     let { mode: formMode, formName } = formContext;
@@ -70,9 +71,11 @@
         }
     });
 
-    const lastPageOption = () => {
-        return $listStep.items.findLast(item => !isComment(item) && !isPagelessAction(item.action))?.page;
+    const isTestStep = (item: IDictionary) => {
+        return (item as ITestStep).type === "testStep";
     };
+
+    let lastUsedPage: string | undefined = $listStep.items.findLast(item => isTestStep(item) && !isPagelessAction(item.action))?.page;
 
     const dispatch = createEventDispatcher();
 
@@ -87,6 +90,10 @@
         });
 
         dispatchChange();
+    };
+    const handlePageChange = (index: number, value: any) => {
+        lastUsedPage = value;
+        handleItemChange(index, "page", value);
     };
 
     const handleStepDataItemChange = (index: number, dataIndex: number, value: any) => {
@@ -168,7 +175,7 @@
                     type: 'testStep',
                     name: '',
                     description: '',
-                    page: lastPageOption(),
+                    page: lastUsedPage,
                     data: dataSetItems.map((x) => ({
                         id: x.id,
                         value: '',
@@ -184,7 +191,7 @@
     const handleAddComment = () => {
         listStepDispatch({
             type: ListDataActionType.AppendItems,
-            items: [{ id: uuidv4(), type: 'comment', comment: '' } as ITestStep],
+            items: [{ id: uuidv4(), type: 'comment', comment: '' } as IDictionary],
             hasMoreItems: false,
         });
 
@@ -231,7 +238,7 @@
             <ListTableBodyRow>
                 {#if isComment(item)}
                     <ListTableBodyCell type={ListTableCellType.First} colspan={3 + dataSetItems.length}>
-                        <TextField
+                        <CommentTextField
                             name={`${formName}_${index}_comment`}
                             value={item.comment}
                             placeholder={uiContext.str(stringResKeys.testRoutineEditor.comment)}
@@ -245,7 +252,7 @@
                             name={`${formName}_${index}_page`}
                             value={item.page}
                             options={pageDefinitionOptions}
-                            on:change={(event) => handleItemChange(index, 'page', event.detail.value)}
+                            on:change={(event) => handlePageChange(index, event.detail.value)}
                         />
                         {/if}
                     </ListTableBodyCell>

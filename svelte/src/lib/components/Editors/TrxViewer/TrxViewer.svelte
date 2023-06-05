@@ -42,8 +42,6 @@
     let selectedOutcome: TestOutcome = TestOutcome.Unknown;
 
     onMount(async () => {
-        console.log('contentIndex', contentIndex);
-
         let fileContent = await fileSystem.readFile(filePath);
         if (fileContent) {
             data = parseTestRun(fileContent);
@@ -54,7 +52,6 @@
             totalDuration = (data.finish.valueOf() - data.start.valueOf()) / 1000;
 
             viewModel.set(parseViewModel(data));
-            //console.log(model);
         }
     });
 
