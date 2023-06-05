@@ -1,4 +1,4 @@
-import { StandardFileExtension } from 'rockmelonqa.common';
+import { ActionType, StandardFileExtension } from 'rockmelonqa.common';
 import type { ComponentType } from 'svelte';
 import PageDefinitionEditor from './PageDefinitionEditor.svelte';
 import RmProjectEditor from './RmProjectEditor.svelte';
@@ -69,4 +69,18 @@ export const toTitle = (fileName: string): string => {
         .join(' ');
 
     return formatted;
+};
+
+export const pagelessActions = [
+    ActionType.ClosePopup.toString(),
+    ActionType.Delay.toString(),
+    ActionType.GoToUrl.toString(),
+    ActionType.RunCode.toString(),
+    ActionType.VerifyTitle.toString(),
+    ActionType.VerifyTitleContains.toString(),
+    ActionType.VerifyUrl.toString()
+];
+
+export const isPagelessAction = (action: string) => {
+    return pagelessActions.includes(action);
 };

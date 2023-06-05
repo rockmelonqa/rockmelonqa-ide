@@ -27,7 +27,7 @@
     import SaveIcon from "$lib/icons/SaveIcon.svelte";
     import { fileSystem } from "$lib/ipc";
     import { getActionTypeDropDownOptions } from "$lib/utils/dropdowns";
-    import { ActionType, fileDefFactory, type ITestCase, type ITestCaseStep as ITestStep } from "rockmelonqa.common";
+    import { fileDefFactory, type ITestCase, type ITestCaseStep as ITestStep } from "rockmelonqa.common";
     import { createEventDispatcher, getContext, onMount } from "svelte";
     import { derived } from "svelte/store";
     import { v4 as uuidv4 } from "uuid";
@@ -44,7 +44,8 @@
     import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
     import RoutineDropDown from "../RoutineDropDown.svelte";
-    import { toTitle } from "./Editor";
+    import { toTitle, isPagelessAction } from "./Editor";
+    import type { ITestStepComment, ITestStepRegular, ITestStepRoutine } from "rockmelonqa.common/file-defs/testCaseFile";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -160,6 +161,8 @@
         }
     });
 
+    let lastUsedPage: string | undefined = undefined;
+
     onMount(async () => {
         // default/empty data
         let model: ITestCase = fileDefFactory.newTestCase();
@@ -175,10 +178,11 @@
         formDataDispatch({ type: FormDataActionType.Load, newValues: fieldValues });
 
         const items = serializer.deserializeList(model.steps, listDef.fields);
-        console.log("Initial data", items);
         listDataDispatch({ type: ListDataActionType.SetItems, items: items, hasMoreItems: false });
 
         registerOnSaveHandler(contentIndex, doSave);
+
+        lastUsedPage = items.findLast(item => isTestStep(item) && !isPagelessAction(item.action))?.page;
 
         return () => {
             unregisterOnSaveHandler(contentIndex);
@@ -189,22 +193,12 @@
         return (item as ITestStep).type === "comment";
     };
 
-    const isTestRoutine = (item: IDictionary) => {
-        return (item as ITestStep).type === "routine";
+    const isTestStep = (item: IDictionary) => {
+        return (item as ITestStep).type === "testStep";
     };
 
-    const pagelessActions = [
-        ActionType.ClosePopup.toString(),
-        ActionType.Delay.toString(),
-        ActionType.GoToUrl.toString(),
-        ActionType.RunCode.toString(),
-        ActionType.VerifyTitle.toString(),
-        ActionType.VerifyTitleContains.toString(),
-        ActionType.VerifyUrl.toString()
-    ];
-
-    const isPagelessAction = (action: string) => {
-        return pagelessActions.includes(action);
+    const isTestRoutine = (item: IDictionary) => {
+        return (item as ITestStep).type === "routine";
     };
 
     const handleSave = async () => {
@@ -249,6 +243,10 @@
         });
 
         dispatchChange();
+    };
+    const handlePageChange = (index: number, value: any) => {
+        lastUsedPage = value;
+        handleItemChange(index, ITEM_KEY_PAGE, value);
     };
 
     const dispatchChange = () => {
@@ -331,8 +329,8 @@
 
         dispatchChange();
     };
-    const newStep = (): ITestStep => {
-        return { id: uuidv4(), type: "testStep", name: "", description: "", data: "" } as ITestStep;
+    const newStep = (): ITestStepRegular => {
+        return { id: uuidv4(), type: "testStep", name: "", description: "", data: "", page: lastUsedPage } as ITestStepRegular;
     };
 
     const handleAddComment = () => {
@@ -364,11 +362,12 @@
 
         dispatchChange();
     };
-    const newComment = (): ITestStep => {
-        return { id: uuidv4(), type: "comment", comment: "" } as ITestStep;
+    const newComment = (): ITestStepComment => {
+        return { id: uuidv4(), type: "comment", comment: "" } as ITestStepComment;
     };
-    const newRoutine = (): ITestStep => {
-        return { id: uuidv4(), type: "routine", routine: "" } as ITestStep;
+
+    const newRoutine = (): ITestStepRoutine => {
+        return { id: uuidv4(), type: "routine", routine: "" } as ITestStepRoutine;
     };
 </script>
 
@@ -447,7 +446,7 @@
                                     name={`${formContext.formName}_${index}_page`}
                                     value={item.page}
                                     options={pageDefinitionOptions}
-                                    on:change={(event) => handleItemChange(index, ITEM_KEY_PAGE, event.detail.value)}
+                                    on:change={(event) => handlePageChange(index, event.detail.value)}
                                 />
                             {/if}
                         </ListTableBodyCell>
