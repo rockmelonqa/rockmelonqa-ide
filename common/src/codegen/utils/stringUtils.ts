@@ -35,10 +35,12 @@ export const getParameters = (parameters: string[]) => {
   return result;
 };
 
+/** Creates a new string with lowercase first letter from the given source string   */
 export const lowerCaseFirstChar = (str: string) => {
   return str.substring(0, 1).toLowerCase() + str.substring(1);
 };
 
+/** Creates a new string with UPPERCASE first letter from the given source string   */
 export const upperCaseFirstChar = (str: string) => {
   return str.substring(0, 1).toUpperCase() + str.substring(1);
 };
