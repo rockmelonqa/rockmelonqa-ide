@@ -12,7 +12,11 @@ const generateDatasetInfos = (testRoutine: ITestRoutine): IDataSetInfo[] => {
 
       // Obtain dataset values from data of each step
       values: testRoutine.steps.map((step) => {
-        return step.data[dataset.id];
+        if (step.type === "testStep") {
+          return step.data[dataset.id];
+        }
+        // For comments, return empty string
+        return "";
       }),
     };
 
