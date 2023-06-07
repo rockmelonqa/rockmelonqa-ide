@@ -30,6 +30,7 @@
     import { v4 as uuidv4 } from 'uuid';
     import { isPagelessAction } from '../Editor';
     import CommentTextField from '$lib/components/CommentTextField.svelte';
+    import type { ITestStepComment } from 'rockmelonqa.common/file-defs/testCaseFile';
 
     export let formContext: IFormContext;
     let { mode: formMode, formName } = formContext;
@@ -166,36 +167,58 @@
         }
     };
 
-    const handleAdd = () => {
+    const handleAddStep = () => {
         listStepDispatch({
             type: ListDataActionType.AppendItems,
-            items: [
-                {
-                    id: uuidv4(),
-                    type: 'testStep',
-                    name: '',
-                    description: '',
-                    page: lastUsedPage,
-                    data: dataSetItems.map((x) => ({
-                        id: x.id,
-                        value: '',
-                    })),
-                } as IDictionary,
-            ],
+            items: [newStep()],
             hasMoreItems: false,
         });
 
         dispatchChange();
     };
+    const handleInsertStep = (index: number) => {
+        listStepDispatch({
+            type: ListDataActionType.InsertItem,
+            item: newStep(),
+            index: index + 1,
+        });
+
+        dispatchChange();
+    };
+    const newStep = () => {
+        return {
+            id: uuidv4(),
+            type: 'testStep',
+            name: '',
+            description: '',
+            page: lastUsedPage,
+            data: dataSetItems.map((x) => ({
+                id: x.id,
+                value: '',
+            })),
+        } as IDictionary;
+    };
 
     const handleAddComment = () => {
         listStepDispatch({
             type: ListDataActionType.AppendItems,
-            items: [{ id: uuidv4(), type: 'comment', comment: '' } as IDictionary],
+            items: [newComment()],
             hasMoreItems: false,
         });
 
         dispatchChange();
+    };
+    const handleInsertComment = (index: number) => {
+        listStepDispatch({
+            type: ListDataActionType.InsertItem,
+            item: newComment(),
+            index: index + 1,
+        });
+
+        dispatchChange();
+    };
+    const newComment = () => {
+        return { id: uuidv4(), type: 'comment', comment: '' } as IDictionary;
     };
 
     const isComment = (item: IDictionary) => {
@@ -210,13 +233,13 @@
 <ListTable class="table-fixed mb-4" isProcessing={$formMode.isLoading() || $formMode.isProcessing()} isEmpty={false}>
     <svelte:fragment slot="header">
         <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-48">
+            {uiContext.str(stringResKeys.testRoutineEditor.action)}
+        </ListTableHeaderCell>
+        <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-48">
             {uiContext.str(stringResKeys.testRoutineEditor.page)}
         </ListTableHeaderCell>
         <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-48">
             {uiContext.str(stringResKeys.testRoutineEditor.element)}
-        </ListTableHeaderCell>
-        <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-48">
-            {uiContext.str(stringResKeys.testRoutineEditor.action)}
         </ListTableHeaderCell>
         {#if dataSetItems.length > 0}
             {#each dataSetItems as item, index}
@@ -247,32 +270,32 @@
                     </ListTableBodyCell>
                 {:else}
                     <ListTableBodyCell type={ListTableCellType.First}>
-                        {#if !isPagelessAction(item.action)}
-                        <FancyDropdownField
-                            name={`${formName}_${index}_page`}
-                            value={item.page}
-                            options={pageDefinitionOptions}
-                            on:change={(event) => handlePageChange(index, event.detail.value)}
-                        />
-                        {/if}
-                    </ListTableBodyCell>
-                    <ListTableBodyCell type={ListTableCellType.Normal}>
-                        {#if !isPagelessAction(item.action)}
-                        <FancyDropdownField
-                            name={`${formName}_${index}_element`}
-                            value={item.element}
-                            options={pageElementsMap.get(item.page) ?? []}
-                            on:change={(event) => handleItemChange(index, 'element', event.detail.value)}
-                        />
-                        {/if}
-                    </ListTableBodyCell>
-                    <ListTableBodyCell type={ListTableCellType.Normal}>
                         <FancyDropdownField
                             name={`${formName}_${index}_action`}
                             value={item.action}
                             options={actionTypeOptions}
                             on:change={(event) => handleItemChange(index, 'action', event.detail.value)}
                         />
+                    </ListTableBodyCell>
+                    <ListTableBodyCell type={ListTableCellType.Normal}>
+                        {#if !isPagelessAction(item.action)}
+                            <FancyDropdownField
+                                name={`${formName}_${index}_page`}
+                                value={item.page}
+                                options={pageDefinitionOptions}
+                                on:change={(event) => handlePageChange(index, event.detail.value)}
+                            />
+                        {/if}
+                    </ListTableBodyCell>
+                    <ListTableBodyCell type={ListTableCellType.Normal}>
+                        {#if !isPagelessAction(item.action)}
+                            <FancyDropdownField
+                                name={`${formName}_${index}_element`}
+                                value={item.element}
+                                options={pageElementsMap.get(item.page) ?? []}
+                                on:change={(event) => handleItemChange(index, 'element', event.detail.value)}
+                            />
+                        {/if}
                     </ListTableBodyCell>
                     {#if item.data.length > 0}
                         {#each item.data as data, dataIndex}
@@ -291,6 +314,18 @@
                     {/if}
                 {/if}
                 <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">
+                    <IconLinkButton
+                        on:click={() => handleInsertStep(index)}
+                        title={uiContext.str(stringResKeys.testCaseEditor.addStep)}
+                    >
+                        <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
+                    </IconLinkButton>
+                    <IconLinkButton
+                        on:click={() => handleInsertComment(index)}
+                        title={uiContext.str(stringResKeys.testCaseEditor.addComment)}
+                    >
+                        <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
+                    </IconLinkButton>
                     <IconLinkButton
                         on:click={() => handleDeleteClick(index)}
                         title={uiContext.str(stringResKeys.general.delete)}
@@ -320,7 +355,7 @@
 </ListTable>
 
 <div class="mb-8 flex items-center gap-x-2">
-    <IconLinkButton on:click={handleAdd}>
+    <IconLinkButton on:click={handleAddStep}>
         <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
         <svelte:fragment slot="label">
             {uiContext.str(stringResKeys.general.add)}
