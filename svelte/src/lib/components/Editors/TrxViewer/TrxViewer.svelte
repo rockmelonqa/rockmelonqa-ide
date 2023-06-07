@@ -27,8 +27,6 @@
     export let fileName: string;
     $: filePath = combinePath([folderPath, fileName], uiContext.pathSeparator);
 
-    export let contentIndex: number;
-
     let data: ITestRun | undefined;
     const viewModel = writable<ITrxViewerModel | undefined>(undefined);
 

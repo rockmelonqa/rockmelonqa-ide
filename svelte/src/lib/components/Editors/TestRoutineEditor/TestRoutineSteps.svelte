@@ -54,7 +54,7 @@
     const pagesSubscription = derived(appState, ($appState) => $appState.pages);
     pagesSubscription.subscribe((pages) => {
         pageDefinitionOptions = Array.from(pages.entries())
-            .map(([key, { name }]) => ({ key, text: name } as IDropdownOption))
+            .map(([key, { name }]) => ({ key, text: name.split('.').slice(0, -1).join('.') } as IDropdownOption))
             .sort((a, b) => a.text.localeCompare(b.text));
 
         pageElementsMap = new Map();
