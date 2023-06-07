@@ -123,7 +123,7 @@
     $: title = toTitle(fileName);
 
     type tabButton = "btnDataSets" | "btnSteps";
-    let activeBtn: tabButton = "btnDataSets";
+    let activeBtn: tabButton = "btnSteps";
 
     onMount(async () => {
         // default/empty data
@@ -279,16 +279,16 @@
 
     <div class="mb-8 flex">
         <button
-            class={`tab-switcher px-6 py-4 ${activeBtn === "btnDataSets" ? "active" : ""}`}
-            on:click={() => (activeBtn = "btnDataSets")}
-        >
-            {uiContext.str(stringResKeys.testRoutineEditor.dataSet)}
-        </button>
-        <button
             class={`tab-switcher px-6 py-4 ${activeBtn === "btnSteps" ? "active" : ""}`}
             on:click={() => (activeBtn = "btnSteps")}
         >
             {uiContext.str(stringResKeys.testRoutineEditor.steps)}
+        </button>
+        <button
+            class={`tab-switcher px-6 py-4 ${activeBtn === "btnDataSets" ? "active" : ""}`}
+            on:click={() => (activeBtn = "btnDataSets")}
+        >
+            {uiContext.str(stringResKeys.testRoutineEditor.dataSet)}
         </button>
     </div>
 

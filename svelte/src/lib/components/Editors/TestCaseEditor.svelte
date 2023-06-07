@@ -23,8 +23,8 @@
     import DeleteIcon from "$lib/icons/DeleteIcon.svelte";
     import MoveDownIcon from "$lib/icons/MoveDownIcon.svelte";
     import MoveUpIcon from "$lib/icons/MoveUpIcon.svelte";
-    import RoutineIcon from "$lib/icons/RoutineIcon.svelte";
     import SaveIcon from "$lib/icons/SaveIcon.svelte";
+    import TRoutineIcon from "$lib/icons/TRoutineIcon.svelte";
     import { fileSystem } from "$lib/ipc";
     import { getActionTypeDropDownOptions } from "$lib/utils/dropdowns";
     import { fileDefFactory, type ITestCase, type ITestCaseStep as ITestStep } from "rockmelonqa.common";
@@ -518,14 +518,14 @@
         </IconLinkButton>
         <span>|</span>
         <IconLinkButton on:click={handleAddRoutine}>
-            <svelte:fragment slot="icon"><RoutineIcon /></svelte:fragment>
+            <svelte:fragment slot="icon"><TRoutineIcon /></svelte:fragment>
             <svelte:fragment slot="label">
                 {uiContext.str(stringResKeys.testCaseEditor.addRoutine)}
             </svelte:fragment>
         </IconLinkButton>
         <span>|</span>
         <IconLinkButton on:click={handleAddComment}>
-            <svelte:fragment slot="icon"><RoutineIcon /></svelte:fragment>
+            <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
             <svelte:fragment slot="label">
                 {uiContext.str(stringResKeys.testCaseEditor.addComment)}
             </svelte:fragment>

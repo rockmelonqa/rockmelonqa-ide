@@ -109,17 +109,27 @@
     const handleAdd = () => {
         listDataSetDispatch({
             type: ListDataActionType.AppendItems,
-            items: [
-                {
-                    id: uuidv4(),
-                    name: '',
-                    description: '',
-                } as IDataSet,
-            ],
+            items: [newItem()],
             hasMoreItems: false,
         });
 
         dispatchChange(true);
+    };
+    const handleInsert = (index: number) => {
+        listDataSetDispatch({
+            type: ListDataActionType.InsertItem,
+            item: newItem(),
+            index: index + 1,
+        });
+
+        dispatchChange(true);
+    };
+    const newItem = () => {
+        return {
+            id: uuidv4(),
+            name: '',
+            description: '',
+        } as IDataSet;
     };
 
     /**
@@ -163,6 +173,12 @@
                     />
                 </ListTableBodyCell>
                 <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">
+                    <IconLinkButton
+                        on:click={() => handleInsert(index)}
+                        title={uiContext.str(stringResKeys.general.add)}
+                    >
+                        <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
+                    </IconLinkButton>
                     <IconLinkButton
                         on:click={() => handleDeleteClick(index)}
                         title={uiContext.str(stringResKeys.general.delete)}
