@@ -71,6 +71,10 @@ export const stringResEn: IStringRes = {
         thousandsDelimeter: ",",
         timeFormat: "hh:mm:ss a",
     },
+    deletePageConfirmationDialog: {
+        dialogContent: "This page definition is being used by the following test cases and test routines. Do you want to remove it?",
+        dialogTitle: "Delete page",
+    },
     deleteTestCaseConfirmationDialog: {
         dialogTitle: "Delete test case",
         relatedSuitesMessage: "This test case is being used by the following test suites. Do you want to remove it?",
