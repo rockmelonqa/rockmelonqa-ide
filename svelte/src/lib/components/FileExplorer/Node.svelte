@@ -2,6 +2,7 @@
     import { AppActionType, appContextKey, type IAppContext } from "$lib/context/AppContext";
     import { stringResKeys } from "$lib/context/StringResKeys";
     import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import DeletePageConfirmationDialog from "$lib/dialogs/DeletePageConfirmationDialog.svelte";
     import DeleteTestCaseConfirmationDialog from "$lib/dialogs/DeleteTestCaseConfirmationDialog.svelte";
     import { codeGenerator, fileSystem } from "$lib/ipc";
     import type { IFileInfo } from "$lib/models";
@@ -170,7 +171,9 @@
     };
 
     const handleMenuDelete = async () => {
-        if (type === FileType.TCase && (await onDeleteTestCase())) {
+        if (type === FileType.Page && (await onDeletePage())) {
+            return;
+        } else if (type === FileType.TCase && (await onDeleteTestCase())) {
             return;
         }
 
@@ -311,6 +314,9 @@
         }
     };
 
+    /**************************************
+     * Handle test case deletion
+     ***************************************/
     let showDeleteTestCaseConfirmationDialog: boolean = false;
     let testCasePathToDelete: string = "";
     let relatedTestSuitePaths: string[] = [];
@@ -349,6 +355,54 @@
 
         return false;
     };
+
+    /**************************************
+     * Handle page deletion
+     ***************************************/
+    let showDeletePageConfirmationDialog: boolean = false;
+    let pagePathToDelete: string = "";
+    let relatedTestCasePaths: string[] = [];
+    let relatedTestRoutinePaths: string[] = [];
+
+    const onDeletePage = async (): Promise<boolean> => {
+        const meta = await codeGenerator.generateSourceProjectMetadata($appState.projectFile!);
+        if (!meta) {
+            return false;
+        }
+
+        const page = meta.pages.find(
+            (p) => combinePath([p.folderPath, p.fileName], uiContext.pathSeparator) === fileSystemPath
+        );
+
+        if (!page) {
+            return false;
+        }
+
+        pagePathToDelete = combinePath([page.folderPath, page.fileName], uiContext.pathSeparator);
+        
+        if (meta.testCases) {
+            relatedTestCasePaths = meta.testCases
+                .filter((tc) => tc.content.steps.some((s) => s.type === 'testStep' && s.page === page.content.id))
+                .map((tc) => {
+                    return combinePath([tc.folderPath, tc.fileName], uiContext.pathSeparator);
+                });
+        }
+
+        if (meta.testRoutines) {
+            relatedTestRoutinePaths = meta.testRoutines
+                .filter((tr) => tr.content.steps.some((s) => s.type === 'testStep' && s.page === page.content.id))
+                .map((tr) => {
+                    return combinePath([tr.folderPath, tr.fileName], uiContext.pathSeparator);
+                });
+        }
+
+        if (relatedTestCasePaths.length > 0 || relatedTestRoutinePaths.length > 0) {
+            showDeletePageConfirmationDialog = true;
+            return true;
+        }
+
+        return false;
+    }
 </script>
 
 <div class={containerClass}>
@@ -432,6 +486,14 @@
         {/if}
     </Menu>
 {/if}
+
+<DeletePageConfirmationDialog
+    bind:showDialog={showDeletePageConfirmationDialog}
+    pageFilePath={pagePathToDelete}
+    testCaseFilePaths={relatedTestCasePaths}
+    testRoutineFilePaths={relatedTestRoutinePaths}
+    on:deleteConfirmed={doDeleteFile}
+/>
 
 <DeleteTestCaseConfirmationDialog
     bind:showDialog={showDeleteTestCaseConfirmationDialog}

@@ -44,6 +44,10 @@ export const stringResKeys = {
         thousandsDelimeter: "culture.thousandsDelimeter",
         timeFormat: "culture.timeFormat",
     },
+    deletePageConfirmationDialog: {
+        dialogContent: "deletePageConfirmationDialog.dialogContent",
+        dialogTitle: "deletePageConfirmationDialog.dialogTitle",
+    },
     deleteTestCaseConfirmationDialog: {
         dialogTitle: "deleteTestCaseConfirmationDialog.dialogTitle",
         relatedSuitesMessage: "deleteTestCaseConfirmationDialog.relatedSuitesMessage",

@@ -5,6 +5,7 @@ export interface IStringRes {
     actionType: IActionTypeStringRes;
     application: IApplicationStringRes;
     codeGenerationDialog: ICodeGenerationDialogStringRes;
+    deletePageConfirmationDialog: IDeletePageConfirmationDialogStringRes;
     deleteTestCaseConfirmationDialog: IDeleteTestCaseConfirmationDialogStringRes;
     culture: ICultureStringRes;
     fileExplorer: IFileExplorerStringRes;
@@ -58,6 +59,11 @@ export interface IActionTypeStringRes {
 
 export interface IApplicationStringRes {
     name: string;
+}
+
+export interface IDeletePageConfirmationDialogStringRes {
+    dialogContent: string;
+    dialogTitle: string;
 }
 
 export interface IDeleteTestCaseConfirmationDialogStringRes {
