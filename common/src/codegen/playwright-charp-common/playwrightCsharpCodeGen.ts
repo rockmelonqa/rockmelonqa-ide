@@ -96,7 +96,7 @@ export class PlaywrightCsharpCodeGen {
       if (step.type === "routine") {
         stepItems.push("// Routine " + step.id);
         let routineId = step.routine!;
-        let datasetId = step.dataset!;
+        let datasetId = step.dataset!.length > 0 ? step.dataset![0] : '';  // FIXME: changed from `string` to `string[]`
         let routine = routines.find((r) => r.id === routineId)!;
         let routineName = this._outProjMeta.get(routineId)!.outputFileClassName;
         let dataset = routine.dataSets.find((ds) => ds.id === datasetId)!;

@@ -191,6 +191,10 @@ hr {
     --disabled-background: none;
 }
 
+.dropdown-field-root .svelte-select.multi .value-container input {
+    --tw-ring-color: none;
+}
+
 .text-field-input,
 .number-field-input,
 .folder-pick-field-input {

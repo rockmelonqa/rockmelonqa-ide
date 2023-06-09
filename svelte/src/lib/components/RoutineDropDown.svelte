@@ -7,6 +7,7 @@
     import type { IUiTheme } from "$lib/context/UiTheme";
     import type { IDropdownOption } from "$lib/controls/DropdownField";
     import FancyDropdownField from "$lib/controls/FancyDropdownField.svelte";
+    import FancyMultiSelectionField from "$lib/controls/FancyMultiSelectionField.svelte";
     import { fileSystem } from "$lib/ipc";
     import type { ITestRoutine } from "rockmelonqa.common";
     import { createEventDispatcher, getContext, onMount } from "svelte";
@@ -19,7 +20,7 @@
     //*****************************************
     export let name: string;
     export let routine: string;
-    export let dataset: string;
+    export let dataset: string[];
 
     //*****************************************
     // Init
@@ -69,8 +70,9 @@
     const handleSelectRoutine = async (e: any) => {
         const routineId = e.detail.value;
         await loadDataSetDropDown(routineId);
+
         dispatch("selectRoutine", { value: routineId });
-        dataset = "";
+        dataset = [];
     };
     const handleSelectDataset = (e: any) => {
         dispatch("selectDataset", { value: e.detail.value });
@@ -79,7 +81,7 @@
 
 <div id={rootId} class="text-field-root {thisTheme.root}">
     <div class="text-field-input-container {thisTheme?.inputContainer}">
-        <div class="flex">
+        <div class="flex items-end gap-x-6">
             <button
                 type="button"
                 class={`bg-slate-100 cursor-default px-6 py-3 
@@ -88,24 +90,21 @@
             >
                 <span>Routine</span>
             </button>
-
-            <div class="flex-1 flex ps-3 gap-6">
-                <div class="flex-1">
-                    <FancyDropdownField
-                        name={name + "_id"}
-                        value={routine}
-                        options={testRoutineOptions}
-                        on:change={handleSelectRoutine}
-                    />
-                </div>
-                <div class="flex-1">
-                    <FancyDropdownField
-                        name={name + "_dataset"}
-                        value={dataset}
-                        options={datasetOptions}
-                        on:change={handleSelectDataset}
-                    />
-                </div>
+            <div class="flex-1">
+                <FancyDropdownField
+                    name={name + "_id"}
+                    value={routine}
+                    options={testRoutineOptions}
+                    on:change={handleSelectRoutine}
+                />
+            </div>
+            <div class="flex-1">
+                <FancyMultiSelectionField 
+                    name={name + "_dataset"}
+                    values={dataset}
+                    options={datasetOptions}
+                    on:change={handleSelectDataset}
+                />
             </div>
         </div>
     </div>

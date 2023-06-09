@@ -35,5 +35,5 @@ export interface ITestStepComment extends Omit<ITestStepBase, "type"> {
 export interface ITestStepRoutine extends Omit<ITestStepBase, "type"> {
   type: "routine";
   routine?: string;
-  dataset?: string;
+  dataset?: string[];
 }

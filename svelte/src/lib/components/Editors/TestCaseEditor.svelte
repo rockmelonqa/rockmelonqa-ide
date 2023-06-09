@@ -366,8 +366,13 @@
         return { id: uuidv4(), type: "comment", comment: "" } as ITestStepComment;
     };
 
-    const newRoutine = (): ITestStepRoutine => {
-        return { id: uuidv4(), type: "routine", routine: "" } as ITestStepRoutine;
+    const newRoutine = () => {
+        return { 
+            id: uuidv4(), 
+            type: "routine", 
+            routine: "",
+            dataset: [],
+        } as ITestStepRoutine;
     };
 </script>
 
