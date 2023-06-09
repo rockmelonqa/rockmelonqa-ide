@@ -49,9 +49,6 @@ export enum FieldDataType {
 
     /** data value = number (float)| null */
     NullableInteger = 'NullableInteger',
-
-    /** data value = [{ key: value }] */
-    List = 'List',
 }
 
 export type OnIsRequiredFunction = (fieldValues: IDictionary) => boolean;
@@ -433,14 +430,6 @@ export interface IBooleanDropdownFieldDef extends IBaseFieldDef, IRequiredFieldD
 }
 
 /**
- * List of fields
- */
-export interface IListFieldDef extends IBaseFieldDef, IRequiredFieldDef {
-    dataType: FieldDataType.List;
-    fieldDefs: IFieldDefs;
-}
-
-/**
  * Field definition
  */
 export type IFieldDef =
@@ -454,8 +443,7 @@ export type IFieldDef =
     | IFloatFieldDef
     | INullableFloatFieldDef
     | ICheckFieldDef
-    | IBooleanDropdownFieldDef
-    | IListFieldDef;
+    | IBooleanDropdownFieldDef;
 
 /**
  * List of fields
