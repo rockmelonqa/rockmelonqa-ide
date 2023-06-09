@@ -77,20 +77,6 @@
                 dataType: FieldDataType.Dropdown,
                 dataPath: "action",
             },
-            data: {
-                dataType: FieldDataType.List,
-                dataPath: "data",
-                fieldDefs: {
-                    id: {
-                        dataType: FieldDataType.Text,
-                        dataPath: "id",
-                    },
-                    value: {
-                        dataType: FieldDataType.Text,
-                        dataPath: "value",
-                    },
-                },
-            },
             comment: {
                 dataType: FieldDataType.Text,
                 dataPath: "comment",
