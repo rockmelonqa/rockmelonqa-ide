@@ -49,6 +49,9 @@ export enum FieldDataType {
 
     /** data value = number (float)| null */
     NullableInteger = 'NullableInteger',
+
+    /** data value = [ 'string-1', 'string-2', 'string-3', .... ] */
+    StringList = 'StringList'
 }
 
 export type OnIsRequiredFunction = (fieldValues: IDictionary) => boolean;
@@ -429,6 +432,19 @@ export interface IBooleanDropdownFieldDef extends IBaseFieldDef, IRequiredFieldD
     onValidate?: (fieldName: string, fieldValue: any, fieldValues: IDictionary, uiContext: IUiContext) => string | null;
 }
 
+interface IListFieldDef<T> extends IBaseFieldDef, IRequiredFieldDef {
+    onValidate?: (
+        fieldName: string,
+        fieldValue: T[],
+        fieldValues: IDictionary,
+        uiContext: IUiContext
+    ) => string | null;
+}
+
+export interface IStringListFieldDef extends IListFieldDef<string> {
+    dataType: FieldDataType.StringList;
+}
+
 /**
  * Field definition
  */
@@ -443,7 +459,8 @@ export type IFieldDef =
     | IFloatFieldDef
     | INullableFloatFieldDef
     | ICheckFieldDef
-    | IBooleanDropdownFieldDef;
+    | IBooleanDropdownFieldDef
+    | IStringListFieldDef;
 
 /**
  * List of fields
