@@ -113,8 +113,6 @@ export class FieldValidator {
             case FieldDataType.NullableBoolean:
                 errorMessage = this.validateBooleanField(fieldName, fieldValue, fieldDef, fieldValues);
                 break;
-            case FieldDataType.List:
-                break;
             default:
                 throw new Error('Unrecognized data type');
         }
