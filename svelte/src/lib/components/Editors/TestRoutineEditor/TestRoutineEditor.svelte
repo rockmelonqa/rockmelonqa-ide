@@ -151,14 +151,13 @@
          *   { id: "guid-2", value: "value-2" },
          * ]
          * */
-        const viewModelSteps = model.steps.map((step) => {
+        const steps = model.steps.map((step) => {
             return {
                 ...step,
                 // 'data' can be null of that is 'comment' row
                 data: step.data ? Object.entries(step.data).map(([id, value]) => ({ id, value })) as IDictionary[] : undefined,
             };
         });
-        const steps = serializer.deserializeList(viewModelSteps, listStepDef.fields);
         listStepDispatch({ type: ListDataActionType.SetItems, items: steps, hasMoreItems: false });
 
         const dataSets = serializer.deserializeList(model.dataSets, listDataSetDef.fields);
@@ -181,8 +180,6 @@
             const model = serializer.serialize($formData.values, formDef.fields);
 
             const stepItems = $listStep.items.filter((r) => !isEmptyStepItem(r));
-            const steps = serializer.serializeList(stepItems, listStepDef.fields);
-
             /** Reformat step's data
              ** from (form def)
              * data: [
@@ -195,18 +192,19 @@
              *   "guid-2": "value-2",
              * }
              * */
-            steps.forEach((step) => {
+            const steps = stepItems.map((step) => {
                 // do not proceed 'Comment' rows which do not have 'data'
                 if (step.data) {
-                    step.data = step.data.reduce((obj: IDictionary, item: any) => {
+                    const data = step.data.reduce((obj: IDictionary, item: any) => {
                         obj[item.id] = item.value ?? "";
                         return obj;
                     }, {});
+                    return {...step, data};
+                } else {
+                    return step;
                 }
             });
 
-            // const dataSetItems = $listDataSet.items.filter((r) => !isEmptyDataSetItem(r));
-            // const dataSets = serializer.serializeList(dataSetItems, listDataSetDef.fields);
             const dataSets = serializer.serializeList($listDataSet.items, listDataSetDef.fields);
 
             const data = { ...model, steps, dataSets };

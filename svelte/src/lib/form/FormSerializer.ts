@@ -104,10 +104,6 @@ export class FormSerializer {
                     }
                     // Output fieldValue is boolean | null
                     break;
-                case FieldDataType.List:
-                    mergeDictionaries(fieldValues, this.flatternList(fieldName, fieldValue, fieldDef.fieldDefs));
-                    fieldValue = this.deserializeList(fieldValue, fieldDef.fieldDefs);
-                    break;
                 default:
                     throw new Error('Unsuppored deserialization data type');
             }
@@ -116,24 +112,6 @@ export class FormSerializer {
         }
 
         return fieldValues;
-    };
-
-    flatternList = (fieldName: string, dataModelArray: Array<any>, fieldDefs: IFieldDefs): IDictionary => {
-        const flattern: IDictionary = {};
-
-        if (dataModelArray) {
-            let index = 0;
-            for (const dataModel of dataModelArray) {
-                const row = this.serialize(dataModel, fieldDefs);
-                for (const prop in row) {
-                    flattern[`${fieldName}_${index}_${prop}`] = row[prop];
-                }
-
-                index += 1;
-            }
-        }
-
-        return flattern;
     };
 
     /**
@@ -223,10 +201,6 @@ export class FormSerializer {
                     );
                     break;
                 }
-                case FieldDataType.List: {
-                    fieldValue = this.serializeList(fieldValue, fieldDef.fieldDefs);
-                    break;
-                }
                 default:
                     throw new Error('Unsuppored serialization data type ' + dataType);
             }
@@ -267,14 +241,3 @@ function isEmpty(value: any): boolean {
     return value == null || value.length === 0;
 }
 
-/**
- * Merge two dictionary
- * @param dict1 First dictionary
- * @param dict2 Second dictionary to be merged to dict1
- */
-function mergeDictionaries(dict1: IDictionary, dict2: IDictionary) {
-    // Add all the key-value pairs from dict2 to the merged dictionary
-    for (const key in dict2) {
-        dict1[key] = dict2[key];
-    }
-}
