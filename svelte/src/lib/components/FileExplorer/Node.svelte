@@ -4,7 +4,7 @@
     import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
     import DeletePageConfirmationDialog from "$lib/dialogs/DeletePageConfirmationDialog.svelte";
     import DeleteTestCaseConfirmationDialog from "$lib/dialogs/DeleteTestCaseConfirmationDialog.svelte";
-    import { codeGenerator, fileSystem } from "$lib/ipc";
+    import { fileSystem } from "$lib/ipc";
     import type { IFileInfo } from "$lib/models";
     import { StandardFolder, type ITestCase } from "rockmelonqa.common";
     import type { IPage } from "rockmelonqa.common/file-defs/pageFile";
@@ -20,7 +20,6 @@
     import MenuItem from "./MenuItem.svelte";
     import {
         buildChildrenNodes,
-        combinePath,
         extractPath,
         Node as NodeInfo,
         showMenuAt,
@@ -318,7 +317,6 @@
      * Handle test case deletion
      ***************************************/
     let showDeleteTestCaseConfirmationDialog: boolean = false;
-    let testCasePathToDelete: string = "";
     let relatedTestSuitePaths: string[] = [];
 
     /**

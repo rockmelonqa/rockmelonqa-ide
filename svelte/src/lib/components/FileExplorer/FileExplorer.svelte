@@ -12,6 +12,8 @@
         type ITestCase,
         type ITestRoutine,
         type ITestSuite,
+        type ITestStepRegular,
+        type ITestStepRoutine,
     } from "rockmelonqa.common";
     import type { IPage } from "rockmelonqa.common/file-defs/pageFile";
     import { getContext, onDestroy } from "svelte";
@@ -20,7 +22,6 @@
     import CollapsiblePanel from "./CollapsiblePanel.svelte";
     import { buildChildrenNodes, Node as NodeInfo, toFileSystemPath, toTreePath } from "./Node";
     import Nodes from "./Nodes.svelte";
-    import type { ITestStepRegular, ITestStepRoutine } from "rockmelonqa.common/file-defs/testCaseFile";
 
     let uiContext = getContext(uiContextKey) as IUiContext;
 

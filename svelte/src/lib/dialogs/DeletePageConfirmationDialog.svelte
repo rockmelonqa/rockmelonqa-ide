@@ -22,16 +22,25 @@
   export let testCaseFilePaths: string[];
   export let testRoutineFilePaths: string[];
 
+  $: testCasesFolderPath = combinePath(
+    [$appState.projectFile?.folderPath ?? '', StandardFolder.TestCases],
+    uiContext.pathSeparator
+  );
   $: testCaseRelPaths = testCaseFilePaths.map((testCaseFilePath) => {
     return toTreePath(
       testCaseFilePath, 
-      combinePath([$appState.projectFile?.folderPath ?? '', StandardFolder.TestCases], uiContext.pathSeparator), 
+      testCasesFolderPath,
       uiContext.pathSeparator);
   });
+
+  $: testRoutinesFolderPath = combinePath(
+    [$appState.projectFile?.folderPath ?? '', StandardFolder.TestRoutines],
+    uiContext.pathSeparator
+  );
   $: testRoutineRelPaths = testRoutineFilePaths.map((testRoutineFilePath) => {
     return toTreePath(
       testRoutineFilePath, 
-      combinePath([$appState.projectFile?.folderPath ?? '', StandardFolder.TestRoutines], uiContext.pathSeparator), 
+      testRoutinesFolderPath,
       uiContext.pathSeparator);
   });
 

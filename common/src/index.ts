@@ -26,6 +26,8 @@ import {
   StandardOutputFolder,
   TestFramework,
   fileDefFactory,
+  ITestStepRegular,
+  ITestStepRoutine,
 } from "./file-defs";
 import {
   Action,
@@ -78,6 +80,8 @@ export {
   ITestRoutine,
   ITestRoutineFile,
   ITestRoutineStep,
+  ITestStepRegular,
+  ITestStepRoutine,
   ITestSuite,
   ITestSuiteFile,
   IOutputProjectMetadata,
