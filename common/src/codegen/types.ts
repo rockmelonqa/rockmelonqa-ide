@@ -7,6 +7,8 @@ export interface ICodeGen {
 
 export type ProgressEventCallback = (event: IProgressEvent) => void;
 
+export type WriteFileFn = (path: string, content: string) => Promise<void>;
+
 export interface IActionTemplateParam {
   pageName: string;
   elementName: string;
