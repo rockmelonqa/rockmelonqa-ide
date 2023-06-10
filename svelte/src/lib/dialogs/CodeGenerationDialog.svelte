@@ -14,6 +14,7 @@
     import { getContext, onDestroy, onMount } from "svelte";
     import { writable } from "svelte/store";
     import { SourceProjectValidator } from "./CodeGenerationDialog/sourceProjectValidator";
+    import { toPrerequisiteText } from "./CodeGenerationDialog/utils";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -41,7 +42,7 @@
     let showLogs: boolean = false;
     let logFile: string = "";
 
-    onMount(async () => {
+    const registerEvents = () => {
         registerListener(
             codeGenerator.onValidateInput((data: IProgressDetail) => {
                 spinnerText = uiContext.str(stringResKeys.codeGenerationDialog.validateInputMsg);
@@ -110,7 +111,9 @@
                 isProcessing = false;
             })
         );
+    };
 
+    onMount(async () => {
         let hasIssue = false;
         try {
             // verify environments
@@ -163,19 +166,6 @@
 
     const handleCloseClick = () => {
         showDialog = false;
-    };
-
-    const toPrerequisiteText = (item: string) => {
-        switch (item) {
-            case "dotnet":
-                return "Dotnet 6.0 or higher";
-            case "node":
-                return "Node version 16.16 or higher";
-            case "pwsh":
-                return "Powershell (pwsh)";
-            default:
-                return "";
-        }
     };
 
     const toggleLogs = () => {
