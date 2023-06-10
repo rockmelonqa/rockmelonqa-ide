@@ -38,14 +38,14 @@ const validInvokeChannel: IChannels = {
 
 // from Main
 const validReceiveChannel: string[] = [
-    'gen-code:validate-input',
-    'gen-code:parse-data',
-    'gen-code:clean-folder',
-    'gen-code:generate-code',
-    'gen-code:copy-custom-code',
-    'build:build',
-    'build:install-dependencies',
-    'finish',
+  'gen-code:validate-input',
+  'gen-code:parse-data',
+  'gen-code:clean-folder',
+  'gen-code:generate-code',
+  'gen-code:copy-custom-code',
+  'build:build',
+  'build:install-dependencies',
+  'finish',
 ];
 
 const codeGenearator = new IPC({
@@ -195,10 +195,15 @@ async function genCode(browserWindow: BrowserWindow, event: Electron.IpcMainEven
 
     // Actions are completed, let's Save error (if any) to the .code-metadata
     if (!actionRs.isSuccess) {
+      let defaultMetaData: IOutputProjectMetadata = { suites: [], cases: [], pages: [] };
       const metaFilePath = path.join(rmprojFile.folderPath, StandardFolder.OutputCode, StandardOutputFile.MetaData);
-      const metaData = JSON.parse(await fileSystem.readFile(metaFilePath)) as IOutputProjectMetadata;
-      metaData.error = { message: actionRs.errorMessage ?? 'Unknown error' };
-      await fileSystem.writeFile(metaFilePath, JSON.stringify(metaData, null, 2));
+
+      if (fs.existsSync(metaFilePath)) {
+        const metaContent = await fileSystem.readFile(metaFilePath);
+        defaultMetaData = JSON.parse(metaContent) as IOutputProjectMetadata;
+        defaultMetaData.error = { message: actionRs.errorMessage ?? 'Unknown error' };
+      }
+      await fileSystem.writeFile(metaFilePath, JSON.stringify(defaultMetaData, null, 2));
     }
   } catch (err) {
     actionRs = { isSuccess: false, errorMessage: String(err) };
