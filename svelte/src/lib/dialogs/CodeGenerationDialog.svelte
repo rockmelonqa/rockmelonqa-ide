@@ -41,6 +41,7 @@
     $: hasLogs = $logs.length > 0;
     let showLogs: boolean = false;
     let logFile: string = "";
+    let validationErrors: string[] = [];
 
     const registerEvents = () => {
         registerListener(
@@ -66,6 +67,7 @@
 
         registerListener(
             codeGenerator.onGenerateCode((data: IProgressDetail) => {
+                console.log("onGenerateCode", data);
                 spinnerText = uiContext.str(stringResKeys.codeGenerationDialog.generateCodeMsg);
                 addLog(data.log);
             })
@@ -89,6 +91,16 @@
             codeGenerator.onInstallDependencies((data: IProgressDetail) => {
                 spinnerText = uiContext.str(stringResKeys.codeGenerationDialog.installDependenciesMsg);
                 addLog(data.log);
+            })
+        );
+
+        registerListener(
+            codeGenerator.onValidationErrors((detail: IProgressDetail) => {
+                addLog(detail.log);
+                validationErrors = Array.from(detail.data) as string[];
+                showWarning = true;
+                isProcessing = false;
+                showLogs = true;
             })
         );
 
@@ -213,6 +225,10 @@
                                 <div class="logs h-96 overflow-y-auto border-y py-4 flex flex-col gap-y-2">
                                     {#each $logs as log}
                                         <p>{@html log.replace(new RegExp(uiContext.eol, "g"), "<br/>")}</p>
+                                    {/each}
+
+                                    {#each validationErrors as validationError}
+                                        <p>{@html validationError.replace(new RegExp(uiContext.eol, "g"), "<br/>")}</p>
                                     {/each}
                                 </div>
                                 {#if logFile}

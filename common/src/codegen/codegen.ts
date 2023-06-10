@@ -8,16 +8,22 @@ import { CodeGenFactory } from "./codegenFactory";
 import { ProgressEventCallback } from "./types";
 import { buildWriteFileFn, copyCustomCode } from "./utils/codegenUtils";
 import { createSourceProjectMetadata } from "./codegenSourceProjectMeta";
+import { CodegenSourceProjectValidator } from "./codegenSourceProjectValidator";
 
 /** Generates test project */
-export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: ProgressEventCallback): Promise<void> => {
+export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: ProgressEventCallback): Promise<boolean> => {
   info("#################");
   info("# GENERATE CODE #");
   info("#################");
 
   const projMeta = await createSourceProjectMetadata(rmprojFile, progressNotify);
 
-  const writeFile = buildWriteFileFn(rmprojFile, progressNotify);
+  const validationErrors = await CodegenSourceProjectValidator.validate();
+
+  if (validationErrors.length) {
+    progressNotify({ type: "validation-errors", log: `Validation of source files returned errors`, data: validationErrors });
+    return false;
+  }
 
   const outputDir = path.join(rmprojFile.folderPath, StandardFolder.OutputCode);
 
@@ -39,12 +45,13 @@ export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: Prog
   info("--------------------------------------------------");
   await copyCustomCode(rmprojFile, outputDir, progressNotify);
 
+  const writeFile = buildWriteFileFn(rmprojFile, progressNotify);
   const codegen = CodeGenFactory.newInstance(projMeta);
-
   await codegen.generateCode(true, writeFile);
 
   // Done
   info(``);
   info(``);
   info(`Finish generating code!`);
+  return true;
 };

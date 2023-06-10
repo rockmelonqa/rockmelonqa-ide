@@ -41,6 +41,7 @@ const validReceiveChannel: string[] = [
   'gen-code:validate-input',
   'gen-code:parse-data',
   'gen-code:clean-folder',
+  'gen-code:validation-errors',
   'gen-code:generate-code',
   'gen-code:copy-custom-code',
   'build:build',

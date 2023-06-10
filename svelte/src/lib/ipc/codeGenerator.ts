@@ -36,6 +36,9 @@ const onCopyCustomCode = (fn: (data: IProgressDetail) => void, options?: { apiKe
 const onBuild = (fn: (data: IProgressDetail) => void, options?: { apiKey?: string }): Action | undefined =>
     getApi(options?.apiKey).on("build:build", fn);
 
+const onValidationErrors = (fn: (data: IProgressDetail) => void, options?: { apiKey?: string }): Action | undefined =>
+    getApi(options?.apiKey).on("gen-code:validation-errors", fn);
+
 const onInstallDependencies = (
     fn: (data: IProgressDetail) => void,
     options?: { apiKey?: string }
@@ -108,5 +111,6 @@ export const codeGenerator = {
     onInstallDependencies,
     onParseData,
     onValidateInput,
+    onValidationErrors,
     prerequire,
 };

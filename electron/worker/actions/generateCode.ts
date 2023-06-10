@@ -38,6 +38,8 @@ export const generateCode = async function (
 };
 
 export const doGenerateCode = async (port: MessagePort | null, rmProjectFile: IRmProjFile) => {
-  await genCode(rmProjectFile, (event: IProgressEvent) => port?.postMessage(event));
-  port?.postMessage({ type: 'finish' } as IProgressEvent);
+  const success = await genCode(rmProjectFile, (event: IProgressEvent) => port?.postMessage(event));
+  if (success) {
+    port?.postMessage({ type: 'finish' } as IProgressEvent);
+  }
 };
