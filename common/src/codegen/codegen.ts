@@ -21,43 +21,11 @@ import { ITestCase, ITestCaseFile } from "../file-defs/testCaseFile";
 import { IProgressEvent } from "../ipc-defs";
 import { CodeGenFactory } from "./codegenFactory";
 import { CodeGenMetaFactory } from "./codegenMetaFactory";
-import { IOutputProjectMetadata } from "./types";
+import { IOutputProjectMetadata, ProgressEventCallback } from "./types";
 import parseContent from "./codegen-helpers/parseContent";
 import { SourceFileParser } from "./codegen-helpers/sourceFileParser";
 import { readDirRecursiveFilterByExt } from "./utils/fileSystemHelpers";
-
-type ProgressEventCallback = (event: IProgressEvent) => void;
-
-const buildWriteFileFn = (rmprojFile: IRmProjFile, progressNotify: ProgressEventCallback) => {
-  return async (relativeFilePath: string, content: string) => {
-    progressNotify({ type: "generate-code", log: `Creating file: '${relativeFilePath}'` });
-    info("-- writeFile", relativeFilePath);
-
-    let absoluteFilePath = path.join(rmprojFile.folderPath, StandardFolder.OutputCode, relativeFilePath);
-    let folder = path.dirname(absoluteFilePath);
-    if (!fs.existsSync(folder)) {
-      fs.mkdirSync(folder, { recursive: true });
-    }
-
-    fs.writeFileSync(absoluteFilePath, content);
-  };
-};
-
-const copyCustomCode = async (rmprojFile: IRmProjFile, outputDir: string, progressNotify: ProgressEventCallback) => {
-  try {
-    const customCodeDir = path.join(rmprojFile.folderPath, StandardFolder.CustomCode);
-    if (fs.existsSync(customCodeDir)) {
-      progressNotify({ type: "copy-custom-code", log: `Copying custom code from '${customCodeDir}' to '${outputDir}'` });
-      await fs.promises.cp(customCodeDir, outputDir, {
-        recursive: true,
-      });
-    }
-  } catch (err) {
-    console.log("CANNOT copy custom code");
-    console.error(err);
-    throw err;
-  }
-};
+import { buildWriteFileFn, copyCustomCode } from "./utils/codegenUtils";
 
 /** Generates test project */
 export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: ProgressEventCallback): Promise<void> => {

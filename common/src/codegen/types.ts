@@ -1,8 +1,11 @@
 import { ActionType, LocatorType } from "../file-defs";
+import { IProgressEvent } from "../ipc-defs";
 
 export interface ICodeGen {
   generateCode: (full: boolean, writeFile: (path: string, content: string) => Promise<void>) => Promise<string>;
 }
+
+export type ProgressEventCallback = (event: IProgressEvent) => void;
 
 export interface IActionTemplateParam {
   pageName: string;
