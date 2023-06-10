@@ -149,11 +149,15 @@
 
         pageElementsMap = new Map();
         for (const [pageId, pageData] of pages) {
+            // only get completed row
+            const elements = Array.from(pageData.elements.values())
+                .filter((e) => e.id && e.name != null && e.findBy != null && e.locator != null);
+
             const dropdownOptions: IDropdownOption[] = [];
-            for (const [elementId, elementData] of pageData.elements) {
+            for (const element of elements) {
                 dropdownOptions.push({
-                    key: elementId,
-                    text: elementData.name,
+                    key: element.id,
+                    text: element.name!,
                 });
             }
             dropdownOptions.sort((a, b) => a.text.localeCompare(b.text));

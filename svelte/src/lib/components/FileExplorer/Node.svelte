@@ -325,34 +325,20 @@
      * Return true if we want to stop 'delete' workflow. Otherwise, 'false' to act as normally
      */
     const onDeleteTestCase = async (): Promise<boolean> => {
-        const meta = await codeGenerator.generateSourceProjectMetadata($appState.projectFile!);
-        if (!meta) {
-            return false;
-        }
-
-        const testCase = meta.testCases.find(
-            (tc) => combinePath([tc.folderPath, tc.fileName], uiContext.pathSeparator) === fileSystemPath
-        );
-
+        const testCase = Array.from($appState.testCases.values()).find((tc) => tc.filePath === fileSystemPath);
         if (!testCase) {
             return false;
         }
 
-        testCasePathToDelete = combinePath([testCase.folderPath, testCase.fileName], uiContext.pathSeparator);
-        // Find test suites that contains this test case, if found any, display a confirmation dialog
-        if (meta.testSuites) {
-            relatedTestSuitePaths = meta.testSuites
-                .filter((suiteFile) => suiteFile.content.testcases.some((tcId) => tcId === testCase.content.id))
-                .map((suiteFile) => {
-                    return combinePath([suiteFile.folderPath, suiteFile.fileName], uiContext.pathSeparator);
-                });
+        relatedTestSuitePaths = Array.from($appState.testSuites.values())
+            .filter((ts) => ts.testcases.some((tcId) => tcId === testCase.id))
+            .map((ts) => ts.filePath).sort();
 
-            if (relatedTestSuitePaths.length > 0) {
-                showDeleteTestCaseConfirmationDialog = true;
-                return true;
-            }
+        if (relatedTestSuitePaths.length > 0) {
+            showDeleteTestCaseConfirmationDialog = true;
+            return true;
         }
-
+        
         return false;
     };
 
@@ -360,42 +346,23 @@
      * Handle page deletion
      ***************************************/
     let showDeletePageConfirmationDialog: boolean = false;
-    let pagePathToDelete: string = "";
     let relatedTestCasePaths: string[] = [];
     let relatedTestRoutinePaths: string[] = [];
 
     const onDeletePage = async (): Promise<boolean> => {
-        const meta = await codeGenerator.generateSourceProjectMetadata($appState.projectFile!);
-        if (!meta) {
-            return false;
-        }
-
-        const page = meta.pages.find(
-            (p) => combinePath([p.folderPath, p.fileName], uiContext.pathSeparator) === fileSystemPath
-        );
-
+        const page = Array.from($appState.pages.values()).find((p) => p.filePath === fileSystemPath);
         if (!page) {
             return false;
         }
 
-        pagePathToDelete = combinePath([page.folderPath, page.fileName], uiContext.pathSeparator);
+        relatedTestCasePaths = Array.from($appState.testCases.values())
+            .filter((tc) => tc.steps.some((s) => s.type === 'testStep' && s.page === page.id))
+            .map((tc) => tc.filePath).sort();
         
-        if (meta.testCases) {
-            relatedTestCasePaths = meta.testCases
-                .filter((tc) => tc.content.steps.some((s) => s.type === 'testStep' && s.page === page.content.id))
-                .map((tc) => {
-                    return combinePath([tc.folderPath, tc.fileName], uiContext.pathSeparator);
-                });
-        }
-
-        if (meta.testRoutines) {
-            relatedTestRoutinePaths = meta.testRoutines
-                .filter((tr) => tr.content.steps.some((s) => s.type === 'testStep' && s.page === page.content.id))
-                .map((tr) => {
-                    return combinePath([tr.folderPath, tr.fileName], uiContext.pathSeparator);
-                });
-        }
-
+        relatedTestRoutinePaths = Array.from($appState.testRoutines.values())
+            .filter((tr) => tr.steps.some((s) => s.page === page.id))
+            .map((tr) => tr.filePath).sort();
+        
         if (relatedTestCasePaths.length > 0 || relatedTestRoutinePaths.length > 0) {
             showDeletePageConfirmationDialog = true;
             return true;
@@ -489,7 +456,7 @@
 
 <DeletePageConfirmationDialog
     bind:showDialog={showDeletePageConfirmationDialog}
-    pageFilePath={pagePathToDelete}
+    pageFilePath={fileSystemPath}
     testCaseFilePaths={relatedTestCasePaths}
     testRoutineFilePaths={relatedTestRoutinePaths}
     on:deleteConfirmed={doDeleteFile}
@@ -497,7 +464,7 @@
 
 <DeleteTestCaseConfirmationDialog
     bind:showDialog={showDeleteTestCaseConfirmationDialog}
-    testCaseFilePath={testCasePathToDelete}
+    testCaseFilePath={fileSystemPath}
     suiteFilePaths={relatedTestSuitePaths}
     on:deleteConfirmed={doDeleteFile}
 />

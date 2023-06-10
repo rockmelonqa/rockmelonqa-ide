@@ -1,6 +1,6 @@
 <script lang="ts">
     import { AppActionType, appContextKey, type IAppContext } from "$lib/context/AppContext";
-    import type { IPageData, IPageElementData, ITestCaseData, ITestRoutineData } from "$lib/context/AppContext.model";
+    import type { IPageData, IPageElementData, ITestCaseData, ITestCaseStepData, ITestRoutineData, ITestRoutineStepData, ITestSuiteData } from "$lib/context/AppContext.model";
     import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
     import { fileSystem } from "$lib/ipc";
     import lodash from "lodash";
@@ -11,6 +11,7 @@
         type IAddFileWatchEventArgs,
         type ITestCase,
         type ITestRoutine,
+        type ITestSuite,
     } from "rockmelonqa.common";
     import type { IPage } from "rockmelonqa.common/file-defs/pageFile";
     import { getContext, onDestroy } from "svelte";
@@ -19,6 +20,7 @@
     import CollapsiblePanel from "./CollapsiblePanel.svelte";
     import { buildChildrenNodes, Node as NodeInfo, toFileSystemPath, toTreePath } from "./Node";
     import Nodes from "./Nodes.svelte";
+    import type { ITestStepRegular, ITestStepRoutine } from "rockmelonqa.common/file-defs/testCaseFile";
 
     let uiContext = getContext(uiContextKey) as IUiContext;
 
@@ -279,6 +281,11 @@
             shortPath.endsWith(StandardFileExtension.TestRoutine)
         ) {
             await loadTestRoutineData(fileSystemPath);
+        } else if (
+            shortPath.startsWith(StandardFolder.TestSuites + uiContext.pathSeparator) &&
+            shortPath.endsWith(StandardFileExtension.TestSuite)
+        ) {
+            await loadTestSuiteData(fileSystemPath);
         }
     };
 
@@ -306,21 +313,20 @@
     };
 
     const buildPageData = (path: string, page: IPage): IPageData | null => {
+        let name = toTreePath(path, $appState.projectFile?.folderPath!, uiContext.pathSeparator) ?? "";
+        name = name.replace(new RegExp(`^${StandardFolder.PageDefinitions}${NodeInfo.PATH_SEPARATOR}`), "");
+
         const elementsMap: Map<string, IPageElementData> = page.elements
-            // only get completed row
-            .filter((e) => e.id && e.name && e.findBy && e.locator)
+            .filter((e) => e.type === 'pageElement')
             .reduce((map, e) => {
                 map.set(e.id, {
                     id: e.id,
-                    name: e.name!,
-                    findBy: e.findBy!,
-                    locator: e.locator!,
+                    name: e.name,
+                    findBy: e.findBy,
+                    locator: e.locator,
                 });
                 return map;
             }, new Map<string, IPageElementData>());
-
-        let name = toTreePath(path, $appState.projectFile?.folderPath!, uiContext.pathSeparator) ?? "";
-        name = name.replace(new RegExp(`^${StandardFolder.PageDefinitions}${NodeInfo.PATH_SEPARATOR}`), "");
 
         return {
             id: page.id,
@@ -353,6 +359,40 @@
         }
     };
 
+    const buildTestCaseData = (path: string, testCase: ITestCase): ITestCaseData | null => {
+        let name = toTreePath(path, $appState.projectFile?.folderPath!, uiContext.pathSeparator) ?? "";
+        name = name.replace(new RegExp(`^${StandardFolder.TestCases}${NodeInfo.PATH_SEPARATOR}`), "");
+
+        const steps = testCase.steps
+            .filter((s) => s.type !== 'comment')
+            .map((s) => {
+                if (s.type === 'testStep') {
+                    return {
+                        id: s.id,
+                        type: s.type,
+                        page: s.page,
+                        element: s.element,
+                        action: s.action,
+                        data: s.data
+                    } as ITestStepRegular;
+                } else if (s.type === 'routine') {
+                    return {
+                        id: s.id,
+                        type: s.type,
+                        routine: s.routine,
+                        dataset: s.dataset,
+                    } as ITestStepRoutine;
+                }
+            });
+
+        return {
+            id: testCase.id,
+            name: name,
+            steps: steps,
+            filePath: path,
+        } as ITestCaseData;
+    };
+
     const loadTestRoutineData = async (path: string) => {
         try {
             const fileContent = await fileSystem.readFile(path);
@@ -376,26 +416,63 @@
         }
     };
 
-    const buildTestCaseData = (path: string, testCase: ITestCase): ITestCaseData | null => {
-        let name = toTreePath(path, $appState.projectFile?.folderPath!, uiContext.pathSeparator) ?? "";
-        name = name.replace(new RegExp(`^${StandardFolder.TestCases}${NodeInfo.PATH_SEPARATOR}`), "");
-
-        return {
-            id: testCase.id,
-            name: name,
-            filePath: path,
-        } as ITestCaseData;
-    };
-
     const buildTestRoutineData = (path: string, testRoutine: ITestRoutine): ITestRoutineData | null => {
         let name = toTreePath(path, $appState.projectFile?.folderPath!, uiContext.pathSeparator) ?? "";
         name = name.replace(new RegExp(`^${StandardFolder.TestRoutines}${NodeInfo.PATH_SEPARATOR}`), "");
 
+        const steps = testRoutine.steps
+            .filter((s) => s.type !== 'comment')
+            .map((s) => { 
+                return {
+                    id: s.id,
+                    page: s.page,
+                    element: s.element,
+                    action: s.action,
+                    data: s.data,
+                } as ITestRoutineStepData
+            });
+
         return {
             id: testRoutine.id,
             name: name,
+            steps: steps,
             filePath: path,
         } as ITestRoutineData;
+    };
+
+    const loadTestSuiteData = async (path: string) => {
+        try {
+            const fileContent = await fileSystem.readFile(path);
+            if (!fileContent) {
+                return;
+            }
+
+            const testSuite = JSON.parse(fileContent) as ITestSuite;
+            const testSuiteData = buildTestSuiteData(path, testSuite);
+            if (!testSuiteData) {
+                return;
+            }
+
+            appStateDispatch({
+                type: AppActionType.SetTestSuiteData,
+                data: testSuiteData,
+            });
+        } catch (error) {
+            console.log("Cannot load file", path);
+            console.error(error);
+        }
+    };
+
+    const buildTestSuiteData = (path: string, testSuite: ITestSuite): ITestSuiteData | null => {
+        let name = toTreePath(path, $appState.projectFile?.folderPath!, uiContext.pathSeparator) ?? "";
+        name = name.replace(new RegExp(`^${StandardFolder.TestSuites}${NodeInfo.PATH_SEPARATOR}`), "");
+
+        return {
+            id: testSuite.id,
+            name: name,
+            testcases: testSuite.testcases,
+            filePath: path,
+        } as ITestSuiteData;
     };
 
     // Unload file data out of AppContext
@@ -414,6 +491,16 @@
             shortPath.endsWith(StandardFileExtension.TestCase)
         ) {
             appStateDispatch({ type: AppActionType.RemoveTestCaseData, filePath: fileSystemPath });
+        } else if (
+            shortPath.startsWith(StandardFolder.TestRoutines + uiContext.pathSeparator) &&
+            shortPath.endsWith(StandardFileExtension.TestRoutine)
+        ) {
+            appStateDispatch({ type: AppActionType.RemoveTestRoutineData, filePath: fileSystemPath });
+        } else if (
+            shortPath.startsWith(StandardFolder.TestSuites + uiContext.pathSeparator) &&
+            shortPath.endsWith(StandardFileExtension.TestSuite)
+        ) {
+            appStateDispatch({ type: AppActionType.RemoveTestSuiteData, filePath: fileSystemPath });
         }
     };
 </script>
