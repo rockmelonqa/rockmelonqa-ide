@@ -22,92 +22,10 @@ import { IProgressEvent } from "../ipc-defs";
 import { CodeGenFactory } from "./codegenFactory";
 import { CodeGenMetaFactory } from "./codegenMetaFactory";
 import { IOutputProjectMetadata } from "./types";
+import parseContent from "./codegen-helpers/parseContent";
+import { SourceFileParser } from "./codegen-helpers/sourceFileParser";
 
-/** Parses the json string. If parse successfully, return the [content, true]; If not, return [{<empty object>}, false] */
-const parseContent = <TContent>(contentStr: string): [TContent, boolean] => {
-  try {
-    let obj = JSON.parse(contentStr);
-    return [obj, true];
-  } catch {
-    return [{} as TContent, false];
-  }
-};
-
-const parsePageDefinition = async (parentDir: string, fileRelPath: string): Promise<IPageFile> => {
-  let filePath = path.join(parentDir, fileRelPath);
-  let fileContent = fs.readFileSync(filePath, "utf-8");
-  let [page, isValid] = parseContent<IPage>(fileContent);
-
-  // Provide an empty elements array so that codegen can generate a page class with no property
-  if (!isValid) {
-    page.id = uuidv4();
-    page.elements = [];
-  }
-
-  return {
-    content: page,
-    fileName: path.basename(filePath),
-    folderPath: path.dirname(filePath),
-    isValid,
-  };
-};
-
-const parseTestCase = async (parentDir: string, fileRelPath: string): Promise<ITestCaseFile> => {
-  let filePath = path.join(parentDir, fileRelPath);
-  let fileContent = fs.readFileSync(filePath, "utf-8");
-  let [testcase, isValid] = parseContent<ITestCase>(fileContent);
-
-  // Provide an empty steps array so that codegen can generate a case class with no step
-  if (!isValid) {
-    testcase.id = uuidv4();
-    testcase.steps = [];
-  }
-
-  return {
-    content: testcase,
-    fileName: path.basename(filePath),
-    folderPath: path.dirname(filePath),
-    isValid,
-  };
-};
-
-const parseTestRoutine = async (parentDir: string, fileRelPath: string): Promise<ITestRoutineFile> => {
-  let filePath = path.join(parentDir, fileRelPath);
-  let fileContent = fs.readFileSync(filePath, "utf-8");
-  let [routine, isValid] = parseContent<ITestRoutine>(fileContent);
-
-  // Provide an empty steps array so that codegen can generate a Routine class with no step
-  if (!isValid) {
-    routine.id = uuidv4();
-    routine.steps = [];
-  }
-
-  return {
-    content: routine,
-    fileName: path.basename(filePath),
-    folderPath: path.dirname(filePath),
-    isValid,
-  };
-};
-
-const parseTestSuite = async (parentDir: string, fileRelPath: string): Promise<ITestSuiteFile> => {
-  let filePath = path.join(parentDir, fileRelPath);
-  let fileContent = fs.readFileSync(filePath, "utf-8");
-  let [testsuite, isValid] = parseContent<ITestSuite>(fileContent);
-
-  // Provide an testcases elements array so that codegen can generate a suite class with no test case
-  if (!isValid) {
-    testsuite.id = uuidv4();
-    testsuite.testcases = [];
-  }
-
-  return {
-    content: testsuite,
-    fileName: path.basename(filePath),
-    folderPath: path.dirname(filePath),
-    isValid,
-  };
-};
+type ProgressEventCallback = (event: IProgressEvent) => void;
 
 /** Reads all files in the provided directory recursively */
 const readDirRecursive = async (dir: string) => {
@@ -130,15 +48,8 @@ const readDirRecursiveFilterByExt = async (dir: string, ext: string) => {
   return paths;
 };
 
-/** Generates test project */
-export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: (event: IProgressEvent) => void): Promise<void> => {
-  info("#################");
-  info("# GENERATE CODE", rmprojFile);
-  info("#################");
-
-  const projMeta = await createSourceProjectMetadata(rmprojFile, progressNotify);
-
-  const writeFile = async (relativeFilePath: string, content: string) => {
+const buildWriteFileFn = (rmprojFile: IRmProjFile, progressNotify: ProgressEventCallback) => {
+  return async (relativeFilePath: string, content: string) => {
     progressNotify({ type: "generate-code", log: `Creating file: '${relativeFilePath}'` });
     info("-- writeFile", relativeFilePath);
 
@@ -150,26 +61,9 @@ export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: (eve
 
     fs.writeFileSync(absoluteFilePath, content);
   };
+};
 
-  const outputDir = path.join(rmprojFile.folderPath, StandardFolder.OutputCode);
-  info(``);
-  info(``);
-  info(`--------------------------------------------------`);
-  info(`-- Generating code to '${outputDir}'`);
-  info("--------------------------------------------------");
-
-  if (fs.existsSync(outputDir)) {
-    progressNotify({ type: "clean-folder", log: `Cleaning folder: ${outputDir}` });
-    fse.emptyDirSync(outputDir);
-  }
-
-  // Copy Custom Code
-  info(``);
-  info(``);
-  info(`--------------------------------------------------`);
-  info(`-- Copy custom code`);
-  info("--------------------------------------------------");
-
+const copyCustomCode = async (rmprojFile: IRmProjFile, outputDir: string, progressNotify: ProgressEventCallback) => {
   try {
     const customCodeDir = path.join(rmprojFile.folderPath, StandardFolder.CustomCode);
     if (fs.existsSync(customCodeDir)) {
@@ -183,6 +77,37 @@ export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: (eve
     console.error(err);
     throw err;
   }
+};
+
+/** Generates test project */
+export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: ProgressEventCallback): Promise<void> => {
+  info("#################");
+  info("# GENERATE CODE #");
+  info("#################");
+
+  const projMeta = await createSourceProjectMetadata(rmprojFile, progressNotify);
+
+  const writeFile = buildWriteFileFn(rmprojFile, progressNotify);
+
+  const outputDir = path.join(rmprojFile.folderPath, StandardFolder.OutputCode);
+
+  info(``);
+  info(``);
+  info(`--------------------------------------------------`);
+  info(`-- Generating code to '${outputDir}'`);
+  info("--------------------------------------------------");
+
+  if (fs.existsSync(outputDir)) {
+    progressNotify({ type: "clean-folder", log: `Cleaning folder: ${outputDir}` });
+    fse.emptyDirSync(outputDir);
+  }
+
+  info(``);
+  info(``);
+  info(`--------------------------------------------------`);
+  info(`-- Copy custom code`);
+  info("--------------------------------------------------");
+  await copyCustomCode(rmprojFile, outputDir, progressNotify);
 
   const codegen = CodeGenFactory.newInstance(projMeta);
 
@@ -255,7 +180,7 @@ export const createSourceProjectMetadata = async (
   for (let pageDefinitionFile of pageDefinitionFiles) {
     notify({ type: "parse-data", log: `Parsing: ${pageDefinitionFile}` });
     info(`    ---> Found page definition file: ${pageDefinitionFile}`);
-    pages.push(await parsePageDefinition(pageDefFolder, pageDefinitionFile));
+    pages.push(await SourceFileParser.parsePageDefinition(pageDefFolder, pageDefinitionFile));
   }
 
   // Parsing test suite definitions
@@ -272,7 +197,7 @@ export const createSourceProjectMetadata = async (
   for (let testSuiteDefFile of testSuiteFilePaths) {
     notify({ type: "parse-data", log: `Parsing: ${testSuiteDefFile}` });
     info(`    ---> Found test suite file: ${testSuiteDefFile}`);
-    suites.push(await parseTestSuite(testSuiteFolderPath, testSuiteDefFile));
+    suites.push(await SourceFileParser.parseTestSuite(testSuiteFolderPath, testSuiteDefFile));
   }
 
   // Parsing test case definitions
@@ -288,7 +213,7 @@ export const createSourceProjectMetadata = async (
   let testCaseFileRelPaths = await readDirRecursiveFilterByExt(testCaseFolderPath, StandardFileExtension.TestCase);
 
   for (let testCaseDefFile of testCaseFileRelPaths) {
-    cases.push(await parseTestCase(testCaseFolderPath, testCaseDefFile));
+    cases.push(await SourceFileParser.parseTestCase(testCaseFolderPath, testCaseDefFile));
     notify({ type: "parse-data", log: `Parsing: ${testCaseDefFile}` });
     info(`    ---> Found test case file: ${testCaseDefFile}`);
   }
@@ -308,7 +233,7 @@ export const createSourceProjectMetadata = async (
     let testRoutineFileRelPaths = await readDirRecursiveFilterByExt(testRoutineFolderPath, StandardFileExtension.TestRoutine);
 
     for (let testRoutineDefFile of testRoutineFileRelPaths) {
-      routines.push(await parseTestRoutine(testRoutineFolderPath, testRoutineDefFile));
+      routines.push(await SourceFileParser.parseTestRoutine(testRoutineFolderPath, testRoutineDefFile));
       notify({ type: "parse-data", log: `Parsing: ${testRoutineDefFile}` });
       info(`    ---> Found test routine file: ${testRoutineDefFile}`);
     }
