@@ -11,7 +11,6 @@ import {
 } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
-import { createOutputProjectMetadata } from "../codegen";
 import { ICodeGen } from "../types";
 import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
 import { MsTestProjMeta } from "./msTestProjMeta";
@@ -21,6 +20,7 @@ import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfo
 import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCsharpCodeGen";
 import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
+import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
 
 export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen implements ICodeGen {
   /**
