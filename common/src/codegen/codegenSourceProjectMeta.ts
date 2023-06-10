@@ -8,10 +8,11 @@ import { ITestCaseFile } from "../file-defs/testCaseFile";
 import { IProgressEvent } from "../ipc-defs";
 import { SourceFileParser } from "./codegen-helpers/sourceFileParser";
 import { readDirRecursiveFilterByExt } from "./utils/fileSystemHelpers";
+import { ProgressEventCallback } from "./types";
 
 export const createSourceProjectMetadata = async (
   rmprojFile: IRmProjFile,
-  progressNotify?: (event: IProgressEvent) => void
+  progressNotify?: ProgressEventCallback
 ): Promise<ISourceProjectMetadata> => {
   const notify = (event: IProgressEvent) => progressNotify && progressNotify(event);
 
