@@ -114,6 +114,8 @@
     };
 
     onMount(async () => {
+        registerEvents();
+
         let hasIssue = false;
         try {
             // verify environments
