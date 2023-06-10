@@ -13,6 +13,7 @@
     import type { Action, IIpcGenericResponse, IProgressDetail } from "rockmelonqa.common";
     import { getContext, onDestroy, onMount } from "svelte";
     import { writable } from "svelte/store";
+    import { SourceProjectValidator } from "./CodeGenerationDialog/sourceProjectValidator";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -120,7 +121,7 @@
             }
 
             // verify duplicated objects
-            let duplicateObjects = await findDuplicatedObjects();
+            let duplicateObjects = await SourceProjectValidator.findDuplicatedObjects($appState.projectFile!);
             if (duplicateObjects.length) {
                 dialogMessage = `"${duplicateObjects[0]}" ${uiContext.str(stringResKeys.general.and)} "${
                     duplicateObjects[1]
@@ -135,57 +136,6 @@
             isPrerequiring = false;
         }
     });
-
-    /** Returns the first pair duplicated items (cases, pages, suites) by outputFilePath */
-    const findDuplicatedObjects = async (): Promise<string[]> => {
-        const meta = await codeGenerator.generateOutputProjectMetadata($appState.projectFile!);
-        if (!meta) {
-            return [];
-        }
-
-        const duplicateTestCases = findDuplicatedItems(meta.cases);
-        if (duplicateTestCases.length) {
-            return duplicateTestCases;
-        }
-
-        const duplicatePages = findDuplicatedItems(meta.pages);
-        if (duplicatePages.length) {
-            return duplicatePages;
-        }
-
-        const duplicateTestSuites = findDuplicatedItems(meta.suites);
-        if (duplicateTestSuites.length) {
-            return duplicateTestSuites;
-        }
-
-        return [];
-    };
-
-    /** Returns the first pair duplicated items by outputFilePath */
-    const findDuplicatedItems = (items: { outputFilePath: string; inputFileRelPath: string }[]): string[] => {
-        // Group the items by "outputFilePath", the find the first group that has more than 1 item.
-        const groups = _(
-            items.map((item) => ({
-                inputFileRelPath: item.inputFileRelPath,
-                outputFilePath: item.outputFilePath.toLocaleLowerCase(),
-            }))
-        )
-            .groupBy("outputFilePath")
-            .map(function (items, outputFilePath) {
-                return {
-                    outputFilePath,
-                    inputFileRelPaths: _.map(items, "inputFileRelPath"),
-                };
-            })
-            .value();
-
-        const duplicateGroup = groups.find((g) => g.inputFileRelPaths.length > 1);
-        if (duplicateGroup) {
-            const [file1Name, file2Name] = duplicateGroup?.inputFileRelPaths;
-            return [file1Name, file2Name];
-        }
-        return [];
-    };
 
     onDestroy(() => {
         cleanupFns.forEach((listener) => listener());
