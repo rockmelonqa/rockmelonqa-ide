@@ -11,7 +11,7 @@ export interface RmpSpec {
   testcases: ITestCase[];
   testsuites: ITestSuite[];
   testroutines: ITestRoutine[];
-  outputFiles?: OutputCodeFile[];
+  outputFiles: OutputCodeFile[];
 }
 
 export interface OutputCodeFile {
