@@ -20,12 +20,12 @@ export class CodeGenFactory {
     let automationFramework = registy[projMeta.project.content.automationFramework];
 
     if (automationFramework === undefined) {
-      throw new Error(`Can't find Codegen for AutomationFramework '${projMeta.project.content.automationFramework}'`);
+      throw new Error(`DEV ERROR: Can't find Codegen for AutomationFramework '${projMeta.project.content.automationFramework}'`);
     }
 
     let codegenClass = automationFramework[projMeta.project.content.testFramework];
     if (!codegenClass) {
-      throw new Error(`Can't find Codegen class for TestFramework '${projMeta.project.content.testFramework}'`);
+      throw new Error(`DEV ERROR: Can't find Codegen class for TestFramework '${projMeta.project.content.testFramework}'`);
     }
 
     return new codegenClass(projMeta);
