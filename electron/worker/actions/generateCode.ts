@@ -27,7 +27,7 @@ export const generateCode = async function (
     });
 
     worker.on('error', (error: Error) => {
-      rs({ isSuccess: false, errorMessage: String(error) });
+      rs({ isSuccess: false, errorMessage: String(error), data: error.stack });
     });
 
     worker.postMessage({

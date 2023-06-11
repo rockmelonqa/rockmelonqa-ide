@@ -202,17 +202,18 @@ async function genCode(browserWindow: BrowserWindow, event: Electron.IpcMainEven
       if (fs.existsSync(metaFilePath)) {
         const metaContent = await fileSystem.readFile(metaFilePath);
         defaultMetaData = JSON.parse(metaContent) as IOutputProjectMetadata;
-        defaultMetaData.error = { message: actionRs.errorMessage ?? 'Unknown error' };
+        defaultMetaData.error = { message: actionRs.errorMessage ?? 'Unknown error', data: actionRs.data };
       }
       await fileSystem.writeFile(metaFilePath, JSON.stringify(defaultMetaData, null, 2));
     }
   } catch (err) {
-    actionRs = { isSuccess: false, errorMessage: String(err) };
+    actionRs = { isSuccess: false, errorMessage: String(err), data: (err as Error)?.stack };
   }
 
   const ipcRs: IIpcGenericResponse<{ logFile: string }> = {
     isSuccess: actionRs.isSuccess,
     errorMessage: actionRs.errorMessage,
+    data: actionRs.data,
   };
 
   // Print log file
