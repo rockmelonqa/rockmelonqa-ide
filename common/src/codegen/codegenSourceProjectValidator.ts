@@ -1,9 +1,8 @@
-import { ITestCaseFile } from "rockmelonqa.common";
 import { ActionType, ISourceProjectMetadata, ITestCase } from "../file-defs";
-import { actionValidatorRegistryDotnet } from "./playwright-charp-common/action-validator-registry-dotnet";
+import { actionValidatorRegistryDotnet } from "./codegen-common/action-validator-registry";
 import { SourceFileValidationError } from "./types";
 import path from "path";
-import { ITestStep } from "../file-defs/testCaseFile";
+import { ITestCaseFile, ITestStep } from "../file-defs/testCaseFile";
 
 type ErrorInfo = {
   /** Line number: starts at 1 */

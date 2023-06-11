@@ -1,7 +1,7 @@
 import { ITestStepRegular } from "../../../file-defs/testCaseFile";
-import { validateStepRequireData } from "../action-validator-registry-dotnet";
+import { validateStepRequirePageAndElementAndData } from "../action-validator-registry";
 
 /** Validate step with action Clear */
 export default (step: ITestStepRegular) => {
-  return validateStepRequireData(step);
+  return validateStepRequirePageAndElementAndData(step);
 };
