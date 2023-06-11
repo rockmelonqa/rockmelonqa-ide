@@ -10,11 +10,14 @@
     import WarningIcon from "$lib/icons/WarningIcon.svelte";
     import { codeGenerator } from "$lib/ipc";
     import _ from "lodash";
-    import type { Action, IIpcGenericResponse, IProgressDetail } from "rockmelonqa.common";
+    import type { Action, ActionType, IIpcGenericResponse, IProgressDetail } from "rockmelonqa.common";
     import { getContext, onDestroy, onMount } from "svelte";
     import { writable } from "svelte/store";
     import { SourceProjectValidator } from "./CodeGenerationDialog/sourceProjectValidator";
     import { toPrerequisiteText } from "./CodeGenerationDialog/utils";
+    import type { SourceFileValidationError } from "rockmelonqa.common/codegen/types";
+    import { getActionTypeDropDownOptions } from "$lib/utils/dropdowns";
+    import type { IDropdownOption } from "$lib/controls/DropdownField";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -22,6 +25,8 @@
 
     let appContext = getContext(appContextKey) as IAppContext;
     let { state: appState, dispatch: appStateDispatch } = appContext;
+
+    let actionTypeOptions: IDropdownOption[] = getActionTypeDropDownOptions(uiContext);
 
     export let showDialog: boolean = false;
 
@@ -41,7 +46,7 @@
     $: hasLogs = $logs.length > 0;
     let showLogs: boolean = false;
     let logFile: string = "";
-    let validationErrors: string[] = [];
+    let validationErrors: SourceFileValidationError[] = [];
 
     const registerEvents = () => {
         registerListener(
@@ -97,7 +102,7 @@
         registerListener(
             codeGenerator.onValidationErrors((detail: IProgressDetail) => {
                 addLog(detail.log);
-                validationErrors = Array.from(detail.data) as string[];
+                validationErrors = Array.from(detail.data) as SourceFileValidationError[];
                 showWarning = true;
                 isProcessing = false;
                 showLogs = true;
@@ -185,6 +190,21 @@
     const toggleLogs = () => {
         showLogs = !showLogs;
     };
+
+    /** Generates the error message from the error message template by replacing the placeholder with StringRes */
+    const generateErrorMessage = (messageTemplate: string, actionType?: ActionType) => {
+        if (!actionType) {
+            return messageTemplate;
+        }
+        let regex = new RegExp(`{{${actionType}}}`);
+        let actionTypeOption = actionTypeOptions.find((option) => option.key === actionType);
+
+        if (!actionTypeOption) {
+            return messageTemplate.replace(regex, actionType);
+        }
+
+        return messageTemplate.replace(regex, actionTypeOption.text);
+    };
 </script>
 
 {#if showDialog}
@@ -228,7 +248,14 @@
                                     {/each}
 
                                     {#each validationErrors as validationError}
-                                        <p>{@html validationError.replace(new RegExp(uiContext.eol, "g"), "<br/>")}</p>
+                                        <p>
+                                            {uiContext.str(stringResKeys.general.error)}: {`${
+                                                validationError.fileName
+                                            } - Line ${validationError.lineNumber}, ${generateErrorMessage(
+                                                validationError.message,
+                                                validationError.actionType
+                                            )}`}
+                                        </p>
                                     {/each}
                                 </div>
                                 {#if logFile}

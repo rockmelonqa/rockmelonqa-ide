@@ -50,18 +50,18 @@ actionValidatorRegistryDotnet
 
 /**
  * Validates a testStep that requires "Page" and "Element" and "Data"
- * @return {string} The message to indicate the missing values. Empty string if the testStep is valid.
+ * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
  */
 export const validateStepRequirePageAndElementAndData = (step: ITestStepRegular): string => {
   if (!step.page && !step.element) {
-    return `Action "${step.action}" is missing "Page" and "Element"`;
+    return `Action "{{${step.action}}}" is missing "Page" and "Element"`;
   }
   if (step.page && !step.element) {
-    return `Action "${step.action}" is missing "Element"`;
+    return `Action "{{${step.action}}}" is missing "Element"`;
   }
 
   if (step.page && step.element && !step.data) {
-    return `Action "${step.action}" is missing "Data"`;
+    return `Action "{{${step.action}}}" is missing "Data"`;
   }
 
   return ``;
@@ -69,14 +69,14 @@ export const validateStepRequirePageAndElementAndData = (step: ITestStepRegular)
 
 /**
  * Validates a testStep that requires "Page" and "Element"
- * @return {string} The message to indicate the missing values. Empty string if the testStep is valid.
+ * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
  */
 export const validateStepRequirePageAndElement = (step: ITestStepRegular): string => {
   if (!step.page && !step.element) {
-    return `Action "${step.action}" is missing "Page" and "Element"`;
+    return `Action "{{${step.action}}}" is missing "Page" and "Element"`;
   }
   if (step.page && !step.element) {
-    return `Action "${step.action}" is missing "Element"`;
+    return `Action "{{${step.action}}}" is missing "Element"`;
   }
 
   // The UI should have prevented user from selecting an element before selecting a page
@@ -86,8 +86,8 @@ export const validateStepRequirePageAndElement = (step: ITestStepRegular): strin
 
 /**
  * Validates a testStep that requires "Data"
- * @return {string} The message to indicate the missing values. Empty string if the testStep is valid.
+ * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
  * */
 export const validateStepRequireData = (step: ITestStepRegular): string => {
-  return step.data ? "" : `Action "${step.action}" is missing "data"`;
+  return step.data ? "" : `Action "{{${step.action}}}" is missing "Data"`;
 };

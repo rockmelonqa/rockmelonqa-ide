@@ -2,13 +2,15 @@ import { ActionType, ISourceProjectMetadata, ITestCase } from "../file-defs";
 import { actionValidatorRegistryDotnet } from "./codegen-common/action-validator-registry";
 import { SourceFileValidationError } from "./types";
 import path from "path";
-import { ITestCaseFile, ITestStep } from "../file-defs/testCaseFile";
+import { ITestCaseFile, ITestStep, ITestStepRegular } from "../file-defs/testCaseFile";
 
 type ErrorInfo = {
   /** Line number: starts at 1 */
   lineNumber: number;
   /** Error message */
   message: string;
+  /** Action type */
+  actionType?: ActionType;
 };
 
 /** Validator for source project files */
@@ -49,7 +51,8 @@ export class CodegenSourceProjectValidator {
             testcaseFile.fileName,
             path.join(testcaseFile.folderPath, testcaseFile.fileName),
             errorInfo.lineNumber,
-            errorInfo.message
+            errorInfo.message,
+            errorInfo.actionType
           );
         })
       );
@@ -65,9 +68,19 @@ export class CodegenSourceProjectValidator {
     let errors: ErrorInfo[] = [];
 
     for (let [index, step] of steps.entries()) {
+      if (!(step.type === "testStep")) {
+        continue;
+      }
+
+      if (!step.action) {
+        errors.push({ lineNumber: index + 1, message: `Missing "Action"` });
+        continue;
+      }
+
       let errorMessage = this.validateTestStep(step);
       if (errorMessage) {
-        errors.push({ lineNumber: index + 1, message: errorMessage });
+        const actionType = step.action! as unknown as ActionType;
+        errors.push({ lineNumber: index + 1, message: errorMessage, actionType: actionType });
       }
     }
 
@@ -76,17 +89,9 @@ export class CodegenSourceProjectValidator {
 
   /**
    * Validates a single testStep item
-   * @returns {string|undefined} The error message string or `undefined` if there is no error.
+   * @returns {string|undefined} The error message TEMPLATE string or `undefined` if there is no error.
    */
-  private validateTestStep(step: ITestStep): string | undefined {
-    if (!(step.type === "testStep")) {
-      return undefined;
-    }
-
-    if (!step.action) {
-      return `Missing "Action"`;
-    }
-
+  private validateTestStep(step: ITestStepRegular): string | undefined {
     const actionType = step.action! as unknown as ActionType;
     const actionValidator = actionValidatorRegistryDotnet.get(actionType);
 
