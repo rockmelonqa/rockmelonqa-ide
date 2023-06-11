@@ -16,9 +16,9 @@ export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: Prog
   info("# GENERATE CODE #");
   info("#################");
 
-  const projMeta = await createSourceProjectMetadata(rmprojFile, progressNotify);
+  const sourceProjMeta = await createSourceProjectMetadata(rmprojFile, progressNotify);
 
-  const validationErrors = await CodegenSourceProjectValidator.validate();
+  const validationErrors = new CodegenSourceProjectValidator(sourceProjMeta).validate();
 
   if (validationErrors.length) {
     progressNotify({ type: "validation-errors", log: `Validation of source files returned errors`, data: validationErrors });
@@ -46,7 +46,7 @@ export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: Prog
   await copyCustomCode(rmprojFile, outputDir, progressNotify);
 
   const writeFile = buildWriteFileFn(rmprojFile, progressNotify);
-  const codegen = CodeGenFactory.newInstance(projMeta);
+  const codegen = CodeGenFactory.newInstance(sourceProjMeta);
   await codegen.generateCode(true, writeFile);
 
   // Done

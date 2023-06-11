@@ -100,3 +100,23 @@ export interface IOutputProjectMetadata {
 }
 
 export type ReturnedLocatorType = "IFrameLocator" | "ILocator" | "FrameLocator" | "Locator";
+
+export class SourceFileValidationError {
+  /** Name of the file */
+  readonly fileName: string;
+  /** Full path of the file */
+  readonly filePath: string;
+  /** Line number (i.e step index) of the error step */
+  readonly lineNumber: number;
+  /** Error message */
+  readonly message: string;
+  /**
+   *
+   */
+  constructor(fileName: string, filePath: string, lineNumber: number, message: string) {
+    this.fileName = fileName;
+    this.filePath = filePath;
+    this.lineNumber = lineNumber;
+    this.message = message;
+  }
+}
