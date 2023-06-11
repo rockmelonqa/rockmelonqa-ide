@@ -44,13 +44,17 @@ export const stringResKeys = {
         thousandsDelimeter: "culture.thousandsDelimeter",
         timeFormat: "culture.timeFormat",
     },
-    deletePageConfirmationDialog: {
-        dialogContent: "deletePageConfirmationDialog.dialogContent",
-        dialogTitle: "deletePageConfirmationDialog.dialogTitle",
+    deletePageWarningDialog: {
+        dialogContent: "deletePageWarningDialog.dialogContent",
+        dialogTitle: "deletePageWarningDialog.dialogTitle",
     },
     deleteTestCaseConfirmationDialog: {
+        dialogContent: "deleteTestCaseConfirmationDialog.dialogContent",
         dialogTitle: "deleteTestCaseConfirmationDialog.dialogTitle",
-        relatedSuitesMessage: "deleteTestCaseConfirmationDialog.relatedSuitesMessage",
+    },
+    deleteTestRoutineWarningDialog: {
+        dialogContent: "deleteTestRoutineWarningDialog.dialogContent",
+        dialogTitle: "deleteTestRoutineWarningDialog.dialogTitle",
     },
     fileExplorer: {
         newFile: "fileExplorer.newFile",

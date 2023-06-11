@@ -344,10 +344,6 @@
 {/if}
 
 <style>
-    :global(.modal-title) {
-        color: var(--color-brand);
-    }
-
     a {
         color: var(--color-brand);
         cursor: pointer;

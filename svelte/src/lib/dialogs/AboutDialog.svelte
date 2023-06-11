@@ -156,8 +156,3 @@
     </div>
 {/if}
 
-<style>
-    :global(.modal-title) {
-        color: var(--color-brand);
-    }
-</style>
