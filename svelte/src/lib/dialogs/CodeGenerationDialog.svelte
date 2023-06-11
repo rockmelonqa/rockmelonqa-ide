@@ -314,10 +314,6 @@
 {/if}
 
 <style>
-    :global(.modal-title) {
-        color: var(--color-brand);
-    }
-
     .warning {
         color: var(--color-alert--bright);
     }

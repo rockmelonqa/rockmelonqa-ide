@@ -2,8 +2,9 @@
     import { AppActionType, appContextKey, type IAppContext } from "$lib/context/AppContext";
     import { stringResKeys } from "$lib/context/StringResKeys";
     import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
-    import DeletePageConfirmationDialog from "$lib/dialogs/DeletePageConfirmationDialog.svelte";
+    import DeletePageWarningDialog from "$lib/dialogs/DeletePageWarningDialog.svelte";
     import DeleteTestCaseConfirmationDialog from "$lib/dialogs/DeleteTestCaseConfirmationDialog.svelte";
+    import DeleteTestRoutineWarningDialog from "$lib/dialogs/DeleteTestRoutineWarningDialog.svelte";
     import { fileSystem } from "$lib/ipc";
     import type { IFileInfo } from "$lib/models";
     import { StandardFolder, type ITestCase } from "rockmelonqa.common";
@@ -174,12 +175,14 @@
             return;
         } else if (type === FileType.TCase && (await onDeleteTestCase())) {
             return;
+        } else if (type === FileType.TRoutine && (await onDeleteTestRoutine())) {
+            return;
         }
 
         await doDeleteFile();
     };
 
-    /** Handle deleting a file/folder */
+    // Handle deleting a file/folder
     const doDeleteFile = async () => {
         const response = await fileSystem.deleteFileSystem(fileSystemPath);
         if (!response.isSuccess) {
@@ -314,6 +317,35 @@
     };
 
     /**************************************
+     * Handle page deletion
+     ***************************************/
+    let showDeletePageWarningDialog: boolean = false;
+    let relatedTestCasePaths: string[] = [];
+    let relatedTestRoutinePaths: string[] = [];
+
+    const onDeletePage = async (): Promise<boolean> => {
+        const page = Array.from($appState.pages.values()).find((p) => p.filePath === fileSystemPath);
+        if (!page) {
+            return false;
+        }
+
+        relatedTestCasePaths = Array.from($appState.testCases.values())
+            .filter((tc) => tc.steps.some((s) => s.type === 'testStep' && s.page === page.id))
+            .map((tc) => tc.filePath).sort();
+        
+        relatedTestRoutinePaths = Array.from($appState.testRoutines.values())
+            .filter((tr) => tr.steps.some((s) => s.page === page.id))
+            .map((tr) => tr.filePath).sort();
+        
+        if (relatedTestCasePaths.length > 0 || relatedTestRoutinePaths.length > 0) {
+            showDeletePageWarningDialog = true;
+            return true;
+        }
+
+        return false;
+    }
+
+    /**************************************
      * Handle test case deletion
      ***************************************/
     let showDeleteTestCaseConfirmationDialog: boolean = false;
@@ -341,33 +373,26 @@
     };
 
     /**************************************
-     * Handle page deletion
+     * Handle test routine deletion
      ***************************************/
-    let showDeletePageConfirmationDialog: boolean = false;
-    let relatedTestCasePaths: string[] = [];
-    let relatedTestRoutinePaths: string[] = [];
-
-    const onDeletePage = async (): Promise<boolean> => {
-        const page = Array.from($appState.pages.values()).find((p) => p.filePath === fileSystemPath);
-        if (!page) {
+    let showDeleteTestRoutineWarningDialog: boolean = false;
+    const onDeleteTestRoutine = async (): Promise<boolean> => {
+        const testRoutine = Array.from($appState.testRoutines.values()).find((tr) => tr.filePath === fileSystemPath);
+        if (!testRoutine) {
             return false;
         }
 
         relatedTestCasePaths = Array.from($appState.testCases.values())
-            .filter((tc) => tc.steps.some((s) => s.type === 'testStep' && s.page === page.id))
+            .filter((tc) => tc.steps.some((s) => s.type === 'routine' && s.routine === testRoutine.id))
             .map((tc) => tc.filePath).sort();
         
-        relatedTestRoutinePaths = Array.from($appState.testRoutines.values())
-            .filter((tr) => tr.steps.some((s) => s.page === page.id))
-            .map((tr) => tr.filePath).sort();
-        
-        if (relatedTestCasePaths.length > 0 || relatedTestRoutinePaths.length > 0) {
-            showDeletePageConfirmationDialog = true;
+        if (relatedTestCasePaths.length > 0) {
+            showDeleteTestRoutineWarningDialog = true;
             return true;
         }
 
         return false;
-    }
+    };
 </script>
 
 <div class={containerClass}>
@@ -452,12 +477,10 @@
     </Menu>
 {/if}
 
-<DeletePageConfirmationDialog
-    bind:showDialog={showDeletePageConfirmationDialog}
-    pageFilePath={fileSystemPath}
+<DeletePageWarningDialog
+    bind:showDialog={showDeletePageWarningDialog}
     testCaseFilePaths={relatedTestCasePaths}
     testRoutineFilePaths={relatedTestRoutinePaths}
-    on:deleteConfirmed={doDeleteFile}
 />
 
 <DeleteTestCaseConfirmationDialog
@@ -465,4 +488,9 @@
     testCaseFilePath={fileSystemPath}
     suiteFilePaths={relatedTestSuitePaths}
     on:deleteConfirmed={doDeleteFile}
+/>
+
+<DeleteTestRoutineWarningDialog
+    bind:showDialog={showDeleteTestRoutineWarningDialog}
+    testCaseFilePaths={relatedTestCasePaths}
 />

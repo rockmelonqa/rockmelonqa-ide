@@ -243,12 +243,6 @@ input.folder-picker-field-input.folder-picker-field-error:focus {
     --toastWidth: 20rem;
 }
 
-.truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 /*********************************************
  * SF-PRO fonts
  ********************************************/
@@ -453,4 +447,17 @@ input.folder-picker-field-input.folder-picker-field-error:focus {
 .tab-item-title-container:not(.active):not(.dirty):hover .close-button,
 .tab-item-title-container.dirty .tab-button:hover .close-button {
     display: inline-block;
+}
+
+/*********************************************
+ * Others
+ ********************************************/
+.modal-title {
+    color: var(--color-brand);
+}
+
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

@@ -73,7 +73,7 @@
           <div class="modal-content mb-8 flex flex-col gap-y-4">
             {#if suiteRelPaths.length}
               <div>
-                {uiContext.str(stringResKeys.deleteTestCaseConfirmationDialog.relatedSuitesMessage)}
+                {uiContext.str(stringResKeys.deleteTestCaseConfirmationDialog.dialogContent)}
               </div>
               <ul class="list-disc list-inside">
                 {#each suiteRelPaths as relatedSuite}
@@ -97,9 +97,3 @@
     </div>
   </div>
 {/if}
-
-<style>
-  :global(.modal-title) {
-    color: var(--color-brand);
-  }
-</style>

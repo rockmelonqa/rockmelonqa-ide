@@ -5,10 +5,8 @@
   import { appContextKey, type IAppContext } from "$lib/context/AppContext";
   import { stringResKeys } from "$lib/context/StringResKeys";
   import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
-  import { StandardFolder, type ITestSuite, type ITestCase, type ITestRoutine } from "rockmelonqa.common";
-  import { createEventDispatcher, getContext, onDestroy, onMount } from "svelte";
-  import { fileSystem } from "$lib/ipc";
-    import type { IPage } from "rockmelonqa.common/file-defs/pageFile";
+  import { StandardFolder } from "rockmelonqa.common";
+  import { getContext, } from "svelte";
 
   let uiContext = getContext(uiContextKey) as IUiContext;
   let appContext = getContext(appContextKey) as IAppContext;
@@ -16,8 +14,6 @@
 
   /** Toggle on dialog */
   export let showDialog: boolean = false;
-
-  export let pageFilePath: string = '';
 
   export let testCaseFilePaths: string[];
   export let testRoutineFilePaths: string[];
@@ -44,42 +40,8 @@
       uiContext.pathSeparator);
   });
 
-  const dispatch = createEventDispatcher();
-
-  const handleDeleteClick = async () => {
-    const fileContent = await fileSystem.readFile(pageFilePath);
-    if (fileContent) {
-      const page = JSON.parse(fileContent) as IPage;    
-      await removePageFromTestCases(page.id);
-      await removePageFromTestRoutines(page.id);
-    }
-
-    dispatch("deleteConfirmed");
-    showDialog = false;
-  };
   const handleCancelClick = () => {
     showDialog = false;
-  };
-
-  const removePageFromTestCases = async (pageId: string) => {
-    for (let testCaseFilePath of testCaseFilePaths) {
-      const fileContent = await fileSystem.readFile(testCaseFilePath);
-      if (fileContent) {
-        const testCase = JSON.parse(fileContent) as ITestCase;
-        testCase.steps = testCase.steps.filter((s) => !(s.type === 'testStep' && s.page === pageId))
-        await fileSystem.writeFile(testCaseFilePath, JSON.stringify(testCase, null, 4));
-      }
-    }
-  };
-  const removePageFromTestRoutines = async (pageId: string) => {
-    for (let testRoutineFilePath of testRoutineFilePaths) {
-      const fileContent = await fileSystem.readFile(testRoutineFilePath);
-      if (fileContent) {
-        const testRoutine = JSON.parse(fileContent) as ITestRoutine;
-        testRoutine.steps = testRoutine.steps.filter((s) => !(s.type === 'testStep' && s.page === pageId))
-        await fileSystem.writeFile(testRoutineFilePath, JSON.stringify(testRoutine, null, 4));
-      }
-    }
   };
 </script>
 
@@ -93,12 +55,12 @@
                     text-left shadow-xl transform transition-all max-w-xl w-full"
                 >
                     <div class="modal-title text-xl leading-6 font-bold mb-8">
-                        {uiContext.str(stringResKeys.deletePageConfirmationDialog.dialogTitle)}
+                        {uiContext.str(stringResKeys.deletePageWarningDialog.dialogTitle)}
                     </div>
                     <div class="modal-content mb-8 flex flex-col gap-y-4">
                         {#if testCaseRelPaths.length > 0 || testRoutineRelPaths.length > 0}
                             <div>
-                                {uiContext.str(stringResKeys.deletePageConfirmationDialog.dialogContent)}
+                                {uiContext.str(stringResKeys.deletePageWarningDialog.dialogContent)}
                             </div>
                             <ul class="list-disc list-inside">
                                 {#each testCaseRelPaths as path}
@@ -114,11 +76,6 @@
                     </div>
                     <div class="modal-buttons flex justify-start items-end gap-x-4">
                         <div class="ml-auto">
-                            <PrimaryButton
-                                label={uiContext.str(stringResKeys.general.delete)}
-                                class="mr-4"
-                                on:click={handleDeleteClick}
-                            />
                             <StandardButton
                                 label={uiContext.str(stringResKeys.general.cancel)}
                                 on:click={handleCancelClick}
@@ -130,9 +87,3 @@
         </div>
     </div>
 {/if}
-
-<style>
-    :global(.modal-title) {
-        color: var(--color-brand);
-    }
-</style>
