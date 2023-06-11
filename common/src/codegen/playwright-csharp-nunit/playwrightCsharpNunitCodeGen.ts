@@ -179,7 +179,7 @@ export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implem
         pageItems.push(
           this._templateProvider.getLocator({
             elementName: upperCaseFirstChar(element.name!),
-            locatorStr: element.locator!,
+            locatorStr: element.locator || "",
             locatorType: element.findBy!,
             description: element.description!,
             hasParams: hasPlaceholder(element.locator!),

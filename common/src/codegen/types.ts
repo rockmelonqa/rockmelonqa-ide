@@ -96,7 +96,7 @@ export interface IOutputProjectMetadata {
   suites: ISuiteInfo[];
   cases: ITestCaseInfo[];
   pages: IPageInfo[];
-  error?: { message: string };
+  error?: { message: string; data?: string };
 }
 
 export type ReturnedLocatorType = "IFrameLocator" | "ILocator" | "FrameLocator" | "Locator";
