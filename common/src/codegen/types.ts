@@ -1,8 +1,13 @@
 import { ActionType, LocatorType } from "../file-defs";
+import { IProgressEvent } from "../ipc-defs";
 
 export interface ICodeGen {
   generateCode: (full: boolean, writeFile: (path: string, content: string) => Promise<void>) => Promise<string>;
 }
+
+export type ProgressEventCallback = (event: IProgressEvent) => void;
+
+export type WriteFileFn = (path: string, content: string) => Promise<void>;
 
 export interface IActionTemplateParam {
   pageName: string;
@@ -91,7 +96,30 @@ export interface IOutputProjectMetadata {
   suites: ISuiteInfo[];
   cases: ITestCaseInfo[];
   pages: IPageInfo[];
-  error?: { message: string };
+  error?: { message: string; data?: string };
 }
 
 export type ReturnedLocatorType = "IFrameLocator" | "ILocator" | "FrameLocator" | "Locator";
+
+export class SourceFileValidationError {
+  /** Name of the file */
+  readonly fileName: string;
+  /** Full path of the file */
+  readonly filePath: string;
+  /** Line number (i.e step index) of the error step */
+  readonly lineNumber: number;
+  /** Error message TEMPLATE, which might contain placeholders for filling with StringRes */
+  readonly message: string;
+  /** Action type */
+  readonly actionType?: ActionType;
+  /**
+   *
+   */
+  constructor(fileName: string, filePath: string, lineNumber: number, message: string, actionType?: ActionType) {
+    this.fileName = fileName;
+    this.filePath = filePath;
+    this.lineNumber = lineNumber;
+    this.message = message;
+    this.actionType = actionType;
+  }
+}

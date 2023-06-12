@@ -11,8 +11,7 @@ import {
 } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
-import { createOutputProjectMetadata } from "../codegen";
-import { ICodeGen } from "../types";
+import { ICodeGen, WriteFileFn } from "../types";
 import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
 import { MsTestProjMeta } from "./msTestProjMeta";
 import { PlaywrightCsharpMsTestTemplatesProvider } from "./playwrightCsharpMsTestTemplatesProvider";
@@ -21,6 +20,7 @@ import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfo
 import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCsharpCodeGen";
 import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
+import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
 
 export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen implements ICodeGen {
   /**
@@ -39,7 +39,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
   }
 
   /** Generate MsTest project */
-  public async generateCode(full: boolean, writeFile: (path: string, content: string) => Promise<void>): Promise<string> {
+  public async generateCode(full: boolean, writeFile: WriteFileFn): Promise<string> {
     await this.generatePageFiles(writeFile);
     await this.generateCaseFiles(writeFile);
     await this.generateRoutineFiles(writeFile);
@@ -54,7 +54,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     return "";
   }
 
-  private async generateProjectFiles(writeFile: (path: string, content: string) => Promise<void>) {
+  private async generateProjectFiles(writeFile: WriteFileFn) {
     // # Generate full project files
     // Files:
     //     - {Namespace}.csproj
@@ -71,13 +71,13 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
   }
 
-  private async generateMetaFiles(writeFile: (path: string, content: string) => Promise<void>) {
+  private async generateMetaFiles(writeFile: WriteFileFn) {
     // Write output project metadata
     const outputProjectMetadata = await createOutputProjectMetadata(this._rmprojFile);
     await writeFile(StandardOutputFile.MetaData, JSON.stringify(outputProjectMetadata, null, 2));
   }
 
-  private async generateSupportFiles(writeFile: (path: string, content: string) => Promise<void>) {
+  private async generateSupportFiles(writeFile: WriteFileFn) {
     // Filename: PageDefinitions.cs
     await writeFile(
       `${StandardOutputFile.PageDefinitions}${this._outputFileExt}`,
@@ -103,7 +103,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     );
   }
 
-  private async generateSuiteFiles(writeFile: (path: string, content: string) => Promise<void>) {
+  private async generateSuiteFiles(writeFile: WriteFileFn) {
     for (let { content: testsuite } of this._projMeta.testSuites) {
       let outputFileRelPath = this._outProjMeta.get(testsuite.id)!.outputFileRelPath;
       let testClassContent = this.generateTestSuiteFile(
@@ -114,7 +114,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     }
   }
 
-  private async generatePageFiles(writeFile: (path: string, content: string) => Promise<void>) {
+  private async generatePageFiles(writeFile: WriteFileFn) {
     for (let page of this._projMeta.pages) {
       let pageContent = this.generatePage(page.content);
       let fileRelPath = this._outProjMeta.get(page.content.id)!.outputFileRelPath;
@@ -122,7 +122,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     }
   }
 
-  private async generateCaseFiles(writeFile: (path: string, content: string) => Promise<void>) {
+  private async generateCaseFiles(writeFile: WriteFileFn) {
     for (let { content: testCase } of this._projMeta.testCases) {
       let testClassContent = this.generateTestCaseFile(
         testCase,
@@ -135,7 +135,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     }
   }
 
-  private async generateRoutineFiles(writeFile: (path: string, content: string) => Promise<void>) {
+  private async generateRoutineFiles(writeFile: WriteFileFn) {
     for (let { content: testRoutine } of this._projMeta.testRoutines) {
       const datasets: IDataSetInfo[] = generateDatasetInfos(testRoutine);
       const testRoutinesClasses: string[] = [];
@@ -201,7 +201,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
         pageItems.push(
           this._templateProvider.getLocator({
             elementName: element.name!,
-            locatorStr: element.locator!,
+            locatorStr: element.locator || "",
             locatorType: element.findBy!,
             description: element.description!,
             hasParams: hasPlaceholder(element.locator!),

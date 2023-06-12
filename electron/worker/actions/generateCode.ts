@@ -8,38 +8,38 @@ import { WorkerAction, WorkerMessage } from '../worker';
 import { IActionResult } from './shared';
 
 export const generateCode = async function (
-    rmprojFile: IRmProjFile,
-    progressNotify: (event: IProgressEvent) => void
+  rmprojFile: IRmProjFile,
+  progressNotify: (event: IProgressEvent) => void
 ): Promise<IActionResult> {
-    return await new Promise<IActionResult>((rs, _) => {
-        const workerPath = path.join(__dirname, '../worker.js');
-        const worker = new Worker(workerPath);
+  return await new Promise<IActionResult>((rs, _) => {
+    const workerPath = path.join(__dirname, '../worker.js');
+    const worker = new Worker(workerPath);
 
-        worker.on('message', (event: IProgressEvent) => {
-            if (event.type === 'finish') {
-                rs({ isSuccess: true });
-            } else {
-                progressNotify({
-                    ...event,
-                    type: `gen-code:${event.type}`,
-                });
-            }
+    worker.on('message', (event: IProgressEvent) => {
+      if (event.type === 'finish') {
+        rs({ isSuccess: true });
+      } else {
+        progressNotify({
+          ...event,
+          type: `gen-code:${event.type}`,
         });
-
-        worker.on('error', (error: Error) => {
-            console.error(error);
-            rs({ isSuccess: false, errorMessage: String(error) });
-        });
-
-        worker.postMessage({
-            action: WorkerAction.GenCode,
-            rmProjectFile: rmprojFile,
-        } as WorkerMessage);
+      }
     });
+
+    worker.on('error', (error: Error) => {
+      rs({ isSuccess: false, errorMessage: String(error), data: error.stack });
+    });
+
+    worker.postMessage({
+      action: WorkerAction.GenCode,
+      rmProjectFile: rmprojFile,
+    } as WorkerMessage);
+  });
 };
 
 export const doGenerateCode = async (port: MessagePort | null, rmProjectFile: IRmProjFile) => {
-    await genCode(rmProjectFile, (event: IProgressEvent) => port?.postMessage(event));
-
+  const success = await genCode(rmProjectFile, (event: IProgressEvent) => port?.postMessage(event));
+  if (success) {
     port?.postMessage({ type: 'finish' } as IProgressEvent);
+  }
 };

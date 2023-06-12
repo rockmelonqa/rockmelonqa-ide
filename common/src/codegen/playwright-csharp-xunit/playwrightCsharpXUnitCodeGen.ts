@@ -13,7 +13,6 @@ import {
 } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
-import { createOutputProjectMetadata } from "../codegen";
 import { ICodeGen } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
@@ -25,6 +24,7 @@ import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCs
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfos";
+import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
 
 type WriteFileFn = (path: string, content: string) => Promise<void>;
 
@@ -204,7 +204,7 @@ export class PlaywrightCsharpXUnitCodeGen extends PlaywrightCsharpCodeGen implem
         pageItems.push(
           this._templateProvider.getLocator({
             elementName: upperCaseFirstChar(element.name!),
-            locatorStr: element.locator!,
+            locatorStr: element.locator || "",
             locatorType: element.findBy!,
             description: element.description!,
             hasParams: hasPlaceholder(element.locator!),

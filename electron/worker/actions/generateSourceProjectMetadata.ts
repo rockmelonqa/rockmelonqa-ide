@@ -2,7 +2,7 @@ import path from 'path';
 import { Worker } from 'worker_threads';
 
 import { IProgressEvent, IRmProjFile } from 'rockmelonqa.common';
-import { createSourceProjectMetadata } from 'rockmelonqa.common/codegen/codegen';
+import { createSourceProjectMetadata } from 'rockmelonqa.common/codegen/codegenSourceProjectMeta';
 import { MessagePort } from 'worker_threads';
 import { WorkerAction, WorkerMessage } from '../worker';
 import { IActionResult } from './shared';

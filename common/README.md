@@ -23,3 +23,7 @@ For output Node project, run `npm i` before running test.
 - All public files (modules) of `common` package must be exported in `common/index.ts`
 
 - Code files in Svelte app must import only from root namespace `rockmelonqa.common`, `rockmelonqa.common/file-defs`, `rockmelonqa.common/ipc-defs`. Do not import files/modules in other sub namespaces: `file-defs`, `ipc-defs`, those are specific for Electron app;
+
+# Run Tests
+
+Open `common` in a separate vscode window to run the jest tests.

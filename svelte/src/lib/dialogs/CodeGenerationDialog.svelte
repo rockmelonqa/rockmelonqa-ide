@@ -10,9 +10,14 @@
     import WarningIcon from "$lib/icons/WarningIcon.svelte";
     import { codeGenerator } from "$lib/ipc";
     import _ from "lodash";
-    import type { Action, IIpcGenericResponse, IProgressDetail } from "rockmelonqa.common";
+    import type { Action, ActionType, IIpcGenericResponse, IProgressDetail } from "rockmelonqa.common";
     import { getContext, onDestroy, onMount } from "svelte";
     import { writable } from "svelte/store";
+    import { SourceProjectValidator } from "./CodeGenerationDialog/sourceProjectValidator";
+    import { toPrerequisiteText } from "./CodeGenerationDialog/utils";
+    import type { SourceFileValidationError } from "rockmelonqa.common/codegen/types";
+    import { getActionTypeDropDownOptions } from "$lib/utils/dropdowns";
+    import type { IDropdownOption } from "$lib/controls/DropdownField";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -20,6 +25,8 @@
 
     let appContext = getContext(appContextKey) as IAppContext;
     let { state: appState, dispatch: appStateDispatch } = appContext;
+
+    let actionTypeOptions: IDropdownOption[] = getActionTypeDropDownOptions(uiContext);
 
     export let showDialog: boolean = false;
 
@@ -39,8 +46,9 @@
     $: hasLogs = $logs.length > 0;
     let showLogs: boolean = false;
     let logFile: string = "";
+    let validationErrors: SourceFileValidationError[] = [];
 
-    onMount(async () => {
+    const registerEvents = () => {
         registerListener(
             codeGenerator.onValidateInput((data: IProgressDetail) => {
                 spinnerText = uiContext.str(stringResKeys.codeGenerationDialog.validateInputMsg);
@@ -64,6 +72,7 @@
 
         registerListener(
             codeGenerator.onGenerateCode((data: IProgressDetail) => {
+                console.log("onGenerateCode", data);
                 spinnerText = uiContext.str(stringResKeys.codeGenerationDialog.generateCodeMsg);
                 addLog(data.log);
             })
@@ -91,6 +100,16 @@
         );
 
         registerListener(
+            codeGenerator.onValidationErrors((detail: IProgressDetail) => {
+                addLog(detail.log);
+                validationErrors = Array.from(detail.data) as SourceFileValidationError[];
+                showWarning = true;
+                isProcessing = false;
+                showLogs = true;
+            })
+        );
+
+        registerListener(
             codeGenerator.onFinish((response: IIpcGenericResponse<{ logFile: string }>) => {
                 const { isSuccess, errorMessage, data } = response;
                 if (isSuccess) {
@@ -109,6 +128,10 @@
                 isProcessing = false;
             })
         );
+    };
+
+    onMount(async () => {
+        registerEvents();
 
         let hasIssue = false;
         try {
@@ -120,7 +143,7 @@
             }
 
             // verify duplicated objects
-            let duplicateObjects = await findDuplicatedObjects();
+            let duplicateObjects = await SourceProjectValidator.findDuplicatedObjects($appState.projectFile!);
             if (duplicateObjects.length) {
                 dialogMessage = `"${duplicateObjects[0]}" ${uiContext.str(stringResKeys.general.and)} "${
                     duplicateObjects[1]
@@ -135,57 +158,6 @@
             isPrerequiring = false;
         }
     });
-
-    /** Returns the first pair duplicated items (cases, pages, suites) by outputFilePath */
-    const findDuplicatedObjects = async (): Promise<string[]> => {
-        const meta = await codeGenerator.generateOutputProjectMetadata($appState.projectFile!);
-        if (!meta) {
-            return [];
-        }
-
-        const duplicateTestCases = findDuplicatedItems(meta.cases);
-        if (duplicateTestCases.length) {
-            return duplicateTestCases;
-        }
-
-        const duplicatePages = findDuplicatedItems(meta.pages);
-        if (duplicatePages.length) {
-            return duplicatePages;
-        }
-
-        const duplicateTestSuites = findDuplicatedItems(meta.suites);
-        if (duplicateTestSuites.length) {
-            return duplicateTestSuites;
-        }
-
-        return [];
-    };
-
-    /** Returns the first pair duplicated items by outputFilePath */
-    const findDuplicatedItems = (items: { outputFilePath: string; inputFileRelPath: string }[]): string[] => {
-        // Group the items by "outputFilePath", the find the first group that has more than 1 item.
-        const groups = _(
-            items.map((item) => ({
-                inputFileRelPath: item.inputFileRelPath,
-                outputFilePath: item.outputFilePath.toLocaleLowerCase(),
-            }))
-        )
-            .groupBy("outputFilePath")
-            .map(function (items, outputFilePath) {
-                return {
-                    outputFilePath,
-                    inputFileRelPaths: _.map(items, "inputFileRelPath"),
-                };
-            })
-            .value();
-
-        const duplicateGroup = groups.find((g) => g.inputFileRelPaths.length > 1);
-        if (duplicateGroup) {
-            const [file1Name, file2Name] = duplicateGroup?.inputFileRelPaths;
-            return [file1Name, file2Name];
-        }
-        return [];
-    };
 
     onDestroy(() => {
         cleanupFns.forEach((listener) => listener());
@@ -215,21 +187,23 @@
         showDialog = false;
     };
 
-    const toPrerequisiteText = (item: string) => {
-        switch (item) {
-            case "dotnet":
-                return "Dotnet 6.0 or higher";
-            case "node":
-                return "Node version 16.16 or higher";
-            case "pwsh":
-                return "Powershell (pwsh)";
-            default:
-                return "";
-        }
-    };
-
     const toggleLogs = () => {
         showLogs = !showLogs;
+    };
+
+    /** Generates the error message from the error message template by replacing the placeholder with StringRes */
+    const generateErrorMessage = (messageTemplate: string, actionType?: ActionType) => {
+        if (!actionType) {
+            return messageTemplate;
+        }
+        let regex = new RegExp(`{{${actionType}}}`);
+        let actionTypeOption = actionTypeOptions.find((option) => option.key === actionType);
+
+        if (!actionTypeOption) {
+            return messageTemplate.replace(regex, actionType);
+        }
+
+        return messageTemplate.replace(regex, actionTypeOption.text);
     };
 </script>
 
@@ -271,6 +245,17 @@
                                 <div class="logs h-96 overflow-y-auto border-y py-4 flex flex-col gap-y-2">
                                     {#each $logs as log}
                                         <p>{@html log.replace(new RegExp(uiContext.eol, "g"), "<br/>")}</p>
+                                    {/each}
+
+                                    {#each validationErrors as validationError}
+                                        <p>
+                                            {uiContext.str(stringResKeys.general.error)}: {`${
+                                                validationError.fileName
+                                            } - Line ${validationError.lineNumber}, ${generateErrorMessage(
+                                                validationError.message,
+                                                validationError.actionType
+                                            )}`}
+                                        </p>
                                     {/each}
                                 </div>
                                 {#if logFile}
