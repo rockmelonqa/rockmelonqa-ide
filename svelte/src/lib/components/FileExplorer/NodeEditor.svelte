@@ -1,21 +1,21 @@
 <script lang="ts">
-    import { createEventDispatcher, onMount } from 'svelte';
-    import FileIcon from '../FileIcon.svelte';
-    import { FileType } from '../FileType';
-    import { StandardFileExtension } from 'rockmelonqa.common';
+    import { createEventDispatcher, onMount } from "svelte";
+    import FileIcon from "../FileIcon.svelte";
+    import { FileType } from "../FileType";
+    import { StandardFileExtension } from "rockmelonqa.common";
 
     //*****************************************
     // Props
     //*****************************************
-    export let value: string = '';
+    export let value: string = "";
     export let type: FileType;
     export let level: number = 0;
 
     //*****************************************
     // Init
     //*****************************************
-    $: containerClass = 'treeview-item';
-    $: rootItemClass = 'treeview-item-root min-w-fit';
+    $: containerClass = "treeview-item";
+    $: rootItemClass = "treeview-item-root min-w-fit";
     $: rootItemStyle = `padding-left: calc(var(--f7-treeview-item-padding-left) + var(--f7-treeview-children-offset) * ${level})`;
 
     let inputElement: HTMLInputElement;
@@ -38,16 +38,16 @@
             return;
         }
 
-        dispatch('submit', { value: enhanceValue(value) });
+        dispatch("submit", { value: enhanceValue(value) });
     };
 
     const onKeyUp = (e: KeyboardEvent) => {
-        if (e.key === 'Enter') {
+        if (e.key === "Enter") {
             dispatched = true;
-            dispatch('submit', { value: enhanceValue(value) });
-        } else if (e.key === 'Escape') {
+            dispatch("submit", { value: enhanceValue(value) });
+        } else if (e.key === "Escape") {
             dispatched = true;
-            dispatch('cancel');
+            dispatch("cancel");
         }
     };
 
@@ -68,34 +68,38 @@
             return val + StandardFileExtension.TestSuite;
         }
 
+        if (type === FileType.Env && !val.endsWith(StandardFileExtension.Env)) {
+            return val + StandardFileExtension.Env;
+        }
+
         return val;
-    }
+    };
 </script>
 
 <div class={containerClass}>
-  <div class={rootItemClass} style={rootItemStyle}>
-    <div class="treeview-item-content">
-      <FileIcon {type} />
-      <input
-        type="text"
-        bind:this={inputElement}
-        bind:value
-        class="treeview-item-content-input block w-full text-base px-4 rounded h-8"
-        {...$$restProps}
-        on:blur={onBlur}
-        on:keyup={onKeyUp}
-      />
+    <div class={rootItemClass} style={rootItemStyle}>
+        <div class="treeview-item-content">
+            <FileIcon {type} />
+            <input
+                type="text"
+                bind:this={inputElement}
+                bind:value
+                class="treeview-item-content-input block w-full text-base px-4 rounded h-8"
+                {...$$restProps}
+                on:blur={onBlur}
+                on:keyup={onKeyUp}
+            />
+        </div>
     </div>
-  </div>
 </div>
 
 <style>
-  :global(.treeview-item-content-input) {
-    border-color: var(--color-input-border);
-  }
+    :global(.treeview-item-content-input) {
+        border-color: var(--color-input-border);
+    }
 
-  :global(.treeview-item-content-input:focus) {
-    border-color: var(--color-input-border--focus);
-    --tw-ring-color: var(--color-input-border--focus);
-  }
+    :global(.treeview-item-content-input:focus) {
+        border-color: var(--color-input-border--focus);
+        --tw-ring-color: var(--color-input-border--focus);
+    }
 </style>

@@ -83,7 +83,15 @@ export const stringResEn: IStringRes = {
         dialogContent: "This test routine is being used by following test case(s).",
         dialogTitle: "Warning",
     },
+    envEditor: {
+        actions: "Actions",
+        deleteRowConfirmation: "Are you sure to delete this row?", 
+        name: "Name",
+        value: "Value",
+        
+    },
     fileExplorer: {
+        newEnvFile: "New .env File",
         newFile: "New File",
         newFolder: "New Folder",
         newPage: "New Page",

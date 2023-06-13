@@ -2,6 +2,7 @@ import { StandardFileExtension } from 'rockmelonqa.common';
 
 /** File system (OS) type */
 export enum FileType {
+    Env = 'Env',
     File = 'File', // generic file type
     Folder = 'Folder',
     Page = 'Page', // Page definition file
@@ -22,6 +23,8 @@ export const getFileType = (fileName: string): FileType => {
     switch (ext) {
         case StandardFileExtension.Page:
             return FileType.Page;
+        case StandardFileExtension.Env:
+            return FileType.Env;
         case StandardFileExtension.Project:
             return FileType.RmProj;
         case StandardFileExtension.TestCase:

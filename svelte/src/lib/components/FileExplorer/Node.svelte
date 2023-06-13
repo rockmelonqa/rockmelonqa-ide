@@ -19,13 +19,7 @@
     import Menu from "./Menu.svelte";
     import MenuDivider from "./MenuDivider.svelte";
     import MenuItem from "./MenuItem.svelte";
-    import {
-        buildChildrenNodes,
-        extractPath,
-        Node as NodeInfo,
-        showMenuAt,
-        toFileSystemPath,
-    } from "./Node";
+    import { buildChildrenNodes, extractPath, Node as NodeInfo, showMenuAt, toFileSystemPath } from "./Node";
     import NodeEditor from "./NodeEditor.svelte";
 
     export let node: NodeInfo;
@@ -36,7 +30,7 @@
     let { state: appState, dispatch: appStateDispatch } = appContext;
 
     $: nodePath = node.toTreePath();
-    $: fileSystemPath = toFileSystemPath(nodePath, $appState.projectFile?.folderPath ?? '', uiContext.pathSeparator);
+    $: fileSystemPath = toFileSystemPath(nodePath, $appState.projectFile?.folderPath ?? "", uiContext.pathSeparator);
     $: label = node.name;
     $: type = node.type;
     $: hasChildren = node.hasChildren;
@@ -135,6 +129,22 @@
         typeToAdd = fileType;
     };
 
+    const isEnvFileNameValid = (fileName: string) => {
+        const nameAndExt = fileName.split(".");
+        if (nameAndExt.length != 2) {
+            return false;
+        }
+
+        const name = nameAndExt[0];
+
+        if (name) {
+            const regex = /^[A-Za-z0-9_-]+$/;
+            return regex.test(name);
+        }
+
+        return true;
+    };
+
     const handleMenuRename = () => {
         appStateDispatch({
             type: AppActionType.UpdateFile,
@@ -212,7 +222,7 @@
         addMode = false;
     };
 
-    const submitNew = async (e: any) => {      
+    const submitNew = async (e: any) => {
         // create file or folder
         const { value } = e.detail;
         if (value) {
@@ -220,6 +230,11 @@
             if (typeToAdd === FileType.Folder) {
                 fileSystem.createFolder(newPath);
             } else {
+                if (typeToAdd == FileType.Env) {
+                    if (!isEnvFileNameValid(value)) {
+                        return false;
+                    }
+                }
                 await fileSystem.writeFile(newPath, "");
             }
         }
@@ -262,6 +277,12 @@
                 value: { editMode: false },
             });
             return;
+        }
+
+        if (newName.split('.')[1] === FileType.Env.toLowerCase()) {
+            if (!isEnvFileNameValid(newName)) {
+                return;
+            }
         }
 
         // if change node name, invoke rename action
@@ -330,20 +351,22 @@
         }
 
         relatedTestCasePaths = Array.from($appState.testCases.values())
-            .filter((tc) => tc.steps.some((s) => s.type === 'testStep' && s.page === page.id))
-            .map((tc) => tc.filePath).sort();
-        
+            .filter((tc) => tc.steps.some((s) => s.type === "testStep" && s.page === page.id))
+            .map((tc) => tc.filePath)
+            .sort();
+
         relatedTestRoutinePaths = Array.from($appState.testRoutines.values())
             .filter((tr) => tr.steps.some((s) => s.page === page.id))
-            .map((tr) => tr.filePath).sort();
-        
+            .map((tr) => tr.filePath)
+            .sort();
+
         if (relatedTestCasePaths.length > 0 || relatedTestRoutinePaths.length > 0) {
             showDeletePageWarningDialog = true;
             return true;
         }
 
         return false;
-    }
+    };
 
     /**************************************
      * Handle test case deletion
@@ -362,13 +385,14 @@
 
         relatedTestSuitePaths = Array.from($appState.testSuites.values())
             .filter((ts) => ts.testcases.some((tcId) => tcId === testCase.id))
-            .map((ts) => ts.filePath).sort();
+            .map((ts) => ts.filePath)
+            .sort();
 
         if (relatedTestSuitePaths.length > 0) {
             showDeleteTestCaseConfirmationDialog = true;
             return true;
         }
-        
+
         return false;
     };
 
@@ -383,9 +407,10 @@
         }
 
         relatedTestCasePaths = Array.from($appState.testCases.values())
-            .filter((tc) => tc.steps.some((s) => s.type === 'routine' && s.routine === testRoutine.id))
-            .map((tc) => tc.filePath).sort();
-        
+            .filter((tc) => tc.steps.some((s) => s.type === "routine" && s.routine === testRoutine.id))
+            .map((tc) => tc.filePath)
+            .sort();
+
         if (relatedTestCasePaths.length > 0) {
             showDeleteTestRoutineWarningDialog = true;
             return true;
@@ -455,6 +480,11 @@
                 <MenuItem
                     label={uiContext.str(stringResKeys.fileExplorer.newTestSuite)}
                     on:click={() => handleMenuNew(FileType.TSuite)}
+                />
+            {:else if nodePath.includes(StandardFolder.Config)}
+                <MenuItem
+                    label={uiContext.str(stringResKeys.fileExplorer.newEnvFile)}
+                    on:click={() => handleMenuNew(FileType.Env)}
                 />
             {:else}
                 <MenuItem

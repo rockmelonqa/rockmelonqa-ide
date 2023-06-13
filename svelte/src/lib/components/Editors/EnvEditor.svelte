@@ -1,0 +1,336 @@
+<script lang="ts">
+    import { stringResKeys } from "$lib/context/StringResKeys";
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import type { IUiTheme } from "$lib/context/UiTheme";
+    import TextField from "$lib/controls/TextField.svelte";
+    import { FieldDataType, type IDictionary } from "$lib/form/FieldDef";
+    import { createFormContext } from "$lib/form/FormContext";
+    import { FormDataActionType } from "$lib/form/FormData";
+    import type { IFormDef } from "$lib/form/FormDef";
+    import { FormModeState } from "$lib/form/FormMode";
+    import { FormSerializer } from "$lib/form/FormSerializer";
+    import { ListDataActionType, createListDataContext } from "$lib/form/ListData";
+    import type { IListDef } from "$lib/form/ListDef";
+    import AddIcon from "$lib/icons/AddIcon.svelte";
+    import DeleteIcon from "$lib/icons/DeleteIcon.svelte";
+    import MoveDownIcon from "$lib/icons/MoveDownIcon.svelte";
+    import MoveUpIcon from "$lib/icons/MoveUpIcon.svelte";
+    import SaveIcon from "$lib/icons/SaveIcon.svelte";
+    import { fileSystem } from "$lib/ipc";
+    import { getLocatorTypeDropDownOptions } from "$lib/utils/dropdowns";
+    import { fileDefFactory } from "rockmelonqa.common";
+    import { createEventDispatcher, getContext, onMount } from "svelte";
+    import { v4 as uuidv4 } from "uuid";
+    import { AlertDialogButtons, AlertDialogType } from "../Alert";
+    import AlertDialog from "../AlertDialog.svelte";
+    import { appActionContextKey, type IAppActionContext } from "../Application";
+    import { combinePath } from "../FileExplorer/Node";
+    import IconLinkButton from "../IconLinkButton.svelte";
+    import { ListTableCellType } from "../ListTable";
+    import ListTable from "../ListTable.svelte";
+    import ListTableBodyCell from "../ListTableBodyCell.svelte";
+    import ListTableBodyRow from "../ListTableBodyRow.svelte";
+    import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
+    import PrimaryButton from "../PrimaryButton.svelte";
+    import { toTitle } from "./Editor";
+    import type { IEnvPage, IEnvSetting } from "rockmelonqa.common/file-defs/envFile";
+
+    const uiContext = getContext(uiContextKey) as IUiContext;
+
+    export let folderPath: string;
+    export let fileName: string;
+    $: filePath = combinePath([folderPath, fileName], uiContext.pathSeparator);
+
+    export let contentIndex: number;
+
+    const formDef: IFormDef = {
+        fields: {},
+    };
+    let formContext = createFormContext("envEditor", formDef, uiContext, FormModeState.Edit);
+    let {
+        mode: formMode,
+        modeDispatch: formModeDispatch,
+        data: formData,
+        dataDispatch: formDataDispatch,
+    } = formContext;
+
+    const listDef: IListDef = {
+        fields: {
+            id: {
+                dataType: FieldDataType.Text,
+                dataPath: "id",
+            },
+            name: {
+                dataType: FieldDataType.Text,
+                dataPath: "name",
+            },
+            value: {
+                dataType: FieldDataType.Text,
+                dataPath: "value",
+            },
+        },
+    };
+    let listDataContext = createListDataContext(listDef, uiContext);
+    let { value: listData, dispatch: listDataDispatch } = listDataContext;
+
+    $: title = toTitle(fileName);
+    const locatorTypeOptions = getLocatorTypeDropDownOptions(uiContext);
+
+    let deleteDialogType: AlertDialogType = AlertDialogType.None;
+    let indexToDelete: number;
+
+    const { registerOnSaveHandler, unregisterOnSaveHandler } = getContext(appActionContextKey) as IAppActionContext;
+    const dispatch = createEventDispatcher();
+
+    let focusFieldId = "";
+
+    onMount(async () => {
+        // default/empty data
+        let model = fileDefFactory.newEnvSettings();
+
+        // parse file content if any
+        const fileContent = await fileSystem.readFile(filePath);
+        if (fileContent) {
+            model = JSON.parse(fileContent) as IEnvPage;
+        }
+
+        const serializer = new FormSerializer(uiContext);
+        const fieldValues = serializer.deserialize(model, formDef.fields);
+        formDataDispatch({ type: FormDataActionType.Load, newValues: fieldValues });
+
+        const items = serializer.deserializeList(model.settings, listDef.fields);
+        listDataDispatch({ type: ListDataActionType.SetItems, items: items, hasMoreItems: false });
+
+        registerOnSaveHandler(contentIndex, doSave);
+
+        return () => {
+            unregisterOnSaveHandler(contentIndex);
+        };
+    });
+
+    const handleItemChange = (index: number, key: string, value: any) => {
+        const item = { ...$listData.items[index] };
+        item[key] = value;
+
+        listDataDispatch({
+            type: ListDataActionType.UpdateItem,
+            index,
+            item,
+        });
+
+        dispatchChange();
+    };
+
+    const dispatchChange = () => {
+        dispatch("change");
+    };
+
+    const handleDeleteClick = (index: number) => {
+        // Determine if this row has any input.
+        // If yes, show confirmation dialog. Otherwise, delete straight away
+        if (isEmptyItem($listData.items[index])) {
+            doDeleteRow(index);
+        } else {
+            deleteDialogType = AlertDialogType.Question;
+            indexToDelete = index;
+        }
+    };
+
+    const isEmptyItem = (item: IDictionary) => {
+        const ignoredProperties: string[] = ["id", "type"];
+        return Object.entries(item)
+            .filter(([key, value]) => !ignoredProperties.includes(key))
+            .map(([key, value]) => value)
+            .every((x) => !x);
+    };
+
+    const handleDeleteConfirmation = async (event: any) => {
+        if (event.detail.button === "delete") {
+            doDeleteRow(indexToDelete);
+        }
+    };
+
+    const doDeleteRow = (index: number) => {
+        listDataDispatch({
+            type: ListDataActionType.RemoveItem,
+            index: index,
+        });
+
+        dispatchChange();
+    };
+
+    const handleMoveDownClick = (index: number) => {
+        if (index >= 0 && index <= $listData.items.length - 2) {
+            listDataDispatch({
+                type: ListDataActionType.SwapItems,
+                indexA: index,
+                indexB: index + 1,
+            });
+
+            dispatchChange();
+        }
+    };
+
+    const handleMoveUpClick = (index: number) => {
+        if (index >= 1 && index <= $listData.items.length - 1) {
+            listDataDispatch({
+                type: ListDataActionType.SwapItems,
+                indexA: index,
+                indexB: index - 1,
+            });
+
+            dispatchChange();
+        }
+    };
+
+    const handleAdd = () => {
+        focusFieldId = `envEditor_${$listData.items.length}_name_input`;
+
+        listDataDispatch({
+            type: ListDataActionType.AppendItems,
+            items: [newConfig()],
+            hasMoreItems: false,
+        });
+
+        dispatchChange();
+    };
+
+    const newConfig = (): IEnvSetting => {
+        return {
+            id: uuidv4(),
+            name: "",
+            value: "",
+        };
+    };
+
+    const handleSave = async () => {
+        await doSave();
+    };
+
+    const doSave = async (): Promise<boolean> => {
+        if (isDataValid) {
+            const serializer = new FormSerializer(uiContext);
+            const model = serializer.serialize($formData.values, formDef.fields);
+
+            const items = $listData.items.filter((r) => !isEmptyItem(r));
+            const settings = serializer.serializeList(items, listDef.fields);
+            const data = { ...model, settings };
+            await fileSystem.writeFile(filePath, JSON.stringify(data, null, 4));
+
+            dispatch("saved");
+            return true;
+        }
+
+        formDataDispatch({ type: FormDataActionType.ShowAllErrors });
+        return false;
+    };
+
+    const isNameValid = (name: string) => {
+        if (name) {
+            const regex = /^[A-Za-z0-9_-]+$/;
+            return regex.test(name);
+        }
+
+        return true;
+    };
+    $: isListDataValid = $listData.items.every((item) => isNameValid(item.name));
+    $: isDataValid = $formData.isValid && isListDataValid;
+</script>
+
+<div class="page-definition-editor p-8">
+    <div class="font-semibold text-xl mb-4">{title}</div>
+
+    <ListTable
+        class="table-fixed mb-8"
+        isProcessing={$formMode.isLoading() || $formMode.isProcessing()}
+        isEmpty={false}
+    >
+        <svelte:fragment slot="header">
+            <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-1/2">
+                {uiContext.str(stringResKeys.envEditor.name)}
+            </ListTableHeaderCell>
+            <ListTableHeaderCell type={ListTableCellType.Last} class="text-left w-1/2">
+                {uiContext.str(stringResKeys.envEditor.value)}
+            </ListTableHeaderCell>
+            <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-40">
+                {uiContext.str(stringResKeys.envEditor.actions)}
+            </ListTableHeaderCell>
+        </svelte:fragment>
+        <svelte:fragment slot="body">
+            {#each $listData.items as item, index (item.id)}
+                <ListTableBodyRow>
+                    <ListTableBodyCell type={ListTableCellType.First}>
+                        <TextField
+                            name={`${formContext.formName}_${index}_name`}
+                            value={item.name}
+                            on:input={(event) => handleItemChange(index, "name", event.detail.value)}
+                            focus={`${formContext.formName}_${index}_name_input` === focusFieldId}
+                        />
+                    </ListTableBodyCell>
+
+                    <ListTableBodyCell type={ListTableCellType.Last}>
+                        <TextField
+                            name={`${formContext.formName}_${index}_value`}
+                            value={item.value}
+                            on:input={(event) => handleItemChange(index, "value", event.detail.value)}
+                            focus={`${formContext.formName}_${index}_value_input` === focusFieldId}
+                        />
+                    </ListTableBodyCell>
+
+                    <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">
+                        <IconLinkButton
+                            on:click={() => handleDeleteClick(index)}
+                            title={uiContext.str(stringResKeys.general.delete)}
+                        >
+                            <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
+                        </IconLinkButton>
+                        {#if index > 0}
+                            <IconLinkButton
+                                on:click={() => handleMoveUpClick(index)}
+                                title={uiContext.str(stringResKeys.general.moveUp)}
+                            >
+                                <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>
+                            </IconLinkButton>
+                        {/if}
+                        {#if index < $listData.items.length - 1}
+                            <IconLinkButton
+                                on:click={() => handleMoveDownClick(index)}
+                                title={uiContext.str(stringResKeys.general.moveDown)}
+                            >
+                                <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>
+                            </IconLinkButton>
+                        {/if}
+                    </ListTableBodyCell>
+                </ListTableBodyRow>
+            {/each}
+        </svelte:fragment>
+    </ListTable>
+
+    <div class="flex items-center gap-x-2">
+        <IconLinkButton on:click={handleAdd}>
+            <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
+            <svelte:fragment slot="label">
+                {uiContext.str(stringResKeys.general.add)}
+            </svelte:fragment>
+        </IconLinkButton>
+
+        <div class="ml-auto">
+            <PrimaryButton on:click={handleSave} disabled={!isDataValid}>
+                <span class="flex items-center gap-x-2">
+                    <SaveIcon class="w-5 h-5" />
+                    {uiContext.str(stringResKeys.general.save)}
+                </span>
+            </PrimaryButton>
+        </div>
+    </div>
+</div>
+
+<AlertDialog
+    id="dialogDeleteRow"
+    bind:type={deleteDialogType}
+    buttons={AlertDialogButtons.DeleteCancel}
+    on:click={handleDeleteConfirmation}
+>
+    <div slot="title">{uiContext.str(stringResKeys.general.confirmation)}</div>
+    <div slot="content">{uiContext.str(stringResKeys.envEditor.deleteRowConfirmation)}</div>
+</AlertDialog>

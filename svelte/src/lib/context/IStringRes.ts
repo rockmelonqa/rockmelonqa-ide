@@ -9,6 +9,7 @@ export interface IStringRes {
     deleteTestCaseConfirmationDialog: IDeleteTestCaseConfirmationDialogStringRes;
     deleteTestRoutineWarningDialog: IDeleteTestRoutineWarningDialogStringRes;
     culture: ICultureStringRes;
+    envEditor: IEnvEditorStringRes; 
     fileExplorer: IFileExplorerStringRes;
     form: IFormStringRes;
     general: IGeneralStringRes;
@@ -94,7 +95,15 @@ export interface ICodeGenerationDialogStringRes {
     validateInputMsg: string;
 }
 
+export interface IEnvEditorStringRes {
+    actions: string;
+    deleteRowConfirmation: string;
+    name: string;
+    value: string;
+}
+
 export interface IFileExplorerStringRes {
+    newEnvFile: string;
     newFile: string;
     newFolder: string;
     newPage: string;
