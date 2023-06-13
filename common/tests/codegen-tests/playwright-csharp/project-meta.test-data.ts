@@ -16,6 +16,7 @@ export const createTestData = (): RmpSpec => {
       indentSize: 4,
       testIdAttributeName: "",
     },
+    configFiles: [],
     pages: [
       {
         id: "",
@@ -198,5 +199,6 @@ export const createTestData = (): RmpSpec => {
         testcases: ["fills"],
       },
     ],
+    outputFiles: [],
   };
 };

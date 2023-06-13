@@ -19,6 +19,7 @@ export const createPlaywrightNunitTestData = (): RmpSpec => {
       testIdAttributeName: "",
     },
 
+    configFiles: [],
     ...simpleRoutineTestData,
 
     outputFiles: [

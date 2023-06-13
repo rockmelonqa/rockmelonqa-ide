@@ -21,6 +21,7 @@ export const createPlaywrightMsTestTestData = (): RmpSpec => {
       testIdAttributeName: "",
     },
 
+    configFiles: [],
     ...simpleRoutineTestData,
 
     outputFiles: [

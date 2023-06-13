@@ -4,7 +4,7 @@ import fs from "fs";
 import fse from "fs-extra";
 import { v4 as uuidv4 } from "uuid";
 import { StandardFolder } from "../../src/file-defs/standardFolder";
-import { IPage, ITestCase, ITestSuite, ITestRoutine, OutputCodeFile, RmpSpec } from "./rm-project-spec.types";
+import { IPage, ITestCase, ITestSuite, ITestRoutine, OutputCodeFile, RmpSpec, IConfig } from "./rm-project-spec.types";
 import { IRmProj, IRmProjFile, StandardFileExtension } from "../../src";
 import { createDir, writeFile } from "./fsHelpers";
 
@@ -19,6 +19,7 @@ export const createRmTestProject = (rmpSpec: RmpSpec, projectDir: string): IRmPr
   };
 
   writeCustomCode(projectDir);
+  writeConfigFiles(rmpSpec.configFiles, projectDir);
   writePages(rmpSpec.pages, projectDir);
   writeTestRoutines(rmpSpec.testroutines, rmpSpec.pages, rmpSpec.testcases, projectDir);
   writeTestCases(rmpSpec.testcases, rmpSpec.pages, rmpSpec.testsuites, projectDir);
@@ -44,6 +45,17 @@ const wrriteTestProjectFile = (rmProj: IRmProj, projectName: string, projectDir:
     folderPath: projectDir,
   };
   writeFile(projFile, path.join(projectDir, fileName));
+};
+
+const writeConfigFiles = (configFiles: IConfig[], projectDir: string) => {
+  const configDir = path.join(projectDir, StandardFolder.Config);
+  createDir(configDir);
+
+  for (let configFile of configFiles) {
+    let filePath = path.join(configDir, `${configFile.name}.env`);
+    let fileContent = JSON.stringify({ settings: configFile.settings }, null, 2);
+    writeFile(fileContent, filePath);
+  }
 };
 
 const writePages = (pages: IPage[], projectDir: string) => {

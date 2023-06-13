@@ -18,6 +18,7 @@ export const createPlaywrightXUnitTestData = (): RmpSpec => {
       indentSize: 4,
       testIdAttributeName: "",
     },
+    configFiles: [],
 
     ...simpleRoutineTestData,
 

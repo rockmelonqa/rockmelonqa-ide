@@ -2,14 +2,14 @@ import os from "os";
 import fs from "fs";
 import path from "path";
 
-import { StandardFolder } from "../../../src/file-defs";
-import { IProgressEvent } from "../../../src/ipc-defs";
-import { createSourceProjectMetadata, generateCode } from "../../../src/codegen";
-import { prepareOutputProject, createRmTestProject } from "../../test-helpers/rm-project-generator";
-import { doAssert } from "../../test-helpers/assert-helper";
-import { createTempDir } from "../../test-helpers/fsHelpers";
+import { StandardFolder } from "../../../../src/file-defs";
+import { IProgressEvent } from "../../../../src/ipc-defs";
+import { createSourceProjectMetadata, generateCode } from "../../../../src/codegen";
+import { prepareOutputProject, createRmTestProject } from "../../../test-helpers/rm-project-generator";
+import { doAssert } from "../../../test-helpers/assert-helper";
+import { createTempDir } from "../../../test-helpers/fsHelpers";
 import { createCodegenValidatorTestData } from "./codegen-validator.test.test-data";
-import { CodegenSourceProjectValidator } from "../../../src/codegen/codegenSourceProjectValidator";
+import { CodegenSourceProjectValidator } from "../../../../src/codegen/codegenSourceProjectValidator";
 
 test("CodeGen Source Project Files Validator Test", async () => {
   // Arrange
