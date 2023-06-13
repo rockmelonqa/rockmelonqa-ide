@@ -1,6 +1,7 @@
 import path from "path";
 
 export class StandardOutputFolder {
+  static readonly Config: string = "Config";
   static readonly Pages: string = "Pages";
   static readonly Tests: string = "Tests";
   static readonly TestCases: string = "TestCases";

@@ -14,6 +14,10 @@ export class PlaywrightCsharpNunitTemplatesProvider implements IPlaywrightCsharp
     this._templateCollection = new NunitTemplateCollection(path.resolve(__dirname, "./templates"), customTemplatesDir, ".hbs");
   }
 
+  getEnvironmentSettingsFiles(rootNamespace: string, allVariableNames: string[]): string {
+    return this._templateCollection.ENVIRONMENT_SETTINGS_FILE({ rootNamespace, allVariableNames });
+  }
+
   getTestSuiteFile(usings: string, name: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
     return this._templateCollection.TEST_SUITE_FILE({ usings, name, description, body, rootNamespace, fullNamespace });
   }

@@ -1,5 +1,13 @@
 import { EOL } from "os";
-import { ActionType, IRmProjFile, ISourceProjectMetadata, ITestCase, ITestRoutine } from "../../file-defs";
+import {
+  ActionType,
+  IRmProjFile,
+  ISourceProjectMetadata,
+  ITestCase,
+  ITestRoutine,
+  StandardOutputFile,
+  StandardOutputFolder,
+} from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { addIndent, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
 import { IOutputProjectMetadataProcessor } from "./outputProjectMetadataProcessor";
@@ -7,6 +15,7 @@ import { createCleanName } from "../utils/createName";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { IDataSetInfo } from "./dataSetInfo";
 import { IPlaywrightCsharpTemplatesProvider } from "./playwrightCsharpTemplatesProvider";
+import { WriteFileFn } from "../types";
 
 /** Base CodeGen for MsTest, Nunit, Xunit CodeGens */
 export class PlaywrightCsharpCodeGen {
@@ -47,6 +56,18 @@ export class PlaywrightCsharpCodeGen {
 
   protected getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {
     throw new Error("Must implement getTemplateProvider in sub class");
+  }
+
+  protected async generateEnvironmentSettingsFile(writeFile: WriteFileFn) {
+    // Aggregate all variable names in all config file
+    let allNames: string[] = [];
+    for (let configFile of this._projMeta.configFiles) {
+      let namesInFile = configFile.content.settings.map((setting) => setting.name);
+      allNames.push(...namesInFile);
+    }
+    allNames = Array.from(new Set(allNames));
+    const content = this._templateProvider.getEnvironmentSettingsFiles(this._rmprojFile.content.rootNamespace, allNames);
+    await writeFile(`${StandardOutputFolder.Config}/${StandardOutputFile.EnvironmentSettings}${this._outputFileExt}`, content);
   }
 
   protected generateTestCaseBody(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {

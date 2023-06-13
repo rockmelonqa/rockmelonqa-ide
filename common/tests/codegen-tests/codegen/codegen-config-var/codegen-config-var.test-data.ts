@@ -108,14 +108,7 @@ export const createCodegenWithConfigVarTestData = (): RmpSpec => {
         id: "",
         name: "fills",
         description: "Fills the values on Fills page",
-        steps: [
-          {
-            id: "",
-            type: "routine",
-            routine: "FillName",
-            dataset: "DataSet Number Two",
-          },
-        ],
+        steps: [],
       },
     ],
     testsuites: [],

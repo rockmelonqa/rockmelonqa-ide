@@ -12,7 +12,7 @@ import {
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { ICodeGen, WriteFileFn } from "../types";
-import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
+import { addIndent, hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
 import { MsTestProjMeta } from "./msTestProjMeta";
 import { PlaywrightCsharpMsTestTemplatesProvider } from "./playwrightCsharpMsTestTemplatesProvider";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
@@ -21,6 +21,7 @@ import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCs
 import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
+import { IConfiguration } from "../../file-defs/configFile";
 
 export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen implements ICodeGen {
   /**
@@ -40,6 +41,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
 
   /** Generate MsTest project */
   public async generateCode(full: boolean, writeFile: WriteFileFn): Promise<string> {
+    await this.generateEnvironmentSettingsFile(writeFile);
     await this.generatePageFiles(writeFile);
     await this.generateCaseFiles(writeFile);
     await this.generateRoutineFiles(writeFile);
@@ -192,6 +194,10 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     propertyInits = addIndent(propertyInits, this._indentString.repeat(2));
 
     return this._templateProvider.getPageDefinitions(this._rootNamespace, usings, propertyDeclarations, propertyInits);
+  }
+
+  private generateEnvironmentSettingsConten(page: IConfiguration): string {
+    return "";
   }
 
   private generatePage(page: IPage): string {

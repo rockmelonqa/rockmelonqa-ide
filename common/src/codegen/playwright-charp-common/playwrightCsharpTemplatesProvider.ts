@@ -1,6 +1,7 @@
 import { IActionTemplateParam, ILocatorTemplateParam } from "../types";
 
 export interface IPlaywrightCsharpTemplatesProvider {
+  getEnvironmentSettingsFiles: (rootNamespace: string, allVariableNames: string[]) => string;
   getTestSuiteBase: (rootNamespace: string, testIdAttributeName: string) => string;
   getTestSuiteFile: (
     usings: string,
@@ -10,15 +11,15 @@ export interface IPlaywrightCsharpTemplatesProvider {
     rootNamespace: string,
     fullNamespace: string
   ) => string;
-  
+
   getTestCaseBase: (rootNamespace: string) => string;
   getTestCaseFile: (testCaseName: string, description: string, body: string, rootNamespace: string, fullNamespace: string) => string;
-  
+
   getTestRoutineClass: (testRoutineName: string, description: string, body: string) => string;
   getTestRoutineFile: (rootNamespace: string, fullNamespace: string, testRoutineClasses: string[]) => string;
 
   getAction: (params: IActionTemplateParam) => string;
-  getComment: (message: string) => string;  
+  getComment: (message: string) => string;
   getTestFunction: (name: string, description: string) => string;
 
   getLocator: (params: ILocatorTemplateParam) => string;

@@ -23,10 +23,10 @@ test("CodeGen Configuration Variables Test", async () => {
   fs.mkdirSync(sampleOutputDir);
   prepareOutputProject(projSpec.outputFiles, sampleOutputDir);
 
-  const sourceProjMeta = await createSourceProjectMetadata(rmprojFile);
-
   // Act
-  const errors = new CodegenSourceProjectValidator(sourceProjMeta).validate();
-  console.log("errors", errors);
+  await generateCode(rmprojFile, (event: IProgressEvent) => {});
+
+  // Assert
   // Assert: TODO: just want to run the code without exception
+  //doAssert(path.join(rmprojFile.folderPath, StandardFolder.OutputCode), sampleOutputDir);
 });

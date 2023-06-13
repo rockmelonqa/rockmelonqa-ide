@@ -5,12 +5,21 @@ import { MsTestTemplateCollection } from "./templateCollection";
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 import { actionRegistyDotnet } from "../playwright-charp-common/action-registry-dotnet";
 import { locatorRegistyDotnet } from "../playwright-charp-common/locator-registry-dotnet";
+import { BasePlaywrightDotnetTemplatesProvider } from "../playwright-charp-common/basePlaywrightDotnetTemplatesProvider";
 
-export class PlaywrightCsharpMsTestTemplatesProvider implements IPlaywrightCsharpTemplatesProvider {
+export class PlaywrightCsharpMsTestTemplatesProvider
+  extends BasePlaywrightDotnetTemplatesProvider
+  implements IPlaywrightCsharpTemplatesProvider
+{
   private _templateCollection: MsTestTemplateCollection;
 
   constructor(customTemplatesDir: string) {
+    super();
     this._templateCollection = new MsTestTemplateCollection(path.resolve(__dirname, "./templates"), customTemplatesDir, ".hbs");
+  }
+
+  getEnvironmentSettingsFiles(rootNamespace: string, allVariableNames: string[]): string {
+    return this._templateCollection.ENVIRONMENT_SETTINGS_FILE({ rootNamespace, allVariableNames });
   }
 
   getTestSuiteFile(usings: string, name: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {

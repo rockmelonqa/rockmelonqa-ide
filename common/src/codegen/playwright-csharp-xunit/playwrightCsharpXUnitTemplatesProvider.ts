@@ -14,6 +14,10 @@ export class PlaywrightCsharpXUnitTemplatesProvider implements IPlaywrightCsharp
     this._templateCollection = new XUnitTemplateCollection(path.resolve(__dirname, "./templates"), customTemplatesDir, ".hbs");
   }
 
+  getEnvironmentSettingsFiles(rootNamespace: string, allVariableNames: string[]): string {
+    return this._templateCollection.ENVIRONMENT_SETTINGS_FILE({ rootNamespace, allVariableNames });
+  }
+
   getTestSuiteBase(rootNamespace: string, testIdAttributeName: string): string {
     return this._templateCollection.TEST_SUITE_BASE_FILE({ rootNamespace, testIdAttributeName });
   }

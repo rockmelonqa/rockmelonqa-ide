@@ -1,5 +1,6 @@
 export class StandardOutputFile {
   // dotnet
+  static readonly EnvironmentSettings: string = "EnvironmentSettings";
   static readonly RunSettings: string = ".runsettings";
   static readonly Usings: string = "Usings";
   static readonly PageDefinitions: string = "PageDefinitions";
