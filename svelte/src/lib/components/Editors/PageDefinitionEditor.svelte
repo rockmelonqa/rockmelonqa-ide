@@ -395,6 +395,7 @@
                                     (item.findBy === LocatorType.RelativeXpath ? "MyField://div[text() = 'abc']" : "")}
                                 name={`${formContext.formName}_${index}_locator`}
                                 value={item.locator}
+                                title={item.locator}
                                 on:input={(event) => handleItemChange(index, "locator", event.detail.value)}
                             />
                         </ListTableBodyCell>

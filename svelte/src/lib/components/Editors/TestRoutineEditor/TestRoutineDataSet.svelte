@@ -1,6 +1,7 @@
 <script lang="ts">
     import { AlertDialogButtons, AlertDialogType } from '$lib/components/Alert';
     import AlertDialog from '$lib/components/AlertDialog.svelte';
+    import { combinePath, toTreePath } from '$lib/components/FileExplorer/Node';
     import IconLinkButton from '$lib/components/IconLinkButton.svelte';
     import { ListTableCellType } from '$lib/components/ListTable';
     import ListTable from '$lib/components/ListTable.svelte';
@@ -8,6 +9,8 @@
     import ListTableBodyRow from '$lib/components/ListTableBodyRow.svelte';
     import ListTableHeaderCell from '$lib/components/ListTableHeaderCell.svelte';
     import PrimaryButton from '$lib/components/PrimaryButton.svelte';
+    import StandardButton from '$lib/components/StandardButton.svelte';
+    import { appContextKey, type IAppContext } from '$lib/context/AppContext';
     import { stringResKeys } from '$lib/context/StringResKeys';
     import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
     import TextField from '$lib/controls/TextField.svelte';
@@ -19,17 +22,19 @@
     import MoveDownIcon from '$lib/icons/MoveDownIcon.svelte';
     import MoveUpIcon from '$lib/icons/MoveUpIcon.svelte';
     import SaveIcon from '$lib/icons/SaveIcon.svelte';
-    import type { IDataSet } from 'rockmelonqa.common';
+    import { StandardFolder, type IDataSet, ActionType } from 'rockmelonqa.common';
     import { createEventDispatcher, getContext } from 'svelte';
     import { v4 as uuidv4 } from 'uuid';
 
     export let formContext: IFormContext;
-    let { mode: formMode, formName } = formContext;
+    let { formName, mode: formMode, data: formData } = formContext;
 
     export let listDataSetContext: IListDataContext;
     let { value: listDataSet, dispatch: listDataSetDispatch } = listDataSetContext;
 
     const uiContext = getContext(uiContextKey) as IUiContext;
+    let appContext = getContext(appContextKey) as IAppContext;
+    let { state: appState } = appContext;
 
     const dispatch = createEventDispatcher();
 
@@ -47,39 +52,6 @@
         });
 
         dispatchChange(false);
-    };
-
-    const handleDeleteClick = (index: number) => {
-        // Determine if this row has any input.
-        // If yes, show confirmation dialog. Otherwise, delete straight away
-        if (isEmptyItem($listDataSet.items[index])) {
-            doDeleteRow(index);
-        } else {
-            deleteDialogType = AlertDialogType.Question;
-            indexToDelete = index;
-        }
-    };
-
-    const isEmptyItem = (item: IDictionary) => {
-        const ignoredProperties: string[] = ['id'];
-        return Object.entries(item)
-            .filter(([key, value]) => !ignoredProperties.includes(key))
-            .map(([key, value]) => value)
-            .every((x) => !x);
-    };
-
-    const handleDeleteConfirmation = async (event: any) => {
-        if (event.detail.button === 'delete') {
-            doDeleteRow(indexToDelete);
-        }
-    };
-
-    const doDeleteRow = (index: number) => {
-        listDataSetDispatch({
-            type: ListDataActionType.RemoveItem,
-            index: index,
-        });
-        dispatchChange(true);
     };
 
     const handleMoveDownClick = (index: number) => {
@@ -139,6 +111,63 @@
     const dispatchChange = (changeScheme: boolean) => {
         dispatch('change', { changeScheme });
     };
+
+        /**************************************
+     * Handle data set deletion
+     ***************************************/
+     let showReferenceWarningDialog: boolean = false;
+    let relatedTestCasePaths: string[] = [];
+
+    const hasReferenceData = async (dataSetItem: IDictionary): Promise<boolean> => {
+        const testCaseFolderPath = combinePath(
+            [$appState.projectFile?.folderPath ?? '', StandardFolder.TestCases],
+            uiContext.pathSeparator
+        );
+        debugger;
+        relatedTestCasePaths = Array.from($appState.testCases.values())
+            .filter((tc) => tc.steps.some((s) => s.action === ActionType.RunTestRoutine && s.data === $formData.values.id && s.dataset?.includes(dataSetItem.id)))
+            .map((tc) => toTreePath(tc.filePath, testCaseFolderPath, uiContext.pathSeparator) ?? '');
+
+        if (relatedTestCasePaths.length > 0) {
+            showReferenceWarningDialog = true;
+            return true;
+        }
+
+        return false;
+    }
+
+    const handleDeleteClick = async (dataSetItem: IDictionary, index: number) => {
+        // Determine if this row has any input.
+        // If yes, show confirmation dialog. Otherwise, delete straight away
+        if (isEmptyItem(dataSetItem)) {
+            doDeleteRow(index);
+        } else if (!await hasReferenceData(dataSetItem)) {
+            deleteDialogType = AlertDialogType.Question;
+            indexToDelete = index;
+        }
+    };
+
+    const isEmptyItem = (item: IDictionary) => {
+        const ignoredProperties: string[] = ['id'];
+        return Object.entries(item)
+            .filter(([key, value]) => !ignoredProperties.includes(key))
+            .map(([key, value]) => value)
+            .every((x) => !x);
+    };
+
+    const handleDeleteConfirmation = async (event: any) => {
+        if (event.detail.button === 'delete') {
+            doDeleteRow(indexToDelete);
+        }
+    };
+
+    const doDeleteRow = (index: number) => {
+        listDataSetDispatch({
+            type: ListDataActionType.RemoveItem,
+            index: index,
+        });
+        dispatchChange(true);
+    };
 </script>
 
 <ListTable class="table-fixed mb-4" isProcessing={$formMode.isLoading() || $formMode.isProcessing()} isEmpty={false}>
@@ -180,7 +209,7 @@
                         <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
                     </IconLinkButton>
                     <IconLinkButton
-                        on:click={() => handleDeleteClick(index)}
+                        on:click={() => handleDeleteClick(item, index)}
                         title={uiContext.str(stringResKeys.general.delete)}
                     >
                         <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
@@ -234,3 +263,39 @@
     <div slot="title">{uiContext.str(stringResKeys.general.confirmation)}</div>
     <div slot="content">{uiContext.str(stringResKeys.testRoutineEditor.deleteRowConfirmation)}</div>
 </AlertDialog>
+
+{#if showReferenceWarningDialog}
+    <div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-400 bg-opacity-75 transition-opacity" />
+        <div class="fixed inset-0 overflow-y-auto">
+            <div class="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0">
+                <div
+                    class="modal-panel relative bg-white rounded-lg p-4 sm:p-6
+                    text-left shadow-xl transform transition-all max-w-xl w-full"
+                >
+                    <div class="modal-title text-xl leading-6 font-bold mb-8">
+                        {uiContext.str(stringResKeys.general.warning)}
+                    </div>
+                    <div class="modal-content mb-8 flex flex-col gap-y-4">
+                          <div>
+                            This dataset is being used by following test cases. Please update test case before deleting dataset
+                          </div>
+                          <ul class="list-disc list-inside">
+                            {#each relatedTestCasePaths as testCasePath}
+                              <li>{testCasePath}</li>
+                            {/each}
+                          </ul>
+                      </div>
+                    <div class="modal-buttons flex justify-start items-end gap-x-4">
+                        <div class="ml-auto">
+                            <StandardButton
+                                label={uiContext.str(stringResKeys.general.cancel)}
+                                on:click={() => showReferenceWarningDialog = false}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/if}

@@ -158,7 +158,6 @@ export const stringResKeys = {
         action: "testCaseEditor.action",
         actions: "testCaseEditor.actions",
         addComment: "testCaseEditor.addComment",
-        addRoutine: "testCaseEditor.addRoutine",
         addStep: "testCaseEditor.addStep",
         comment: "testCaseEditor.comment",
         data: "testCaseEditor.data",

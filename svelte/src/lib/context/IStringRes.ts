@@ -45,6 +45,7 @@ export interface IActionTypeStringRes {
     inputByCode: string;
     run: string;
     runCode: string;
+    runTestRoutine: string;
     selectOption: string;
     verifyAttribute: string;
     verifyHasText: string;
@@ -203,7 +204,6 @@ export interface ITestCaseEditorStringRes {
     action: string;
     actions: string;
     addComment: string;
-    addRoutine: string;
     addStep: string;
     comment: string;
     data: string;

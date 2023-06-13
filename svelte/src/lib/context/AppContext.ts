@@ -77,7 +77,7 @@ export enum AppActionType {
     UnloadProject = "UnloadProject",
     SetProject = "SetProject",
 
-    SetPageData = "LoadPageData",
+    SetPageData = "SetPageData",
     RemovePageData = "RemovePageData",
 
     SetTestCaseData = "SetTestCaseData",

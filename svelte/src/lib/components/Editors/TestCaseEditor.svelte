@@ -24,10 +24,9 @@
     import MoveDownIcon from "$lib/icons/MoveDownIcon.svelte";
     import MoveUpIcon from "$lib/icons/MoveUpIcon.svelte";
     import SaveIcon from "$lib/icons/SaveIcon.svelte";
-    import TRoutineIcon from "$lib/icons/TRoutineIcon.svelte";
     import { fileSystem } from "$lib/ipc";
     import { getActionTypeDropDownOptions } from "$lib/utils/dropdowns";
-    import { fileDefFactory, type ITestCase, type ITestCaseStep as ITestStep } from "rockmelonqa.common";
+    import { ActionType, fileDefFactory, type ITestCase, type ITestCaseStep as ITestStep } from "rockmelonqa.common";
     import { createEventDispatcher, getContext, onMount } from "svelte";
     import { derived } from "svelte/store";
     import { v4 as uuidv4 } from "uuid";
@@ -43,9 +42,10 @@
     import ListTableBodyRow from "../ListTableBodyRow.svelte";
     import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
-    import RoutineDropDown from "../RoutineDropDown.svelte";
     import { toTitle, isPagelessAction } from "./Editor";
-    import type { ITestStepComment, ITestStepRegular, ITestStepRoutine } from "rockmelonqa.common/file-defs/testCaseFile";
+    import type { ITestStepComment, ITestStepRegular } from "rockmelonqa.common/file-defs/testCaseFile";
+    import { removeFileExtension } from "$lib/utils/utils";
+    import ListIcon from "$lib/icons/ListIcon.svelte";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -116,14 +116,6 @@
                 dataType: FieldDataType.Text,
                 dataPath: "comment",
             },
-            routine: {
-                dataType: FieldDataType.Text,
-                dataPath: "routine",
-            },
-            dataset: {
-                dataType: FieldDataType.Text,
-                dataPath: "dataset",
-            },
         },
     };
     let listDataContext = createListDataContext(listDef, uiContext);
@@ -144,7 +136,7 @@
     const pagesSubscription = derived(appState, ($appState) => $appState.pages);
     pagesSubscription.subscribe((pages) => {
         pageDefinitionOptions = Array.from(pages.entries())
-            .map(([key, { name }]) => ({ key, text: name.split('.').slice(0, -1).join('.') } as IDropdownOption))
+            .map(([key, { name }]) => ({ key, text: removeFileExtension(name) } as IDropdownOption))
             .sort((a, b) => a.text.localeCompare(b.text));
 
         pageElementsMap = new Map();
@@ -176,7 +168,7 @@
         if (fileContent) {
             model = JSON.parse(fileContent) as ITestCase;
         }
-
+        
         const serializer = new FormSerializer(uiContext);
         const fieldValues = serializer.deserialize(model, formDef.fields);
         formDataDispatch({ type: FormDataActionType.Load, newValues: fieldValues });
@@ -201,10 +193,6 @@
         return (item as ITestStep).type === "testStep";
     };
 
-    const isTestRoutine = (item: IDictionary) => {
-        return (item as ITestStep).type === "routine";
-    };
-
     const handleSave = async () => {
         await doSave();
     };
@@ -216,6 +204,7 @@
 
             const items = $listData.items.filter((r) => !isEmptyItem(r));
             const steps = serializer.serializeList(items, listDef.fields);
+            // FIXME: serialize the `dataset` of `runTestRoutine`
 
             const data = { ...model, steps };
             const filePath = combinePath([folderPath, fileName], uiContext.pathSeparator);
@@ -347,16 +336,6 @@
         dispatchChange();
     };
 
-    const handleAddRoutine = () => {
-        listDataDispatch({
-            type: ListDataActionType.AppendItems,
-            items: [newRoutine()],
-            hasMoreItems: false,
-        });
-
-        dispatchChange();
-    };
-
     const handleInsertComment = (index: number) => {
         listDataDispatch({
             type: ListDataActionType.InsertItem,
@@ -370,9 +349,31 @@
         return { id: uuidv4(), type: "comment", comment: "" } as ITestStepComment;
     };
 
-    const newRoutine = (): ITestStepRoutine => {
-        return { id: uuidv4(), type: "routine", routine: "" } as ITestStepRoutine;
-    };
+    const toRoutineData = (item: IDictionary): string => {
+        debugger;
+        if (item.action !== ActionType.RunTestRoutine) {
+            return item.data;
+        }
+
+        const routineId: string = item.data ?? '';
+        const dataSetId: string[] = item.dataset ?? [];
+
+        const routine = $appState.testRoutines.get(routineId);
+        if (routine) {
+            const selectedDataSet = dataSetIds
+                .filter(key => routine.dataSets.has(key)) 
+                .map(key => routine.dataSets.get(key)!.name) ?? [];   
+            
+            let label = removeFileExtension(routine.name);
+            if (selectedDataSet.length > 0) {
+                label = label + "[" + selectedDataSet.join(', ') + "]";
+            }
+
+            return label;
+        }
+
+        return '';
+    }
 </script>
 
 <div class="test-case-editor p-8">
@@ -425,16 +426,6 @@
                                 on:input={(event) => handleItemChange(index, "comment", event.detail.value)}
                             />
                         </ListTableBodyCell>
-                    {:else if isTestRoutine(item)}
-                        <ListTableBodyCell type={ListTableCellType.First} colspan={4}>
-                            <RoutineDropDown
-                                name={`${formContext.formName}_${index}_routine`}
-                                routine={item.routine}
-                                dataset={item.dataset}
-                                on:selectRoutine={(event) => handleItemChange(index, "routine", event.detail.value)}
-                                on:selectDataset={(event) => handleItemChange(index, "dataset", event.detail.value)}
-                            />
-                        </ListTableBodyCell>
                     {:else}
                         <ListTableBodyCell type={ListTableCellType.First}>
                             <FancyDropdownField
@@ -465,11 +456,29 @@
                             {/if}
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Last}>
-                            <TextField
-                                name={`${formContext.formName}_${index}_data`}
-                                value={item.data}
-                                on:input={(event) => handleItemChange(index, ITEM_KEY_DATA, event.detail.value)}
-                            />
+                            {#if item.action === ActionType.RunTestRoutine.toString()}
+                                <div class="flex justify-between items-center">
+                                    <div class="grow">
+                                    <TextField
+                                        name={`${formContext.formName}_${index}_data`}
+                                        value={toRoutineData(item)}
+                                        class="truncate"
+                                        readonly={true} />
+                                    </div>
+                                    <IconLinkButton
+                                        on:click={() => console.log('Select routine')}
+                                        title="Select routine"
+                                    >
+                                        <svelte:fragment slot="icon"><ListIcon class="h-5 w-5" strokeColor="#e56d00" /></svelte:fragment>
+                                    </IconLinkButton>
+                                </div>
+                            {:else}
+                                <TextField
+                                    name={`${formContext.formName}_${index}_data`}
+                                    value={item.data}
+                                    on:input={(event) => handleItemChange(index, ITEM_KEY_DATA, event.detail.value)}
+                                />
+                            {/if}
                         </ListTableBodyCell>
                     {/if}
                     <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">
@@ -518,13 +527,6 @@
             <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
             <svelte:fragment slot="label">
                 {uiContext.str(stringResKeys.testCaseEditor.addStep)}
-            </svelte:fragment>
-        </IconLinkButton>
-        <span>|</span>
-        <IconLinkButton on:click={handleAddRoutine}>
-            <svelte:fragment slot="icon"><TRoutineIcon /></svelte:fragment>
-            <svelte:fragment slot="label">
-                {uiContext.str(stringResKeys.testCaseEditor.addRoutine)}
             </svelte:fragment>
         </IconLinkButton>
         <span>|</span>
