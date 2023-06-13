@@ -8,7 +8,7 @@ import { createSourceProjectMetadata, generateCode } from "../../../../src/codeg
 import { prepareOutputProject, createRmTestProject } from "../../../test-helpers/rm-project-generator";
 import { doAssert } from "../../../test-helpers/assert-helper";
 import { createTempDir } from "../../../test-helpers/fsHelpers";
-import { createCodegenWithConfigVarTestData } from "./codegen-validator.test.test-data";
+import { createCodegenWithConfigVarTestData } from "./codegen-config-var.test-data";
 import { CodegenSourceProjectValidator } from "../../../../src/codegen/codegenSourceProjectValidator";
 
 test("CodeGen Configuration Variables Test", async () => {

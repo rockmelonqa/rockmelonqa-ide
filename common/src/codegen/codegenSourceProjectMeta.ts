@@ -9,23 +9,13 @@ import { IProgressEvent } from "../ipc-defs";
 import { SourceFileParser } from "./codegen-helpers/sourceFileParser";
 import { readDirRecursiveFilterByExt } from "./utils/fileSystemHelpers";
 import { ProgressEventCallback } from "./types";
+import { IConfiguration, IConfigurationFile } from "../file-defs/configFile";
 
 export const createSourceProjectMetadata = async (
   rmprojFile: IRmProjFile,
   progressNotify?: ProgressEventCallback
 ): Promise<ISourceProjectMetadata> => {
   const notify = (event: IProgressEvent) => progressNotify && progressNotify(event);
-
-  // Print out information about the context
-  info(``);
-  info(``);
-  info(`--------------------------------------------------`);
-  info(`-- Rockmelon QA`);
-  info(`-- Framework: ${rmprojFile.content.automationFramework}`);
-  info(`-- Language: ${rmprojFile.content.language}`);
-  info(`-- Test Framework: ${rmprojFile.content.testFramework}`);
-  info(`-- Date: ${new Date()}`);
-  info(`--------------------------------------------------`);
 
   notify({ type: "validate-input" });
   info(``);
@@ -57,6 +47,23 @@ export const createSourceProjectMetadata = async (
     info(`    ---> Property testIdAttributeName is not set, will be defaulted to data-testid at runtime.`);
   }
 
+  // Parsing config file
+  info(``);
+  info(``);
+  info(`--------------------------------------------------`);
+  info(`-- Parsing Configuration Variables files`);
+  info("--------------------------------------------------");
+
+  let configFiles: IConfigurationFile[] = [];
+  let configFolder = path.join(rmprojFile.folderPath, StandardFolder.Config);
+  let configFilePaths: string[] = await readDirRecursiveFilterByExt(configFolder, StandardFileExtension.Environment);
+
+  for (let configFilePath of configFilePaths) {
+    notify({ type: "parse-data", log: `Parsing: ${configFilePath}` });
+    info(`    ---> Found configuration variables file: ${configFilePath}`);
+    configFiles.push(await SourceFileParser.parseConfiguration(configFolder, configFilePath));
+  }
+
   // Parsing page definitions
   info(``);
   info(``);
@@ -64,14 +71,14 @@ export const createSourceProjectMetadata = async (
   info(`-- Parsing page definitions`);
   info("--------------------------------------------------");
 
-  let pages: IPageFile[] = [];
+  let pageFiles: IPageFile[] = [];
   let pageDefFolder = path.join(rmprojFile.folderPath, StandardFolder.PageDefinitions);
-  let pageDefinitionFiles: string[] = await readDirRecursiveFilterByExt(pageDefFolder, StandardFileExtension.Page);
+  let pageDefinitionFilePaths: string[] = await readDirRecursiveFilterByExt(pageDefFolder, StandardFileExtension.Page);
 
-  for (let pageDefinitionFile of pageDefinitionFiles) {
+  for (let pageDefinitionFile of pageDefinitionFilePaths) {
     notify({ type: "parse-data", log: `Parsing: ${pageDefinitionFile}` });
     info(`    ---> Found page definition file: ${pageDefinitionFile}`);
-    pages.push(await SourceFileParser.parsePageDefinition(pageDefFolder, pageDefinitionFile));
+    pageFiles.push(await SourceFileParser.parsePageDefinition(pageDefFolder, pageDefinitionFile));
   }
 
   // Parsing test suite definitions
@@ -81,14 +88,14 @@ export const createSourceProjectMetadata = async (
   info(`-- Parsing test suite definitions`);
   info("--------------------------------------------------");
 
-  let suites: ITestSuiteFile[] = [];
+  let suiteFiles: ITestSuiteFile[] = [];
   let testSuiteFolderPath = path.join(rmprojFile.folderPath, StandardFolder.TestSuites);
   let testSuiteFilePaths = await readDirRecursiveFilterByExt(testSuiteFolderPath, StandardFileExtension.TestSuite);
 
   for (let testSuiteDefFile of testSuiteFilePaths) {
     notify({ type: "parse-data", log: `Parsing: ${testSuiteDefFile}` });
     info(`    ---> Found test suite file: ${testSuiteDefFile}`);
-    suites.push(await SourceFileParser.parseTestSuite(testSuiteFolderPath, testSuiteDefFile));
+    suiteFiles.push(await SourceFileParser.parseTestSuite(testSuiteFolderPath, testSuiteDefFile));
   }
 
   // Parsing test case definitions
@@ -98,13 +105,13 @@ export const createSourceProjectMetadata = async (
   info(`-- Parsing test case definitions`);
   info("--------------------------------------------------");
 
-  let cases: ITestCaseFile[] = [];
+  let caseFiles: ITestCaseFile[] = [];
   let testCaseFolderPath = path.join(rmprojFile.folderPath, StandardFolder.TestCases);
 
   let testCaseFileRelPaths = await readDirRecursiveFilterByExt(testCaseFolderPath, StandardFileExtension.TestCase);
 
   for (let testCaseDefFile of testCaseFileRelPaths) {
-    cases.push(await SourceFileParser.parseTestCase(testCaseFolderPath, testCaseDefFile));
+    caseFiles.push(await SourceFileParser.parseTestCase(testCaseFolderPath, testCaseDefFile));
     notify({ type: "parse-data", log: `Parsing: ${testCaseDefFile}` });
     info(`    ---> Found test case file: ${testCaseDefFile}`);
   }
@@ -116,7 +123,7 @@ export const createSourceProjectMetadata = async (
   info(`-- Parsing test routine definitions`);
   info("--------------------------------------------------");
 
-  let routines: ITestRoutineFile[] = [];
+  let routineFiles: ITestRoutineFile[] = [];
 
   let testRoutineFolderPath = path.join(rmprojFile.folderPath, StandardFolder.TestRoutines);
 
@@ -124,7 +131,7 @@ export const createSourceProjectMetadata = async (
     let testRoutineFileRelPaths = await readDirRecursiveFilterByExt(testRoutineFolderPath, StandardFileExtension.TestRoutine);
 
     for (let testRoutineDefFile of testRoutineFileRelPaths) {
-      routines.push(await SourceFileParser.parseTestRoutine(testRoutineFolderPath, testRoutineDefFile));
+      routineFiles.push(await SourceFileParser.parseTestRoutine(testRoutineFolderPath, testRoutineDefFile));
       notify({ type: "parse-data", log: `Parsing: ${testRoutineDefFile}` });
       info(`    ---> Found test routine file: ${testRoutineDefFile}`);
     }
@@ -132,10 +139,11 @@ export const createSourceProjectMetadata = async (
 
   let projMeta: ISourceProjectMetadata = {
     project: rmprojFile,
-    pages: pages,
-    testCases: cases,
-    testSuites: suites,
-    testRoutines: routines,
+    pages: pageFiles,
+    testCases: caseFiles,
+    testSuites: suiteFiles,
+    testRoutines: routineFiles,
+    configFiles: configFiles,
   };
 
   return projMeta;
