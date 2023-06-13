@@ -31,11 +31,12 @@ export const writeFile = (content: any, filePath: string) => {
   if (!fs.existsSync(containerDir)) {
     fs.mkdirSync(containerDir, { recursive: true });
   }
-  fs.writeFileSync(filePath, JSON.stringify(content, null, 4));
+
+  fs.writeFileSync(filePath, typeof content === "string" ? content : JSON.stringify(content, null, 4));
 };
 
 export const createDir = (dirPath: string) => {
-  if (!fs.existsSync(dirPath)) {    
+  if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
 };
