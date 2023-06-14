@@ -205,7 +205,14 @@ export class FormSerializer {
                     throw new Error('Unsuppored serialization data type ' + dataType);
             }
 
-            if (!isEmpty(fieldValue)) {
+            if (
+                fieldDef.dataType === FieldDataType.Text ||
+                fieldDef.dataType === FieldDataType.Dropdown ||
+                fieldDef.dataType === FieldDataType.NullableBoolean ||
+                fieldDef.dataType === FieldDataType.NullableFloat ||
+                fieldDef.dataType === FieldDataType.NullableInteger ||
+                !isEmpty(fieldValue)
+            ) {
                 lodash.set(dataModel, fieldDef.dataPath ?? '', fieldValue);
             }
         }

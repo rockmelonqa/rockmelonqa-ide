@@ -1,4 +1,5 @@
 import { ActionType } from "./actionType";
+import { IEnvironmentContent, IEnvironmentFile, ISetting } from "./environmentFile";
 import { IFileDef } from "./fileDef";
 import { fileDefFactory } from "./fileDefFactory";
 import { LocatorType } from "./locatorType";
@@ -14,19 +15,23 @@ export * from "./standardFileExtension";
 export * from "./standardFolder";
 export * from "./standardOutputFolder";
 export {
+  ActionType,
+  AutomationFramework,
   Browser,
-  IFileDef,
-  IRecentFile,
   fileDefFactory,
+  IDataSet,
+  IEnvironmentFile,
+  IEnvironmentContent,
+  IFileDef,
+  Indent,
+  IRecentFile,
   IRmProjFile,
   IRmProj,
+  ISetting,
   ISourceProjectMetadata,
-  LocatorType,
-  ActionType,
   ITestCase,
   ITestCaseFile,
   ITestCaseStep,
-  IDataSet,
   ITestRoutine,
   ITestRoutineFile,
   ITestRoutineStep,
@@ -36,9 +41,8 @@ export {
   ITestSuiteFile,
   IUserSettings,
   IUserSettingsFile,
-  AutomationFramework,
   Language,
-  TestFramework,
-  Indent,
+  LocatorType,
   StandardOutputFile,
+  TestFramework,
 };
