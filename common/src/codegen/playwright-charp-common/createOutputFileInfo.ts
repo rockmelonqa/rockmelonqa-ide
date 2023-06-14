@@ -1,9 +1,8 @@
 import path from "path";
-import { ExtensionToNameMap, IFileDef, StandardFolder, StandardOutputFolder } from "../../file-defs";
+import { IFileDef, StandardFolder, StandardOutputFolder } from "../../file-defs";
 import { IRmProjFile } from "../../file-defs/rmProjFile";
 import { IOutputFileInfo } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
-import { upperCaseFirstChar } from "../utils/stringUtils";
 import createName from "../utils/createName";
 
 /** Map from standard input folder to standard output folder */

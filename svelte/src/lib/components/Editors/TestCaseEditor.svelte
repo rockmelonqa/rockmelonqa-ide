@@ -174,6 +174,12 @@
         formDataDispatch({ type: FormDataActionType.Load, newValues: fieldValues });
 
         const items = serializer.deserializeList(model.steps, listDef.fields);
+        items.forEach((item, index) => {
+            const step = model.steps[index];
+            if (step.type === 'testStep') {
+                item.parameters = step.parameters;
+            }
+        });
         listDataDispatch({ type: ListDataActionType.SetItems, items: items, hasMoreItems: false });
 
         registerOnSaveHandler(contentIndex, doSave);
@@ -204,7 +210,12 @@
 
             const items = $listData.items.filter((r) => !isEmptyItem(r));
             const steps = serializer.serializeList(items, listDef.fields);
-            // FIXME: serialize the `dataset` of `runTestRoutine`
+            steps.forEach((step, index) => {
+                const item = items[index];
+                if (item.type === 'testStep') {
+                    step.parameters = item.parameters;
+                }
+            });
 
             const data = { ...model, steps };
             const filePath = combinePath([folderPath, fileName], uiContext.pathSeparator);
@@ -350,13 +361,12 @@
     };
 
     const toRoutineData = (item: IDictionary): string => {
-        debugger;
         if (item.action !== ActionType.RunTestRoutine) {
             return item.data;
         }
 
         const routineId: string = item.data ?? '';
-        const dataSetId: string[] = item.dataset ?? [];
+        const dataSetIds: string[] = item.parameters ?? [];
 
         const routine = $appState.testRoutines.get(routineId);
         if (routine) {

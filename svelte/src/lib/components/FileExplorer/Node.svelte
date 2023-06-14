@@ -19,13 +19,7 @@
     import Menu from "./Menu.svelte";
     import MenuDivider from "./MenuDivider.svelte";
     import MenuItem from "./MenuItem.svelte";
-    import {
-        buildChildrenNodes,
-        extractPath,
-        Node as NodeInfo,
-        showMenuAt,
-        toFileSystemPath,
-    } from "./Node";
+    import { buildChildrenNodes, extractPath, Node as NodeInfo, showMenuAt, toFileSystemPath } from "./Node";
     import NodeEditor from "./NodeEditor.svelte";
 
     export let node: NodeInfo;
@@ -36,7 +30,7 @@
     let { state: appState, dispatch: appStateDispatch } = appContext;
 
     $: nodePath = node.toTreePath();
-    $: fileSystemPath = toFileSystemPath(nodePath, $appState.projectFile?.folderPath ?? '', uiContext.pathSeparator);
+    $: fileSystemPath = toFileSystemPath(nodePath, $appState.projectFile?.folderPath ?? "", uiContext.pathSeparator);
     $: label = node.name;
     $: type = node.type;
     $: hasChildren = node.hasChildren;
@@ -212,7 +206,7 @@
         addMode = false;
     };
 
-    const submitNew = async (e: any) => {      
+    const submitNew = async (e: any) => {
         // create file or folder
         const { value } = e.detail;
         if (value) {
@@ -331,19 +325,21 @@
 
         relatedTestCasePaths = Array.from($appState.testCases.values())
             .filter((tc) => tc.steps.some((s) => s.page === page.id))
-            .map((tc) => tc.filePath).sort();
-        
+            .map((tc) => tc.filePath)
+            .sort();
+
         relatedTestRoutinePaths = Array.from($appState.testRoutines.values())
             .filter((tr) => tr.steps.some((s) => s.page === page.id))
-            .map((tr) => tr.filePath).sort();
-        
+            .map((tr) => tr.filePath)
+            .sort();
+
         if (relatedTestCasePaths.length > 0 || relatedTestRoutinePaths.length > 0) {
             showDeletePageWarningDialog = true;
             return true;
         }
 
         return false;
-    }
+    };
 
     /**************************************
      * Handle test case deletion
@@ -362,13 +358,14 @@
 
         relatedTestSuitePaths = Array.from($appState.testSuites.values())
             .filter((ts) => ts.testcases.some((tcId) => tcId === testCase.id))
-            .map((ts) => ts.filePath).sort();
+            .map((ts) => ts.filePath)
+            .sort();
 
         if (relatedTestSuitePaths.length > 0) {
             showDeleteTestCaseConfirmationDialog = true;
             return true;
         }
-        
+
         return false;
     };
 
@@ -384,8 +381,9 @@
 
         relatedTestCasePaths = Array.from($appState.testCases.values())
             .filter((tc) => tc.steps.some((s) => s.action === ActionType.RunTestRoutine && s.data === testRoutine.id))
-            .map((tc) => tc.filePath).sort();
-        
+            .map((tc) => tc.filePath)
+            .sort();
+
         if (relatedTestCasePaths.length > 0) {
             showDeleteTestRoutineWarningDialog = true;
             return true;
@@ -432,29 +430,37 @@
 {#if showMenu}
     <Menu {...position} on:click={closeMenu} on:clickoutside={closeMenu}>
         {#if type == FileType.Folder}
-            <MenuItem
-                label={uiContext.str(stringResKeys.fileExplorer.newFolder)}
-                on:click={() => handleMenuNew(FileType.Folder)}
-            />
-            {#if nodePath.includes(StandardFolder.PageDefinitions)}
+            {#if nodePath !== StandardFolder.Config}
+                <MenuItem
+                    label={uiContext.str(stringResKeys.fileExplorer.newFolder)}
+                    on:click={() => handleMenuNew(FileType.Folder)}
+                />
+            {/if}
+
+            {#if nodePath.startsWith(StandardFolder.PageDefinitions)}
                 <MenuItem
                     label={uiContext.str(stringResKeys.fileExplorer.newPage)}
                     on:click={() => handleMenuNew(FileType.Page)}
                 />
-            {:else if nodePath.includes(StandardFolder.TestCases)}
+            {:else if nodePath.startsWith(StandardFolder.TestCases)}
                 <MenuItem
                     label={uiContext.str(stringResKeys.fileExplorer.newTestCase)}
                     on:click={() => handleMenuNew(FileType.TCase)}
                 />
-            {:else if nodePath.includes(StandardFolder.TestRoutines)}
+            {:else if nodePath.startsWith(StandardFolder.TestRoutines)}
                 <MenuItem
                     label={uiContext.str(stringResKeys.fileExplorer.newTestRoutine)}
                     on:click={() => handleMenuNew(FileType.TRoutine)}
                 />
-            {:else if nodePath.includes(StandardFolder.TestSuites)}
+            {:else if nodePath.startsWith(StandardFolder.TestSuites)}
                 <MenuItem
                     label={uiContext.str(stringResKeys.fileExplorer.newTestSuite)}
                     on:click={() => handleMenuNew(FileType.TSuite)}
+                />
+            {:else if nodePath.startsWith(StandardFolder.Config)}
+                <MenuItem
+                    label={uiContext.str(stringResKeys.fileExplorer.newEnvFile)}
+                    on:click={() => handleMenuNew(FileType.Env)}
                 />
             {:else}
                 <MenuItem

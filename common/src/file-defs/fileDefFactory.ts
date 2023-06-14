@@ -5,6 +5,7 @@ import { ITestCase } from "./testCaseFile";
 import { ITestRoutine } from "./testRoutineFile";
 import { ITestSuite } from "./testSuiteFile";
 import { IUserSettings } from "./userSettingsFile";
+import { IEnvironmentContent } from "./environmentFile";
 
 /** Factory to create new instances of our files */
 export const fileDefFactory = {
@@ -53,4 +54,10 @@ export const fileDefFactory = {
   newTestSuite: (): ITestSuite => {
     return { id: uuidv4(), description: "", testcases: [] };
   },
+
+  newEnvironmentSettings: (): IEnvironmentContent => {
+    return { 
+      settings: [] 
+    }
+  }
 };
