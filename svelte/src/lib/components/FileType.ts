@@ -21,10 +21,10 @@ export const getFileType = (fileName: string): FileType => {
     const lastIndex = fileName.lastIndexOf('.');
     const ext = lastIndex < 0 ? '' : fileName.substring(lastIndex).toLowerCase();
     switch (ext) {
+        case StandardFileExtension.Environment:
+            return FileType.Env;
         case StandardFileExtension.Page:
             return FileType.Page;
-        case StandardFileExtension.Env:
-            return FileType.Env;
         case StandardFileExtension.Project:
             return FileType.RmProj;
         case StandardFileExtension.TestCase:

@@ -7,13 +7,13 @@ import TestRoutineEditor from './TestRoutineEditor/TestRoutineEditor.svelte';
 import TestSuiteEditor from './TestSuiteEditor.svelte';
 import TextEditor from './TextEditor.svelte';
 import TrxViewer from './TrxViewer/TrxViewer.svelte';
-import EnvEditor from './EnvEditor.svelte';
+import EnvEditor from './EnvironmentEditor.svelte';
 
 export const getEditor = (fileName: string): ComponentType | undefined => {
     const lastIndex = fileName.lastIndexOf('.');
     const ext = lastIndex < 0 ? '' : fileName.substring(lastIndex).toLowerCase();
     switch (ext) {
-        case StandardFileExtension.Env:
+        case StandardFileExtension.Environment:
             return EnvEditor;
         case StandardFileExtension.Page:
             return PageDefinitionEditor;

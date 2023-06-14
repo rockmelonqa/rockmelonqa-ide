@@ -56,11 +56,12 @@ export const stringResKeys = {
         dialogContent: "deleteTestRoutineWarningDialog.dialogContent",
         dialogTitle: "deleteTestRoutineWarningDialog.dialogTitle",
     },
-    envEditor: {
-        actions: "envEditor.actions",
-        deleteRowConfirmation: "envEditor.deleteRowConfirmation",
-        name: "envEditor.name",
-        value: "envEditor.value",
+    environmentEditor: {
+        actions: "environmentEditor.actions",
+        deleteRowConfirmation: "environmentEditor.deleteRowConfirmation",
+        invalidNameMessage: "environmentEditor.invalidNameMessage",
+        name: "environmentEditor.name",
+        value: "environmentEditor.value",
     },
     fileExplorer: {
         newEnvFile: "fileExplorer.newEnvFile",

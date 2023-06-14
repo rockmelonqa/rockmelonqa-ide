@@ -68,8 +68,8 @@
             return val + StandardFileExtension.TestSuite;
         }
 
-        if (type === FileType.Env && !val.endsWith(StandardFileExtension.Env)) {
-            return val + StandardFileExtension.Env;
+        if (type === FileType.Env && !val.endsWith(StandardFileExtension.Environment)) {
+            return val + StandardFileExtension.Environment;
         }
 
         return val;

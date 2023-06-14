@@ -1,5 +1,5 @@
 export class StandardFileExtension {
-  static readonly Env: string = ".env";
+  static readonly Environment: string = ".env";
   static readonly TestSuite: string = ".tsuite";
   static readonly TestCase: string = ".tcase";
   static readonly TestRoutine: string = ".troutine";
@@ -8,7 +8,7 @@ export class StandardFileExtension {
 }
 
 export const ExtensionToNameMap = {
-  [StandardFileExtension.Env]: "Env",
+  [StandardFileExtension.Environment]: "Environment",
   [StandardFileExtension.TestSuite]: "TestSuite",
   [StandardFileExtension.TestCase]: "TestCase",
   [StandardFileExtension.TestRoutine]: "TestRoutine",

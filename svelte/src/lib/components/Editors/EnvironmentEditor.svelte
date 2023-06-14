@@ -1,7 +1,6 @@
 <script lang="ts">
     import { stringResKeys } from "$lib/context/StringResKeys";
     import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
-    import type { IUiTheme } from "$lib/context/UiTheme";
     import TextField from "$lib/controls/TextField.svelte";
     import { FieldDataType, type IDictionary } from "$lib/form/FieldDef";
     import { createFormContext } from "$lib/form/FormContext";
@@ -18,9 +17,8 @@
     import SaveIcon from "$lib/icons/SaveIcon.svelte";
     import { fileSystem } from "$lib/ipc";
     import { getLocatorTypeDropDownOptions } from "$lib/utils/dropdowns";
-    import { fileDefFactory } from "rockmelonqa.common";
+    import { fileDefFactory, type IEnvironmentContent, type ISetting } from "rockmelonqa.common";
     import { createEventDispatcher, getContext, onMount } from "svelte";
-    import { v4 as uuidv4 } from "uuid";
     import { AlertDialogButtons, AlertDialogType } from "../Alert";
     import AlertDialog from "../AlertDialog.svelte";
     import { appActionContextKey, type IAppActionContext } from "../Application";
@@ -33,19 +31,17 @@
     import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
     import { toTitle } from "./Editor";
-    import type { IEnvPage, IEnvSetting } from "rockmelonqa.common/file-defs/envFile";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
 
     export let folderPath: string;
     export let fileName: string;
-    $: filePath = combinePath([folderPath, fileName], uiContext.pathSeparator);
-
     export let contentIndex: number;
 
     const formDef: IFormDef = {
         fields: {},
     };
+
     let formContext = createFormContext("envEditor", formDef, uiContext, FormModeState.Edit);
     let {
         mode: formMode,
@@ -56,10 +52,6 @@
 
     const listDef: IListDef = {
         fields: {
-            id: {
-                dataType: FieldDataType.Text,
-                dataPath: "id",
-            },
             name: {
                 dataType: FieldDataType.Text,
                 dataPath: "name",
@@ -73,8 +65,8 @@
     let listDataContext = createListDataContext(listDef, uiContext);
     let { value: listData, dispatch: listDataDispatch } = listDataContext;
 
+    $: filePath = combinePath([folderPath, fileName], uiContext.pathSeparator);
     $: title = toTitle(fileName);
-    const locatorTypeOptions = getLocatorTypeDropDownOptions(uiContext);
 
     let deleteDialogType: AlertDialogType = AlertDialogType.None;
     let indexToDelete: number;
@@ -82,16 +74,14 @@
     const { registerOnSaveHandler, unregisterOnSaveHandler } = getContext(appActionContextKey) as IAppActionContext;
     const dispatch = createEventDispatcher();
 
-    let focusFieldId = "";
-
     onMount(async () => {
         // default/empty data
-        let model = fileDefFactory.newEnvSettings();
+        let model = fileDefFactory.newEnvironmentSettings();
 
         // parse file content if any
         const fileContent = await fileSystem.readFile(filePath);
         if (fileContent) {
-            model = JSON.parse(fileContent) as IEnvPage;
+            model = JSON.parse(fileContent) as IEnvironmentContent;
         }
 
         const serializer = new FormSerializer(uiContext);
@@ -137,9 +127,7 @@
     };
 
     const isEmptyItem = (item: IDictionary) => {
-        const ignoredProperties: string[] = ["id", "type"];
         return Object.entries(item)
-            .filter(([key, value]) => !ignoredProperties.includes(key))
             .map(([key, value]) => value)
             .every((x) => !x);
     };
@@ -159,33 +147,7 @@
         dispatchChange();
     };
 
-    const handleMoveDownClick = (index: number) => {
-        if (index >= 0 && index <= $listData.items.length - 2) {
-            listDataDispatch({
-                type: ListDataActionType.SwapItems,
-                indexA: index,
-                indexB: index + 1,
-            });
-
-            dispatchChange();
-        }
-    };
-
-    const handleMoveUpClick = (index: number) => {
-        if (index >= 1 && index <= $listData.items.length - 1) {
-            listDataDispatch({
-                type: ListDataActionType.SwapItems,
-                indexA: index,
-                indexB: index - 1,
-            });
-
-            dispatchChange();
-        }
-    };
-
     const handleAdd = () => {
-        focusFieldId = `envEditor_${$listData.items.length}_name_input`;
-
         listDataDispatch({
             type: ListDataActionType.AppendItems,
             items: [newConfig()],
@@ -195,9 +157,8 @@
         dispatchChange();
     };
 
-    const newConfig = (): IEnvSetting => {
+    const newConfig = (): ISetting => {
         return {
-            id: uuidv4(),
             name: "",
             value: "",
         };
@@ -211,9 +172,10 @@
         if (isDataValid) {
             const serializer = new FormSerializer(uiContext);
             const model = serializer.serialize($formData.values, formDef.fields);
-
+            debugger;
             const items = $listData.items.filter((r) => !isEmptyItem(r));
             const settings = serializer.serializeList(items, listDef.fields);
+
             const data = { ...model, settings };
             await fileSystem.writeFile(filePath, JSON.stringify(data, null, 4));
 
@@ -225,19 +187,23 @@
         return false;
     };
 
-    const isNameValid = (name: string) => {
-        if (name) {
-            const regex = /^[A-Za-z0-9_-]+$/;
-            return regex.test(name);
+    const validateName = (name: string): string => {
+        if (!name?.trim()) {
+            return uiContext.str(stringResKeys.form.isRequiredError)
         }
 
-        return true;
+        const regex = /^[A-Za-z0-9_-]+$/;
+        if (!regex.test(name)) {
+            return uiContext.str(stringResKeys.environmentEditor.invalidNameMessage);
+        }
+
+        return '';  // no error message == valid
     };
-    $: isListDataValid = $listData.items.every((item) => isNameValid(item.name));
+    $: isListDataValid = $listData.items.every((item) => !validateName(item.name));
     $: isDataValid = $formData.isValid && isListDataValid;
 </script>
 
-<div class="page-definition-editor p-8">
+<div class="environment-editor p-8">
     <div class="font-semibold text-xl mb-4">{title}</div>
 
     <ListTable
@@ -246,25 +212,25 @@
         isEmpty={false}
     >
         <svelte:fragment slot="header">
-            <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-1/2">
-                {uiContext.str(stringResKeys.envEditor.name)}
+            <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-1/4">
+                {uiContext.str(stringResKeys.environmentEditor.name)}
             </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.Last} class="text-left w-1/2">
-                {uiContext.str(stringResKeys.envEditor.value)}
+            <ListTableHeaderCell type={ListTableCellType.Last} class="text-left w-3/4">
+                {uiContext.str(stringResKeys.environmentEditor.value)}
             </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-40">
-                {uiContext.str(stringResKeys.envEditor.actions)}
+            <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-20">
+                {uiContext.str(stringResKeys.environmentEditor.actions)}
             </ListTableHeaderCell>
         </svelte:fragment>
         <svelte:fragment slot="body">
-            {#each $listData.items as item, index (item.id)}
+            {#each $listData.items as item, index}
                 <ListTableBodyRow>
                     <ListTableBodyCell type={ListTableCellType.First}>
                         <TextField
                             name={`${formContext.formName}_${index}_name`}
                             value={item.name}
                             on:input={(event) => handleItemChange(index, "name", event.detail.value)}
-                            focus={`${formContext.formName}_${index}_name_input` === focusFieldId}
+                            errorMessage={validateName(item.name)}
                         />
                     </ListTableBodyCell>
 
@@ -273,7 +239,6 @@
                             name={`${formContext.formName}_${index}_value`}
                             value={item.value}
                             on:input={(event) => handleItemChange(index, "value", event.detail.value)}
-                            focus={`${formContext.formName}_${index}_value_input` === focusFieldId}
                         />
                     </ListTableBodyCell>
 
@@ -284,22 +249,6 @@
                         >
                             <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
                         </IconLinkButton>
-                        {#if index > 0}
-                            <IconLinkButton
-                                on:click={() => handleMoveUpClick(index)}
-                                title={uiContext.str(stringResKeys.general.moveUp)}
-                            >
-                                <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>
-                            </IconLinkButton>
-                        {/if}
-                        {#if index < $listData.items.length - 1}
-                            <IconLinkButton
-                                on:click={() => handleMoveDownClick(index)}
-                                title={uiContext.str(stringResKeys.general.moveDown)}
-                            >
-                                <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>
-                            </IconLinkButton>
-                        {/if}
                     </ListTableBodyCell>
                 </ListTableBodyRow>
             {/each}
@@ -332,5 +281,5 @@
     on:click={handleDeleteConfirmation}
 >
     <div slot="title">{uiContext.str(stringResKeys.general.confirmation)}</div>
-    <div slot="content">{uiContext.str(stringResKeys.envEditor.deleteRowConfirmation)}</div>
+    <div slot="content">{uiContext.str(stringResKeys.environmentEditor.deleteRowConfirmation)}</div>
 </AlertDialog>

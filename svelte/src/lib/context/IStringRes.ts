@@ -9,7 +9,7 @@ export interface IStringRes {
     deleteTestCaseConfirmationDialog: IDeleteTestCaseConfirmationDialogStringRes;
     deleteTestRoutineWarningDialog: IDeleteTestRoutineWarningDialogStringRes;
     culture: ICultureStringRes;
-    envEditor: IEnvEditorStringRes; 
+    environmentEditor: IEnvironementEditorStringRes; 
     fileExplorer: IFileExplorerStringRes;
     form: IFormStringRes;
     general: IGeneralStringRes;
@@ -63,21 +63,6 @@ export interface IApplicationStringRes {
     name: string;
 }
 
-export interface IDeletePageWarningDialogStringRes {
-    dialogContent: string;
-    dialogTitle: string;
-}
-
-export interface IDeleteTestCaseConfirmationDialogStringRes {
-    dialogContent: string;
-    dialogTitle: string;
-}
-
-export interface IDeleteTestRoutineWarningDialogStringRes {
-    dialogContent: string;
-    dialogTitle: string;
-}
-
 export interface ICodeGenerationDialogStringRes {
     buildMsg: string;
     checkPrerequisites: string;
@@ -95,9 +80,25 @@ export interface ICodeGenerationDialogStringRes {
     validateInputMsg: string;
 }
 
-export interface IEnvEditorStringRes {
+export interface IDeletePageWarningDialogStringRes {
+    dialogContent: string;
+    dialogTitle: string;
+}
+
+export interface IDeleteTestCaseConfirmationDialogStringRes {
+    dialogContent: string;
+    dialogTitle: string;
+}
+
+export interface IDeleteTestRoutineWarningDialogStringRes {
+    dialogContent: string;
+    dialogTitle: string;
+}
+
+export interface IEnvironementEditorStringRes {
     actions: string;
     deleteRowConfirmation: string;
+    invalidNameMessage: string;
     name: string;
     value: string;
 }

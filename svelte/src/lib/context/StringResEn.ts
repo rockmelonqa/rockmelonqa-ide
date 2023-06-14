@@ -83,9 +83,10 @@ export const stringResEn: IStringRes = {
         dialogContent: "This test routine is being used by following test case(s).",
         dialogTitle: "Warning",
     },
-    envEditor: {
+    environmentEditor: {
         actions: "Actions",
         deleteRowConfirmation: "Are you sure to delete this row?", 
+        invalidNameMessage: "Only accepts a-z, A-Z, 0-9 characters",
         name: "Name",
         value: "Value",
         

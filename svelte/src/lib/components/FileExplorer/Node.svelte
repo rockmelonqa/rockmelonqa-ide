@@ -129,22 +129,6 @@
         typeToAdd = fileType;
     };
 
-    const isEnvFileNameValid = (fileName: string) => {
-        const nameAndExt = fileName.split(".");
-        if (nameAndExt.length != 2) {
-            return false;
-        }
-
-        const name = nameAndExt[0];
-
-        if (name) {
-            const regex = /^[A-Za-z0-9_-]+$/;
-            return regex.test(name);
-        }
-
-        return true;
-    };
-
     const handleMenuRename = () => {
         appStateDispatch({
             type: AppActionType.UpdateFile,
@@ -230,11 +214,6 @@
             if (typeToAdd === FileType.Folder) {
                 fileSystem.createFolder(newPath);
             } else {
-                if (typeToAdd == FileType.Env) {
-                    if (!isEnvFileNameValid(value)) {
-                        return false;
-                    }
-                }
                 await fileSystem.writeFile(newPath, "");
             }
         }
@@ -277,12 +256,6 @@
                 value: { editMode: false },
             });
             return;
-        }
-
-        if (newName.split('.')[1] === FileType.Env.toLowerCase()) {
-            if (!isEnvFileNameValid(newName)) {
-                return;
-            }
         }
 
         // if change node name, invoke rename action
@@ -457,31 +430,34 @@
 {#if showMenu}
     <Menu {...position} on:click={closeMenu} on:clickoutside={closeMenu}>
         {#if type == FileType.Folder}
-            <MenuItem
-                label={uiContext.str(stringResKeys.fileExplorer.newFolder)}
-                on:click={() => handleMenuNew(FileType.Folder)}
-            />
-            {#if nodePath.includes(StandardFolder.PageDefinitions)}
+            {#if nodePath !== StandardFolder.Config}
+                <MenuItem
+                    label={uiContext.str(stringResKeys.fileExplorer.newFolder)}
+                    on:click={() => handleMenuNew(FileType.Folder)}
+                />
+            {/if}
+
+            {#if nodePath.startsWith(StandardFolder.PageDefinitions)}
                 <MenuItem
                     label={uiContext.str(stringResKeys.fileExplorer.newPage)}
                     on:click={() => handleMenuNew(FileType.Page)}
                 />
-            {:else if nodePath.includes(StandardFolder.TestCases)}
+            {:else if nodePath.startsWith(StandardFolder.TestCases)}
                 <MenuItem
                     label={uiContext.str(stringResKeys.fileExplorer.newTestCase)}
                     on:click={() => handleMenuNew(FileType.TCase)}
                 />
-            {:else if nodePath.includes(StandardFolder.TestRoutines)}
+            {:else if nodePath.startsWith(StandardFolder.TestRoutines)}
                 <MenuItem
                     label={uiContext.str(stringResKeys.fileExplorer.newTestRoutine)}
                     on:click={() => handleMenuNew(FileType.TRoutine)}
                 />
-            {:else if nodePath.includes(StandardFolder.TestSuites)}
+            {:else if nodePath.startsWith(StandardFolder.TestSuites)}
                 <MenuItem
                     label={uiContext.str(stringResKeys.fileExplorer.newTestSuite)}
                     on:click={() => handleMenuNew(FileType.TSuite)}
                 />
-            {:else if nodePath.includes(StandardFolder.Config)}
+            {:else if nodePath.startsWith(StandardFolder.Config)}
                 <MenuItem
                     label={uiContext.str(stringResKeys.fileExplorer.newEnvFile)}
                     on:click={() => handleMenuNew(FileType.Env)}
