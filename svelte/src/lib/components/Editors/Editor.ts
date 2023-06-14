@@ -40,6 +40,9 @@ export const toTitle = (fileName: string): string => {
     const lastIndex = fileName.lastIndexOf('.');
     const ext = lastIndex < 0 ? '' : fileName.substring(lastIndex).toLowerCase();
     switch (ext) {
+        case StandardFileExtension.Environment:
+            fileName = fileName.slice(0, -StandardFileExtension.Environment.length) + ' Environment';
+            break;
         case StandardFileExtension.Page:
             fileName = fileName.slice(0, -StandardFileExtension.Page.length) + ' Page';
             break;
