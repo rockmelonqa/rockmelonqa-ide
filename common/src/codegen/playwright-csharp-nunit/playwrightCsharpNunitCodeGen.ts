@@ -11,7 +11,7 @@ import {
 } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
-import { ICodeGen } from "../types";
+import { ICodeGen, WriteFileFn } from "../types";
 import { addIndent, hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
 import { NunitProjectMeta } from "./nunitProjectMeta";
 import { PlaywrightCsharpNunitTemplatesProvider } from "./playwrightCsharpNunitTemplatesProvider";
@@ -36,33 +36,25 @@ export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implem
   }
 
   async generateCode(full: boolean, writeFile: (path: string, content: string) => Promise<void>): Promise<string> {
-    // Each page definition will be a property
-    // Filename: PageDefinitions.cs
-    await writeFile(
-      `${StandardOutputFile.PageDefinitions}${this._outputFileExt}`,
-      this.generatePageDefinitions(this._projMeta.pages.map((p) => p.content))
-    );
+    await this.generateEnvironmentSettingsFile(writeFile);
+    await this.generateEnvironmentSetterScripts(writeFile);
 
-    // # Generate Page definition for each page
-    // Filename: Pages/{PageName}.cs
-    for (let page of this._projMeta.pages) {
-      let filePath = this._outProjMeta.get(page.content.id)!.outputFileRelPath;
-      await writeFile(filePath, this.generatePage(page.content));
+    await this.generatePageFiles(writeFile);
+    await this.generateCaseFiles(writeFile);
+    await this.generateRoutineFiles(writeFile);
+    await this.generateSuiteFiles(writeFile);
+    await this.generateSupportFiles(writeFile);
+
+    if (full) {
+      await this.generateProjectFiles(writeFile);
     }
 
-    // # Generate TestCase
+    await this.generateMetaFiles(writeFile);
 
-    for (let { content: testCase } of this._projMeta.testCases) {
-      let testClassContent = this.generateTestCaseFile(
-        testCase,
-        this._projMeta.pages.map((p) => p.content),
-        this._projMeta.testRoutines.map((p) => p.content)
-      );
-      let outputFileRelPath = this._outProjMeta.get(testCase.id)!.outputFileRelPath;
+    return "";
+  }
 
-      await writeFile(outputFileRelPath, testClassContent);
-    }
-
+  async generateRoutineFiles(writeFile: WriteFileFn) {
     // Filename: TestRoutines/{TestRoutineName}.cs
     for (let { content: testRoutine } of this._projMeta.testRoutines) {
       const datasets: IDataSetInfo[] = generateDatasetInfos(testRoutine);
@@ -82,8 +74,32 @@ export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implem
       let outputFileRelPath = this._outProjMeta.get(testRoutine.id)!.outputFileRelPath;
       await writeFile(outputFileRelPath, testRoutineFile);
     }
+  }
 
-    // Filename: Tests/{TestClassName}.cs
+  async generateCaseFiles(writeFile: WriteFileFn) {
+    // # Generate TestCase files
+
+    for (let { content: testCase } of this._projMeta.testCases) {
+      let testClassContent = this.generateTestCaseFile(
+        testCase,
+        this._projMeta.pages.map((p) => p.content),
+        this._projMeta.testRoutines.map((p) => p.content)
+      );
+      let outputFileRelPath = this._outProjMeta.get(testCase.id)!.outputFileRelPath;
+
+      await writeFile(outputFileRelPath, testClassContent);
+    }
+  }
+  async generatePageFiles(writeFile: WriteFileFn) {
+    // # Generate Page definition for each page
+    // Filename: Pages/{PageName}.cs
+    for (let page of this._projMeta.pages) {
+      let filePath = this._outProjMeta.get(page.content.id)!.outputFileRelPath;
+      await writeFile(filePath, this.generatePage(page.content));
+    }
+  }
+  async generateSuiteFiles(writeFile: WriteFileFn) {
+    // Filename: TestSuites/{TestClassName}.cs
     for (let testSuite of this._projMeta.testSuites) {
       let fileRelPath = this._outProjMeta.get(testSuite.content.id)!.outputFileRelPath;
       let classContent = this.generateTestSuiteFile(
@@ -92,8 +108,15 @@ export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implem
       );
       await writeFile(fileRelPath, classContent);
     }
+  }
 
-    // # Generate TestLocatorHelper
+  async generateSupportFiles(writeFile: WriteFileFn) {
+    // Each page definition will be a property
+    // Filename: PageDefinitions.cs
+    await writeFile(
+      `${StandardOutputFile.PageDefinitions}${this._outputFileExt}`,
+      this.generatePageDefinitions(this._projMeta.pages.map((p) => p.content))
+    );
 
     // Filename: Support/LocatorHelper.cs
     await writeFile(
@@ -111,28 +134,23 @@ export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implem
       `${StandardOutputFolder.Support}/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
       this._templateProvider.getTestSuiteBase(this._rmprojFile.content.rootNamespace, this._rmprojFile.content.testIdAttributeName)
     );
-    // # Generate full project files
-    // Files:
-    //     - {Namespace}.csproj
-    //     - Usings.cs
-    //     - .runsettings
-    if (full) {
-      await writeFile(
-        `${this._rmprojFile.content.rootNamespace}.csproj`,
-        this._templateProvider.getCsProject(this._rmprojFile.content.rootNamespace)
-      );
-      await writeFile(
-        `${StandardOutputFile.Usings}${this._outputFileExt}`,
-        this._templateProvider.getUsings(this._rmprojFile.content.rootNamespace, this._projMeta.testRoutines.length > 0)
-      );
-      await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
-    }
-
+  }
+  async generateMetaFiles(writeFile: WriteFileFn) {
     // Write output project metadata
     const outputProjectMetadata = await createOutputProjectMetadata(this._rmprojFile);
     await writeFile(StandardOutputFile.MetaData, JSON.stringify(outputProjectMetadata, null, 2));
+  }
 
-    return "";
+  async generateProjectFiles(writeFile: WriteFileFn) {
+    await writeFile(
+      `${this._rmprojFile.content.rootNamespace}.csproj`,
+      this._templateProvider.getCsProject(this._rmprojFile.content.rootNamespace)
+    );
+    await writeFile(
+      `${StandardOutputFile.Usings}${this._outputFileExt}`,
+      this._templateProvider.getUsings(this._rmprojFile.content.rootNamespace, this._projMeta.testRoutines.length > 0)
+    );
+    await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
   }
 
   generatePageDefinitions(pages: IPage[]): string {
