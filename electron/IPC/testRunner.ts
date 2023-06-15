@@ -1,17 +1,17 @@
-import { BrowserWindow } from "electron";
-import fs from "fs";
-import moment from "moment";
-import path from "path";
-import { IIpcGenericResponse, IProgressDetail, IProgressEvent, StandardFolder } from "rockmelonqa.common";
-import { StandardOutputFile } from "rockmelonqa.common/file-defs";
-import { IRunTestRequest, IRunTestResponseData } from "rockmelonqa.common/ipc-defs";
-import * as fileSystem from "../utils/fileSystem";
-import { StringBuilder } from "../utils/stringBuilder";
-import { IRunTestActionResult, IRunTestContext, runTest as runTestInWorker } from "../worker/actions/runTest";
-import { IChannels } from "./core/channelsInterface";
-import IPC from "./core/ipc";
+import { BrowserWindow } from 'electron';
+import fs from 'fs';
+import moment from 'moment';
+import path from 'path';
+import { IIpcGenericResponse, IProgressDetail, IProgressEvent, StandardFolder } from 'rockmelonqa.common';
+import { StandardOutputFile } from 'rockmelonqa.common/file-defs';
+import { IRunTestRequest, IRunTestResponseData } from 'rockmelonqa.common/ipc-defs';
+import * as fileSystem from '../utils/fileSystem';
+import { StringBuilder } from '../utils/stringBuilder';
+import { IRunTestActionResult, IRunTestContext, runTest as runTestInWorker } from '../worker/actions/runTest';
+import { IChannels } from './core/channelsInterface';
+import IPC from './core/ipc';
 
-const nameAPI = "testRunner";
+const nameAPI = 'testRunner';
 
 // to Main
 const validSendChannel: IChannels = { runTest: runTest };
@@ -19,7 +19,7 @@ const validSendChannel: IChannels = { runTest: runTest };
 const validInvokeChannel: IChannels = {};
 
 // from Main
-const validReceiveChannel: string[] = ["running-test", "finish"];
+const validReceiveChannel: string[] = ['running-test', 'finish'];
 
 const testRunner = new IPC({
   nameAPI,
@@ -33,7 +33,7 @@ export default testRunner;
 async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEvent, request: IRunTestRequest) {
   const { projFile, setting } = request;
 
-  const storageFolder = path.join(StandardFolder.TestRuns, moment().format("YYYYMMDD_HHmmss"));
+  const storageFolder = path.join(StandardFolder.TestRuns, moment().format('YYYYMMDD_HHmmss'));
   let actionRs: IRunTestActionResult;
   const sb = new StringBuilder();
 
@@ -69,7 +69,7 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
     actionRs = { isSuccess: false, errorMessage: String(error) };
   }
 
-  console.log("Finish runTest", actionRs);
+  console.log('Finish runTest', actionRs);
 
   const ipcRs: IIpcGenericResponse<IRunTestResponseData> = {
     isSuccess: actionRs.isSuccess,
@@ -82,7 +82,7 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
 
   // Print log file
   try {
-    sb.appendLine(`*** Finish at ${moment().format("MMMM Do YYYY, h:mm:ss a")}`);
+    sb.appendLine(`*** Finish at ${moment().format('MMMM Do YYYY, h:mm:ss a')}`);
     sb.appendLine(JSON.stringify(ipcRs, null, 4));
 
     const logFileName = `run-test.log`;
@@ -91,6 +91,6 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
 
     ipcRs.data = { ...ipcRs.data, logFileName: logFileName } as IRunTestResponseData;
   } finally {
-    browserWindow.webContents.send("finish", ipcRs);
+    browserWindow.webContents.send('finish', ipcRs);
   }
 }

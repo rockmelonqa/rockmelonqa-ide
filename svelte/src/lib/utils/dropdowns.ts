@@ -1,8 +1,9 @@
-import { stringResKeys } from '$lib/context/StringResKeys';
-import type { IUiContext } from '$lib/context/UiContext';
-import type { IDropdownOption } from '$lib/controls/DropdownField';
-import { ActionType, AutomationFramework, Indent, Language, LocatorType, TestFramework } from 'rockmelonqa.common';
-import { Browser } from 'rockmelonqa.common/file-defs/rmProjFile';
+import { stringResKeys } from "$lib/context/StringResKeys";
+import type { IUiContext } from "$lib/context/UiContext";
+import type { IDropdownOption } from "$lib/controls/DropdownField";
+import { ActionType, AutomationFramework, Indent, Language, LocatorType, TestFramework } from "rockmelonqa.common";
+import type { IEnvironmentFileInfo } from "rockmelonqa.common/codegen/types";
+import { Browser } from "rockmelonqa.common/file-defs/rmProjFile";
 
 const toLowerFirstChar = (str: string): string => {
     return `${str.charAt(0).toLowerCase()}${str.slice(1)}`;
@@ -55,5 +56,12 @@ export const getActionTypeDropDownOptions = (uiContext: IUiContext): IDropdownOp
 };
 
 export const getBrowserDropDownOptions = (uiContext: IUiContext): IDropdownOption[] => {
-    return [{ key: '', text: uiContext.str(stringResKeys.runTestDialog.headless) }, ...browserOptions];
+    return [{ key: "", text: uiContext.str(stringResKeys.runTestDialog.headless) }, ...browserOptions];
+};
+
+export const getEnvironmentFileDropDownOptions = (
+    uiContext: IUiContext,
+    environments: IEnvironmentFileInfo[]
+): IDropdownOption[] => {
+    return environments.map((e) => ({ key: e.outputFileRelPath, text: e.inputFileName }));
 };

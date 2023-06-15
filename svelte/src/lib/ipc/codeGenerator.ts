@@ -94,7 +94,7 @@ const getOutputProjectMetadata = async (
         return response.data;
     } else {
         console.error(`Cannot get output project metadata. ${response.errorMessage}`);
-        return { suites: [], cases: [], pages: [] };
+        return { suites: [], cases: [], pages: [], environments: [] };
     }
 };
 
