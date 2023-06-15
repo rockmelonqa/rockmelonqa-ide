@@ -7,11 +7,14 @@ import TestRoutineEditor from './TestRoutineEditor/TestRoutineEditor.svelte';
 import TestSuiteEditor from './TestSuiteEditor.svelte';
 import TextEditor from './TextEditor.svelte';
 import TrxViewer from './TrxViewer/TrxViewer.svelte';
+import EnvEditor from './EnvironmentEditor.svelte';
 
 export const getEditor = (fileName: string): ComponentType | undefined => {
     const lastIndex = fileName.lastIndexOf('.');
     const ext = lastIndex < 0 ? '' : fileName.substring(lastIndex).toLowerCase();
     switch (ext) {
+        case StandardFileExtension.Environment:
+            return EnvEditor;
         case StandardFileExtension.Page:
             return PageDefinitionEditor;
         case StandardFileExtension.Project:
@@ -37,6 +40,9 @@ export const toTitle = (fileName: string): string => {
     const lastIndex = fileName.lastIndexOf('.');
     const ext = lastIndex < 0 ? '' : fileName.substring(lastIndex).toLowerCase();
     switch (ext) {
+        case StandardFileExtension.Environment:
+            fileName = fileName.slice(0, -StandardFileExtension.Environment.length) + ' Environment';
+            break;
         case StandardFileExtension.Page:
             fileName = fileName.slice(0, -StandardFileExtension.Page.length) + ' Page';
             break;

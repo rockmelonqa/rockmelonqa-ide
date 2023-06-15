@@ -6,10 +6,10 @@ import { IOutputProjectMetadataProcessor } from "./playwright-charp-common/outpu
 import { ICodeGen, SourceFileValidationError } from "./types";
 
 export {
+  CodeGenMetaFactory,
   createOutputProjectMetadata,
   createSourceProjectMetadata,
   generateCode,
-  CodeGenMetaFactory,
   IOutputProjectMetadataProcessor,
   ICodeGen,
   SourceFileValidationError,
