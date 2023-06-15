@@ -149,6 +149,15 @@ export const stringResKeys = {
         rootNamespace: "project.rootNamespace",
         testFramework: "project.testFramework",
     },
+    routinePickerDialog: {
+        availableOptions: 'routinePickerDialog.availableOptions',
+        dataset: 'routinePickerDialog.dataset',
+        dialogTitle: 'routinePickerDialog.dialogTitle',
+        routine: 'routinePickerDialog.routine',
+        selectAll: 'routinePickerDialog.selectAll',
+        selectedOption: 'routinePickerDialog.selectedOption',
+        unselectAll: 'routinePickerDialog.unselectAll',
+    },
     runTestDialog: {
         dialogTitle: "runTestDialog.dialogTitle",
         errorMsg: "runTestDialog.errorMsg",

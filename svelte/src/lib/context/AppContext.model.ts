@@ -36,7 +36,7 @@ export interface ITestRoutineData {
     id: string;
     name: string;
     steps: ITestRoutineStepData[];
-    dataSets: Map<string, IDataSetData>;
+    datasets: Map<string, IDataSetData>;
     filePath: string;
 }
 

@@ -197,6 +197,15 @@ export const stringResEn: IStringRes = {
         testIdAttributeName: "Test Id Attribute Name",
         testFramework: "Test Framework",
     },
+    routinePickerDialog: {
+        availableOptions: 'Available options',
+        dataset: 'Dataset',
+        dialogTitle: 'Select Routine - Dataset',
+        routine: 'Routine',
+        selectAll: 'Select all',
+        selectedOption: 'Selected options',
+        unselectAll: 'Unselect all',
+    },
     runTestDialog: {
         dialogTitle: "Run Tests",
         errorMsg: `There are errors with following logs.`,

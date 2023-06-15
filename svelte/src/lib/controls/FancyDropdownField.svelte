@@ -15,6 +15,7 @@
     export let name: string;
     export let value: string;
     export let options: IDropdownOption[];
+    export let label: string = '';
 
     //*****************************************
     // Init
@@ -32,6 +33,7 @@
     $: containerCss = dropdownTheme?.dropdownContainer;
 
     let rootId = `${name}_root`;
+    let labelId = `${name}_label`;
     let selectId = `${name}_select`;
 
     //*****************************************
@@ -48,6 +50,9 @@
 </script>
 
 <div id={rootId} class="dropdown-field-root {dropdownTheme.root}">
+    {#if label}
+        <label id={labelId} for={name} class="dropdown-field-label {dropdownTheme?.label}">{label}</label>
+    {/if}
     <div class="dropdown-field-select-container {containerCss}">
         <Select
             id={selectId}

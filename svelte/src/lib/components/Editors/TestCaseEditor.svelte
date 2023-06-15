@@ -21,6 +21,7 @@
     import AddIcon from "$lib/icons/AddIcon.svelte";
     import CommentIcon from "$lib/icons/CommentIcon.svelte";
     import DeleteIcon from "$lib/icons/DeleteIcon.svelte";
+    import ListIcon from "$lib/icons/ListIcon.svelte";
     import MoveDownIcon from "$lib/icons/MoveDownIcon.svelte";
     import MoveUpIcon from "$lib/icons/MoveUpIcon.svelte";
     import SaveIcon from "$lib/icons/SaveIcon.svelte";
@@ -45,7 +46,7 @@
     import { toTitle, isPagelessAction } from "./Editor";
     import type { ITestStepComment, ITestStepRegular } from "rockmelonqa.common/file-defs/testCaseFile";
     import { removeFileExtension } from "$lib/utils/utils";
-    import ListIcon from "$lib/icons/ListIcon.svelte";
+    import RoutinePickerDialog from "$lib/dialogs/RoutinePickerDialog.svelte";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -371,8 +372,8 @@
         const routine = $appState.testRoutines.get(routineId);
         if (routine) {
             const selectedDataSet = dataSetIds
-                .filter(key => routine.dataSets.has(key)) 
-                .map(key => routine.dataSets.get(key)!.name) ?? [];   
+                .filter(key => routine.datasets.has(key)) 
+                .map(key => routine.datasets.get(key)!.name) ?? [];   
             
             let label = removeFileExtension(routine.name);
             if (selectedDataSet.length > 0) {
@@ -383,6 +384,17 @@
         }
 
         return '';
+    }
+
+    let showRoutinePickerDialog: boolean = false;
+    let indexToSelectRoutine: number;
+    let selectingRoutineId: string = '';
+    let selectingDatasets: string[] = [];
+    const handleShowRoutinePickerDialog = (stepItem: IDictionary, stepIndex: number) => {
+        showRoutinePickerDialog = true;
+        indexToSelectRoutine = stepIndex;
+        selectingRoutineId = stepItem.data ?? '';
+        selectingDatasets = stepItem.parameters ?? [];
     }
 </script>
 
@@ -469,17 +481,20 @@
                             {#if item.action === ActionType.RunTestRoutine.toString()}
                                 <div class="flex justify-between items-center">
                                     <div class="grow">
-                                    <TextField
-                                        name={`${formContext.formName}_${index}_data`}
-                                        value={toRoutineData(item)}
-                                        class="truncate"
-                                        readonly={true} />
+                                        {#each [toRoutineData(item)] as routineData}
+                                            <TextField
+                                                name={`${formContext.formName}_${index}_data`}
+                                                value={routineData}
+                                                title={routineData}
+                                                class="truncate"
+                                                readonly={true} />
+                                        {/each}
                                     </div>
                                     <IconLinkButton
-                                        on:click={() => console.log('Select routine')}
+                                        on:click={() => handleShowRoutinePickerDialog(item, index)}
                                         title="Select routine"
                                     >
-                                        <svelte:fragment slot="icon"><ListIcon class="h-5 w-5" strokeColor="#e56d00" /></svelte:fragment>
+                                        <svelte:fragment slot="icon"><ListIcon class="h-5 w-5" strokeColor="var(--color-brand)" /></svelte:fragment>
                                     </IconLinkButton>
                                 </div>
                             {:else}
@@ -567,3 +582,9 @@
     <div slot="title">{uiContext.str(stringResKeys.general.confirmation)}</div>
     <div slot="content">{uiContext.str(stringResKeys.testCaseEditor.deleteRowConfirmation)}</div>
 </AlertDialog>
+
+<RoutinePickerDialog
+    bind:showDialog={showRoutinePickerDialog}
+    routineId={selectingRoutineId}
+    datasets={selectingDatasets}
+/>

@@ -440,7 +440,7 @@
             id: testRoutine.id,
             name: name,
             steps: steps,
-            dataSets: datasetsMap,
+            datasets: datasetsMap,
             filePath: path,
         } as ITestRoutineData;
     };
