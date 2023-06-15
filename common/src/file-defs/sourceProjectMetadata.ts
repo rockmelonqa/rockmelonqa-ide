@@ -1,4 +1,4 @@
-import { IConfigurationFile } from "./configFile";
+import { IEnvironmentFile } from "./environmentFile";
 import { IPageFile } from "./pageFile";
 import { IRmProjFile } from "./rmProjFile";
 import { ITestCaseFile } from "./testCaseFile";
@@ -6,7 +6,7 @@ import { ITestRoutineFile } from "./testRoutineFile";
 import { ITestSuiteFile } from "./testSuiteFile";
 
 export interface ISourceProjectMetadata {
-  configFiles: IConfigurationFile[];
+  environmentFiles: IEnvironmentFile[];
   project: IRmProjFile;
   pages: IPageFile[];
   testRoutines: ITestRoutineFile[];

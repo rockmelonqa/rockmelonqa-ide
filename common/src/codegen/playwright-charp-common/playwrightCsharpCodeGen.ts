@@ -5,6 +5,7 @@ import {
   ISourceProjectMetadata,
   ITestCase,
   ITestRoutine,
+  StandardFileExtension,
   StandardOutputFile,
   StandardOutputFolder,
 } from "../../file-defs";
@@ -15,7 +16,14 @@ import { createCleanName } from "../utils/createName";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { IDataSetInfo } from "./dataSetInfo";
 import { IPlaywrightCsharpTemplatesProvider } from "./playwrightCsharpTemplatesProvider";
-import { WriteFileFn } from "../types";
+import { ActionDataType, IActionData, WriteFileFn } from "../types";
+import path from "path";
+import {
+  IEnvironmentVariableFileGenerator,
+  UnixEnvironmentVariableFileGenerator,
+  WindowEnvironmentVariableFileGenerator,
+} from "../codegen-common/environmentVariableFileGenerator";
+import { Platform } from "../../file-defs/platform";
 
 /** Base CodeGen for MsTest, Nunit, Xunit CodeGens */
 export class PlaywrightCsharpCodeGen {
@@ -24,6 +32,7 @@ export class PlaywrightCsharpCodeGen {
   protected _indentString: string;
   protected _indentChar: string;
   protected _indentSize: number;
+  protected _envVarFileGenerator: IEnvironmentVariableFileGenerator;
 
   protected _projMeta: ISourceProjectMetadata;
   protected _rmprojFile: IRmProjFile;
@@ -48,6 +57,10 @@ export class PlaywrightCsharpCodeGen {
 
     this._outProjMeta = this.getOutProjMeta();
     this._templateProvider = this.getTemplateProvider();
+
+    this._envVarFileGenerator = Platform.IsWindows()
+      ? new WindowEnvironmentVariableFileGenerator()
+      : new UnixEnvironmentVariableFileGenerator();
   }
 
   protected getOutProjMeta(): IOutputProjectMetadataProcessor {
@@ -61,13 +74,22 @@ export class PlaywrightCsharpCodeGen {
   protected async generateEnvironmentSettingsFile(writeFile: WriteFileFn) {
     // Aggregate all variable names in all config file
     let allNames: string[] = [];
-    for (let configFile of this._projMeta.configFiles) {
+    for (let configFile of this._projMeta.environmentFiles) {
       let namesInFile = configFile.content.settings.map((setting) => setting.name);
       allNames.push(...namesInFile);
     }
     allNames = Array.from(new Set(allNames));
     const content = this._templateProvider.getEnvironmentSettingsFiles(this._rmprojFile.content.rootNamespace, allNames);
     await writeFile(`${StandardOutputFolder.Config}/${StandardOutputFile.EnvironmentSettings}${this._outputFileExt}`, content);
+  }
+
+  protected async generateEnvironmentSetterScripts(writeFile: WriteFileFn) {
+    for (let configFile of this._projMeta.environmentFiles) {
+      const fileContent = this._envVarFileGenerator.generate(configFile);
+      const sourceFileNameWithoutExt = path.parse(configFile.fileName).name;
+      const fileExt = Platform.IsWindows() ? StandardFileExtension.Bat : StandardFileExtension.Sh;
+      await writeFile(`${StandardOutputFolder.DotEnvironment}/run.${sourceFileNameWithoutExt}.env${fileExt}`, fileContent);
+    }
   }
 
   protected generateTestCaseBody(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {
@@ -95,12 +117,13 @@ export class PlaywrightCsharpCodeGen {
           }
         }
 
+        let actionData = this.getActionData(step.data);
         stepItems.push(
           this._templateProvider.getAction({
             pageName: pageName,
             elementName: upperCaseFirstChar(elementName),
             action: step.action! as unknown as ActionType,
-            data: String(step.data),
+            data: actionData,
             parameters: step.parameters || [],
           })
         );
@@ -165,12 +188,13 @@ export class PlaywrightCsharpCodeGen {
           }
         }
 
+        let actionData = this.getActionData(datasetInfo.values[stepIndex]);
         stepItems.push(
           this._templateProvider.getAction({
             pageName: pageName,
             elementName: upperCaseFirstChar(elementName),
             action: step.action! as unknown as ActionType,
-            data: datasetInfo.values[stepIndex],
+            data: actionData,
             parameters: step.parameters || [],
           })
         );
@@ -195,4 +219,23 @@ export class PlaywrightCsharpCodeGen {
     testcaseBody = addIndent(testcaseBody, this._indentString.repeat(2));
     return testcaseBody;
   }
+
+  private getActionData(rawData: any): IActionData {
+    if (PlaywrightCsharpCodeGen.EnvironmentVariableDataRegex.test(rawData)) {
+      let groups = PlaywrightCsharpCodeGen.EnvironmentVariableDataRegex.exec(rawData)!;
+      let varName = groups[1];
+      return {
+        rawData: varName,
+        dataType: ActionDataType.EnvironmentVar,
+      };
+    }
+
+    return {
+      rawData: String(rawData),
+      dataType: ActionDataType.LiteralValue,
+    };
+  }
+
+  /** Regex to test for Environment variable data: e.g "{TestUser}", "{TestPassword}" */
+  private static readonly EnvironmentVariableDataRegex = /{(.+)}/;
 }

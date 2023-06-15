@@ -1,14 +1,60 @@
 import { LocatorType } from "../../../src/file-defs";
-import { IPage, ITestCase, ITestRoutine, ITestSuite } from "../../test-helpers/rm-project-spec.types";
+import { IConfig, IPage, ITestCase, ITestRoutine, ITestSuite } from "../../test-helpers/rm-project-spec.types";
 
 export interface ITestData {
   pages: IPage[];
   testcases: ITestCase[];
   testsuites: ITestSuite[];
   testroutines: ITestRoutine[];
+  configFiles: IConfig[];
 }
 
 export const simpleRoutineTestData: ITestData = {
+  configFiles: [
+    {
+      name: "default",
+      settings: [
+        {
+          name: "TestUser",
+          value: "jim",
+        },
+        {
+          name: "TestPassword",
+          value: "xxx",
+        },
+        {
+          name: "RememeberMe",
+          value: "yes",
+        },
+        {
+          name: "DelayMs",
+          value: "2000",
+        },
+        {
+          name: "TheUrl",
+          value: "https://github.com/",
+        },
+        {
+          name: "Attr",
+          value: "name=Test",
+        },
+      ],
+    },
+    {
+      name: "local",
+      settings: [
+        {
+          name: "TestUser",
+          value: "john",
+        },
+        {
+          name: "TestPassword",
+          value: "yyy",
+        },
+      ],
+    },
+  ],
+
   pages: [
     {
       id: "",
@@ -76,16 +122,16 @@ export const simpleRoutineTestData: ITestData = {
           type: "testStep",
           page: "FillsScreen",
           element: "street",
-          action: "Input",
-          data: "Nguyen Van Linh",
+          action: "Clear",
+          data: "",
         },
         {
           id: "",
           type: "testStep",
           page: "FillsScreen",
           element: "district",
-          action: "Input",
-          data: "Seven",
+          action: "Click",
+          data: "",
         },
         {
           id: "",
@@ -96,10 +142,138 @@ export const simpleRoutineTestData: ITestData = {
         {
           id: "",
           type: "testStep",
+          page: "FillsScreen",
+          element: "district",
+          action: "ClickPopup",
+          data: "",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "",
+          element: "",
+          action: "ClosePopup",
+          data: "",
+        },
+        {
+          id: "",
+          type: "testStep",
           page: "",
           element: "",
           action: "Delay",
           data: "2000",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "FillsScreen",
+          element: "district",
+          action: "Input",
+          data: "ABC",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "FillsScreen",
+          element: "district",
+          action: "InputByCode",
+          data: "string.Empty",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "",
+          element: "",
+          action: "RunCode",
+          data: "await defs.FillsScreenPage.Name().SelectOptionAsync(EnvironmentSettings.TestUser);",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "FillsScreen",
+          element: "district",
+          action: "SelectOption",
+          data: "ABC",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "FillsScreen",
+          element: "district",
+          action: "VerifyAttribute",
+          data: "ABC=DEF",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "FillsScreen",
+          element: "district",
+          action: "VerifyHasText",
+          data: "ABC",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "FillsScreen",
+          element: "district",
+          action: "VerifyHasValue",
+          data: "ABC",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "FillsScreen",
+          element: "district",
+          action: "VerifyIsEditable",
+          data: "",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "FillsScreen",
+          element: "district",
+          action: "VerifyIsReadOnly",
+          data: "",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "FillsScreen",
+          element: "district",
+          action: "VerifyIsHidden",
+          data: "",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "FillsScreen",
+          element: "district",
+          action: "VerifyIsVisible",
+          data: "",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "",
+          element: "",
+          action: "VerifyTitle",
+          data: "TRZ",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "",
+          element: "",
+          action: "VerifyTitleContains",
+          data: "nnn213gfhsd",
+        },
+        {
+          id: "",
+          type: "testStep",
+          page: "",
+          element: "",
+          action: "VerifyUrl",
+          data: "https://stackoverflow.com/",
         },
       ],
     },

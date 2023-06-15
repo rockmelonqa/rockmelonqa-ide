@@ -15,7 +15,7 @@ const codegenMetaRegisty: { [key in keyof typeof AutomationFramework]?: { [key i
 };
 
 export class CodeGenMetaFactory {
-  /** Creates new instance of Codegen based on  { automationFramework, testFramework }*/
+  /** Creates new instance of Codegen Meta Generator based on  { automationFramework, testFramework }*/
   static newInstance(projMeta: ISourceProjectMetadata): IOutputProjectMetadataProcessor {
     let automationFramework = codegenMetaRegisty[projMeta.project.content.automationFramework];
 

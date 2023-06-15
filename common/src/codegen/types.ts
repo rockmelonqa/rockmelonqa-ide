@@ -1,6 +1,19 @@
 import { ActionType, LocatorType } from "../file-defs";
 import { IProgressEvent } from "../ipc-defs";
 
+/** Action data type indicator */
+export enum ActionDataType {
+  /** Indicates that the data string is a literal value: string, number, ... */
+  LiteralValue = "LiteralValue",
+  /** Indicates that the data string is a Environment variable notation, e.g {TestUser}, {TestPassword}*/
+  EnvironmentVar = "EnvironmentVar",
+}
+
+export interface IActionData {
+  rawData: any;
+  dataType: ActionDataType;
+}
+
 export interface ICodeGen {
   generateCode: (full: boolean, writeFile: (path: string, content: string) => Promise<void>) => Promise<string>;
 }
@@ -13,7 +26,7 @@ export interface IActionTemplateParam {
   pageName: string;
   elementName: string;
   action: ActionType;
-  data: string;
+  data: IActionData;
   parameters: string[];
 }
 
@@ -64,6 +77,17 @@ export interface IPageInfo {
   isValid: boolean;
 }
 
+export interface IEnvironmentFileInfo {
+  name: string;
+  inputFileName: string;
+  inputFilePath: string;
+  inputFileRelPath: string;
+  outputFileName: string;
+  outputFilePath: string;
+  outputFileRelPath: string;
+  isValid: boolean;
+}
+
 /** Contains metadata of an output file */
 export interface IOutputFileInfo {
   /** Input file name without extension */
@@ -96,6 +120,7 @@ export interface IOutputProjectMetadata {
   suites: ISuiteInfo[];
   cases: ITestCaseInfo[];
   pages: IPageInfo[];
+  environments: IEnvironmentFileInfo[];
   error?: { message: string; data?: string };
 }
 

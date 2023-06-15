@@ -51,13 +51,13 @@ export class PlaywrightCsharpMsTestTemplatesProvider
   }
 
   getAction(params: IActionTemplateParam) {
-    const actionGenerate = actionRegistyDotnet.get(params.action);
+    const actionGenerateFn = actionRegistyDotnet.get(params.action);
 
-    if (!actionGenerate) {
+    if (!actionGenerateFn) {
       throw new Error("(DEV ERROR) Action is not support: " + params.action);
     }
 
-    return actionGenerate(params);
+    return actionGenerateFn(params);
   }
 
   getLocator(params: ILocatorTemplateParam) {

@@ -2,14 +2,21 @@ import { info } from "console";
 import fs from "fs";
 import path from "path";
 
-import { IRmProjFile, ISourceProjectMetadata, ITestRoutineFile, ITestSuiteFile, StandardFileExtension, StandardFolder } from "../file-defs";
+import {
+  IEnvironmentFile,
+  IRmProjFile,
+  ISourceProjectMetadata,
+  ITestRoutineFile,
+  ITestSuiteFile,
+  StandardFileExtension,
+  StandardFolder,
+} from "../file-defs";
 import { IPageFile } from "../file-defs/pageFile";
 import { ITestCaseFile } from "../file-defs/testCaseFile";
 import { IProgressEvent } from "../ipc-defs";
 import { SourceFileParser } from "./codegen-helpers/sourceFileParser";
 import { readDirRecursiveFilterByExt } from "./utils/fileSystemHelpers";
 import { ProgressEventCallback } from "./types";
-import { IConfiguration, IConfigurationFile } from "../file-defs/configFile";
 
 export const createSourceProjectMetadata = async (
   rmprojFile: IRmProjFile,
@@ -54,7 +61,7 @@ export const createSourceProjectMetadata = async (
   info(`-- Parsing Configuration Variables files`);
   info("--------------------------------------------------");
 
-  let configFiles: IConfigurationFile[] = [];
+  let configFiles: IEnvironmentFile[] = [];
   let configFolder = path.join(rmprojFile.folderPath, StandardFolder.Config);
   let configFilePaths: string[] = await readDirRecursiveFilterByExt(configFolder, StandardFileExtension.Environment);
 
@@ -143,7 +150,7 @@ export const createSourceProjectMetadata = async (
     testCases: caseFiles,
     testSuites: suiteFiles,
     testRoutines: routineFiles,
-    configFiles: configFiles,
+    environmentFiles: configFiles,
   };
 
   return projMeta;

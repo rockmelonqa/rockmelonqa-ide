@@ -1,6 +1,7 @@
 import { EOL } from "os";
 import path from "path";
 import {
+  IEnvironmentContent,
   ISourceProjectMetadata,
   ITestCase,
   ITestRoutine,
@@ -21,7 +22,6 @@ import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCs
 import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
-import { IConfiguration } from "../../file-defs/configFile";
 
 export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen implements ICodeGen {
   /**
@@ -42,6 +42,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
   /** Generate MsTest project */
   public async generateCode(full: boolean, writeFile: WriteFileFn): Promise<string> {
     await this.generateEnvironmentSettingsFile(writeFile);
+    await this.generateEnvironmentSetterScripts(writeFile);
     await this.generatePageFiles(writeFile);
     await this.generateCaseFiles(writeFile);
     await this.generateRoutineFiles(writeFile);
@@ -196,7 +197,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     return this._templateProvider.getPageDefinitions(this._rootNamespace, usings, propertyDeclarations, propertyInits);
   }
 
-  private generateEnvironmentSettingsConten(page: IConfiguration): string {
+  private generateEnvironmentSettingsContent(page: IEnvironmentContent): string {
     return "";
   }
 

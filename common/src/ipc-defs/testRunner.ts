@@ -16,4 +16,5 @@ export interface IRunTestSettings {
   browser: Browser;
   dotnetFilterStr: string;
   outputCodeDir: string;
+  environmentFile: string;
 }

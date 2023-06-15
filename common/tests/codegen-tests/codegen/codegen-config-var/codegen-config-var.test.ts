@@ -24,8 +24,11 @@ test("CodeGen Configuration Variables Test", async () => {
   prepareOutputProject(projSpec.outputFiles, sampleOutputDir);
 
   // Act
-  await generateCode(rmprojFile, (event: IProgressEvent) => {});
+  const sucess = await generateCode(rmprojFile, (event: IProgressEvent) => {
+    console.log(`PROGRESS: ${event.type}. ${event.log}`);
+  });
 
+  console.log(`SUCESS: ${sucess}`);
   // Assert
   // Assert: TODO: just want to run the code without exception
   //doAssert(path.join(rmprojFile.folderPath, StandardFolder.OutputCode), sampleOutputDir);
