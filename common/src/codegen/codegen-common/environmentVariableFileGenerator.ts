@@ -22,6 +22,12 @@ export class WindowEnvironmentVariableFileGenerator implements IEnvironmentVaria
 
 export class UnixEnvironmentVariableFileGenerator implements IEnvironmentVariableFileGenerator {
   generate(configFile: IEnvironmentFile): string {
-    return "# Not implemented";
+    const setters = [];
+    for (let varItem of configFile.content.settings) {
+      setters.push(`export ${varItem.name}="${varItem.value}"`);
+    }
+
+    const content = setters.join(EOL);
+    return content;
   }
 }
