@@ -12,7 +12,7 @@ export default class RunXUnitCommandBuilder implements ICommandBuilder {
     const commands = [];
 
     if (settings.environmentFile) {
-      commands.push(`.\\${settings.environmentFile}`);
+      commands.push(`.${path.sep}${settings.environmentFile}`);
     }
 
     const runSettingsFile = new RunSettingsFile();

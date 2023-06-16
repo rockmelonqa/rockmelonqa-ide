@@ -7,7 +7,7 @@ export default class RunDotnetTestCommandBuilder implements ICommandBuilder {
     const commands = [];
 
     if (settings.environmentFile) {
-      commands.push(`.\\${settings.environmentFile}`);
+      commands.push(`.${path.sep}${settings.environmentFile}`);
     }
 
     const filterStr = settings.dotnetFilterStr ? `--filter "${settings.dotnetFilterStr}"` : '';
