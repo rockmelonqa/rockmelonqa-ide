@@ -155,7 +155,7 @@ export const stringResKeys = {
         dialogTitle: 'routinePickerDialog.dialogTitle',
         routine: 'routinePickerDialog.routine',
         selectAll: 'routinePickerDialog.selectAll',
-        selectedOption: 'routinePickerDialog.selectedOption',
+        selectedOptions: 'routinePickerDialog.selectedOptions',
         unselectAll: 'routinePickerDialog.unselectAll',
     },
     runTestDialog: {

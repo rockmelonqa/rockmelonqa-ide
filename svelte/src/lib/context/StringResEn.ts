@@ -203,7 +203,7 @@ export const stringResEn: IStringRes = {
         dialogTitle: 'Select Routine - Dataset',
         routine: 'Routine',
         selectAll: 'Select all',
-        selectedOption: 'Selected options',
+        selectedOptions: 'Selected options',
         unselectAll: 'Unselect all',
     },
     runTestDialog: {

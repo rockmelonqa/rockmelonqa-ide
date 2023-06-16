@@ -1,5 +1,4 @@
 <script lang="ts">
-    import IconLinkButton from "$lib/components/IconLinkButton.svelte";
     import PrimaryButton from "$lib/components/PrimaryButton.svelte";
     import StandardButton from "$lib/components/StandardButton.svelte";
     import { appContextKey, type IAppContext } from "$lib/context/AppContext";
@@ -7,7 +6,7 @@
     import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
     import type { IDropdownOption } from "$lib/controls/DropdownField";
     import FancyDropdownField from "$lib/controls/FancyDropdownField.svelte";
-    import { getContext } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
     import { derived } from "svelte/store";
 
     //*****************************************
@@ -20,8 +19,11 @@
     /** Toggle on dialog */
     export let showDialog: boolean = false;
 
-    export let routineId: string = "";
-    export let datasets: string[] = [];
+    export { selectingRoutineId as routine };
+    let selectingRoutineId: string = "";
+
+    export { selectingDatasets as datasets };
+    let selectingDatasets: string[] = [];
 
     let routineOptions: IDropdownOption[] = [];
     const testRoutinesSubscription = derived(appState, ($appState) => $appState.testRoutines);
@@ -33,8 +35,10 @@
 
     let datasetOptions: IDropdownOption[] = [];
     $: {
-        loadDatasetOptions(routineId);
+        loadDatasetOptions(selectingRoutineId);
     }
+
+    const dispatch = createEventDispatcher();
 
     //*****************************************
     // Event handler
@@ -45,14 +49,18 @@
 
     const handleSaveClick = () => {
         showDialog = false;
+
+        dispatch("submit", { 
+            value: { 
+                routine: selectingRoutineId, 
+                datasets: selectingDatasets 
+            } 
+        });
     };
 
     const handleSelectRoutine = (e: any) => {
-        // update selecting routine id
-        routineId = e.detail.value;
-
-        // clear selected datasets
-        datasets.length = 0;
+        selectingRoutineId = e.detail.value;
+        selectingDatasets.length = 0;
     };
 
     const loadDatasetOptions = (selectingRoutineId: string) => {
@@ -70,19 +78,19 @@
     };
 
     const handleSelectAll = () => {
-        console.log('select-all');
+        selectingDatasets = [...datasetOptions.map((x) => x.key)];
     };
 
     const handleUnselectAll = () => {
-        console.log('unselect-all');
+        selectingDatasets = [];
     };
 
     const handleSelect = (value: string) => {
-
+        selectingDatasets = [...selectingDatasets, value];
     };
 
     const handleUnselect = (value: string) => {
-
+        selectingDatasets = selectingDatasets.filter((x) => x !== value);
     };
 </script>
 
@@ -101,7 +109,7 @@
                     <div class="modal-content mb-8">
                         <FancyDropdownField
                             name="routinePickerDialog_routine"
-                            value={routineId}
+                            value={selectingRoutineId}
                             options={routineOptions}
                             on:change={handleSelectRoutine}
                             label={uiContext.str(stringResKeys.routinePickerDialog.routine)}
@@ -110,40 +118,44 @@
                             {uiContext.str(stringResKeys.routinePickerDialog.dataset)}
                         </div>
                         <div class="flex gap-x-4">
-                            <div class="box w-1/2 border relative rounded-md">
-                                <div class="absolute top-2 left-2 bg-white px-2 transform -translate-y-full 
-                                    flex items-center gap-x-4">
+                            <div class="box flex-1 border relative rounded-md">
+                                <div class="absolute top-2 left-2 bg-white px-2 transform -translate-y-full">
                                     <span>{uiContext.str(stringResKeys.routinePickerDialog.availableOptions)}</span>
-                                    <IconLinkButton on:click={handleSelectAll}>
-                                        <svelte:fragment slot="label">
-                                            {uiContext.str(stringResKeys.routinePickerDialog.selectAll)}
-                                        </svelte:fragment>
-                                    </IconLinkButton>
                                 </div>
-                                <div class="mt-2 p-4 flex flex-col gap-y-2">
-                                    {#each datasetOptions as option (option.key)}
+                                <div class="box-content mt-2 p-4 flex flex-col gap-y-2 overflow-y-auto">
+                                    {#each datasetOptions.filter((x) => !selectingDatasets.includes(x.key)) as option (option.key)}
                                         <div class="flex items-center gap-x-2">
-                                            <input type="checkbox" on:change={() => handleSelect(option.key)}/>
-                                            <span>{option.text}</span>
+                                            <input type="checkbox" on:change={() => handleSelect(option.key)} />
+                                            <span class="truncate">{option.text}</span>
                                         </div>
                                     {/each}
                                 </div>
                             </div>
-                            <div class="box w-1/2 border relative rounded-md">
-                                <div class="absolute top-2 right-2 bg-white px-2 transform -translate-y-full text-right
-                                    flex items-center gap-x-4">
-                                    <IconLinkButton on:click={handleUnselectAll}>
-                                        <svelte:fragment slot="label">
-                                            {uiContext.str(stringResKeys.routinePickerDialog.unselectAll)}
-                                        </svelte:fragment>
-                                    </IconLinkButton>
-                                    <span>{uiContext.str(stringResKeys.routinePickerDialog.selectedOption)}</span>
+                            <div class="flex flex-col justify-center gap-y-4">
+                                <StandardButton
+                                    label={uiContext.str(stringResKeys.routinePickerDialog.selectAll)}
+                                    on:click={handleSelectAll}
+                                    disabled={selectingDatasets.length === datasetOptions.length}
+                                />
+                                <StandardButton
+                                    label={uiContext.str(stringResKeys.routinePickerDialog.unselectAll)}
+                                    on:click={handleUnselectAll}
+                                    disabled={selectingDatasets.length === 0}
+                                />
+                            </div>
+                            <div class="box flex-1 border relative rounded-md">
+                                <div class="absolute top-2 left-2 bg-white px-2 transform -translate-y-full">
+                                    <span>{uiContext.str(stringResKeys.routinePickerDialog.selectedOptions)}</span>
                                 </div>
-                                <div class="mt-2 p-4 flex flex-col gap-y-2">
-                                    {#each datasetOptions as option (option.key)}
+                                <div class="box-content mt-2 p-4 flex flex-col gap-y-2 overflow-y-auto">
+                                    {#each datasetOptions.filter((x) => selectingDatasets.includes(x.key)) as option (option.key)}
                                         <div class="flex items-center gap-x-2">
-                                            <input type="checkbox" checked={true} on:change={() => handleUnselect(option.key)}/>
-                                            <span>{option.text}</span>
+                                            <input
+                                                type="checkbox"
+                                                checked={true}
+                                                on:change={() => handleUnselect(option.key)}
+                                            />
+                                            <span class="truncate">{option.text}</span>
                                         </div>
                                     {/each}
                                 </div>
@@ -174,7 +186,13 @@
         border-color: var(--color-input-border);
     }
 
-    .icon {
+    .box-content {
+        height: 20rem;
+    }
+
+    input[type="checkbox"] {
         color: var(--color-brand);
+        --tw-ring-color: var(--color-brand);
+        cursor: pointer;
     }
 </style>

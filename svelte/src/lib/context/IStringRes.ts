@@ -203,7 +203,7 @@ export interface IRoutinePickerDialogStringRes {
     dialogTitle: string;
     routine: string;
     selectAll: string;
-    selectedOption: string;
+    selectedOptions: string;
     unselectAll: string;
 }
 

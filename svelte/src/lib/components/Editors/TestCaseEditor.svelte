@@ -396,6 +396,22 @@
         selectingRoutineId = stepItem.data ?? '';
         selectingDatasets = stepItem.parameters ?? [];
     }
+
+    const handleSelectRoutine = (e: any) => {
+        const value = e.detail.value;
+
+        const item = {...$listData.items[indexToSelectRoutine]};
+        item.data = value.routine,
+        item.parameters = value.datasets
+
+        listDataDispatch({
+            type: ListDataActionType.UpdateItem,
+            index: indexToSelectRoutine,
+            item,
+        });
+
+        dispatchChange();
+    }
 </script>
 
 <div class="test-case-editor p-8">
@@ -585,6 +601,7 @@
 
 <RoutinePickerDialog
     bind:showDialog={showRoutinePickerDialog}
-    routineId={selectingRoutineId}
+    routine={selectingRoutineId}
     datasets={selectingDatasets}
+    on:submit={handleSelectRoutine}
 />
