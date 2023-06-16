@@ -11,7 +11,7 @@
     /** Unique id for the button element */
     export let id = '';
 
-    /** Additoinal CSS class */
+    /** Additional CSS class */
     export { cssClass as class };
     let cssClass = '';
 

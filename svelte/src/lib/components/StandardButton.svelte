@@ -18,7 +18,7 @@
     /** Button type */
     export let type: ButtonType = 'button';
 
-    /** Additoinal CSS class */
+    /** Additional CSS class */
     export { cssClass as class };
     let cssClass = '';
 

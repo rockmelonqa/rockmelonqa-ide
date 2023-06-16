@@ -17,6 +17,13 @@
     export let disabled: boolean = false;
     export let errorMessage: string = '';
     export let focus: boolean = false;
+    export let title: string = '';
+    export let prefixPadding = '';
+    export let suffixPadding = '';
+    export let isRightAligned = false;
+
+    export { cssClass as class };
+    let cssClass = '';
 
     $: displayLabel = label.length > 0;
 
@@ -39,7 +46,13 @@
     let labelId = `${name}_label`;
     let inputId = `${name}_input`;
 
-    $: inputCssClass = `${thisTheme?.input} ${thisTheme.inputValid} h-10 focus-visible:outline-0`.trim();
+    $: inputCssClass = `${thisTheme?.input} ${thisTheme.inputValid} h-10 focus-visible:outline-0 ${cssClass}`.trim();
+
+    $: inputStyle = (
+        `${prefixPadding ? 'padding-left: ' + prefixPadding + '; ' : ' '}` +
+        `${suffixPadding ? 'padding-right: ' + suffixPadding + '; ' : ' '}` +
+        `${isRightAligned ? 'text-align: right; ' : ' '}`
+    ).trim();
     //*****************************************
     // Events
     //*****************************************
@@ -75,7 +88,9 @@
             {placeholder}
             {readonly}
             {disabled}
+            {title}
             class={inputCssClass}
+            style={inputStyle}
             {...$$restProps}
             on:input={handleInput}
             on:keyup

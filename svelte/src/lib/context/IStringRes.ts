@@ -16,6 +16,7 @@ export interface IStringRes {
     locatorType: ILocatorTypeStringRes;
     pageDefinitionEditor: IPageDefinitionEditorStringRes;
     project: IProjectStringRes;
+    routinePickerDialog: IRoutinePickerDialogStringRes;
     runTestDialog: IRunTestDialogStringRes;
     testCaseEditor: ITestCaseEditorStringRes;
     testRoutineEditor: ITestRoutineStringRes;
@@ -46,6 +47,7 @@ export interface IActionTypeStringRes {
     inputByCode: string;
     run: string;
     runCode: string;
+    runTestRoutine: string;
     selectOption: string;
     verifyAttribute: string;
     verifyHasText: string;
@@ -195,6 +197,17 @@ export interface IProjectStringRes {
     testIdAttributeName: string;
 }
 
+export interface IRoutinePickerDialogStringRes {
+    availableOptions: string;
+    dataset: string;
+    dialogTitle: string;
+    mode: string;
+    routine: string;
+    selectAll: string;
+    selectedOptions: string;
+    unselectAll: string;
+}
+
 export interface IRunTestDialogStringRes {
     dialogTitle: string;
     errorMsg: string;
@@ -213,7 +226,6 @@ export interface ITestCaseEditorStringRes {
     action: string;
     actions: string;
     addComment: string;
-    addRoutine: string;
     addStep: string;
     comment: string;
     data: string;

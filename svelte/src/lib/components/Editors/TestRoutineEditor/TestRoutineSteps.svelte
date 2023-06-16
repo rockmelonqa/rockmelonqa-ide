@@ -30,6 +30,7 @@
     import { v4 as uuidv4 } from 'uuid';
     import { isPagelessAction } from '../Editor';
     import CommentTextField from '$lib/components/CommentTextField.svelte';
+    import { removeFileExtension } from '$lib/utils/utils';
 
     export let formContext: IFormContext;
     let { mode: formMode, formName } = formContext;
@@ -54,7 +55,7 @@
     const pagesSubscription = derived(appState, ($appState) => $appState.pages);
     pagesSubscription.subscribe((pages) => {
         pageDefinitionOptions = Array.from(pages.entries())
-            .map(([key, { name }]) => ({ key, text: name.split('.').slice(0, -1).join('.') } as IDropdownOption))
+            .map(([key, { name }]) => ({ key, text: removeFileExtension(name) } as IDropdownOption))
             .sort((a, b) => a.text.localeCompare(b.text));
 
         pageElementsMap = new Map();

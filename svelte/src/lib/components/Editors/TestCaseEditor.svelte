@@ -21,13 +21,13 @@
     import AddIcon from "$lib/icons/AddIcon.svelte";
     import CommentIcon from "$lib/icons/CommentIcon.svelte";
     import DeleteIcon from "$lib/icons/DeleteIcon.svelte";
+    import ListIcon from "$lib/icons/ListIcon.svelte";
     import MoveDownIcon from "$lib/icons/MoveDownIcon.svelte";
     import MoveUpIcon from "$lib/icons/MoveUpIcon.svelte";
     import SaveIcon from "$lib/icons/SaveIcon.svelte";
-    import TRoutineIcon from "$lib/icons/TRoutineIcon.svelte";
     import { fileSystem } from "$lib/ipc";
     import { getActionTypeDropDownOptions } from "$lib/utils/dropdowns";
-    import { fileDefFactory, type ITestCase, type ITestCaseStep as ITestStep } from "rockmelonqa.common";
+    import { ActionType, fileDefFactory, type ITestCase, type ITestCaseStep as ITestStep } from "rockmelonqa.common";
     import { createEventDispatcher, getContext, onMount } from "svelte";
     import { derived } from "svelte/store";
     import { v4 as uuidv4 } from "uuid";
@@ -43,9 +43,10 @@
     import ListTableBodyRow from "../ListTableBodyRow.svelte";
     import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
-    import RoutineDropDown from "../RoutineDropDown.svelte";
     import { toTitle, isPagelessAction } from "./Editor";
-    import type { ITestStepComment, ITestStepRegular, ITestStepRoutine } from "rockmelonqa.common/file-defs/testCaseFile";
+    import type { ITestStepComment, ITestStepRegular } from "rockmelonqa.common/file-defs/testCaseFile";
+    import { removeFileExtension } from "$lib/utils/utils";
+    import RoutinePickerDialog from "$lib/dialogs/RoutinePickerDialog.svelte";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -116,14 +117,6 @@
                 dataType: FieldDataType.Text,
                 dataPath: "comment",
             },
-            routine: {
-                dataType: FieldDataType.Text,
-                dataPath: "routine",
-            },
-            dataset: {
-                dataType: FieldDataType.Text,
-                dataPath: "dataset",
-            },
         },
     };
     let listDataContext = createListDataContext(listDef, uiContext);
@@ -144,7 +137,7 @@
     const pagesSubscription = derived(appState, ($appState) => $appState.pages);
     pagesSubscription.subscribe((pages) => {
         pageDefinitionOptions = Array.from(pages.entries())
-            .map(([key, { name }]) => ({ key, text: name.split('.').slice(0, -1).join('.') } as IDropdownOption))
+            .map(([key, { name }]) => ({ key, text: removeFileExtension(name) } as IDropdownOption))
             .sort((a, b) => a.text.localeCompare(b.text));
 
         pageElementsMap = new Map();
@@ -176,12 +169,18 @@
         if (fileContent) {
             model = JSON.parse(fileContent) as ITestCase;
         }
-
+        
         const serializer = new FormSerializer(uiContext);
         const fieldValues = serializer.deserialize(model, formDef.fields);
         formDataDispatch({ type: FormDataActionType.Load, newValues: fieldValues });
 
         const items = serializer.deserializeList(model.steps, listDef.fields);
+        items.forEach((item, index) => {
+            const step = model.steps[index];
+            if (step.type === 'testStep') {
+                item.parameters = step.parameters;
+            }
+        });
         listDataDispatch({ type: ListDataActionType.SetItems, items: items, hasMoreItems: false });
 
         registerOnSaveHandler(contentIndex, doSave);
@@ -201,10 +200,6 @@
         return (item as ITestStep).type === "testStep";
     };
 
-    const isTestRoutine = (item: IDictionary) => {
-        return (item as ITestStep).type === "routine";
-    };
-
     const handleSave = async () => {
         await doSave();
     };
@@ -216,6 +211,12 @@
 
             const items = $listData.items.filter((r) => !isEmptyItem(r));
             const steps = serializer.serializeList(items, listDef.fields);
+            steps.forEach((step, index) => {
+                const item = items[index];
+                if (item.type === 'testStep') {
+                    step.parameters = item.parameters;
+                }
+            });
 
             const data = { ...model, steps };
             const filePath = combinePath([folderPath, fileName], uiContext.pathSeparator);
@@ -347,16 +348,6 @@
         dispatchChange();
     };
 
-    const handleAddRoutine = () => {
-        listDataDispatch({
-            type: ListDataActionType.AppendItems,
-            items: [newRoutine()],
-            hasMoreItems: false,
-        });
-
-        dispatchChange();
-    };
-
     const handleInsertComment = (index: number) => {
         listDataDispatch({
             type: ListDataActionType.InsertItem,
@@ -370,9 +361,64 @@
         return { id: uuidv4(), type: "comment", comment: "" } as ITestStepComment;
     };
 
-    const newRoutine = (): ITestStepRoutine => {
-        return { id: uuidv4(), type: "routine", routine: "" } as ITestStepRoutine;
-    };
+    const toRoutineData = (item: IDictionary): string => {
+        if (item.action !== ActionType.RunTestRoutine) {
+            return item.data;
+        }
+
+        const routineId: string = item.data ?? '';
+        const datasets: string[] = item.parameters ?? [];
+
+        const routine = $appState.testRoutines.get(routineId);
+        if (routine) {
+            let label = removeFileExtension(routine.name);
+
+            // no dataset or select all
+            if (datasets.length === 0 || (datasets.length === 1 && datasets[0] === '*')) {
+                return label;
+            }
+
+            // select few datasets
+            const selectedDataSet = datasets
+                .filter(key => routine.datasets.has(key)) 
+                .map(key => routine.datasets.get(key)!.name) ?? [];              
+            if (selectedDataSet.length > 0) {
+                label = label + "[" + selectedDataSet.join(', ') + "]";
+            }
+
+            return label;
+        }
+
+        return '';
+    }
+
+    let showRoutinePickerDialog: boolean = false;
+    let indexToSelectRoutine: number;
+    let selectingRoutineId: string = '';
+    let selectingDatasets: string[] = [];
+    const handleShowRoutinePickerDialog = (stepItem: IDictionary, stepIndex: number) => {
+        showRoutinePickerDialog = true;
+        indexToSelectRoutine = stepIndex;
+        selectingRoutineId = stepItem.data ?? '';
+        selectingDatasets = stepItem.parameters ?? [];
+    }
+
+    const handleSelectRoutine = (e: any) => {
+        showRoutinePickerDialog = false;
+        const value = e.detail.value;
+
+        const item = {...$listData.items[indexToSelectRoutine]};
+        item.data = value.routine,
+        item.parameters = value.datasets
+
+        listDataDispatch({
+            type: ListDataActionType.UpdateItem,
+            index: indexToSelectRoutine,
+            item,
+        });
+
+        dispatchChange();
+    }
 </script>
 
 <div class="test-case-editor p-8">
@@ -425,16 +471,6 @@
                                 on:input={(event) => handleItemChange(index, "comment", event.detail.value)}
                             />
                         </ListTableBodyCell>
-                    {:else if isTestRoutine(item)}
-                        <ListTableBodyCell type={ListTableCellType.First} colspan={4}>
-                            <RoutineDropDown
-                                name={`${formContext.formName}_${index}_routine`}
-                                routine={item.routine}
-                                dataset={item.dataset}
-                                on:selectRoutine={(event) => handleItemChange(index, "routine", event.detail.value)}
-                                on:selectDataset={(event) => handleItemChange(index, "dataset", event.detail.value)}
-                            />
-                        </ListTableBodyCell>
                     {:else}
                         <ListTableBodyCell type={ListTableCellType.First}>
                             <FancyDropdownField
@@ -465,11 +501,32 @@
                             {/if}
                         </ListTableBodyCell>
                         <ListTableBodyCell type={ListTableCellType.Last}>
-                            <TextField
-                                name={`${formContext.formName}_${index}_data`}
-                                value={item.data}
-                                on:input={(event) => handleItemChange(index, ITEM_KEY_DATA, event.detail.value)}
-                            />
+                            {#if item.action === ActionType.RunTestRoutine.toString()}
+                                <div class="flex justify-between items-center">
+                                    <div class="grow">
+                                        {#each [toRoutineData(item)] as routineData}
+                                            <TextField
+                                                name={`${formContext.formName}_${index}_data`}
+                                                value={routineData}
+                                                title={routineData}
+                                                class="truncate"
+                                                readonly={true} />
+                                        {/each}
+                                    </div>
+                                    <IconLinkButton
+                                        on:click={() => handleShowRoutinePickerDialog(item, index)}
+                                        title="Select routine"
+                                    >
+                                        <svelte:fragment slot="icon"><ListIcon class="h-5 w-5" strokeColor="var(--color-brand)" /></svelte:fragment>
+                                    </IconLinkButton>
+                                </div>
+                            {:else}
+                                <TextField
+                                    name={`${formContext.formName}_${index}_data`}
+                                    value={item.data}
+                                    on:input={(event) => handleItemChange(index, ITEM_KEY_DATA, event.detail.value)}
+                                />
+                            {/if}
                         </ListTableBodyCell>
                     {/if}
                     <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">
@@ -521,13 +578,6 @@
             </svelte:fragment>
         </IconLinkButton>
         <span>|</span>
-        <IconLinkButton on:click={handleAddRoutine}>
-            <svelte:fragment slot="icon"><TRoutineIcon /></svelte:fragment>
-            <svelte:fragment slot="label">
-                {uiContext.str(stringResKeys.testCaseEditor.addRoutine)}
-            </svelte:fragment>
-        </IconLinkButton>
-        <span>|</span>
         <IconLinkButton on:click={handleAddComment}>
             <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
             <svelte:fragment slot="label">
@@ -555,3 +605,12 @@
     <div slot="title">{uiContext.str(stringResKeys.general.confirmation)}</div>
     <div slot="content">{uiContext.str(stringResKeys.testCaseEditor.deleteRowConfirmation)}</div>
 </AlertDialog>
+
+{#if showRoutinePickerDialog}
+    <RoutinePickerDialog
+        routine={selectingRoutineId}
+        datasets={selectingDatasets}
+        on:submit={handleSelectRoutine}
+        on:cancel={() => showRoutinePickerDialog = false}
+    />
+{/if}

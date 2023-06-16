@@ -7,7 +7,7 @@
     import DeleteTestRoutineWarningDialog from "$lib/dialogs/DeleteTestRoutineWarningDialog.svelte";
     import { fileSystem } from "$lib/ipc";
     import type { IFileInfo } from "$lib/models";
-    import { StandardFolder, type ITestCase } from "rockmelonqa.common";
+    import { StandardFolder, type ITestCase, ActionType } from "rockmelonqa.common";
     import type { IPage } from "rockmelonqa.common/file-defs/pageFile";
     import { getContext } from "svelte";
     import { v4 as uuidv4 } from "uuid";
@@ -324,7 +324,7 @@
         }
 
         relatedTestCasePaths = Array.from($appState.testCases.values())
-            .filter((tc) => tc.steps.some((s) => s.type === "testStep" && s.page === page.id))
+            .filter((tc) => tc.steps.some((s) => s.page === page.id))
             .map((tc) => tc.filePath)
             .sort();
 
@@ -380,7 +380,7 @@
         }
 
         relatedTestCasePaths = Array.from($appState.testCases.values())
-            .filter((tc) => tc.steps.some((s) => s.type === "routine" && s.routine === testRoutine.id))
+            .filter((tc) => tc.steps.some((s) => s.action === ActionType.RunTestRoutine && s.data === testRoutine.id))
             .map((tc) => tc.filePath)
             .sort();
 

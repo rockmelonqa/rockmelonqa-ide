@@ -15,6 +15,8 @@
     export let name: string;
     export let value: string;
     export let options: IDropdownOption[];
+    export let label: string = '';
+    export let errorMessage: string = '';
 
     //*****************************************
     // Init
@@ -32,7 +34,9 @@
     $: containerCss = dropdownTheme?.dropdownContainer;
 
     let rootId = `${name}_root`;
+    let labelId = `${name}_label`;
     let selectId = `${name}_select`;
+    let errorId = `${name}_error`;
 
     //*****************************************
     // Events
@@ -48,6 +52,9 @@
 </script>
 
 <div id={rootId} class="dropdown-field-root {dropdownTheme.root}">
+    {#if label}
+        <label id={labelId} for={name} class="dropdown-field-label {dropdownTheme?.label}">{label}</label>
+    {/if}
     <div class="dropdown-field-select-container {containerCss}">
         <Select
             id={selectId}
@@ -61,4 +68,7 @@
             on:clear={handleClear}
         />
     </div>
+    {#if errorMessage}
+        <p id={errorId} class="dropdown-field-error {dropdownTheme?.errorMessage}">{errorMessage}</p>
+    {/if}
 </div>

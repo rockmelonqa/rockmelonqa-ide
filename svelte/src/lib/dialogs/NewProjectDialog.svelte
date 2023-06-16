@@ -320,10 +320,3 @@
         </div>
     </div>
 {/if}
-
-<style>
-    .modal-title,
-    a {
-        color: var(--color-brand);
-    }
-</style>

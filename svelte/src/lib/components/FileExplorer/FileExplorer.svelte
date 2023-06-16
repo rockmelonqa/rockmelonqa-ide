@@ -1,6 +1,6 @@
 <script lang="ts">
     import { AppActionType, appContextKey, type IAppContext } from "$lib/context/AppContext";
-    import type { IPageData, IPageElementData, ITestCaseData, ITestCaseStepData, ITestRoutineData, ITestRoutineStepData, ITestSuiteData } from "$lib/context/AppContext.model";
+    import type { IDataSetData, IPageData, IPageElementData, ITestCaseData, ITestCaseStepData, ITestRoutineData, ITestRoutineStepData, ITestSuiteData } from "$lib/context/AppContext.model";
     import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
     import { fileSystem } from "$lib/ipc";
     import lodash from "lodash";
@@ -374,15 +374,9 @@
                         page: s.page,
                         element: s.element,
                         action: s.action,
-                        data: s.data
-                    } as ITestStepRegular;
-                } else if (s.type === 'routine') {
-                    return {
-                        id: s.id,
-                        type: s.type,
-                        routine: s.routine,
-                        dataset: s.dataset,
-                    } as ITestStepRoutine;
+                        data: s.data,
+                        dataset: s.parameters
+                    } as ITestCaseStepData;
                 }
             });
 
@@ -433,10 +427,20 @@
                 } as ITestRoutineStepData
             });
 
+        const datasetsMap: Map<string, IDataSetData> = testRoutine.dataSets
+            .reduce((map, ds) => {
+                map.set(ds.id, {
+                    id: ds.id,
+                    name: ds.name,
+                });
+                return map;
+            }, new Map<string, IDataSetData>());
+
         return {
             id: testRoutine.id,
             name: name,
             steps: steps,
+            datasets: datasetsMap,
             filePath: path,
         } as ITestRoutineData;
     };

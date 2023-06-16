@@ -82,6 +82,7 @@ export const pagelessActions = [
     ActionType.Delay.toString(),
     ActionType.GoToUrl.toString(),
     ActionType.RunCode.toString(),
+    ActionType.RunTestRoutine.toString(),
     ActionType.VerifyTitle.toString(),
     ActionType.VerifyTitleContains.toString(),
     ActionType.VerifyUrl.toString()

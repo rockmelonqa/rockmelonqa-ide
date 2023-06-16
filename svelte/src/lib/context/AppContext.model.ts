@@ -22,31 +22,21 @@ export interface ITestCaseData {
     filePath: string;
 }
 
-export type ITestCaseStepData = ITestCaseStepRegularData | ITestCaseStepRoutineData;
-
-interface ITestCaseStepBase {
+export interface ITestCaseStepData {
   id: string;
-  type: "";
-}
-
-export interface ITestCaseStepRegularData extends Omit<ITestCaseStepBase, "type"> {
-  type: "testStep";
   page?: string;
   element?: string;
   action?: string;
-  data: string | { [datasetId: string]: string };
+  data: string;
+  dataset?: string[];
 }
 
-export interface ITestCaseStepRoutineData extends Omit<ITestCaseStepBase, "type"> {
-  type: "routine";
-  routine?: string;
-  dataset?: string;
-}
 
 export interface ITestRoutineData {
     id: string;
     name: string;
     steps: ITestRoutineStepData[];
+    datasets: Map<string, IDataSetData>;
     filePath: string;
 }
 
@@ -56,6 +46,12 @@ export interface ITestRoutineStepData {
   element?: string;
   action?: string;
   data: IDictionary<string>;
+}
+
+
+export interface IDataSetData {
+  id: string;
+  name: string;
 }
 
 export interface ITestSuiteData {
