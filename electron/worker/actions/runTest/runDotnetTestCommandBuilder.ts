@@ -15,9 +15,9 @@ export default class RunDotnetTestCommandBuilder implements ICommandBuilder {
       ? `Playwright.BrowserName=${settings.browser}`
       : 'Playwright.LaunchOptions.Headless=true';
 
-    // See https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-test for more details about `dotnet test`
-    // stand at 'output-code/bin' folder
     commands.push(
+      // See https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-test for more details about `dotnet test`
+      // stand at 'output-code/bin' folder
       `dotnet test ${filterStr} -l:"trx;LogFileName=${`..${path.sep}..${path.sep}${resultFilePath}`}" -- ${browserStr}`
     );
 
