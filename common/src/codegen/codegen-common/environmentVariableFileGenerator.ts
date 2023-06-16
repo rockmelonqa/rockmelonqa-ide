@@ -9,11 +9,10 @@ export class WindowEnvironmentVariableFileGenerator implements IEnvironmentVaria
   generate(configFile: IEnvironmentFile): string {
     const setters = [];
     for (let varItem of configFile.content.settings) {
-      setters.push(`SETX ${varItem.name} "${varItem.value}"`);
+      setters.push(`SET ${varItem.name}=${varItem.value}`);
     }
     const commandItems: string[] = [];
     commandItems.push("@echo off");
-    commandItems.push("SETLOCAL");
     commandItems.push(...setters);
 
     const content = commandItems.join(EOL);

@@ -3,6 +3,6 @@ namespace {{{rootNamespace}}}.Config;
 public static class EnvironmentSettings
 {
     {{#each allVariableNames as |name|}}
-    public static readonly string {{{name}}} = Environment.GetEnvironmentVariable(nameof({{{name}}}), EnvironmentVariableTarget.User) ?? string.Empty;
+    public static readonly string {{{name}}} = Environment.GetEnvironmentVariable(nameof({{{name}}})) ?? string.Empty;
     {{/each}}
 }
