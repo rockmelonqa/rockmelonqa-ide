@@ -201,6 +201,7 @@ export const stringResEn: IStringRes = {
         availableOptions: 'Available options',
         dataset: 'Dataset',
         dialogTitle: 'Select Routine - Dataset',
+        mode: 'Mode',
         routine: 'Routine',
         selectAll: 'Select all',
         selectedOptions: 'Selected options',

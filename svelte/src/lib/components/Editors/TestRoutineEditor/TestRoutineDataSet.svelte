@@ -123,9 +123,12 @@
             [$appState.projectFile?.folderPath ?? '', StandardFolder.TestCases],
             uiContext.pathSeparator
         );
-        debugger;
+
         relatedTestCasePaths = Array.from($appState.testCases.values())
-            .filter((tc) => tc.steps.some((s) => s.action === ActionType.RunTestRoutine && s.data === $formData.values.id && s.dataset?.includes(dataSetItem.id)))
+            .filter((tc) => tc.steps.some((s) => 
+                s.action === ActionType.RunTestRoutine && 
+                s.data === $formData.values.id && 
+                s.dataset?.includes(dataSetItem.id)))
             .map((tc) => toTreePath(tc.filePath, testCaseFolderPath, uiContext.pathSeparator) ?? '');
 
         if (relatedTestCasePaths.length > 0) {

@@ -367,15 +367,21 @@
         }
 
         const routineId: string = item.data ?? '';
-        const dataSetIds: string[] = item.parameters ?? [];
+        const datasets: string[] = item.parameters ?? [];
 
         const routine = $appState.testRoutines.get(routineId);
         if (routine) {
-            const selectedDataSet = dataSetIds
-                .filter(key => routine.datasets.has(key)) 
-                .map(key => routine.datasets.get(key)!.name) ?? [];   
-            
             let label = removeFileExtension(routine.name);
+
+            // no dataset or select all
+            if (datasets.length === 0 || (datasets.length === 1 && datasets[0] === '*')) {
+                return label;
+            }
+
+            // select few datasets
+            const selectedDataSet = datasets
+                .filter(key => routine.datasets.has(key)) 
+                .map(key => routine.datasets.get(key)!.name) ?? [];              
             if (selectedDataSet.length > 0) {
                 label = label + "[" + selectedDataSet.join(', ') + "]";
             }

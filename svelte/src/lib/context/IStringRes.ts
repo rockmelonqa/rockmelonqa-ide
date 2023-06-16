@@ -201,6 +201,7 @@ export interface IRoutinePickerDialogStringRes {
     availableOptions: string;
     dataset: string;
     dialogTitle: string;
+    mode: string;
     routine: string;
     selectAll: string;
     selectedOptions: string;

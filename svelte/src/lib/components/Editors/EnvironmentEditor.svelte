@@ -172,7 +172,7 @@
         if (isDataValid) {
             const serializer = new FormSerializer(uiContext);
             const model = serializer.serialize($formData.values, formDef.fields);
-            debugger;
+
             const items = $listData.items.filter((r) => !isEmptyItem(r));
             const settings = serializer.serializeList(items, listDef.fields);
 

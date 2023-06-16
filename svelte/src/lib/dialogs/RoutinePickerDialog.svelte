@@ -22,8 +22,11 @@
     export { selectingRoutineId as routine };
     let selectingRoutineId: string = "";
 
-    export { selectingDatasets as datasets };
-    let selectingDatasets: string[] = [];
+    export let datasets: string[] = [];
+    const isSelectAll = (datasets: string[]): boolean => {
+        return datasets.length === 1 && datasets[0] === '*';
+    };
+    let selectingDatasets: string[] = isSelectAll(datasets) ? [] : datasets;
 
     let routineOptions: IDropdownOption[] = [];
     const testRoutinesSubscription = derived(appState, ($appState) => $appState.testRoutines);
@@ -33,38 +36,29 @@
             .sort((a, b) => a.text.localeCompare(b.text));
     });
 
+    let mode: "all" | "select" = isSelectAll(datasets) || datasets.length === 0 ? 'all' : 'select';
+    let modeOptions: IDropdownOption[] = [
+        { key: "all", text: "Run all datasets" },
+        { key: "select", text: "Run selected datasets" },
+    ];
+
     let datasetOptions: IDropdownOption[] = [];
     $: {
         loadDatasetOptions(selectingRoutineId);
     }
 
+    let isSubmitted: boolean = false;
+    $: routineErrorMessage = selectingRoutineId === '' ? uiContext.str(stringResKeys.form.isRequiredError) : '';
+    $: datasetsErrorMessage = mode === 'select' && selectingDatasets.length === 0 ? uiContext.str(stringResKeys.form.isRequiredError) : '';
+    $: isValid = routineErrorMessage || datasetsErrorMessage ? false : true;
+
     const dispatch = createEventDispatcher();
 
     //*****************************************
-    // Event handler
+    // Helper
     //*****************************************
-    const handleCancelClick = () => {
-        showDialog = false;
-    };
-
-    const handleSaveClick = () => {
-        showDialog = false;
-
-        dispatch("submit", { 
-            value: { 
-                routine: selectingRoutineId, 
-                datasets: selectingDatasets 
-            } 
-        });
-    };
-
-    const handleSelectRoutine = (e: any) => {
-        selectingRoutineId = e.detail.value;
-        selectingDatasets.length = 0;
-    };
-
-    const loadDatasetOptions = (selectingRoutineId: string) => {
-        const routine = $appState.testRoutines.get(selectingRoutineId);
+    const loadDatasetOptions = (routineId: string) => {
+        const routine = $appState.testRoutines.get(routineId);
         datasetOptions.length = 0; // clear old options
 
         if (routine) {
@@ -77,19 +71,50 @@
         }
     };
 
-    const handleSelectAll = () => {
+    //*****************************************
+    // Event handler
+    //*****************************************
+    const handleCancelClick = () => {
+        showDialog = false;
+    };
+
+    const handleDoneClick = () => {
+        isSubmitted = true;
+
+        if (isValid) {
+            dispatch("submit", {
+                value: {
+                    routine: selectingRoutineId,
+                    datasets: mode === 'all' ? ['*'] : selectingDatasets,
+                },
+            });
+
+            showDialog = false;
+        }
+    };
+
+    const handleSelectRoutine = (e: any) => {
+        selectingRoutineId = e.detail.value;
+        selectingDatasets.length = 0;
+    };
+
+    const handleSelectMode = (e: any) => {
+        mode = e.detail.value;
+    };
+
+    const handleSelectAllDatasets = () => {
         selectingDatasets = [...datasetOptions.map((x) => x.key)];
     };
 
-    const handleUnselectAll = () => {
+    const handleUnselectAllDatasets = () => {
         selectingDatasets = [];
     };
 
-    const handleSelect = (value: string) => {
+    const handleSelectDataset = (value: string) => {
         selectingDatasets = [...selectingDatasets, value];
     };
 
-    const handleUnselect = (value: string) => {
+    const handleUnselectDataset = (value: string) => {
         selectingDatasets = selectingDatasets.filter((x) => x !== value);
     };
 </script>
@@ -106,68 +131,86 @@
                     <div class="modal-title text-xl leading-6 font-bold mb-8">
                         {uiContext.str(stringResKeys.routinePickerDialog.dialogTitle)}
                     </div>
-                    <div class="modal-content mb-8">
+                    <div class="modal-content mb-8 space-y-4">
                         <FancyDropdownField
                             name="routinePickerDialog_routine"
                             value={selectingRoutineId}
                             options={routineOptions}
                             on:change={handleSelectRoutine}
                             label={uiContext.str(stringResKeys.routinePickerDialog.routine)}
+                            errorMessage={isSubmitted ? routineErrorMessage : ''}
                         />
-                        <div class="my-4 block font-semibold text-base">
-                            {uiContext.str(stringResKeys.routinePickerDialog.dataset)}
-                        </div>
-                        <div class="flex gap-x-4">
-                            <div class="box flex-1 border relative rounded-md">
-                                <div class="absolute top-2 left-2 bg-white px-2 transform -translate-y-full">
-                                    <span>{uiContext.str(stringResKeys.routinePickerDialog.availableOptions)}</span>
+                        <FancyDropdownField
+                            name="routinePickerDialog_mode"
+                            value={mode}
+                            options={modeOptions}
+                            on:change={handleSelectMode}
+                            label={uiContext.str(stringResKeys.routinePickerDialog.mode)}
+                        />
+                        {#if mode === 'select'}
+                            <div>
+                                <div class="mb-4 block font-semibold text-base">
+                                    {uiContext.str(stringResKeys.routinePickerDialog.dataset)}
                                 </div>
-                                <div class="box-content mt-2 p-4 flex flex-col gap-y-2 overflow-y-auto">
-                                    {#each datasetOptions.filter((x) => !selectingDatasets.includes(x.key)) as option (option.key)}
-                                        <div class="flex items-center gap-x-2">
-                                            <input type="checkbox" on:change={() => handleSelect(option.key)} />
-                                            <span class="truncate">{option.text}</span>
+                                <div class="flex gap-x-4">
+                                    <div class="box flex-1 border relative rounded-md">
+                                        <div class="absolute top-2 left-2 bg-white px-2 transform -translate-y-full">
+                                            <span>{uiContext.str(stringResKeys.routinePickerDialog.availableOptions)}</span>
                                         </div>
-                                    {/each}
-                                </div>
-                            </div>
-                            <div class="flex flex-col justify-center gap-y-4">
-                                <StandardButton
-                                    label={uiContext.str(stringResKeys.routinePickerDialog.selectAll)}
-                                    on:click={handleSelectAll}
-                                    disabled={selectingDatasets.length === datasetOptions.length}
-                                />
-                                <StandardButton
-                                    label={uiContext.str(stringResKeys.routinePickerDialog.unselectAll)}
-                                    on:click={handleUnselectAll}
-                                    disabled={selectingDatasets.length === 0}
-                                />
-                            </div>
-                            <div class="box flex-1 border relative rounded-md">
-                                <div class="absolute top-2 left-2 bg-white px-2 transform -translate-y-full">
-                                    <span>{uiContext.str(stringResKeys.routinePickerDialog.selectedOptions)}</span>
-                                </div>
-                                <div class="box-content mt-2 p-4 flex flex-col gap-y-2 overflow-y-auto">
-                                    {#each datasetOptions.filter((x) => selectingDatasets.includes(x.key)) as option (option.key)}
-                                        <div class="flex items-center gap-x-2">
-                                            <input
-                                                type="checkbox"
-                                                checked={true}
-                                                on:change={() => handleUnselect(option.key)}
-                                            />
-                                            <span class="truncate">{option.text}</span>
+                                        <div class="box-content mt-2 p-4 flex flex-col gap-y-2 overflow-y-auto">
+                                            {#each datasetOptions.filter((x) => !selectingDatasets.includes(x.key)) as option (option.key)}
+                                                <div class="flex items-center gap-x-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        on:change={() => handleSelectDataset(option.key)}
+                                                    />
+                                                    <span class="truncate">{option.text}</span>
+                                                </div>
+                                            {/each}
                                         </div>
-                                    {/each}
+                                    </div>
+                                    <div class="flex flex-col justify-center gap-y-4">
+                                        <StandardButton
+                                            label={uiContext.str(stringResKeys.routinePickerDialog.selectAll)}
+                                            on:click={handleSelectAllDatasets}
+                                            disabled={selectingDatasets.length === datasetOptions.length}
+                                        />
+                                        <StandardButton
+                                            label={uiContext.str(stringResKeys.routinePickerDialog.unselectAll)}
+                                            on:click={handleUnselectAllDatasets}
+                                            disabled={selectingDatasets.length === 0}
+                                        />
+                                    </div>
+                                    <div class="box flex-1 border relative rounded-md">
+                                        <div class="absolute top-2 left-2 bg-white px-2 transform -translate-y-full">
+                                            <span>{uiContext.str(stringResKeys.routinePickerDialog.selectedOptions)}</span>
+                                        </div>
+                                        <div class="box-content mt-2 p-4 flex flex-col gap-y-2 overflow-y-auto">
+                                            {#each datasetOptions.filter((x) => selectingDatasets.includes(x.key)) as option (option.key)}
+                                                <div class="flex items-center gap-x-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={true}
+                                                        on:change={() => handleUnselectDataset(option.key)}
+                                                    />
+                                                    <span class="truncate">{option.text}</span>
+                                                </div>
+                                            {/each}
+                                        </div>
+                                    </div>
                                 </div>
+                                {#if isSubmitted && datasetsErrorMessage}
+                                    <p class="dropdown-field-error mt-2 text-red-600 text-sm">{datasetsErrorMessage}</p>
+                                {/if}
                             </div>
-                        </div>
+                        {/if}
                     </div>
                     <div class="modal-buttons flex justify-start items-end gap-x-4">
                         <div class="ml-auto">
                             <PrimaryButton
-                                label={uiContext.str(stringResKeys.general.save)}
+                                label={uiContext.str(stringResKeys.general.done)}
                                 class="mr-4"
-                                on:click={handleSaveClick}
+                                on:click={handleDoneClick}
                             />
                             <StandardButton
                                 label={uiContext.str(stringResKeys.general.cancel)}

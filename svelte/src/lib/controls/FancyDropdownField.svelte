@@ -16,6 +16,7 @@
     export let value: string;
     export let options: IDropdownOption[];
     export let label: string = '';
+    export let errorMessage: string = '';
 
     //*****************************************
     // Init
@@ -35,6 +36,7 @@
     let rootId = `${name}_root`;
     let labelId = `${name}_label`;
     let selectId = `${name}_select`;
+    let errorId = `${name}_error`;
 
     //*****************************************
     // Events
@@ -66,4 +68,7 @@
             on:clear={handleClear}
         />
     </div>
+    {#if errorMessage}
+        <p id={errorId} class="dropdown-field-error {dropdownTheme?.errorMessage}">{errorMessage}</p>
+    {/if}
 </div>

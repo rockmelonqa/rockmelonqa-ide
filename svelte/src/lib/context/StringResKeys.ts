@@ -153,6 +153,7 @@ export const stringResKeys = {
         availableOptions: 'routinePickerDialog.availableOptions',
         dataset: 'routinePickerDialog.dataset',
         dialogTitle: 'routinePickerDialog.dialogTitle',
+        mode: 'routinePickerDialog.mode',
         routine: 'routinePickerDialog.routine',
         selectAll: 'routinePickerDialog.selectAll',
         selectedOptions: 'routinePickerDialog.selectedOptions',
