@@ -42,6 +42,9 @@ export class PlaywrightCsharpXUnitCodeGen extends PlaywrightCsharpCodeGen implem
   }
 
   async generateCode(full: boolean, writeFile: WriteFileFn): Promise<string> {
+    await this.generateEnvironmentSettingsFile(writeFile);
+    await this.generateEnvironmentSetterScripts(writeFile);
+
     await this.generatePageDefinitionsFile(writeFile);
     await this.generatePageFiles(writeFile);
     await this.generateTestCaseFiles(writeFile);

@@ -31,7 +31,7 @@ export class XUnitTemplateCollection extends BaseDotnetTemplateCollection implem
     const loadAndCompile = (templateFileName: string) =>
       compile(loadTemplate(templatesDir, customTemplatesDir, templateFileName + fileExtension));
 
-    this.BASE_CLASSES_FILE = compile("");
+    this.BASE_CLASSES_FILE = loadAndCompile("BaseClassesFile");
     this.COMMENT = loadAndCompile("Comment");
 
     this.PAGE_DEFINITIONS_FILE = loadAndCompile("PageDefinitionsFile");
