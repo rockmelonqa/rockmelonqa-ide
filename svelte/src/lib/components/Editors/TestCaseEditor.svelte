@@ -404,6 +404,7 @@
     }
 
     const handleSelectRoutine = (e: any) => {
+        showRoutinePickerDialog = false;
         const value = e.detail.value;
 
         const item = {...$listData.items[indexToSelectRoutine]};
@@ -605,9 +606,11 @@
     <div slot="content">{uiContext.str(stringResKeys.testCaseEditor.deleteRowConfirmation)}</div>
 </AlertDialog>
 
-<RoutinePickerDialog
-    bind:showDialog={showRoutinePickerDialog}
-    routine={selectingRoutineId}
-    datasets={selectingDatasets}
-    on:submit={handleSelectRoutine}
-/>
+{#if showRoutinePickerDialog}
+    <RoutinePickerDialog
+        routine={selectingRoutineId}
+        datasets={selectingDatasets}
+        on:submit={handleSelectRoutine}
+        on:cancel={() => showRoutinePickerDialog = false}
+    />
+{/if}

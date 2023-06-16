@@ -16,9 +16,6 @@
     let appContext = getContext(appContextKey) as IAppContext;
     let { state: appState } = appContext;
 
-    /** Toggle on dialog */
-    export let showDialog: boolean = false;
-
     export { selectingRoutineId as routine };
     let selectingRoutineId: string = "";
 
@@ -75,7 +72,7 @@
     // Event handler
     //*****************************************
     const handleCancelClick = () => {
-        showDialog = false;
+        dispatch("cancel");
     };
 
     const handleDoneClick = () => {
@@ -88,8 +85,6 @@
                     datasets: mode === 'all' ? ['*'] : selectingDatasets,
                 },
             });
-
-            showDialog = false;
         }
     };
 
@@ -119,110 +114,108 @@
     };
 </script>
 
-{#if showDialog}
-    <div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="fixed inset-0 bg-gray-400 bg-opacity-75 transition-opacity" />
-        <div class="fixed inset-0 overflow-y-auto">
-            <div class="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0">
-                <div
-                    class="modal-panel relative bg-white rounded-lg p-4 sm:p-6
-                      text-left shadow-xl transform transition-all max-w-5xl w-full"
-                >
-                    <div class="modal-title text-xl leading-6 font-bold mb-8">
-                        {uiContext.str(stringResKeys.routinePickerDialog.dialogTitle)}
-                    </div>
-                    <div class="modal-content mb-8 space-y-4">
-                        <FancyDropdownField
-                            name="routinePickerDialog_routine"
-                            value={selectingRoutineId}
-                            options={routineOptions}
-                            on:change={handleSelectRoutine}
-                            label={uiContext.str(stringResKeys.routinePickerDialog.routine)}
-                            errorMessage={isSubmitted ? routineErrorMessage : ''}
-                        />
-                        <FancyDropdownField
-                            name="routinePickerDialog_mode"
-                            value={mode}
-                            options={modeOptions}
-                            on:change={handleSelectMode}
-                            label={uiContext.str(stringResKeys.routinePickerDialog.mode)}
-                        />
-                        {#if mode === 'select'}
-                            <div>
-                                <div class="mb-4 block font-semibold text-base">
-                                    {uiContext.str(stringResKeys.routinePickerDialog.dataset)}
-                                </div>
-                                <div class="flex gap-x-4">
-                                    <div class="box flex-1 border relative rounded-md">
-                                        <div class="absolute top-2 left-2 bg-white px-2 transform -translate-y-full">
-                                            <span>{uiContext.str(stringResKeys.routinePickerDialog.availableOptions)}</span>
-                                        </div>
-                                        <div class="box-content mt-2 p-4 flex flex-col gap-y-2 overflow-y-auto">
-                                            {#each datasetOptions.filter((x) => !selectingDatasets.includes(x.key)) as option (option.key)}
-                                                <div class="flex items-center gap-x-2">
-                                                    <input
-                                                        type="checkbox"
-                                                        on:change={() => handleSelectDataset(option.key)}
-                                                    />
-                                                    <span class="truncate">{option.text}</span>
-                                                </div>
-                                            {/each}
-                                        </div>
-                                    </div>
-                                    <div class="flex flex-col justify-center gap-y-4">
-                                        <StandardButton
-                                            label={uiContext.str(stringResKeys.routinePickerDialog.selectAll)}
-                                            on:click={handleSelectAllDatasets}
-                                            disabled={selectingDatasets.length === datasetOptions.length}
-                                        />
-                                        <StandardButton
-                                            label={uiContext.str(stringResKeys.routinePickerDialog.unselectAll)}
-                                            on:click={handleUnselectAllDatasets}
-                                            disabled={selectingDatasets.length === 0}
-                                        />
-                                    </div>
-                                    <div class="box flex-1 border relative rounded-md">
-                                        <div class="absolute top-2 left-2 bg-white px-2 transform -translate-y-full">
-                                            <span>{uiContext.str(stringResKeys.routinePickerDialog.selectedOptions)}</span>
-                                        </div>
-                                        <div class="box-content mt-2 p-4 flex flex-col gap-y-2 overflow-y-auto">
-                                            {#each datasetOptions.filter((x) => selectingDatasets.includes(x.key)) as option (option.key)}
-                                                <div class="flex items-center gap-x-2">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={true}
-                                                        on:change={() => handleUnselectDataset(option.key)}
-                                                    />
-                                                    <span class="truncate">{option.text}</span>
-                                                </div>
-                                            {/each}
-                                        </div>
-                                    </div>
-                                </div>
-                                {#if isSubmitted && datasetsErrorMessage}
-                                    <p class="dropdown-field-error mt-2 text-red-600 text-sm">{datasetsErrorMessage}</p>
-                                {/if}
+<div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-400 bg-opacity-75 transition-opacity" />
+    <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0">
+            <div
+                class="modal-panel relative bg-white rounded-lg p-4 sm:p-6
+                    text-left shadow-xl transform transition-all max-w-5xl w-full"
+            >
+                <div class="modal-title text-xl leading-6 font-bold mb-8">
+                    {uiContext.str(stringResKeys.routinePickerDialog.dialogTitle)}
+                </div>
+                <div class="modal-content mb-8 space-y-4">
+                    <FancyDropdownField
+                        name="routinePickerDialog_routine"
+                        value={selectingRoutineId}
+                        options={routineOptions}
+                        on:change={handleSelectRoutine}
+                        label={uiContext.str(stringResKeys.routinePickerDialog.routine)}
+                        errorMessage={isSubmitted ? routineErrorMessage : ''}
+                    />
+                    <FancyDropdownField
+                        name="routinePickerDialog_mode"
+                        value={mode}
+                        options={modeOptions}
+                        on:change={handleSelectMode}
+                        label={uiContext.str(stringResKeys.routinePickerDialog.mode)}
+                    />
+                    {#if mode === 'select'}
+                        <div>
+                            <div class="mb-4 block font-semibold text-base">
+                                {uiContext.str(stringResKeys.routinePickerDialog.dataset)}
                             </div>
-                        {/if}
-                    </div>
-                    <div class="modal-buttons flex justify-start items-end gap-x-4">
-                        <div class="ml-auto">
-                            <PrimaryButton
-                                label={uiContext.str(stringResKeys.general.done)}
-                                class="mr-4"
-                                on:click={handleDoneClick}
-                            />
-                            <StandardButton
-                                label={uiContext.str(stringResKeys.general.cancel)}
-                                on:click={handleCancelClick}
-                            />
+                            <div class="flex gap-x-4">
+                                <div class="box flex-1 border relative rounded-md">
+                                    <div class="absolute top-2 left-2 bg-white px-2 transform -translate-y-full">
+                                        <span>{uiContext.str(stringResKeys.routinePickerDialog.availableOptions)}</span>
+                                    </div>
+                                    <div class="box-content mt-2 p-4 flex flex-col gap-y-2 overflow-y-auto">
+                                        {#each datasetOptions.filter((x) => !selectingDatasets.includes(x.key)) as option (option.key)}
+                                            <div class="flex items-center gap-x-2">
+                                                <input
+                                                    type="checkbox"
+                                                    on:change={() => handleSelectDataset(option.key)}
+                                                />
+                                                <span class="truncate">{option.text}</span>
+                                            </div>
+                                        {/each}
+                                    </div>
+                                </div>
+                                <div class="flex flex-col justify-center gap-y-4">
+                                    <StandardButton
+                                        label={uiContext.str(stringResKeys.routinePickerDialog.selectAll)}
+                                        on:click={handleSelectAllDatasets}
+                                        disabled={selectingDatasets.length === datasetOptions.length}
+                                    />
+                                    <StandardButton
+                                        label={uiContext.str(stringResKeys.routinePickerDialog.unselectAll)}
+                                        on:click={handleUnselectAllDatasets}
+                                        disabled={selectingDatasets.length === 0}
+                                    />
+                                </div>
+                                <div class="box flex-1 border relative rounded-md">
+                                    <div class="absolute top-2 left-2 bg-white px-2 transform -translate-y-full">
+                                        <span>{uiContext.str(stringResKeys.routinePickerDialog.selectedOptions)}</span>
+                                    </div>
+                                    <div class="box-content mt-2 p-4 flex flex-col gap-y-2 overflow-y-auto">
+                                        {#each datasetOptions.filter((x) => selectingDatasets.includes(x.key)) as option (option.key)}
+                                            <div class="flex items-center gap-x-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={true}
+                                                    on:change={() => handleUnselectDataset(option.key)}
+                                                />
+                                                <span class="truncate">{option.text}</span>
+                                            </div>
+                                        {/each}
+                                    </div>
+                                </div>
+                            </div>
+                            {#if isSubmitted && datasetsErrorMessage}
+                                <p class="dropdown-field-error mt-2 text-red-600 text-sm">{datasetsErrorMessage}</p>
+                            {/if}
                         </div>
+                    {/if}
+                </div>
+                <div class="modal-buttons flex justify-start items-end gap-x-4">
+                    <div class="ml-auto">
+                        <PrimaryButton
+                            label={uiContext.str(stringResKeys.general.done)}
+                            class="mr-4"
+                            on:click={handleDoneClick}
+                        />
+                        <StandardButton
+                            label={uiContext.str(stringResKeys.general.cancel)}
+                            on:click={handleCancelClick}
+                        />
                     </div>
                 </div>
             </div>
         </div>
     </div>
-{/if}
+</div>
 
 <style>
     .box {
