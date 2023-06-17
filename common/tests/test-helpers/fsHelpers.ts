@@ -12,7 +12,7 @@ export const createTempDir = (desc: string) => {
     fs.mkdirSync(commonTmpDir);
   }
 
-  // Use actual timestamp to ensure unique namez
+  // Use actual timestamp to ensure unique names
   // const timestamp = moment().format("YYYYMMDD_HHmmss");
   const timestamp = "00000000_000000";
   const sampleTmpDir = path.join(commonTmpDir, `${timestamp}_${desc}`);

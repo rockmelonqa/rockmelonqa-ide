@@ -16,5 +16,6 @@ export interface IRunTestSettings {
   browser: Browser;
   dotnetFilterStr: string;
   outputCodeDir: string;
+  /** Relative path of the environment file being selected */
   environmentFile: string;
 }
