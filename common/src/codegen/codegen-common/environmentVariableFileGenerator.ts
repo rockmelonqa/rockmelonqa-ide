@@ -1,14 +1,16 @@
 import { EOL } from "os";
-import { IEnvironmentFile } from "../../file-defs";
+import { IEnvironmentContent } from "../../file-defs";
 
+/** Generators for the content of the Environment setter script */
 export interface IEnvironmentVariableFileGenerator {
-  generate(configFile: IEnvironmentFile): string;
+  generate(configFile: IEnvironmentContent): string;
 }
 
+/** Generators for the content of the Environment setter script .bat file for Windows system */
 export class WindowEnvironmentVariableFileGenerator implements IEnvironmentVariableFileGenerator {
-  generate(configFile: IEnvironmentFile): string {
+  generate(configContent: IEnvironmentContent): string {
     const setters = [];
-    for (let varItem of configFile.content.settings) {
+    for (let varItem of configContent.settings) {
       setters.push(`SET ${varItem.name}=${varItem.value}`);
     }
     const commandItems: string[] = [];
@@ -20,10 +22,11 @@ export class WindowEnvironmentVariableFileGenerator implements IEnvironmentVaria
   }
 }
 
+/** Generators for the content of the Environment setter script .bat file for Unix system */
 export class UnixEnvironmentVariableFileGenerator implements IEnvironmentVariableFileGenerator {
-  generate(configFile: IEnvironmentFile): string {
+  generate(configContent: IEnvironmentContent): string {
     const setters = [];
-    for (let varItem of configFile.content.settings) {
+    for (let varItem of configContent.settings) {
       setters.push(`export ${varItem.name}="${varItem.value}"`);
     }
 
