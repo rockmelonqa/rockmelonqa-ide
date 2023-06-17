@@ -4,15 +4,24 @@ import fs from 'fs';
 import path from 'path';
 import { RunSettingsFile } from './runsettingFile';
 import convert from 'xml-js';
-import { StandardOutputFile } from 'rockmelonqa.common/file-defs';
+import { Platform, StandardOutputFile } from 'rockmelonqa.common/file-defs';
+import { IInvokeEnvironmentFileCmdBuilder, UnixInvokeEnvironmentFileCmdBuilder, WindowsInvokeEnvironmentFileCmdBuilder } from './invokeEnvironmentFileCmdBuilder';
 const XML_OPTIONS = { compact: true, ignoreComment: true, spaces: 2 };
 
 export default class RunXUnitCommandBuilder implements ICommandBuilder {
+
+  private readonly invokeEnvironmentFileCmdBuilder: IInvokeEnvironmentFileCmdBuilder
+
+  constructor() {
+    this.invokeEnvironmentFileCmdBuilder = Platform.IsWindows() ? new WindowsInvokeEnvironmentFileCmdBuilder() : new UnixInvokeEnvironmentFileCmdBuilder()
+  }
+  
   build(settings: IRunTestSettings, resultFilePath: string) {
     const commands = [];
 
     if (settings.environmentFile) {
-      commands.push(`.${path.sep}${settings.environmentFile}`);
+      const invokeFileCmd = this.invokeEnvironmentFileCmdBuilder.build(settings.environmentFile);
+      commands.push(invokeFileCmd);
     }
 
     const runSettingsFile = new RunSettingsFile();

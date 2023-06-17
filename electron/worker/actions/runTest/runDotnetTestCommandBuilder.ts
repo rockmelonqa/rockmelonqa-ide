@@ -1,13 +1,21 @@
 import { IRunTestSettings } from 'rockmelonqa.common/ipc-defs/testRunner';
 import { ICommandBuilder } from './commandBuilder';
 import path from 'path';
+import { IInvokeEnvironmentFileCmdBuilder } from './invokeEnvironmentFileCmdBuilder';
 
 export default class RunDotnetTestCommandBuilder implements ICommandBuilder {
+  private readonly invokeEnvironmentFileCmdBuilder: IInvokeEnvironmentFileCmdBuilder
+  
+  constructor(invokeEnvironmentFileCmdBuilder: IInvokeEnvironmentFileCmdBuilder) {
+    this.invokeEnvironmentFileCmdBuilder = invokeEnvironmentFileCmdBuilder;  
+  }
+
   build(settings: IRunTestSettings, resultFilePath: string) {
     const commands = [];
 
     if (settings.environmentFile) {
-      commands.push(`.${path.sep}${settings.environmentFile}`);
+      const invokeFileCmd = this.invokeEnvironmentFileCmdBuilder.build(settings.environmentFile);
+      commands.push(invokeFileCmd);
     }
 
     const filterStr = settings.dotnetFilterStr ? `--filter "${settings.dotnetFilterStr}"` : '';
