@@ -338,16 +338,16 @@
         isEmpty={false}
     >
         <svelte:fragment slot="header">
-            <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-3/12">
+            <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-1/6">
                 {uiContext.str(stringResKeys.pageDefinitionEditor.elementName)}
             </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-2/12">
+            <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-52">
                 {uiContext.str(stringResKeys.pageDefinitionEditor.findBy)}
             </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-3/12">
+            <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left">
                 {uiContext.str(stringResKeys.pageDefinitionEditor.locator)}
             </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.Last} class="text-left w-3/12">
+            <ListTableHeaderCell type={ListTableCellType.Last} class="text-left w-1/6">
                 {uiContext.str(stringResKeys.pageDefinitionEditor.description)}
             </ListTableHeaderCell>
             <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-40">
@@ -395,7 +395,6 @@
                                     (item.findBy === LocatorType.RelativeXpath ? "MyField://div[text() = 'abc']" : "")}
                                 name={`${formContext.formName}_${index}_locator`}
                                 value={item.locator}
-                                title={item.locator}
                                 on:input={(event) => handleItemChange(index, "locator", event.detail.value)}
                             />
                         </ListTableBodyCell>

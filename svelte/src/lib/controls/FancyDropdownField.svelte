@@ -38,6 +38,9 @@
     let selectId = `${name}_select`;
     let errorId = `${name}_error`;
 
+    $: inputAttributes = {
+        title: selectedItem?.text,
+    }
     //*****************************************
     // Events
     //*****************************************
@@ -63,6 +66,7 @@
             class={selectCss}
             itemId="key"
             label="text"
+            {inputAttributes}
             {...$$restProps}
             on:select={handleSelect}
             on:clear={handleClear}
