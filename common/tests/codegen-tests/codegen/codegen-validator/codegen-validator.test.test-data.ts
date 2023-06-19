@@ -1,7 +1,16 @@
-import { AutomationFramework, Indent, IRmProj, ITestCase, ITestSuite, Language, LocatorType, TestFramework } from "../../../src/file-defs";
-import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
-import { commonMsTestOutputFiles } from "../../test-helpers/common-files-dotnet";
-import { simpleRoutineTestData } from "../playwright-csharp/simple-routine.test-data";
+import {
+  AutomationFramework,
+  Indent,
+  IRmProj,
+  ITestCase,
+  ITestSuite,
+  Language,
+  LocatorType,
+  TestFramework,
+} from "../../../../src/file-defs";
+import { RmpSpec } from "../../../test-helpers/rm-project-spec.types";
+import { commonMsTestOutputFiles } from "../../../test-helpers/common-files-dotnet";
+import { simpleRoutineTestData } from "../../playwright-csharp/simple-routine.test-data";
 
 export const createCodegenValidatorTestData = (): RmpSpec => {
   return {
@@ -20,6 +29,7 @@ export const createCodegenValidatorTestData = (): RmpSpec => {
       indentSize: 4,
       testIdAttributeName: "",
     },
+    configFiles: [],
 
     pages: [
       {

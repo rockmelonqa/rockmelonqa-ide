@@ -1,5 +1,5 @@
 export class StandardFolder {
-  static readonly Config: string = "config"; 
+  static readonly Config: string = "config";
   static readonly CustomCode: string = "custom-code";
   static readonly OutputCode: string = "output-code";
   static readonly Logs: string = "logs";

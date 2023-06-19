@@ -196,7 +196,7 @@ async function genCode(browserWindow: BrowserWindow, event: Electron.IpcMainEven
 
     // Actions are completed, let's Save error (if any) to the .code-metadata
     if (!actionRs.isSuccess) {
-      let defaultMetaData: IOutputProjectMetadata = { suites: [], cases: [], pages: [] };
+      let defaultMetaData: IOutputProjectMetadata = { suites: [], cases: [], pages: [], environments: [] };
       const metaFilePath = path.join(rmprojFile.folderPath, StandardFolder.OutputCode, StandardOutputFile.MetaData);
 
       if (fs.existsSync(metaFilePath)) {

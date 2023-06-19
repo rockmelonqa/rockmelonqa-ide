@@ -1,9 +1,13 @@
 import { EOL } from "os";
-import { Indent } from "../../file-defs";
+import { Indent, StandardOutputFile } from "../../file-defs";
 
 /** Escapse double quotes and back slash characters so that the string can be inlined in the output code */
 export const escapeStr = (text: string) => {
   return text.replaceAll("\\", "\\\\").replaceAll('"', '\\"');
+};
+
+export const createEenvironmentVariableString = (varName: string) => {
+  return `${StandardOutputFile.EnvironmentSettings}.${varName}`;
 };
 
 export const format = (strTemplate: string, ...args: any[]) => {

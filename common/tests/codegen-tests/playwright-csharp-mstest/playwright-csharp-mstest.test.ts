@@ -5,7 +5,7 @@ import path from "path";
 import { StandardFolder } from "../../../src/file-defs";
 import { IProgressEvent } from "../../../src/ipc-defs";
 import { generateCode } from "../../../src/codegen";
-import {  prepareOutputProject, createRmTestProject } from "../../test-helpers/rm-project-generator";
+import { prepareOutputProject, createRmTestProject } from "../../test-helpers/rm-project-generator";
 import { doAssert } from "../../test-helpers/assert-helper";
 import { createPlaywrightMsTestTestData } from "./playwright-csharp-mstest.test-data";
 import { createTempDir } from "../../test-helpers/fsHelpers";
@@ -23,7 +23,9 @@ test("CodeGen Playwright CSharp MsTest", async () => {
   prepareOutputProject(projSpec.outputFiles!, sampleOutputDir);
 
   // Act
-  await generateCode(projFile, (event: IProgressEvent) => {});
+  await generateCode(projFile, (event: IProgressEvent) => {
+    console.log(`PROGRESS: ${event.type}. ${event.log}`);
+  });
 
   // Assert
   doAssert(path.join(projFile.folderPath, StandardFolder.OutputCode), sampleOutputDir);

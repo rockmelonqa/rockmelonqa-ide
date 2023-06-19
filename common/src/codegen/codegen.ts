@@ -16,6 +16,17 @@ export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: Prog
   info("# GENERATE CODE #");
   info("#################");
 
+  // Print out information about the context
+  info(``);
+  info(``);
+  info(`--------------------------------------------------`);
+  info(`-- Rockmelon QA`);
+  info(`-- Framework: ${rmprojFile.content.automationFramework}`);
+  info(`-- Language: ${rmprojFile.content.language}`);
+  info(`-- Test Framework: ${rmprojFile.content.testFramework}`);
+  info(`-- Date: ${new Date()}`);
+  info(`--------------------------------------------------`);
+
   const sourceProjMeta = await createSourceProjectMetadata(rmprojFile, progressNotify);
 
   const validationErrors = new CodegenSourceProjectValidator(sourceProjMeta).validate();

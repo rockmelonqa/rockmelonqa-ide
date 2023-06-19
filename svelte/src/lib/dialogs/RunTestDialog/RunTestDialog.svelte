@@ -1,38 +1,39 @@
 <script lang="ts">
-    import { appActionContextKey, type IAppActionContext } from '$lib/components/Application';
-    import PrimaryButton from '$lib/components/PrimaryButton.svelte';
-    import Spinner from '$lib/components/Spinner.svelte';
-    import StandardButton from '$lib/components/StandardButton.svelte';
-    import { appContextKey, type IAppContext } from '$lib/context/AppContext';
-    import { stringResKeys } from '$lib/context/StringResKeys';
-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import type { IUiTheme } from '$lib/context/UiTheme';
-    import TextField from '$lib/controls/TextField.svelte';
-    import DropdownField from '$lib/form-controls/DropdownField.svelte';
-    import Form from '$lib/form-controls/Form.svelte';
-    import { FieldDataType } from '$lib/form/FieldDef';
-    import { createFormContext } from '$lib/form/FormContext';
-    import type { IFormDef } from '$lib/form/FormDef';
-    import { FormModeState } from '$lib/form/FormMode';
-    import { FormSerializer } from '$lib/form/FormSerializer';
-    import WarningIcon from '$lib/icons/WarningIcon.svelte';
-    import { codeGenerator, testRunner } from '$lib/ipc';
-    import { getBrowserDropDownOptions } from '$lib/utils/dropdowns';
+    import { appActionContextKey, type IAppActionContext } from "$lib/components/Application";
+    import PrimaryButton from "$lib/components/PrimaryButton.svelte";
+    import Spinner from "$lib/components/Spinner.svelte";
+    import StandardButton from "$lib/components/StandardButton.svelte";
+    import { appContextKey, type IAppContext } from "$lib/context/AppContext";
+    import { stringResKeys } from "$lib/context/StringResKeys";
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import type { IUiTheme } from "$lib/context/UiTheme";
+    import TextField from "$lib/controls/TextField.svelte";
+    import DropdownField from "$lib/form-controls/DropdownField.svelte";
+    import Form from "$lib/form-controls/Form.svelte";
+    import { FieldDataType } from "$lib/form/FieldDef";
+    import { createFormContext } from "$lib/form/FormContext";
+    import type { IFormDef } from "$lib/form/FormDef";
+    import { FormModeState } from "$lib/form/FormMode";
+    import { FormSerializer } from "$lib/form/FormSerializer";
+    import WarningIcon from "$lib/icons/WarningIcon.svelte";
+    import { codeGenerator, testRunner } from "$lib/ipc";
+    import { getBrowserDropDownOptions, getEnvironmentFileDropDownOptions } from "$lib/utils/dropdowns";
     import {
         StandardOutputFolder,
         type Action,
         type IIpcGenericResponse,
         type IProgressDetail,
-    } from 'rockmelonqa.common';
-    import type { ISuiteInfo } from 'rockmelonqa.common/codegen/types';
-    import type { IRunTestResponseData } from 'rockmelonqa.common/ipc-defs';
-    import { getContext, onDestroy, onMount } from 'svelte';
-    import { get, writable } from 'svelte/store';
-    import { combinePath } from '../../components/FileExplorer/Node';
-    import { NodeInfo, NodeType } from './NodeInfo';
-    import TestExplorer from './TestExplorer.svelte';
-    import { createTestExplorerContext, TestExplorerActionType } from './TestExplorerContext';
-    import TestExplorerContext from './TestExplorerContext.svelte';
+    } from "rockmelonqa.common";
+    import type { ISuiteInfo } from "rockmelonqa.common/codegen/types";
+    import type { IRunTestResponseData } from "rockmelonqa.common/ipc-defs";
+    import { getContext, onDestroy, onMount } from "svelte";
+    import { get, writable } from "svelte/store";
+    import { combinePath } from "../../components/FileExplorer/Node";
+    import { NodeInfo, NodeType } from "./NodeInfo";
+    import TestExplorer from "./TestExplorer.svelte";
+    import { createTestExplorerContext, TestExplorerActionType } from "./TestExplorerContext";
+    import TestExplorerContext from "./TestExplorerContext.svelte";
+    import type { IDropdownOption } from "$lib/controls/DropdownField";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -48,12 +49,18 @@
         fields: {
             browser: {
                 dataType: FieldDataType.Dropdown,
-                dataPath: 'browser',
+                dataPath: "browser",
+            },
+            environmentFile: {
+                dataType: FieldDataType.Dropdown,
+                dataPath: "environmentFile",
             },
         },
     };
 
-    let formContext = createFormContext('runSettings', formDef, uiContext, FormModeState.Edit);
+    let environmentFileDropDownOptions: IDropdownOption[];
+
+    let formContext = createFormContext("runSettings", formDef, uiContext, FormModeState.Edit);
     let {
         mode: formMode,
         modeDispatch: formModeDispatch,
@@ -65,9 +72,9 @@
 
     const cleanupFns: Action[] = [];
     let isProcessing: boolean = false;
-    let spinnerText = '';
+    let spinnerText = "";
     let showWarning: boolean = false;
-    let dialogMessage = '';
+    let dialogMessage = "";
 
     let allowRunTest = false;
 
@@ -76,8 +83,8 @@
     let showLogs: boolean = false;
 
     const data = writable<IRunTestResponseData | undefined>(undefined);
-    $: storageFolder = $data?.storageFolder ?? '';
-    $: resultFileName = $data?.resultFileName ?? '';
+    $: storageFolder = $data?.storageFolder ?? "";
+    $: resultFileName = $data?.resultFileName ?? "";
 
     const { openFile } = getContext(appActionContextKey) as IAppActionContext;
 
@@ -143,7 +150,7 @@
                     dialogMessage = uiContext.str(stringResKeys.runTestDialog.finishedMsg);
                 } else {
                     dialogMessage = uiContext.str(stringResKeys.runTestDialog.errorMsg);
-                    addLog(errorMessage ?? 'Unknown error');
+                    addLog(errorMessage ?? "Unknown error");
                     showLogs = true;
                 }
 
@@ -159,7 +166,9 @@
             })
         );
 
-        const { suites, error } = await codeGenerator.getOutputProjectMetadata($appState.projectFile!);
+        const { suites, environments, error } = await codeGenerator.getOutputProjectMetadata($appState.projectFile!);
+        environmentFileDropDownOptions = getEnvironmentFileDropDownOptions(uiContext, environments);
+
         const hasTestCases = suites.some((suite: ISuiteInfo) => suite.testCases.length);
         allowRunTest = hasTestCases && !error;
 
@@ -202,6 +211,7 @@
 
         // TODO: build filter based on Language and Framework
         const filter = buildDotnetFilter();
+
         if (filter) {
             const serializer = new FormSerializer(uiContext);
             const model = serializer.serialize($formData.values, formDef.fields);
@@ -210,7 +220,8 @@
                 setting: {
                     browser: model.browser,
                     dotnetFilterStr: filter,
-                    outputCodeDir: '',
+                    environmentFile: model.environmentFile,
+                    outputCodeDir: "",
                 },
             });
         } else {
@@ -223,7 +234,7 @@
 
     const buildDotnetFilter = (): string => {
         const selectedCases = findSelectedCases($testExplorerState.nodes);
-        return selectedCases.map((node) => node.caseInfo!.fullyQualifiedName).join('|');
+        return selectedCases.map((node) => node.caseInfo!.fullyQualifiedName).join("|");
     };
 
     function findSelectedCases(nodes: NodeInfo[]): NodeInfo[] {
@@ -274,7 +285,7 @@
                             <Spinner class="py-4" textRight={spinnerText} />
                         {:else}
                             <div class="mb-4">
-                                {@html dialogMessage.replace(new RegExp(uiContext.eol, 'g'), '<br/>')}
+                                {@html dialogMessage.replace(new RegExp(uiContext.eol, "g"), "<br/>")}
                             </div>
                             {#if allowRunTest}
                                 <div class="max-h-[70vh] overflow-y-auto mb-4 bg-gray-50">
@@ -288,6 +299,11 @@
                                         {uiContext.str(stringResKeys.runTestDialog.selectBrowser)}
                                     </div>
                                     <DropdownField name="browser" options={getBrowserDropDownOptions(uiContext)} />
+
+                                    <div class="bg-neutral-200 font-bold px-4 py-3 mt-4">
+                                        {uiContext.str(stringResKeys.runTestDialog.selectEnvironmentFile)}
+                                    </div>
+                                    <DropdownField name="environmentFile" options={environmentFileDropDownOptions} />
                                 </Form>
                             {/if}
                         {/if}
@@ -296,7 +312,7 @@
                             <div class="flex flex-col mt-4 gap-y-4">
                                 <div class="logs h-96 overflow-y-auto border-y py-4 flex flex-col gap-y-2">
                                     {#each $logs as log}
-                                        <p>{@html log.replace(new RegExp(uiContext.eol, 'g'), '<br/>')}</p>
+                                        <p>{@html log.replace(new RegExp(uiContext.eol, "g"), "<br/>")}</p>
                                     {/each}
                                 </div>
                                 {#if storageFolder}
@@ -313,12 +329,12 @@
                     </div>
                     <div class="modal-buttons flex justify-start items-center gap-x-4">
                         {#if hasLogs}
-                            <a href={'#'} on:click={toggleLogs} class="underline">
-                                <span>{showLogs ? 'Hide ' : 'Show '} Details</span>
+                            <a href={"#"} on:click={toggleLogs} class="underline">
+                                <span>{showLogs ? "Hide " : "Show "} Details</span>
                             </a>
                         {/if}
                         {#if resultFileName}
-                            <a href={'#'} on:click={openTestResult} class="underline">
+                            <a href={"#"} on:click={openTestResult} class="underline">
                                 <span>View Result</span>
                             </a>
                         {/if}

@@ -168,6 +168,7 @@ export const stringResKeys = {
         runTestBtn: "runTestDialog.runTestBtn",
         selectAllTests: "runTestDialog.selectAllTests",
         selectBrowser: "runTestDialog.selectBrowser",
+        selectEnvironmentFile: "runTestDialog.selectEnvironmentFile",
         testAvailableMsg: "runTestDialog.testAvailableMsg",
         testNotAvailableMsg: "runTestDialog.testNotAvailableMsg",
         testOutput: "runTestDialog.testOutput",

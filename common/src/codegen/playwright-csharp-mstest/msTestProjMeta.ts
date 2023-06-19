@@ -78,6 +78,6 @@ export class MsTestProjMeta implements IOutputProjectMetadataProcessor {
         return this.routineMetaMap.get(routine)!;
       }
     }
-    throw new Error(`NameMap doesn't contain a complete set of names.`);
+    throw new Error(`Lookup failed for key ${guid}. NameMap doesn't contain a complete set of names. `);
   }
 }

@@ -3,6 +3,7 @@ import { IEnvironmentContent, IEnvironmentFile, ISetting } from "./environmentFi
 import { IFileDef } from "./fileDef";
 import { fileDefFactory } from "./fileDefFactory";
 import { LocatorType } from "./locatorType";
+import { Platform, PlatformName } from "./platform";
 import { AutomationFramework, Browser, Indent, IRmProj, IRmProjFile, Language, TestFramework } from "./rmProjFile";
 import { ISourceProjectMetadata } from "./sourceProjectMetadata";
 import { StandardOutputFile } from "./standardOutputFile";
@@ -45,4 +46,7 @@ export {
   LocatorType,
   StandardOutputFile,
   TestFramework,
+  Platform,
+  PlatformName,
+  
 };

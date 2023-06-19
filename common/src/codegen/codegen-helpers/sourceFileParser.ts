@@ -3,9 +3,36 @@ import fs from "fs";
 import { IPage, IPageFile } from "../../file-defs/pageFile";
 import parseContent from "./parseContent";
 import { v4 as uuidv4 } from "uuid";
-import { ITestCase, ITestCaseFile, ITestRoutine, ITestRoutineFile, ITestSuite, ITestSuiteFile } from "../../file-defs";
+import {
+  IEnvironmentContent,
+  IEnvironmentFile,
+  ITestCase,
+  ITestCaseFile,
+  ITestRoutine,
+  ITestRoutineFile,
+  ITestSuite,
+  ITestSuiteFile,
+} from "../../file-defs";
 
 export class SourceFileParser {
+  public static async parseConfiguration(parentDir: string, fileRelPath: string): Promise<IEnvironmentFile> {
+    let filePath = path.join(parentDir, fileRelPath);
+    let fileContent = fs.readFileSync(filePath, "utf-8");
+    let [configuration, isValid] = parseContent<IEnvironmentContent>(fileContent);
+
+    // Provide an empty elements array so that codegen can generate a setting class with no property
+    if (!isValid) {
+      configuration.settings = [];
+    }
+
+    return {
+      content: configuration,
+      fileName: path.basename(filePath),
+      folderPath: path.dirname(filePath),
+      isValid,
+    };
+  }
+
   public static async parsePageDefinition(parentDir: string, fileRelPath: string): Promise<IPageFile> {
     let filePath = path.join(parentDir, fileRelPath);
     let fileContent = fs.readFileSync(filePath, "utf-8");

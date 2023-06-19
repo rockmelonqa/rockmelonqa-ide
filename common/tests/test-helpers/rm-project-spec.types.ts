@@ -1,6 +1,8 @@
 import { AutomationFramework, Indent, IRmProj, ITestCaseStep, Language, LocatorType, TestFramework } from "../../src/file-defs";
 import { IPageElement } from "../../src/file-defs/pageFile";
 
+// These interfaces in this file are only used for unit tests
+
 /**
  * This acts as blueprint to generate an RMProject source files
  */
@@ -12,6 +14,7 @@ export interface RmpSpec {
   testsuites: ITestSuite[];
   testroutines: ITestRoutine[];
   outputFiles: OutputCodeFile[];
+  configFiles: IConfig[];
 }
 
 export interface OutputCodeFile {
@@ -52,4 +55,9 @@ export interface ITestSuite {
 
   /** Guid refers to the test case guid */
   testcases: string[];
+}
+export interface IConfig {
+  /** File name without extension */
+  name: string;
+  settings: { name: string; value: string }[];
 }

@@ -1,6 +1,7 @@
 import { EOL } from "os";
 import path from "path";
 import {
+  IEnvironmentContent,
   ISourceProjectMetadata,
   ITestCase,
   ITestRoutine,
@@ -12,7 +13,7 @@ import {
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { ICodeGen, WriteFileFn } from "../types";
-import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
+import { addIndent, hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
 import { MsTestProjMeta } from "./msTestProjMeta";
 import { PlaywrightCsharpMsTestTemplatesProvider } from "./playwrightCsharpMsTestTemplatesProvider";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
@@ -40,6 +41,8 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
 
   /** Generate MsTest project */
   public async generateCode(full: boolean, writeFile: WriteFileFn): Promise<string> {
+    await this.generateEnvironmentSettingsFile(writeFile);
+    await this.generateEnvironmentSetterScripts(writeFile);
     await this.generatePageFiles(writeFile);
     await this.generateCaseFiles(writeFile);
     await this.generateRoutineFiles(writeFile);
@@ -192,6 +195,10 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     propertyInits = addIndent(propertyInits, this._indentString.repeat(2));
 
     return this._templateProvider.getPageDefinitions(this._rootNamespace, usings, propertyDeclarations, propertyInits);
+  }
+
+  private generateEnvironmentSettingsContent(page: IEnvironmentContent): string {
+    return "";
   }
 
   private generatePage(page: IPage): string {

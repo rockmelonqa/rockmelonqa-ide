@@ -12,7 +12,7 @@ export const createTempDir = (desc: string) => {
     fs.mkdirSync(commonTmpDir);
   }
 
-  // Use actual timestamp to ensure unique namez
+  // Use actual timestamp to ensure unique names
   // const timestamp = moment().format("YYYYMMDD_HHmmss");
   const timestamp = "00000000_000000";
   const sampleTmpDir = path.join(commonTmpDir, `${timestamp}_${desc}`);
@@ -31,11 +31,12 @@ export const writeFile = (content: any, filePath: string) => {
   if (!fs.existsSync(containerDir)) {
     fs.mkdirSync(containerDir, { recursive: true });
   }
-  fs.writeFileSync(filePath, JSON.stringify(content, null, 4));
+
+  fs.writeFileSync(filePath, typeof content === "string" ? content : JSON.stringify(content, null, 4));
 };
 
 export const createDir = (dirPath: string) => {
-  if (!fs.existsSync(dirPath)) {    
+  if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
 };

@@ -1,15 +1,39 @@
 import { ISourceProjectMetadata } from "../../file-defs";
-import { IOutputProjectMetadata, IPageInfo, ISuiteInfo, ITestCaseInfo } from "../types";
-import { createMapForPages, createMapForTestCases, createMapForTestRoutines, createMapForTestSuites } from "./outputProjectMetadataProcessor";
+import { IEnvironmentFileInfo, IOutputProjectMetadata, IPageInfo, ISuiteInfo, ITestCaseInfo } from "../types";
+import {
+  createMapForEnvironmentFiles,
+  createMapForPages,
+  createMapForTestCases,
+  createMapForTestRoutines,
+  createMapForTestSuites,
+} from "./outputProjectMetadataProcessor";
 
 export const createDotnetProjectMetadata = (projMeta: ISourceProjectMetadata): IOutputProjectMetadata => {
   const rmprojFile = projMeta.project;
   const suites: ISuiteInfo[] = [];
+  const environments: IEnvironmentFileInfo[] = [];
 
+  const environmentFileMetaMap = createMapForEnvironmentFiles(rmprojFile, projMeta.environmentFiles);
   const pageMetaMap = createMapForPages(rmprojFile, projMeta.pages);
   const suiteMetaMap = createMapForTestSuites(rmprojFile, projMeta.testSuites);
   const caseMetaMap = createMapForTestCases(rmprojFile, projMeta.testCases);
   const routineMetaMap = createMapForTestRoutines(rmprojFile, projMeta.testRoutines);
+
+  for (let { content: environmentContent } of projMeta.environmentFiles) {
+    let envMeta = environmentFileMetaMap.get(environmentContent)!;
+
+    let envInfo: IEnvironmentFileInfo = {
+      name: envMeta.outputFileClassName,
+      inputFileName: envMeta.inputFileName,
+      inputFilePath: envMeta.inputFilePath,
+      inputFileRelPath: envMeta.inputFileRelPath,
+      outputFileName: envMeta.outputFileName,
+      outputFilePath: envMeta.outputFilePath,
+      outputFileRelPath: envMeta.outputFileRelPath,
+      isValid: envMeta.isValid,
+    };
+    environments.push(envInfo);
+  }
 
   for (let { content: testsuite } of projMeta.testSuites) {
     let testCases = projMeta.testCases.filter((c) => testsuite.testcases.includes(c.content.id));
@@ -80,5 +104,5 @@ export const createDotnetProjectMetadata = (projMeta: ISourceProjectMetadata): I
     pages.push(pageInfo);
   }
 
-  return { suites, cases, pages };
+  return { suites, cases, pages, environments };
 };

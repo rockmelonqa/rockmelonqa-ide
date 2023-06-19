@@ -86,11 +86,10 @@ export const stringResEn: IStringRes = {
     },
     environmentEditor: {
         actions: "Actions",
-        deleteRowConfirmation: "Are you sure to delete this row?", 
+        deleteRowConfirmation: "Are you sure to delete this row?",
         invalidNameMessage: "Only accepts a-z, A-Z, 0-9 characters",
         name: "Name",
         value: "Value",
-        
     },
     fileExplorer: {
         newEnvFile: "New .env File",
@@ -214,6 +213,7 @@ export const stringResEn: IStringRes = {
         headless: "Headless",
         selectAllTests: "Select all",
         selectBrowser: "Select browser",
+        selectEnvironmentFile: "Select environment file",
         runningTestMsg: "Running test cases",
         runTestBtn: "Run",
         testAvailableMsg: "Please select tests to run",

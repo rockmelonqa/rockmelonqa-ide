@@ -21,6 +21,7 @@ import verifyTitle from "./action-generator-dotnet/verifyTitle";
 import verifyTitleContains from "./action-generator-dotnet/verifyTitleContains";
 import verifyUrl from "./action-generator-dotnet/verifyUrl";
 
+/** Contains a map from ActionType of a GenrateAction function */
 export const actionRegistyDotnet = new Map<ActionType, (params: IActionTemplateParam) => string>();
 
 actionRegistyDotnet

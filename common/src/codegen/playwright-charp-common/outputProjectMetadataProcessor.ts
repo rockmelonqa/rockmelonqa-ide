@@ -1,13 +1,67 @@
-import { IRmProjFile, ITestCase, ITestCaseFile, ITestRoutine, ITestRoutineFile, ITestSuite, ITestSuiteFile } from "../../file-defs";
+import path from "path";
+import {
+  IEnvironmentContent,
+  IEnvironmentFile,
+  IRmProjFile,
+  ITestCase,
+  ITestCaseFile,
+  ITestRoutine,
+  ITestRoutineFile,
+  ITestSuite,
+  ITestSuiteFile,
+  StandardFolder,
+  StandardOutputFolder,
+} from "../../file-defs";
 import { IPage, IPageFile } from "../../file-defs/pageFile";
 import { IOutputFileInfo, IOutputProjectMetadata } from "../types";
 import { createOutputFileInfo } from "./createOutputFileInfo";
+import { Platform } from "../../file-defs/platform";
 
 /** For generating output project metadata */
 export interface IOutputProjectMetadataProcessor {
   createOutputProjectMetadata: () => IOutputProjectMetadata;
   get: (guid: string) => IOutputFileInfo;
 }
+
+/** Creates Map with the rEnvironmentFile as keys and Output File Info as values */
+export const createMapForEnvironmentFiles = (
+  proj: IRmProjFile,
+  envFiles: IEnvironmentFile[]
+): Map<IEnvironmentContent, IOutputFileInfo> => {
+  const map = new Map<IEnvironmentContent, IOutputFileInfo>();
+
+  const outputCodeDir = path.join(proj.folderPath, StandardFolder.OutputCode);
+  const standardOutputFolder = StandardOutputFolder.DotEnvironment;
+  const outputContainerFolder = path.join(outputCodeDir, standardOutputFolder);
+  const inputContainerFolder = StandardFolder.Config;
+  const outputFileExt = Platform.IsWindows() ? ".bat" : ".sh";
+
+  for (let envFile of envFiles) {
+    const inputFileName = path.parse(envFile.fileName).name;
+    const inputFilePath = path.join(envFile.folderPath, envFile.fileName);
+    let inputFileRelPath = inputFilePath.substring(inputContainerFolder.length + 1);
+    let outputFileName = `run.${inputFileName}.env${outputFileExt}`;
+    let outputFilePath = path.join(outputContainerFolder, outputFileName);
+    const outputFileRelPath = outputFilePath.replace(outputCodeDir, "").substring(1);
+
+    const nameInfo = {
+      inputFileName: path.parse(envFile.fileName).name,
+      inputFilePath,
+      inputFileRelPath,
+      outputFileName,
+      outputFilePath,
+      outputFileRelPath,
+      outputFileCleanName: "",
+      outputFileClassName: "",
+      outputFileSubNamespace: "",
+      outputFileFullNamespace: "",
+      isValid: false,
+    };
+    map.set(envFile.content, nameInfo);
+  }
+
+  return map;
+};
 
 /** Creates Map with the Page as keys and Output File Infor as values */
 export const createMapForPages = (proj: IRmProjFile, pageFiles: IPageFile[]): Map<IPage, IOutputFileInfo> => {

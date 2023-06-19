@@ -9,7 +9,7 @@ export interface IStringRes {
     deleteTestCaseConfirmationDialog: IDeleteTestCaseConfirmationDialogStringRes;
     deleteTestRoutineWarningDialog: IDeleteTestRoutineWarningDialogStringRes;
     culture: ICultureStringRes;
-    environmentEditor: IEnvironementEditorStringRes; 
+    environmentEditor: IEnvironementEditorStringRes;
     fileExplorer: IFileExplorerStringRes;
     form: IFormStringRes;
     general: IGeneralStringRes;
@@ -217,6 +217,7 @@ export interface IRunTestDialogStringRes {
     runTestBtn: string;
     selectAllTests: string;
     selectBrowser: string;
+    selectEnvironmentFile: string;
     testAvailableMsg: string;
     testNotAvailableMsg: string;
     testOutput: string;
