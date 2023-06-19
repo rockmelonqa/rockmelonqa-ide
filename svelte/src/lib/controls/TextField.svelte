@@ -88,7 +88,7 @@
             {placeholder}
             {readonly}
             {disabled}
-            {title}
+            title={(title || value) ?? value}
             class={inputCssClass}
             style={inputStyle}
             {...$$restProps}

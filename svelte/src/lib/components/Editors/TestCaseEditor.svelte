@@ -504,14 +504,11 @@
                             {#if item.action === ActionType.RunTestRoutine.toString()}
                                 <div class="flex justify-between items-center">
                                     <div class="grow">
-                                        {#each [toRoutineData(item)] as routineData}
-                                            <TextField
-                                                name={`${formContext.formName}_${index}_data`}
-                                                value={routineData}
-                                                title={routineData}
-                                                class="truncate"
-                                                readonly={true} />
-                                        {/each}
+                                        <TextField
+                                            name={`${formContext.formName}_${index}_data`}
+                                            value={toRoutineData(item)}
+                                            class="truncate"
+                                            readonly={true} />
                                     </div>
                                     <IconLinkButton
                                         on:click={() => handleShowRoutinePickerDialog(item, index)}
