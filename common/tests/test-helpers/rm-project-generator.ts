@@ -256,7 +256,7 @@ const clone = <T>(obj: T): T => {
   return JSON.parse(JSON.stringify(obj));
 };
 
-export const prepareOutputProject = (outputFiles: OutputCodeFile[], outputDir: string) => {
+export const writeOutputProjectFiles = (outputFiles: OutputCodeFile[], outputDir: string) => {
   for (let file of outputFiles) {
     let outputFilePath = path.join(outputDir, file.fileRelPath);
     let dir = path.dirname(outputFilePath);

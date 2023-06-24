@@ -78,7 +78,7 @@ export const createTestDataPlaywrightCsharpRoutines = (): RmpSpec => {
             type: "testStep",
             action: "RunTestRoutine",
             data: "FillName",
-            parameters: ["DataSet Number One", "DataSet Number Two"],
+            parameters: ["*"],
           },
           {
             id: "",

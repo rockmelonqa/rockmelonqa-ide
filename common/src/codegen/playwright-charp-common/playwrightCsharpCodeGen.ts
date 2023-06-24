@@ -15,7 +15,7 @@ import { addIndent, indentCharMap, upperCaseFirstChar } from "../utils/stringUti
 import { IOutputProjectMetadataProcessor } from "./outputProjectMetadataProcessor";
 import { createCleanName } from "../utils/createName";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
-import { IDataSetInfo } from "./dataSetInfo";
+import { DataSetCollection, IDataSetInfo } from "./dataSetInfo";
 import { IPlaywrightCsharpTemplatesProvider } from "./playwrightCsharpTemplatesProvider";
 import { ActionDataType, IActionData, WriteFileFn } from "../types";
 import path from "path";
@@ -25,6 +25,8 @@ import {
   WindowEnvironmentVariableFileGenerator,
 } from "../codegen-common/environmentVariableFileGenerator";
 import { Platform } from "../../file-defs/platform";
+import { ITestStepCaseStep } from "../../file-defs/testCaseFile";
+import { ITestStepComment } from "../../file-defs/shared";
 
 /** Base CodeGen for MsTest, Nunit, Xunit CodeGens */
 export class PlaywrightCsharpCodeGen {
@@ -110,60 +112,18 @@ export class PlaywrightCsharpCodeGen {
   }
 
   protected generateTestCaseBody(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {
-    let stepItems = [];
+    let stepItems: string[] = [];
     for (let step of testCase.steps) {
       if (step.type === "testStep") {
-        let pageName = "";
-        let elementName = "";
-
-        if (step.page) {
-          let pageId = step.page;
-          let page = pages.find((p) => p.id === pageId);
-          if (!page) {
-            throw new Error("DEV ERROR: " + `Cannot find page with ID ${step.page}`);
-          }
-          pageName = this._outProjMeta.get(page.id)!.outputFileClassName;
-
-          if (step.element) {
-            let elementId = step.element;
-            let element = page.elements.find((e) => e.id === elementId);
-            if (!element) {
-              throw new Error("DEV ERROR: " + `Cannot find element with ID ${elementId} on page ${pageName}`);
-            }
-            elementName = element.name || "";
-          }
-        }
-
-        let actionData = this.getActionData(step.data);
-        stepItems.push(
-          this._templateProvider.getAction({
-            pageName: pageName,
-            elementName: upperCaseFirstChar(elementName),
-            action: step.action! as unknown as ActionType,
-            data: actionData,
-            parameters: step.parameters || [],
-          })
-        );
+        stepItems.push(...this.generateTestStep(step, pages, routines));
         continue;
       }
 
       if (step.type === "comment") {
         // Add an empty line before the comment
         stepItems.push("");
-        stepItems.push(this._templateProvider.getComment(step.comment!));
+        stepItems.push(this.generateComment(step));
         continue;
-      }
-
-      if (step.type === "routine") {
-        stepItems.push("// Routine " + step.id);
-        let routineId = step.routine!;
-        let datasetId = step.dataset!;
-        let routine = routines.find((r) => r.id === routineId)!;
-        let routineName = this._outProjMeta.get(routineId)!.outputFileClassName;
-        let dataset = routine.dataSets.find((ds) => ds.id === datasetId)!;
-        let datasetName = createCleanName(dataset.name);
-        let finalRoutineClassName = `${routineName}${datasetName}`;
-        stepItems.push(`await new ${finalRoutineClassName}(this.Page).RunAsync();`);
       }
     }
 
@@ -179,10 +139,84 @@ export class PlaywrightCsharpCodeGen {
     return routineBody;
   }
 
+  /** Generates one or more code lines for the step */
+  private generateTestStep(step: ITestStepCaseStep, pages: IPage[], routines: ITestRoutine[]): string[] {
+    if (step.action === "RunTestRoutine") {
+      return this.generateTestRoutineStep(step, routines);
+    }
+
+    let pageName = "";
+    let elementName = "";
+
+    if (step.page) {
+      let pageId = step.page;
+      let page = pages.find((p) => p.id === pageId);
+      if (!page) {
+        throw new Error("DEV ERROR: " + `Cannot find page with ID ${step.page}`);
+      }
+      pageName = this._outProjMeta.get(page.id)!.outputFileClassName;
+
+      if (step.element) {
+        let elementId = step.element;
+        let element = page.elements.find((e) => e.id === elementId);
+        if (!element) {
+          throw new Error("DEV ERROR: " + `Cannot find element with ID ${elementId} on page ${pageName}`);
+        }
+        elementName = element.name || "";
+      }
+    }
+
+    let actionData = this.getActionData(step.data);
+    return [
+      this._templateProvider.getAction({
+        pageName: pageName,
+        elementName: upperCaseFirstChar(elementName),
+        action: step.action! as unknown as ActionType,
+        data: actionData,
+        parameters: step.parameters || [],
+      }),
+    ];
+  }
+
+  /** Generates code for RunTestRoutine step */
+  private generateTestRoutineStep(step: ITestStepCaseStep, routines: ITestRoutine[]): string[] {
+    let routineId = step.data;
+    if (!routineId) {
+      return [];
+    }
+
+    let routine = routines.find((r) => r.id === routineId);
+
+    if (!routine) {
+      throw new Error(`DEV ERROR: routine with id "${routineId}" not found`);
+    }
+
+    let dataSetCollection = new DataSetCollection(step.parameters);
+
+    if (dataSetCollection.isAll()) {
+      dataSetCollection.empty();
+      dataSetCollection.addMany(routine.dataSets.map((ds) => ds.id));
+    }
+
+    const routineCalls = [];
+    for (let dataSetId of dataSetCollection.get()) {
+      let routineName = this._outProjMeta.get(routineId)!.outputFileClassName;
+      let dataset = routine.dataSets.find((ds) => ds.id === dataSetId)!;
+      let datasetName = createCleanName(dataset.name);
+      let finalRoutineClassName = `${routineName}${datasetName}`;
+      routineCalls.push(`await new ${finalRoutineClassName}(this.Page).RunAsync();`);
+    }
+
+    return routineCalls;
+  }
+
+  private generateComment(step: ITestStepComment) {
+    return this._templateProvider.getComment(step.comment!);
+  }
+
   protected generateTestRoutineBody(testRoutine: ITestRoutine, pages: IPage[], datasetInfo: IDataSetInfo) {
     let stepItems = [];
-    for (let stepIndex = 0; stepIndex < testRoutine.steps.length; stepIndex++) {
-      let step = testRoutine.steps[stepIndex];
+    for (let [stepIndex, step] of testRoutine.steps.entries()) {
       if (step.type === "testStep") {
         let pageName = "";
         let elementName = "";
