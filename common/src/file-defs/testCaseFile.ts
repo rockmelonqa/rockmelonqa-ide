@@ -12,7 +12,7 @@ export interface ITestCaseFile extends Omit<IFileDef, "content"> {
   content: ITestCase;
 }
 
-export type ITestStep = ITestStepRegular | ITestStepComment | ITestStepRoutine;
+export type ITestStep = ITestStepRegular | ITestStepComment;
 
 export interface ITestStepBase {
   id: string;
@@ -30,10 +30,4 @@ export interface ITestStepRegular extends Omit<ITestStepBase, "type"> {
 export interface ITestStepComment extends Omit<ITestStepBase, "type"> {
   type: "comment";
   comment?: string;
-}
-
-export interface ITestStepRoutine extends Omit<ITestStepBase, "type"> {
-  type: "routine";
-  routine?: string;
-  dataset?: string;
 }

@@ -5,10 +5,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": ["ES2021.String"],
+    "lib": ["es2021.String"],
     "outDir": "dist/commonjs",
     "declaration": true,
-    "target": "ES2015",
+    "target": "es2021",
     "module": "commonjs"
   },
   "include": ["src/**/*"],

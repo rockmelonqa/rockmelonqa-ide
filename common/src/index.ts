@@ -30,7 +30,6 @@ import {
   TestFramework,
   fileDefFactory,
   ITestStepRegular,
-  ITestStepRoutine,
 } from "./file-defs";
 import {
   Action,
@@ -63,7 +62,7 @@ export {
   IEnvironmentFile,
   IEnvironmentContent,
   IFileDef,
-  IFileSystemInfo,  
+  IFileSystemInfo,
   IGetFolderRequest,
   IIpcGenericResponse,
   IIpcResponse,
@@ -88,9 +87,8 @@ export {
   ITestRoutineFile,
   ITestRoutineStep,
   ITestStepRegular,
-  ITestStepRoutine,
   ITestSuite,
-  ITestSuiteFile, 
+  ITestSuiteFile,
   IUserSettings,
   IUserSettingsFile,
   IWriteFileRequest,
