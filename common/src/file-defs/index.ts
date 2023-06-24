@@ -7,8 +7,8 @@ import { Platform, PlatformName } from "./platform";
 import { AutomationFramework, Browser, Indent, IRmProj, IRmProjFile, Language, TestFramework } from "./rmProjFile";
 import { ISourceProjectMetadata } from "./sourceProjectMetadata";
 import { StandardOutputFile } from "./standardOutputFile";
-import { ITestCase, ITestCaseFile, ITestStep as ITestCaseStep, ITestStepRegular } from "./testCaseFile";
-import { IDataSet, ITestRoutine, ITestRoutineFile, ITestRoutineStep } from "./testRoutineFile";
+import { ITestCase, ITestCaseFile, ITestCaseStep, ITestStepCaseStep } from "./testCaseFile";
+import { IDataSet, ITestRoutine, ITestRoutineFile, ITestStepRoutine, IRoutineStep } from "./testRoutineFile";
 import { ITestSuite, ITestSuiteFile } from "./testSuiteFile";
 import { IRecentFile, IUserSettings, IUserSettingsFile } from "./userSettingsFile";
 
@@ -31,12 +31,10 @@ export {
   ISetting,
   ISourceProjectMetadata,
   ITestCase,
-  ITestCaseFile,
-  ITestCaseStep,
   ITestRoutine,
   ITestRoutineFile,
-  ITestRoutineStep,
-  ITestStepRegular,
+  ITestStepRoutine,
+  ITestStepCaseStep,
   ITestSuite,
   ITestSuiteFile,
   IUserSettings,
@@ -47,4 +45,7 @@ export {
   TestFramework,
   Platform,
   PlatformName,
+  ITestCaseFile,
+  ITestCaseStep,
+  IRoutineStep,
 };

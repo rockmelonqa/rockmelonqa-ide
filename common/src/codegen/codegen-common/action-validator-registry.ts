@@ -1,5 +1,5 @@
 import { ActionType } from "../../file-defs";
-import { ITestStepRegular } from "../../file-defs/testCaseFile";
+import { ITestStepCaseStep } from "../../file-defs/testCaseFile";
 import { IActionTemplateParam } from "../types";
 import clear from "./action-validators/clear";
 import click from "./action-validators/click";
@@ -10,6 +10,7 @@ import gotoUrl from "./action-validators/gotoUrl";
 import input from "./action-validators/input";
 import inputByCode from "./action-validators/inputByCode";
 import runCode from "./action-validators/runCode";
+import runTestRoutine from "./action-validators/runTestRoutine";
 import selectOption from "./action-validators/selectOption";
 import verifyAttribute from "./action-validators/verifyAttribute";
 import verifyHasText from "./action-validators/verifyHasText";
@@ -23,7 +24,7 @@ import verifyTitleContains from "./action-validators/verifyTitleContains";
 import verifyUrl from "./action-validators/verifyUrl";
 
 /** A registry (map) of step validator for each ActionType */
-export const actionValidatorRegistryDotnet = new Map<ActionType, (step: ITestStepRegular) => string | undefined>();
+export const actionValidatorRegistryDotnet = new Map<ActionType, (step: ITestStepCaseStep) => string | undefined>();
 
 actionValidatorRegistryDotnet
   .set(ActionType.Clear, clear)
@@ -36,6 +37,7 @@ actionValidatorRegistryDotnet
   .set(ActionType.InputByCode, inputByCode)
   //.set(ActionType.Run, run)
   .set(ActionType.RunCode, runCode)
+  .set(ActionType.RunTestRoutine, runTestRoutine)
   .set(ActionType.SelectOption, selectOption)
   .set(ActionType.VerifyAttribute, verifyAttribute)
   .set(ActionType.VerifyHasText, verifyHasText)
@@ -52,7 +54,7 @@ actionValidatorRegistryDotnet
  * Validates a testStep that requires "Page" and "Element" and "Data"
  * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
  */
-export const validateStepRequirePageAndElementAndData = (step: ITestStepRegular): string => {
+export const validateStepRequirePageAndElementAndData = (step: ITestStepCaseStep): string => {
   if (!step.page && !step.element) {
     return `Action "{{${step.action}}}" is missing "Page" and "Element"`;
   }
@@ -71,7 +73,7 @@ export const validateStepRequirePageAndElementAndData = (step: ITestStepRegular)
  * Validates a testStep that requires "Page" and "Element"
  * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
  */
-export const validateStepRequirePageAndElement = (step: ITestStepRegular): string => {
+export const validateStepRequirePageAndElement = (step: ITestStepCaseStep): string => {
   if (!step.page && !step.element) {
     return `Action "{{${step.action}}}" is missing "Page" and "Element"`;
   }
@@ -88,6 +90,6 @@ export const validateStepRequirePageAndElement = (step: ITestStepRegular): strin
  * Validates a testStep that requires "Data"
  * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
  * */
-export const validateStepRequireData = (step: ITestStepRegular): string => {
+export const validateStepRequireData = (step: ITestStepCaseStep): string => {
   return step.data ? "" : `Action "{{${step.action}}}" is missing "Data"`;
 };
