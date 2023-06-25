@@ -1,6 +1,15 @@
 <script lang="ts">
     import { AppActionType, appContextKey, type IAppContext } from "$lib/context/AppContext";
-    import type { IDataSetData, IPageData, IPageElementData, ITestCaseData, ITestCaseStepData, ITestRoutineData, ITestRoutineStepData, ITestSuiteData } from "$lib/context/AppContext.model";
+    import type {
+        IDataSetData,
+        IPageData,
+        IPageElementData,
+        ITestCaseData,
+        ITestCaseStepData,
+        ITestRoutineData,
+        ITestRoutineStepData,
+        ITestSuiteData,
+    } from "$lib/context/AppContext.model";
     import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
     import { fileSystem } from "$lib/ipc";
     import lodash from "lodash";
@@ -12,8 +21,8 @@
         type ITestCase,
         type ITestRoutine,
         type ITestSuite,
-        type ITestStepRegular,
-        type ITestStepRoutine,
+        type ITestCaseStep,
+        type ITestRoutineActionStep,
     } from "rockmelonqa.common";
     import type { IPage } from "rockmelonqa.common/file-defs/pageFile";
     import { getContext, onDestroy } from "svelte";
@@ -22,6 +31,7 @@
     import CollapsiblePanel from "./CollapsiblePanel.svelte";
     import { buildChildrenNodes, Node as NodeInfo, toFileSystemPath, toTreePath } from "./Node";
     import Nodes from "./Nodes.svelte";
+    import type { IRoutineStep } from "rockmelonqa.common/file-defs";
 
     let uiContext = getContext(uiContextKey) as IUiContext;
 
@@ -318,7 +328,7 @@
         name = name.replace(new RegExp(`^${StandardFolder.PageDefinitions}${NodeInfo.PATH_SEPARATOR}`), "");
 
         const elementsMap: Map<string, IPageElementData> = page.elements
-            .filter((e) => e.type === 'pageElement')
+            .filter((e) => e.type === "pageElement")
             .reduce((map, e) => {
                 map.set(e.id, {
                     id: e.id,
@@ -365,9 +375,9 @@
         name = name.replace(new RegExp(`^${StandardFolder.TestCases}${NodeInfo.PATH_SEPARATOR}`), "");
 
         const steps = testCase.steps
-            .filter((s) => s.type !== 'comment')
+            .filter((s) => s.type !== "comment")
             .map((s) => {
-                if (s.type === 'testStep') {
+                if (s.type === "testStep") {
                     return {
                         id: s.id,
                         type: s.type,
@@ -375,7 +385,7 @@
                         element: s.element,
                         action: s.action,
                         data: s.data,
-                        dataset: s.parameters
+                        dataset: s.parameters,
                     } as ITestCaseStepData;
                 }
             });
@@ -416,25 +426,25 @@
         name = name.replace(new RegExp(`^${StandardFolder.TestRoutines}${NodeInfo.PATH_SEPARATOR}`), "");
 
         const steps = testRoutine.steps
-            .filter((s) => s.type !== 'comment')
-            .map((s) => { 
+            .filter((s) => s.type !== "comment")
+            .map((s) => s as ITestRoutineActionStep)
+            .map((s) => {
                 return {
                     id: s.id,
                     page: s.page,
                     element: s.element,
                     action: s.action,
                     data: s.data,
-                } as ITestRoutineStepData
+                } as ITestRoutineStepData;
             });
 
-        const datasetsMap: Map<string, IDataSetData> = testRoutine.dataSets
-            .reduce((map, ds) => {
-                map.set(ds.id, {
-                    id: ds.id,
-                    name: ds.name,
-                });
-                return map;
-            }, new Map<string, IDataSetData>());
+        const datasetsMap: Map<string, IDataSetData> = testRoutine.dataSets.reduce((map, ds) => {
+            map.set(ds.id, {
+                id: ds.id,
+                name: ds.name,
+            });
+            return map;
+        }, new Map<string, IDataSetData>());
 
         return {
             id: testRoutine.id,

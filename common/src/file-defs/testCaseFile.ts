@@ -1,5 +1,5 @@
 import { IFileDef } from "./fileDef";
-import { ITestStepBase, ITestStepComment } from "./shared";
+import { ITestActionStep, ITestStepBase, ITestStepComment } from "./shared";
 
 /** A test case is a collection of test steps */
 export interface ITestCase {
@@ -8,18 +8,14 @@ export interface ITestCase {
   steps: ITestCaseStep[];
 }
 
-export type ITestCaseStep = ITestStepCaseStep | ITestStepComment;
+export type ITestCaseStep = ITestCaseActionStep | ITestStepComment;
 
 /** Describes the file and its test case contents */
 export interface ITestCaseFile extends Omit<IFileDef, "content"> {
   content: ITestCase;
 }
 
-export interface ITestStepCaseStep extends Omit<ITestStepBase, "type"> {
-  type: "testStep";
-  page?: string;
-  element?: string;
-  action?: string;
+/** An action step in a test case */
+export interface ITestCaseActionStep extends Omit<ITestActionStep, "data"> {
   data: string;
-  parameters?: string[];
 }

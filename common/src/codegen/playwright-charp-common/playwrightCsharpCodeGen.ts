@@ -25,7 +25,7 @@ import {
   WindowEnvironmentVariableFileGenerator,
 } from "../codegen-common/environmentVariableFileGenerator";
 import { Platform } from "../../file-defs/platform";
-import { ITestStepCaseStep } from "../../file-defs/testCaseFile";
+import { ITestCaseActionStep, ITestCaseActionStep as ITestRoutineActionStep } from "../../file-defs/testCaseFile";
 import { ITestStepComment } from "../../file-defs/shared";
 
 /** Base CodeGen for MsTest, Nunit, Xunit CodeGens */
@@ -140,9 +140,9 @@ export class PlaywrightCsharpCodeGen {
   }
 
   /** Generates one or more code lines for the step */
-  private generateTestStep(step: ITestStepCaseStep, pages: IPage[], routines: ITestRoutine[]): string[] {
+  private generateTestStep(step: ITestRoutineActionStep, pages: IPage[], routines: ITestRoutine[]): string[] {
     if (step.action === "RunTestRoutine") {
-      return this.generateTestRoutineStep(step, routines);
+      return this.generateRunTestRoutineStep(step, routines);
     }
 
     let pageName = "";
@@ -179,7 +179,7 @@ export class PlaywrightCsharpCodeGen {
   }
 
   /** Generates code for RunTestRoutine step */
-  private generateTestRoutineStep(step: ITestStepCaseStep, routines: ITestRoutine[]): string[] {
+  private generateRunTestRoutineStep(step: ITestCaseActionStep, routines: ITestRoutine[]): string[] {
     let routineId = step.data;
     if (!routineId) {
       return [];

@@ -2,7 +2,7 @@ import { ActionType, ISourceProjectMetadata, ITestCase } from "../file-defs";
 import { actionValidatorRegistryDotnet } from "./codegen-common/action-validator-registry";
 import { SourceFileValidationError } from "./types";
 import path from "path";
-import { ITestCaseFile, ITestCaseStep, ITestStepCaseStep } from "../file-defs/testCaseFile";
+import { ITestCaseFile, ITestCaseStep, ITestCaseActionStep } from "../file-defs/testCaseFile";
 
 type ErrorInfo = {
   /** Line number: starts at 1 */
@@ -91,7 +91,7 @@ export class CodegenSourceProjectValidator {
    * Validates a single testStep item
    * @returns {string|undefined} The error message TEMPLATE string or `undefined` if there is no error.
    */
-  private validateTestStep(step: ITestStepCaseStep): string | undefined {
+  private validateTestStep(step: ITestCaseActionStep): string | undefined {
     const actionType = step.action! as unknown as ActionType;
     const actionValidator = actionValidatorRegistryDotnet.get(actionType);
 

@@ -1,7 +1,7 @@
-import { AutomationFramework, Indent, IRmProj, ITestStepRegular, Language, LocatorType, TestFramework } from "../../src/file-defs";
+import { AutomationFramework, Indent, IRmProj, ITestCaseStep, Language, LocatorType, TestFramework } from "../../src/file-defs";
 import { IPageElement } from "../../src/file-defs/pageFile";
 import { ITestStepComment } from "../../src/file-defs/shared";
-import { ITestStepRoutine } from "../../src/file-defs/testRoutineFile";
+import { ITestRoutineActionStep } from "../../src/file-defs/testRoutineFile";
 
 // These interfaces in this file are only used for unit tests
 
@@ -37,7 +37,7 @@ export interface ITestCase {
   id: string;
   name?: string;
   description: string;
-  steps: (ITestStepRegular | ITestStepComment)[];
+  steps: (ITestCaseStep | ITestStepComment)[];
 }
 
 export interface ITestRoutine {
@@ -45,7 +45,7 @@ export interface ITestRoutine {
   id: string;
   name?: string;
   description: string;
-  steps: (ITestStepRoutine | ITestStepComment)[];
+  steps: (ITestRoutineActionStep | ITestStepComment)[];
   dataSets: { id: string; name: string; description: string }[];
 }
 

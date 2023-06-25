@@ -1,36 +1,37 @@
 <script lang="ts">
-    import { AlertDialogButtons, AlertDialogType } from '$lib/components/Alert';
-    import AlertDialog from '$lib/components/AlertDialog.svelte';
-    import IconLinkButton from '$lib/components/IconLinkButton.svelte';
-    import { ListTableCellType } from '$lib/components/ListTable';
-    import ListTable from '$lib/components/ListTable.svelte';
-    import ListTableBodyCell from '$lib/components/ListTableBodyCell.svelte';
-    import ListTableBodyRow from '$lib/components/ListTableBodyRow.svelte';
-    import ListTableHeaderCell from '$lib/components/ListTableHeaderCell.svelte';
-    import PrimaryButton from '$lib/components/PrimaryButton.svelte';
-    import { appContextKey, type IAppContext } from '$lib/context/AppContext';
-    import { stringResKeys } from '$lib/context/StringResKeys';
-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import type { IDropdownOption } from '$lib/controls/DropdownField';
-    import FancyDropdownField from '$lib/controls/FancyDropdownField.svelte';
-    import TextField from '$lib/controls/TextField.svelte';
-    import type { IDictionary } from '$lib/form/FieldDef';
-    import type { IFormContext } from '$lib/form/FormContext';
-    import { ListDataActionType, type IListDataContext } from '$lib/form/ListData';
-    import AddIcon from '$lib/icons/AddIcon.svelte';
-    import CommentIcon from '$lib/icons/CommentIcon.svelte';
-    import DeleteIcon from '$lib/icons/DeleteIcon.svelte';
-    import MoveDownIcon from '$lib/icons/MoveDownIcon.svelte';
-    import MoveUpIcon from '$lib/icons/MoveUpIcon.svelte';
-    import SaveIcon from '$lib/icons/SaveIcon.svelte';
-    import { getActionTypeDropDownOptions } from '$lib/utils/dropdowns';
-    import type { ITestRoutineStep as ITestStep } from 'rockmelonqa.common';
-    import { createEventDispatcher, getContext } from 'svelte';
-    import { derived } from 'svelte/store';
-    import { v4 as uuidv4 } from 'uuid';
-    import { isPagelessAction } from '../Editor';
-    import CommentTextField from '$lib/components/CommentTextField.svelte';
-    import { removeFileExtension } from '$lib/utils/utils';
+    import { AlertDialogButtons, AlertDialogType } from "$lib/components/Alert";
+    import AlertDialog from "$lib/components/AlertDialog.svelte";
+    import IconLinkButton from "$lib/components/IconLinkButton.svelte";
+    import { ListTableCellType } from "$lib/components/ListTable";
+    import ListTable from "$lib/components/ListTable.svelte";
+    import ListTableBodyCell from "$lib/components/ListTableBodyCell.svelte";
+    import ListTableBodyRow from "$lib/components/ListTableBodyRow.svelte";
+    import ListTableHeaderCell from "$lib/components/ListTableHeaderCell.svelte";
+    import PrimaryButton from "$lib/components/PrimaryButton.svelte";
+    import { appContextKey, type IAppContext } from "$lib/context/AppContext";
+    import { stringResKeys } from "$lib/context/StringResKeys";
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import type { IDropdownOption } from "$lib/controls/DropdownField";
+    import FancyDropdownField from "$lib/controls/FancyDropdownField.svelte";
+    import TextField from "$lib/controls/TextField.svelte";
+    import type { IDictionary } from "$lib/form/FieldDef";
+    import type { IFormContext } from "$lib/form/FormContext";
+    import { ListDataActionType, type IListDataContext } from "$lib/form/ListData";
+    import AddIcon from "$lib/icons/AddIcon.svelte";
+    import CommentIcon from "$lib/icons/CommentIcon.svelte";
+    import DeleteIcon from "$lib/icons/DeleteIcon.svelte";
+    import MoveDownIcon from "$lib/icons/MoveDownIcon.svelte";
+    import MoveUpIcon from "$lib/icons/MoveUpIcon.svelte";
+    import SaveIcon from "$lib/icons/SaveIcon.svelte";
+    import { getActionTypeDropDownOptions } from "$lib/utils/dropdowns";
+
+    import { createEventDispatcher, getContext } from "svelte";
+    import { derived } from "svelte/store";
+    import { v4 as uuidv4 } from "uuid";
+    import { isPagelessAction } from "../Editor";
+    import CommentTextField from "$lib/components/CommentTextField.svelte";
+    import { removeFileExtension } from "$lib/utils/utils";
+    import type { IRoutineStep } from "rockmelonqa.common/file-defs";
 
     export let formContext: IFormContext;
     let { mode: formMode, formName } = formContext;
@@ -61,8 +62,9 @@
         pageElementsMap = new Map();
         for (const [pageId, pageData] of pages) {
             // only get completed row
-            const elements = Array.from(pageData.elements.values())
-                .filter((e) => e.id && e.name != null && e.findBy != null && e.locator != null);
+            const elements = Array.from(pageData.elements.values()).filter(
+                (e) => e.id && e.name != null && e.findBy != null && e.locator != null
+            );
 
             const dropdownOptions: IDropdownOption[] = [];
             for (const element of elements) {
@@ -77,10 +79,12 @@
     });
 
     const isTestStep = (item: IDictionary) => {
-        return (item as ITestStep).type === "testStep";
+        return (item as IRoutineStep).type === "testStep";
     };
 
-    let lastUsedPage: string | undefined = $listStep.items.findLast(item => isTestStep(item) && !isPagelessAction(item.action))?.page;
+    let lastUsedPage: string | undefined = $listStep.items.findLast(
+        (item) => isTestStep(item) && !isPagelessAction(item.action)
+    )?.page;
 
     const dispatch = createEventDispatcher();
 
@@ -103,7 +107,7 @@
 
     const handleStepDataItemChange = (index: number, dataIndex: number, value: any) => {
         const item = { ...$listStep.items[index] };
-        item['data'][dataIndex]['value'] = value;
+        item["data"][dataIndex]["value"] = value;
 
         listStepDispatch({
             type: ListDataActionType.UpdateItem,
@@ -126,14 +130,14 @@
     };
 
     const isEmptyItem = (item: IDictionary) => {
-        const ignoredProperties: string[] = ['id', 'type'];
+        const ignoredProperties: string[] = ["id", "type"];
         return !Object.entries(item)
             .filter(([key, value]) => !ignoredProperties.includes(key))
-            .some(([key, value]) => (key === 'data' ? value.some((x: any) => x.value) : value));
+            .some(([key, value]) => (key === "data" ? value.some((x: any) => x.value) : value));
     };
 
     const handleDeleteConfirmation = async (event: any) => {
-        if (event.detail.button === 'delete') {
+        if (event.detail.button === "delete") {
             doDeleteRow(indexToDelete);
         }
     };
@@ -192,13 +196,13 @@
     const newStep = () => {
         return {
             id: uuidv4(),
-            type: 'testStep',
-            name: '',
-            description: '',
+            type: "testStep",
+            name: "",
+            description: "",
             page: lastUsedPage,
             data: dataSetItems.map((x) => ({
                 id: x.id,
-                value: '',
+                value: "",
             })),
         } as IDictionary;
     };
@@ -222,15 +226,15 @@
         dispatchChange();
     };
     const newComment = () => {
-        return { id: uuidv4(), type: 'comment', comment: '' } as IDictionary;
+        return { id: uuidv4(), type: "comment", comment: "" } as IDictionary;
     };
 
     const isComment = (item: IDictionary) => {
-        return (item as ITestStep).type === 'comment';
+        return (item as IRoutineStep).type === "comment";
     };
 
     const dispatchChange = () => {
-        dispatch('change');
+        dispatch("change");
     };
 </script>
 
@@ -269,7 +273,7 @@
                             name={`${formName}_${index}_comment`}
                             value={item.comment}
                             placeholder={uiContext.str(stringResKeys.testRoutineEditor.comment)}
-                            on:input={(event) => handleItemChange(index, 'comment', event.detail.value)}
+                            on:input={(event) => handleItemChange(index, "comment", event.detail.value)}
                         />
                     </ListTableBodyCell>
                 {:else}
@@ -278,7 +282,7 @@
                             name={`${formName}_${index}_action`}
                             value={item.action}
                             options={actionTypeOptions}
-                            on:change={(event) => handleItemChange(index, 'action', event.detail.value)}
+                            on:change={(event) => handleItemChange(index, "action", event.detail.value)}
                         />
                     </ListTableBodyCell>
                     <ListTableBodyCell type={ListTableCellType.Normal}>
@@ -297,7 +301,7 @@
                                 name={`${formName}_${index}_element`}
                                 value={item.element}
                                 options={pageElementsMap.get(item.page) ?? []}
-                                on:change={(event) => handleItemChange(index, 'element', event.detail.value)}
+                                on:change={(event) => handleItemChange(index, "element", event.detail.value)}
                             />
                         {/if}
                     </ListTableBodyCell>
@@ -374,7 +378,7 @@
     </IconLinkButton>
 
     <div class="ml-auto absolute right-5">
-        <PrimaryButton on:click={() => dispatch('save')}>
+        <PrimaryButton on:click={() => dispatch("save")}>
             <span class="flex items-center gap-x-2">
                 <SaveIcon class="w-5 h-5" />
                 {uiContext.str(stringResKeys.general.save)}

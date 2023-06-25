@@ -1,12 +1,17 @@
 import { IFileDef } from "./fileDef";
-import { IDictionary, ITestStepComment } from "./shared";
-import { ITestStepCaseStep } from "./testCaseFile";
+import { IDictionary, ITestActionStep, ITestStepComment } from "./shared";
+import { ITestCaseActionStep } from "./testCaseFile";
 
 /** A data set is set of data to be used for a specific execution of a test routine   */
 export interface IDataSet {
   id: string;
   name: string;
   description: string;
+}
+
+/** Describes the file and its test routine contents */
+export interface ITestRoutineFile extends Omit<IFileDef, "content"> {
+  content: ITestRoutine;
 }
 
 /** Test Routine is a sequence of test steps */
@@ -18,13 +23,9 @@ export interface ITestRoutine {
 }
 
 /** A step in a Routine */
-export type IRoutineStep = ITestStepComment | ITestStepRoutine;
+export type IRoutineStep = ITestStepComment | ITestRoutineActionStep;
 
-/** Describes the file and its test routine contents */
-export interface ITestRoutineFile extends Omit<IFileDef, "content"> {
-  content: ITestRoutine;
-}
-
-export interface ITestStepRoutine extends Omit<ITestStepCaseStep, "data"> {
+/** An Action step in a routine */
+export interface ITestRoutineActionStep extends Omit<ITestActionStep, "data"> {
   data: { [datasetId: string]: string };
 }

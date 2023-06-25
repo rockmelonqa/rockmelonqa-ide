@@ -27,7 +27,7 @@ import {
   TestFramework,
   fileDefFactory,
   ITestCaseStep,
-  ITestStepRoutine,
+  ITestRoutineActionStep,
 } from "./file-defs";
 import {
   Action,
@@ -81,7 +81,7 @@ export {
   ITestCase,
   ITestRoutine,
   ITestRoutineFile,
-  ITestStepRoutine,
+  ITestRoutineActionStep,
   ITestCaseStep,
   ITestSuite,
   ITestSuiteFile,

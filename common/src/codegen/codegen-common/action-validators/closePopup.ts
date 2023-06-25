@@ -1,6 +1,6 @@
-import { ITestStepCaseStep } from "../../../file-defs/testCaseFile";
+import { ITestCaseActionStep } from "../../../file-defs/testCaseFile";
 
 /** Validate step with action Close Popup */
-export default (step: ITestStepCaseStep) => {
+export default (step: ITestCaseActionStep) => {
   return "";
 };

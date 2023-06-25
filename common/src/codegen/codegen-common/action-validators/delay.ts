@@ -1,7 +1,7 @@
-import { ITestStepCaseStep } from "../../../file-defs/testCaseFile";
+import { ITestCaseActionStep } from "../../../file-defs/testCaseFile";
 import { validateStepRequireData } from "../action-validator-registry";
 
 /** Validate step with action Delay */
-export default (step: ITestStepCaseStep) => {
+export default (step: ITestCaseActionStep) => {
   return validateStepRequireData(step);
 };
