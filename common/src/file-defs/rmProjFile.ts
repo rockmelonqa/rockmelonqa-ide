@@ -1,10 +1,12 @@
 import { IFileDef } from "./fileDef";
 
+/** The Supported automation frameworks: Playwright, Selenium, etc...  */
 export enum AutomationFramework {
   Playwright = "Playwright",
   Selenium = "Selenium",
 }
 
+/** The supported languages: C#, Java, Typescript,... */
 export enum Language {
   CSharp = "C#",
   Java = "Java",
@@ -12,6 +14,7 @@ export enum Language {
   Typescript = "Typescript",
 }
 
+/** The supported test framework: MsTest, NUnit,... */
 export enum TestFramework {
   JUnit = "JUnit",
   MSTest = "MSTest",
@@ -21,12 +24,14 @@ export enum TestFramework {
   Jest = "Jest",
 }
 
+/** The supported browser: Chrome, FireFox,... */
 export enum Browser {
   Chromium = "chromium",
   Firefox = "firefox",
   Webkit = "webkit",
 }
 
+/** Indentation of generated source code */
 export enum Indent {
   Spaces = "Spaces",
   Tabs = "Tabs",
@@ -46,7 +51,7 @@ export interface IRmProj {
   indentSize: number;
 }
 
-/** .rmproj file and its contents */
+/** .rmproj file info and its contents */
 export interface IRmProjFile extends Pick<IFileDef, Exclude<keyof IFileDef, "isValid">> {
   content: IRmProj;
 }

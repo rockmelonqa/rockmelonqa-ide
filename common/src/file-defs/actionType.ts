@@ -1,3 +1,4 @@
+/** Test action type */
 export enum ActionType {
   Clear = "Clear",
   Click = "Click",

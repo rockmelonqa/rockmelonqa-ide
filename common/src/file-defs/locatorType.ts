@@ -1,3 +1,4 @@
+/** Locator types that correspond to Playwright locator types */
 export enum LocatorType {
   Attribute = "Attribute",
   Code = "Code",
