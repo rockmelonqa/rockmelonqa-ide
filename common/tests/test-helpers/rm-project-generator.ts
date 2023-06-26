@@ -22,12 +22,13 @@ export const createRmTestProject = (rmpSpec: RmpSpec, projectDir: string): IRmPr
   writeConfigFiles(rmpSpec.configFiles, projectDir);
   writePages(rmpSpec.pages, projectDir);
   writeTestRoutines(rmpSpec.testroutines, rmpSpec.pages, rmpSpec.testcases, projectDir);
-  writeTestCases(rmpSpec.testcases, rmpSpec.pages, rmpSpec.testsuites, projectDir);
+  writeTestCases(rmpSpec.testcases, rmpSpec.pages, rmpSpec.testsuites, rmpSpec.testroutines, projectDir);
   writeTestSuites(rmpSpec.testsuites, projectDir);
   wrriteTestProjectFile(rmpSpec.content, rmpSpec.projectName, projectDir);
 
   createDir(path.join(projectDir, StandardFolder.TestRuns));
   createDir(path.join(projectDir, StandardFolder.OutputCode));
+  createDir(path.join(projectDir, StandardFolder.Config));
   return rmProjFile;
 };
 
@@ -83,7 +84,7 @@ const writePages = (pages: IPage[], projectDir: string) => {
   }
 };
 
-const writeTestCases = (cases: ITestCase[], pages: IPage[], suites: ITestSuite[], projectDir: string) => {
+const writeTestCases = (cases: ITestCase[], pages: IPage[], suites: ITestSuite[], routines: ITestRoutine[], projectDir: string) => {
   const casesDir = path.join(projectDir, StandardFolder.TestCases);
   createDir(casesDir);
 
@@ -129,6 +130,7 @@ const updateTestCaseIdInSuite = (suites: ITestSuite[], caseName: string, newCase
   }
 };
 
+/** Write source .troutine files */
 const writeTestRoutines = (routines: ITestRoutine[], pages: IPage[], testcases: ITestCase[], projectDir: string) => {
   const dir = path.join(projectDir, StandardFolder.TestRoutines);
   createDir(dir);
@@ -187,13 +189,20 @@ const writeTestRoutines = (routines: ITestRoutine[], pages: IPage[], testcases: 
 const updateDataSetIdInTestCases = (testcases: ITestCase[], routine: ITestRoutine) => {
   for (let testcase of testcases) {
     for (let step of testcase.steps) {
-      if (step.type != "routine") continue;
-      if (step.routine === routine.id) {
-        for (let dataset of routine.dataSets) {
-          if (dataset.name === step.dataset) {
-            step.dataset = dataset.id;
-            break;
+      if (step.type !== "testStep") {
+        continue;
+      }
+
+      if (step.action === "RunTestRoutine") {
+        if (!step.parameters) {
+          continue;
+        }
+        for (const [index, manualDataSetName] of step.parameters.entries()) {
+          let dataSet = routine.dataSets.find((ds) => ds.name === manualDataSetName);
+          if (!dataSet) {
+            continue;
           }
+          step.parameters[index] = dataSet.id;
         }
       }
     }
@@ -202,9 +211,20 @@ const updateDataSetIdInTestCases = (testcases: ITestCase[], routine: ITestRoutin
 const updateTestRoutineIdInTestCases = (testcases: ITestCase[], manualName: string, newRoutineId: string) => {
   for (let testcase of testcases) {
     for (let step of testcase.steps) {
-      if (step.type !== "routine") continue;
-      if (step.routine === manualName) {
-        step.routine = newRoutineId;
+      if (step.type !== "testStep") {
+        continue;
+      }
+
+      if (step.action === "RunTestRoutine") {
+        if (!step.data) {
+          continue;
+        }
+
+        // step.data is the routine id
+        let routineName = step.data;
+        if (manualName === routineName) {
+          step.data = newRoutineId;
+        }
       }
     }
   }
@@ -236,7 +256,7 @@ const clone = <T>(obj: T): T => {
   return JSON.parse(JSON.stringify(obj));
 };
 
-export const prepareOutputProject = (outputFiles: OutputCodeFile[], outputDir: string) => {
+export const writeOutputProjectFiles = (outputFiles: OutputCodeFile[], outputDir: string) => {
   for (let file of outputFiles) {
     let outputFilePath = path.join(outputDir, file.fileRelPath);
     let dir = path.dirname(outputFilePath);

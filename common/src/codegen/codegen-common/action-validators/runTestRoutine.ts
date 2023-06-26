@@ -1,6 +1,6 @@
 import { ITestCaseActionStep } from "../../../file-defs/testCaseFile";
 
-/** Validate step with action Close Popup */
+/** Validate step with action RunTestRoutine */
 export default (step: ITestCaseActionStep) => {
-  return "";
+  return ``;
 };

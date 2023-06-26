@@ -7,7 +7,7 @@ import { ITestSuite } from "./testSuiteFile";
 import { IUserSettings } from "./userSettingsFile";
 import { IEnvironmentContent } from "./environmentFile";
 
-/** Factory to create new instances of our files */
+/** Factory to create new instances of our RM files */
 export const fileDefFactory = {
   newUserSetting: (): IUserSettings => {
     return {
@@ -56,8 +56,8 @@ export const fileDefFactory = {
   },
 
   newEnvironmentSettings: (): IEnvironmentContent => {
-    return { 
-      settings: [] 
-    }
-  }
+    return {
+      settings: [],
+    };
+  },
 };

@@ -44,7 +44,8 @@
     import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
     import { toTitle, isPagelessAction } from "./Editor";
-    import type { ITestStepComment, ITestStepRegular } from "rockmelonqa.common/file-defs/testCaseFile";
+    import type { ITestStepComment } from "rockmelonqa.common/file-defs/shared";
+    import type { ITestCaseStep } from "rockmelonqa.common/file-defs/testCaseFile";
     import { removeFileExtension } from "$lib/utils/utils";
     import RoutinePickerDialog from "$lib/dialogs/RoutinePickerDialog.svelte";
 
@@ -143,8 +144,9 @@
         pageElementsMap = new Map();
         for (const [pageId, pageData] of pages) {
             // only get completed row
-            const elements = Array.from(pageData.elements.values())
-                .filter((e) => e.id && e.name != null && e.findBy != null && e.locator != null);
+            const elements = Array.from(pageData.elements.values()).filter(
+                (e) => e.id && e.name != null && e.findBy != null && e.locator != null
+            );
 
             const dropdownOptions: IDropdownOption[] = [];
             for (const element of elements) {
@@ -169,7 +171,7 @@
         if (fileContent) {
             model = JSON.parse(fileContent) as ITestCase;
         }
-        
+
         const serializer = new FormSerializer(uiContext);
         const fieldValues = serializer.deserialize(model, formDef.fields);
         formDataDispatch({ type: FormDataActionType.Load, newValues: fieldValues });
@@ -177,7 +179,7 @@
         const items = serializer.deserializeList(model.steps, listDef.fields);
         items.forEach((item, index) => {
             const step = model.steps[index];
-            if (step.type === 'testStep') {
+            if (step.type === "testStep") {
                 item.parameters = step.parameters;
             }
         });
@@ -185,7 +187,7 @@
 
         registerOnSaveHandler(contentIndex, doSave);
 
-        lastUsedPage = items.findLast(item => isTestStep(item) && !isPagelessAction(item.action))?.page;
+        lastUsedPage = items.findLast((item) => isTestStep(item) && !isPagelessAction(item.action))?.page;
 
         return () => {
             unregisterOnSaveHandler(contentIndex);
@@ -213,7 +215,7 @@
             const steps = serializer.serializeList(items, listDef.fields);
             steps.forEach((step, index) => {
                 const item = items[index];
-                if (item.type === 'testStep') {
+                if (item.type === "testStep") {
                     step.parameters = item.parameters;
                 }
             });
@@ -334,8 +336,15 @@
 
         dispatchChange();
     };
-    const newStep = (): ITestStepRegular => {
-        return { id: uuidv4(), type: "testStep", name: "", description: "", data: "", page: lastUsedPage } as ITestStepRegular;
+    const newStep = (): ITestCaseStep => {
+        return {
+            id: uuidv4(),
+            type: "testStep",
+            name: "",
+            description: "",
+            data: "",
+            page: lastUsedPage,
+        } as ITestCaseStep;
     };
 
     const handleAddComment = () => {
@@ -366,7 +375,7 @@
             return item.data;
         }
 
-        const routineId: string = item.data ?? '';
+        const routineId: string = item.data ?? "";
         const datasets: string[] = item.parameters ?? [];
 
         const routine = $appState.testRoutines.get(routineId);
@@ -374,42 +383,40 @@
             let label = removeFileExtension(routine.name);
 
             // no dataset or select all
-            if (datasets.length === 0 || (datasets.length === 1 && datasets[0] === '*')) {
+            if (datasets.length === 0 || (datasets.length === 1 && datasets[0] === "*")) {
                 return label;
             }
 
             // select few datasets
-            const selectedDataSet = datasets
-                .filter(key => routine.datasets.has(key)) 
-                .map(key => routine.datasets.get(key)!.name) ?? [];              
+            const selectedDataSet =
+                datasets.filter((key) => routine.datasets.has(key)).map((key) => routine.datasets.get(key)!.name) ?? [];
             if (selectedDataSet.length > 0) {
-                label = label + "[" + selectedDataSet.join(', ') + "]";
+                label = label + "[" + selectedDataSet.join(", ") + "]";
             }
 
             return label;
         }
 
-        return '';
-    }
+        return "";
+    };
 
     let showRoutinePickerDialog: boolean = false;
     let indexToSelectRoutine: number;
-    let selectingRoutineId: string = '';
+    let selectingRoutineId: string = "";
     let selectingDatasets: string[] = [];
     const handleShowRoutinePickerDialog = (stepItem: IDictionary, stepIndex: number) => {
         showRoutinePickerDialog = true;
         indexToSelectRoutine = stepIndex;
-        selectingRoutineId = stepItem.data ?? '';
+        selectingRoutineId = stepItem.data ?? "";
         selectingDatasets = stepItem.parameters ?? [];
-    }
+    };
 
     const handleSelectRoutine = (e: any) => {
         showRoutinePickerDialog = false;
         const value = e.detail.value;
 
-        const item = {...$listData.items[indexToSelectRoutine]};
-        item.data = value.routine,
-        item.parameters = value.datasets
+        const item = { ...$listData.items[indexToSelectRoutine] };
+        (item.data = value.routine), (item.parameters = value.datasets);
 
         listDataDispatch({
             type: ListDataActionType.UpdateItem,
@@ -418,7 +425,7 @@
         });
 
         dispatchChange();
-    }
+    };
 </script>
 
 <div class="test-case-editor p-8">
@@ -508,13 +515,19 @@
                                             name={`${formContext.formName}_${index}_data`}
                                             value={toRoutineData(item)}
                                             class="truncate"
-                                            readonly={true} />
+                                            readonly={true}
+                                        />
                                     </div>
                                     <IconLinkButton
                                         on:click={() => handleShowRoutinePickerDialog(item, index)}
                                         title="Select routine"
                                     >
-                                        <svelte:fragment slot="icon"><ListIcon class="h-5 w-5" strokeColor="var(--color-brand)" /></svelte:fragment>
+                                        <svelte:fragment slot="icon"
+                                            ><ListIcon
+                                                class="h-5 w-5"
+                                                strokeColor="var(--color-brand)"
+                                            /></svelte:fragment
+                                        >
                                     </IconLinkButton>
                                 </div>
                             {:else}
@@ -608,6 +621,6 @@
         routine={selectingRoutineId}
         datasets={selectingDatasets}
         on:submit={handleSelectRoutine}
-        on:cancel={() => showRoutinePickerDialog = false}
+        on:cancel={() => (showRoutinePickerDialog = false)}
     />
 {/if}

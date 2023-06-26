@@ -138,10 +138,15 @@
          * ]
          * */
         const steps = model.steps.map((step) => {
+            if (step.type === "comment") {
+                return { ...step };
+            }
+
             return {
                 ...step,
-                // 'data' can be null of that is 'comment' row
-                data: step.data ? Object.entries(step.data).map(([id, value]) => ({ id, value })) as IDictionary[] : undefined,
+                data: step.data
+                    ? (Object.entries(step.data).map(([id, value]) => ({ id, value })) as IDictionary[])
+                    : undefined,
             };
         });
         listStepDispatch({ type: ListDataActionType.SetItems, items: steps, hasMoreItems: false });
@@ -185,7 +190,7 @@
                         obj[item.id] = item.value ?? "";
                         return obj;
                     }, {});
-                    return {...step, data};
+                    return { ...step, data };
                 } else {
                     return step;
                 }
