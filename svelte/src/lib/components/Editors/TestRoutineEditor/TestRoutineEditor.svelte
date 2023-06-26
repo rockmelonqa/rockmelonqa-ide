@@ -141,9 +141,9 @@
             if (step.type === "comment") {
                 return { ...step };
             }
+
             return {
                 ...step,
-                // 'data' can be null of that is 'comment' row
                 data: step.data
                     ? (Object.entries(step.data).map(([id, value]) => ({ id, value })) as IDictionary[])
                     : undefined,
