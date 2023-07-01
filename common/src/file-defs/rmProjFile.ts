@@ -20,8 +20,6 @@ export enum TestFramework {
   MSTest = "MSTest",
   NUnit = "NUnit",
   xUnit = "xUnit",
-  /** To be removed */
-  Jest = "Jest",
 }
 
 /** The supported browser: Chrome, FireFox,... */
@@ -43,7 +41,7 @@ export interface IRmProj {
   name: string;
   description: string;
   automationFramework: AutomationFramework;
-  testFramework: TestFramework;
+  testFramework: TestFramework | "";
   testIdAttributeName: string;
   language: Language;
   rootNamespace: string;
