@@ -20,7 +20,7 @@ export const automationFrameworkOptions: IDropdownOption[] = [
 export const lanugageOptions: IDropdownOption[] = [
     { key: Language.CSharp, text: Language.CSharp.toString() },
     //{ key: Language.Java, text: Language.Java.toString() },
-    //{ key: Language.Typescript, text: Language.Typescript.toString() },
+    { key: Language.Typescript, text: Language.Typescript.toString() },
 ];
 
 export const testFrameworkOptions: IDropdownOption[] = [

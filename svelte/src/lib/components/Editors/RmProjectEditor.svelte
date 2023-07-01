@@ -1,37 +1,37 @@
 <script lang="ts">
-    import Alert from '$lib/components/Alert.svelte';
-    import { AppActionType, appContextKey, type IAppContext } from '$lib/context/AppContext';
-    import { stringResKeys } from '$lib/context/StringResKeys';
-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import type { IDropdownOption } from '$lib/controls/DropdownField';
-    import FormGroup from '$lib/controls/layout/FormGroup.svelte';
-    import FormGroupColumn from '$lib/controls/layout/FormGroupColumn.svelte';
-    import DropdownField from '$lib/form-controls/DropdownField.svelte';
-    import Form from '$lib/form-controls/Form.svelte';
-    import NumberField from '$lib/form-controls/NumberField.svelte';
-    import TextField from '$lib/form-controls/TextField.svelte';
-    import { FieldDataType, type IDictionary } from '$lib/form/FieldDef';
-    import { createFormContext } from '$lib/form/FormContext';
-    import { FormDataActionType } from '$lib/form/FormData';
-    import type { IFormDef } from '$lib/form/FormDef';
-    import { FormModeState } from '$lib/form/FormMode';
-    import { FormSerializer } from '$lib/form/FormSerializer';
-    import { fileSystem } from '$lib/ipc';
+    import Alert from "$lib/components/Alert.svelte";
+    import { AppActionType, appContextKey, type IAppContext } from "$lib/context/AppContext";
+    import { stringResKeys } from "$lib/context/StringResKeys";
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import type { IDropdownOption } from "$lib/controls/DropdownField";
+    import FormGroup from "$lib/controls/layout/FormGroup.svelte";
+    import FormGroupColumn from "$lib/controls/layout/FormGroupColumn.svelte";
+    import DropdownField from "$lib/form-controls/DropdownField.svelte";
+    import Form from "$lib/form-controls/Form.svelte";
+    import NumberField from "$lib/form-controls/NumberField.svelte";
+    import TextField from "$lib/form-controls/TextField.svelte";
+    import { FieldDataType, type IDictionary } from "$lib/form/FieldDef";
+    import { createFormContext } from "$lib/form/FormContext";
+    import { FormDataActionType } from "$lib/form/FormData";
+    import type { IFormDef } from "$lib/form/FormDef";
+    import { FormModeState } from "$lib/form/FormMode";
+    import { FormSerializer } from "$lib/form/FormSerializer";
+    import { fileSystem } from "$lib/ipc";
     import {
         automationFrameworkOptions,
         indentOptions,
         lanugageOptions,
         testFrameworkOptions,
-    } from '$lib/utils/dropdowns';
-    import { ProjectNameRegex } from '$lib/utils/Regex';
-    import _ from 'lodash';
-    import { AutomationFramework, Language, TestFramework, type IRmProj, type IRmProjFile } from 'rockmelonqa.common';
-    import { createEventDispatcher, getContext, onMount } from 'svelte';
-    import { derived } from 'svelte/store';
-    import { AlertLevel } from '../Alert';
-    import { appActionContextKey, type IAppActionContext } from '../Application';
-    import { combinePath } from '../FileExplorer/Node';
-    import PrimaryButton from '../PrimaryButton.svelte';
+    } from "$lib/utils/dropdowns";
+    import { ProjectNameRegex } from "$lib/utils/Regex";
+    import _ from "lodash";
+    import { AutomationFramework, Language, TestFramework, type IRmProj, type IRmProjFile } from "rockmelonqa.common";
+    import { createEventDispatcher, getContext, onMount } from "svelte";
+    import { derived } from "svelte/store";
+    import { AlertLevel } from "../Alert";
+    import { appActionContextKey, type IAppActionContext } from "../Application";
+    import { combinePath } from "../FileExplorer/Node";
+    import PrimaryButton from "../PrimaryButton.svelte";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
 
@@ -48,11 +48,11 @@
         fields: {
             fileVersion: {
                 dataType: FieldDataType.Integer,
-                dataPath: 'fileVersion',
+                dataPath: "fileVersion",
             },
             name: {
                 dataType: FieldDataType.Text,
-                dataPath: 'name',
+                dataPath: "name",
                 isRequired: true,
                 maxLength: 50,
                 pattern: ProjectNameRegex,
@@ -60,51 +60,51 @@
             },
             description: {
                 dataType: FieldDataType.Text,
-                dataPath: 'description',
+                dataPath: "description",
                 maxLength: 10000,
             },
             automationFramework: {
                 dataType: FieldDataType.Dropdown,
-                dataPath: 'automationFramework',
+                dataPath: "automationFramework",
                 isRequired: true,
             },
             language: {
                 dataType: FieldDataType.Dropdown,
-                dataPath: 'language',
+                dataPath: "language",
                 isRequired: true,
             },
             testFramework: {
                 dataType: FieldDataType.Dropdown,
-                dataPath: 'testFramework',
+                dataPath: "testFramework",
                 isRequired: (values) => values.language !== Language.Typescript,
             },
             rootNamespace: {
                 dataType: FieldDataType.Text,
-                dataPath: 'rootNamespace',
+                dataPath: "rootNamespace",
                 maxLength: 100,
             },
             indent: {
                 dataType: FieldDataType.Dropdown,
-                dataPath: 'indent',
+                dataPath: "indent",
                 isRequired: true,
             },
             indentSize: {
                 dataType: FieldDataType.Integer,
-                dataPath: 'indentSize',
+                dataPath: "indentSize",
                 isRequired: true,
                 min: 1,
                 max: 8,
             },
             testIdAttributeName: {
                 dataType: FieldDataType.Text,
-                dataPath: 'testIdAttributeName',
+                dataPath: "testIdAttributeName",
                 isRequired: false,
-                initialValue: '',
+                initialValue: "",
             },
         },
     };
 
-    let formContext = createFormContext('project', formDef, uiContext, FormModeState.Edit);
+    let formContext = createFormContext("project", formDef, uiContext, FormModeState.Edit);
     let {
         mode: formMode,
         modeDispatch: formModeDispatch,
@@ -113,7 +113,7 @@
     } = formContext;
 
     let alertLevel: AlertLevel = AlertLevel.None;
-    let alertMessage = '';
+    let alertMessage = "";
 
     // all options by default
     let languageDropdownOptions: IDropdownOption[] = lanugageOptions;
@@ -127,7 +127,7 @@
 
     onMount(async () => {
         const fileContent = await fileSystem.readFile(filePath);
-        let model: IRmProj = JSON.parse(fileContent ?? '{}') as IRmProj;
+        let model: IRmProj = JSON.parse(fileContent ?? "{}") as IRmProj;
 
         const serializer = new FormSerializer(uiContext);
         const fieldValues = serializer.deserialize(model, formDef.fields);
@@ -161,7 +161,7 @@
             appStateDispatch({ type: AppActionType.SetProject, projectFile: projectFile });
 
             formCommittedValues = $formData.values;
-            dispatch('saved');
+            dispatch("saved");
 
             return true;
         }
@@ -173,7 +173,7 @@
     const formValueSubscription = derived(formData, ($formData) => $formData.values);
     formValueSubscription.subscribe((values) => {
         let isDirty = formCommittedValues !== undefined && !_.isEqual(formCommittedValues, values);
-        dispatch(isDirty ? 'change' : 'saved');
+        dispatch(isDirty ? "change" : "saved");
     });
 
     const handleAutomationFrameworkChange = (value: any) => {
@@ -189,9 +189,9 @@
         if (!languageDropdownOptions.some((item) => item.key == $formData.values.language)) {
             formDataDispatch({
                 type: FormDataActionType.SetValues,
-                newValues: { ...$formData.values, language: '' },
+                newValues: { ...$formData.values, language: "" },
             });
-            handleLanguageChange('');
+            handleLanguageChange("");
         }
     };
 
@@ -218,7 +218,7 @@
         if (!testFrameworkDropdownOptions.some((item) => item.key == $formData.values.testFramework)) {
             formDataDispatch({
                 type: FormDataActionType.SetValues,
-                newValues: { ...$formData.values, testFramework: '' },
+                newValues: { ...$formData.values, testFramework: "" },
             });
         }
     };
@@ -239,6 +239,11 @@
                     on:change={(e) => handleAutomationFrameworkChange(e.detail.value)}
                 />
                 <DropdownField
+                    name="language"
+                    options={languageDropdownOptions}
+                    on:change={(e) => handleLanguageChange(e.detail.value)}
+                />
+                <DropdownField
                     name="testFramework"
                     options={testFrameworkDropdownOptions}
                     disabled={$formData.values.language === Language.Typescript}
@@ -248,11 +253,7 @@
             </FormGroupColumn>
             <FormGroupColumn>
                 <TextField name="description" />
-                <DropdownField
-                    name="language"
-                    options={languageDropdownOptions}
-                    on:change={(e) => handleLanguageChange(e.detail.value)}
-                />
+
                 <TextField name="rootNamespace" />
                 <NumberField name="indentSize" />
             </FormGroupColumn>
