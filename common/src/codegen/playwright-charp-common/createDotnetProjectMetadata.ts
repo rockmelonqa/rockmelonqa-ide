@@ -1,6 +1,7 @@
 import { ISourceProjectMetadata } from "../../file-defs";
 import { IEnvironmentFileInfo, IOutputProjectMetadata, IPageInfo, ISuiteInfo, ITestCaseInfo } from "../types";
 import {
+  MapCreator,
   createMapForEnvironmentFiles,
   createMapForPages,
   createMapForTestCases,
@@ -13,11 +14,13 @@ export const createDotnetProjectMetadata = (projMeta: ISourceProjectMetadata): I
   const suites: ISuiteInfo[] = [];
   const environments: IEnvironmentFileInfo[] = [];
 
-  const environmentFileMetaMap = createMapForEnvironmentFiles(rmprojFile, projMeta.environmentFiles);
-  const pageMetaMap = createMapForPages(rmprojFile, projMeta.pages);
-  const suiteMetaMap = createMapForTestSuites(rmprojFile, projMeta.testSuites);
-  const caseMetaMap = createMapForTestCases(rmprojFile, projMeta.testCases);
-  const routineMetaMap = createMapForTestRoutines(rmprojFile, projMeta.testRoutines);
+  const mapCreator: MapCreator = new MapCreator(rmprojFile);
+
+  const environmentFileMetaMap = mapCreator.createMapForEnvironmentFiles(rmprojFile, projMeta.environmentFiles);
+  const pageMetaMap = mapCreator.createMapForPages(rmprojFile, projMeta.pages);
+  const suiteMetaMap = mapCreator.createMapForTestSuites(rmprojFile, projMeta.testSuites);
+  const caseMetaMap = mapCreator.createMapForTestCases(rmprojFile, projMeta.testCases);
+  const routineMetaMap = mapCreator.createMapForTestRoutines(rmprojFile, projMeta.testRoutines);
 
   for (let { content: environmentContent } of projMeta.environmentFiles) {
     let envMeta = environmentFileMetaMap.get(environmentContent)!;
