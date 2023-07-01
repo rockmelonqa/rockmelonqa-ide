@@ -1,13 +1,7 @@
 import { ISourceProjectMetadata, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { createDotnetProjectMetadata } from "../playwright-charp-common/createDotnetProjectMetadata";
-import {
-  IOutputProjectMetadataProcessor,
-  createMapForPages,
-  createMapForTestCases,
-  createMapForTestRoutines,
-  createMapForTestSuites,
-} from "../playwright-charp-common/outputProjectMetadataProcessor";
+import { IOutputProjectMetadataProcessor, MapCreator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { IOutputFileInfo, IOutputProjectMetadata } from "../types";
 
 /** PlaywrightTypeScriptProjMeta project meta: Contains info of all files and other resources */
@@ -24,10 +18,12 @@ export class PlaywrightTypeScriptProjMeta implements IOutputProjectMetadataProce
 
     const rmprojFile = codegenMeta.project;
 
-    this.pageMetaMap = createMapForPages(rmprojFile, codegenMeta.pages);
-    this.suiteMetaMap = createMapForTestSuites(rmprojFile, codegenMeta.testSuites);
-    this.caseMetaMap = createMapForTestCases(rmprojFile, codegenMeta.testCases);
-    this.routineMetaMap = createMapForTestRoutines(rmprojFile, codegenMeta.testRoutines);
+    const mapCreator: MapCreator = new MapCreator(rmprojFile);
+
+    this.pageMetaMap = mapCreator.createMapForPages(rmprojFile, codegenMeta.pages);
+    this.suiteMetaMap = mapCreator.createMapForTestSuites(rmprojFile, codegenMeta.testSuites);
+    this.caseMetaMap = mapCreator.createMapForTestCases(rmprojFile, codegenMeta.testCases);
+    this.routineMetaMap = mapCreator.createMapForTestRoutines(rmprojFile, codegenMeta.testRoutines);
 
     this.verifyDuplication();
   }

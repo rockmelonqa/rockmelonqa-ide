@@ -1,13 +1,7 @@
 import { ISourceProjectMetadata, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { createDotnetProjectMetadata } from "../playwright-charp-common/createDotnetProjectMetadata";
-import {
-  IOutputProjectMetadataProcessor,
-  createMapForPages,
-  createMapForTestCases,
-  createMapForTestRoutines,
-  createMapForTestSuites,
-} from "../playwright-charp-common/outputProjectMetadataProcessor";
+import { IOutputProjectMetadataProcessor, MapCreator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { IOutputFileInfo, IOutputProjectMetadata } from "../types";
 
 export class NunitProjectMeta implements IOutputProjectMetadataProcessor {
@@ -25,10 +19,12 @@ export class NunitProjectMeta implements IOutputProjectMetadataProcessor {
     this._projMeta = codegenMeta;
     const rmprojFile = codegenMeta.project;
 
-    this.pageNameMap = createMapForPages(rmprojFile, codegenMeta.pages);
-    this.suiteNameMap = createMapForTestSuites(rmprojFile, codegenMeta.testSuites);
-    this.caseNameMap = createMapForTestCases(rmprojFile, codegenMeta.testCases);
-    this.routineNameMap = createMapForTestRoutines(rmprojFile, codegenMeta.testRoutines);
+    const mapCreator: MapCreator = new MapCreator(rmprojFile);
+
+    this.pageNameMap = mapCreator.createMapForPages(rmprojFile, codegenMeta.pages);
+    this.suiteNameMap = mapCreator.createMapForTestSuites(rmprojFile, codegenMeta.testSuites);
+    this.caseNameMap = mapCreator.createMapForTestCases(rmprojFile, codegenMeta.testCases);
+    this.routineNameMap = mapCreator.createMapForTestRoutines(rmprojFile, codegenMeta.testRoutines);
   }
 
   public createOutputProjectMetadata(): IOutputProjectMetadata {
