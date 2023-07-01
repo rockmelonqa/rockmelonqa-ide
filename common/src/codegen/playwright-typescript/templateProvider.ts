@@ -1,29 +1,24 @@
 import path from "path";
 import { Indent } from "../../file-defs";
 import { IActionTemplateParam, ILocatorTemplateParam } from "../types";
-import { lowerCaseFirstChar, upperCaseFirstChar } from "../utils/stringUtils";
-import { actionRegisty } from "./action-registry";
-import { JestTemplateCollection } from "./jestTemplateCollection";
+import { indentCharMap, lowerCaseFirstChar, upperCaseFirstChar } from "../utils/stringUtils";
+import { actionRegistyPlaywright } from "./action-registry";
+import { JestTemplateCollection } from "./templateCollection";
 import { locatorRegisty } from "./locator-registry";
 
-export class PlaywrightTypescriptJestTemplateProvider {
+export class PlaywrightTypescriptTemplateProvider {
   private _templateCollection: JestTemplateCollection;
 
-  private _indent: Indent;
   private _indentChar: string;
-  private _indentSize: number;
   private _indentString: string;
 
-  private readonly indentCharMap = new Map<Indent, string>([
-    [Indent.Tabs, "\t"],
-    [Indent.Spaces, " "],
-  ]);
-
   constructor(customTemplatesDir: string, indent: Indent = Indent.Spaces, indentSize: number = 4) {
-    this._templateCollection = new JestTemplateCollection(path.resolve(__dirname, "./templates"), customTemplatesDir, ".hbs");
-    this._indent = indent;
-    this._indentChar = this.indentCharMap.get(indent)!;
-    this._indentSize = indentSize;
+    this._templateCollection = new JestTemplateCollection(
+      path.resolve(__dirname, "./templates"),
+      customTemplatesDir,
+      ".hbs"
+    );
+    this._indentChar = indentCharMap.get(indent)!;
     this._indentString = this._indentChar.repeat(indentSize);
   }
 
@@ -41,7 +36,7 @@ export class PlaywrightTypescriptJestTemplateProvider {
   }
 
   getAction(params: IActionTemplateParam) {
-    const actionGenerate = actionRegisty.get(params.action);
+    const actionGenerate = actionRegistyPlaywright.get(params.action);
     if (!actionGenerate) {
       throw new Error("(DEV) Action is not support: " + params.action);
     }
@@ -59,7 +54,7 @@ export class PlaywrightTypescriptJestTemplateProvider {
     }
     const getter = generateGetter(params);
 
-    let output = this._templateCollection.LOCATOR_TEMPLATE({
+    let output = this._templateCollection.LOCATOR_FILE({
       hasParams: params.hasParams,
       elementName: lowerCaseFirstChar(elementName),
       getter,
@@ -70,44 +65,24 @@ export class PlaywrightTypescriptJestTemplateProvider {
     return output;
   }
 
-  getTestFile(name: string, body: string) {
-    return this._templateCollection.TEST_FILE_TEMPLATE({ name, body });
-  }
-
   getNodePackageFile() {
-    return this._templateCollection.NODE_PACKAGE_FILE_TEMPLATE({});
+    return this._templateCollection.NODE_PACKAGE_FILE({});
   }
 
   getTsConfigFile() {
-    return this._templateCollection.TS_CONFIG_FILE_TEMPLATE({});
+    return this._templateCollection.TS_CONFIG_FILE({});
   }
 
   getPlaywrightConfigFile() {
-    return this._templateCollection.PLAYWRIGHT_CONFIG_FILE_TEMPLATE({});
-  }
-
-  getJestConfigFile() {
-    return this._templateCollection.JEST_CONFIG_FILE_TEMPLATE({});
-  }
-
-  getPrettierConfigFile() {
-    return this._templateCollection.PRETTIER_CONFIG_FILE_TEMPLATE({});
+    return this._templateCollection.PLAYWRIGHT_CONFIG_FILE({});
   }
 
   getTestCase(name: string, body: string) {
-    return this._templateCollection.TEST_CASE_TEMPLATE({ name, body });
-  }
-
-  getLocatorHelper(namespaceName: string): string {
-    return this._templateCollection.LOCATOR_HELPER_TEMPLATE({ namespaceName });
-  }
-
-  getCustomMatcher(namespaceName: string): string {
-    return this._templateCollection.CUSTOM_MATCHER_FILE_TEMPLATE({ namespaceName });
+    return this._templateCollection.TEST_CASE_FILE({ name, body });
   }
 
   getPageDefinitions(pageImports: string, pageDeclarations: string, pageAssignments: string) {
-    return this._templateCollection.PAGE_DEFINITIONS_TEMPLATE({ pageImports, pageDeclarations, pageAssignments });
+    return this._templateCollection.PAGE_DEFINITIONS_FILE({ pageImports, pageDeclarations, pageAssignments });
   }
 
   getPageImport(pageName: string) {
@@ -125,7 +100,7 @@ export class PlaywrightTypescriptJestTemplateProvider {
   }
 
   getPage(pageName: string, pageDescription: string | undefined, pageBody: string) {
-    return this._templateCollection.PAGE_TEMPLATE({ pageName, pageDescription, pageBody });
+    return this._templateCollection.PAGE_FILE({ pageName, pageDescription, pageBody });
   }
 
   GetComment(message: string) {
