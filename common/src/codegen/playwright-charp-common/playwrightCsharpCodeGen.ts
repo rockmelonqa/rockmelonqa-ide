@@ -19,30 +19,26 @@ import { DataSetCollection, IDataSetInfo } from "./dataSetInfo";
 import { IPlaywrightCsharpTemplatesProvider } from "./playwrightCsharpTemplatesProvider";
 import { ActionDataType, IActionData, WriteFileFn } from "../types";
 import path from "path";
-import {
-  IEnvironmentVariableFileGenerator,
-  UnixEnvironmentVariableFileGenerator,
-  WindowEnvironmentVariableFileGenerator,
-} from "../codegen-common/environmentVariableFileGenerator";
 import { Platform } from "../../file-defs/platform";
 import { ITestCaseActionStep } from "../../file-defs/testCaseFile";
 import { ITestStepComment } from "../../file-defs/shared";
+import { CodeGenBase } from "../codegen-common/codeGenBase";
 
 /** Base CodeGen for MsTest, Nunit, Xunit CodeGens */
-export class PlaywrightCsharpCodeGen {
+export class PlaywrightCsharpCodeGen extends CodeGenBase {
   protected _outProjMeta: IOutputProjectMetadataProcessor;
   protected _templateProvider: IPlaywrightCsharpTemplatesProvider;
   protected _indentString: string;
   protected _indentChar: string;
   protected _indentSize: number;
-  protected _envVarFileGenerator: IEnvironmentVariableFileGenerator;
 
-  protected _projMeta: ISourceProjectMetadata;
   protected _rmprojFile: IRmProjFile;
   protected _rootNamespace: string;
   protected _outputFileExt: string;
 
   constructor(projMeta: ISourceProjectMetadata) {
+    super(projMeta);
+
     const rmprojFile = projMeta.project;
 
     this._projMeta = projMeta;
@@ -60,10 +56,6 @@ export class PlaywrightCsharpCodeGen {
 
     this._outProjMeta = this.getOutProjMeta();
     this._templateProvider = this.getTemplateProvider();
-
-    this._envVarFileGenerator = Platform.IsWindows()
-      ? new WindowEnvironmentVariableFileGenerator()
-      : new UnixEnvironmentVariableFileGenerator();
   }
 
   protected getOutProjMeta(): IOutputProjectMetadataProcessor {
@@ -82,33 +74,14 @@ export class PlaywrightCsharpCodeGen {
       allNames.push(...namesInFile);
     }
     allNames = Array.from(new Set(allNames));
-    const content = this._templateProvider.getEnvironmentSettingsFiles(this._rmprojFile.content.rootNamespace, allNames);
-    await writeFile(`${StandardOutputFolder.Config}/${StandardOutputFile.EnvironmentSettings}${this._outputFileExt}`, content);
-  }
-
-  protected async generateEnvironmentSetterScripts(writeFile: WriteFileFn) {
-    for (let configFile of this._projMeta.environmentFiles) {
-      const fileContent = this._envVarFileGenerator.generate(configFile.content);
-      const sourceFileNameWithoutExt = path.parse(configFile.fileName).name;
-      const fileExt = Platform.IsWindows() ? StandardFileExtension.Bat : StandardFileExtension.Sh;
-      await writeFile(`${StandardOutputFolder.DotEnvironment}/run.${sourceFileNameWithoutExt}.env${fileExt}`, fileContent);
-    }
-
-    // For Windows, generate a bat file that remove environment variable
-    if (Platform.IsWindows()) {
-      // Obtains all varnames from all config files
-      let varnames = [];
-      for (let configFile of this._projMeta.environmentFiles) {
-        varnames.push(...configFile.content.settings.map((setting) => setting.name));
-      }
-      // Get unique name
-      varnames = [...new Set(varnames)];
-
-      // Generate the clear file
-      const settings: ISetting[] = varnames.map((name) => ({ name, value: "" }));
-      const fileContent = this._envVarFileGenerator.generate({ settings });
-      await writeFile(`${StandardOutputFolder.DotEnvironment}${path.sep}rmv.env${StandardFileExtension.Bat}`, fileContent);
-    }
+    const content = this._templateProvider.getEnvironmentSettingsFiles(
+      this._rmprojFile.content.rootNamespace,
+      allNames
+    );
+    await writeFile(
+      `${StandardOutputFolder.Config}/${StandardOutputFile.EnvironmentSettings}${this._outputFileExt}`,
+      content
+    );
   }
 
   protected generateTestCaseBody(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {
