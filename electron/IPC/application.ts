@@ -29,7 +29,7 @@ const USER_SETTINGS_FILE = "user-settings.json";
 const validSendChannel: IChannels = {
   setUserSettings: setUserSettings,
   openProject: openProject,
-  showHideMenuItem: showHideMenuItem
+  showHideMenuItem: showHideMenuItem,
 };
 
 const validInvokeChannel: IChannels = {
@@ -42,10 +42,42 @@ const validInvokeChannel: IChannels = {
 // from Main
 const validReceiveChannel: string[] = ["loadProject", "closeProject", "quit"];
 
+/** Represents a combination of [AutomationFramework, Language, TestFramework] */
+export type LookupKey = [
+  automationFramework: AutomationFramework,
+  language: Language,
+  testFramework: TestFramework | ""
+];
+
+/** Contains all valid combinations of [AutomationFramework, Language, TestFramework] */
+const ValidKeys: LookupKey[] = [
+  [AutomationFramework.Playwright, Language.CSharp, TestFramework.MSTest],
+  [AutomationFramework.Playwright, Language.CSharp, TestFramework.NUnit],
+  [AutomationFramework.Playwright, Language.CSharp, TestFramework.xUnit],
+  [AutomationFramework.Playwright, Language.Java, TestFramework.JUnit],
+  [AutomationFramework.Selenium, Language.Java, TestFramework.JUnit],
+  [AutomationFramework.Playwright, Language.Typescript, ""],
+];
+
+/** Craetes new instance of LookupKey from IRmProjFile */
+const createLookupKey = (project: IRmProjFile) => {
+  const { automationFramework, language, testFramework } = project.content;
+  const keyToLookup: LookupKey = [automationFramework, language, testFramework];
+  return keyToLookup;
+};
+
+/** Checks if 2 LookupKey are equal */
+const areEqual = (
+  [automationFramework1, language1, testFramework1]: LookupKey,
+  [automationFramework2, language2, testFramework2]: LookupKey
+) => {
+  return automationFramework1 === automationFramework2 && language1 === language2 && testFramework1 === testFramework2;
+};
+
 class ApplicationIPC extends IPC {
   async openProject(browserWindow: BrowserWindow) {
     await openProject(browserWindow);
-  };
+  }
   closeProject(browserWindow: BrowserWindow) {
     closeProject(browserWindow);
   }
@@ -160,13 +192,12 @@ async function validateProject(project: IRmProjFile, isNewProject: boolean): Pro
   // validation: Automation Framework vs Language vs Test Framework
   let isFrameworkValid = false;
 
-  if (automationFramework == AutomationFramework.Playwright) {
-    isFrameworkValid =
-      (language === Language.CSharp &&
-        [TestFramework.MSTest, TestFramework.NUnit, TestFramework.xUnit].some((i) => i === testFramework)) ||
-      (language === Language.Java && testFramework === TestFramework.JUnit);
-  } else if (automationFramework === AutomationFramework.Selenium) {
-    isFrameworkValid = language === Language.Java && testFramework === TestFramework.JUnit;
+  let lookupKey = createLookupKey(project);
+  for (let key of ValidKeys) {
+    if (areEqual(key, lookupKey)) {
+      isFrameworkValid = true;
+      break;
+    }
   }
 
   if (!isFrameworkValid) {
@@ -224,7 +255,7 @@ function showHideMenuItem(browserWindow: BrowserWindow, event: Electron.IpcMainE
   Menu.setApplicationMenu(appMenu);
 }
 const getMenuItemByPath = (path: string, appMenu: Menu): MenuItem | undefined => {
-  const parts = path.split('/');
+  const parts = path.split("/");
 
   let items = appMenu.items;
   for (const part of parts) {
@@ -240,4 +271,4 @@ const getMenuItemByPath = (path: string, appMenu: Menu): MenuItem | undefined =>
   }
 
   return undefined;
-}
+};
