@@ -113,12 +113,6 @@ export const simpleRoutineTestData: ITestData = {
         },
         {
           id: "",
-          type: "routine",
-          routine: "FillName",
-          dataset: "DataSet Number Two",
-        },
-        {
-          id: "",
           type: "testStep",
           page: "FillsScreen",
           element: "street",
@@ -130,14 +124,8 @@ export const simpleRoutineTestData: ITestData = {
           type: "testStep",
           page: "FillsScreen",
           element: "district",
-          action: "Click",
+          action: "ClosePopup",
           data: "",
-        },
-        {
-          id: "",
-          type: "routine",
-          routine: "FillDistrictAndBio",
-          dataset: "DS One",
         },
         {
           id: "",
