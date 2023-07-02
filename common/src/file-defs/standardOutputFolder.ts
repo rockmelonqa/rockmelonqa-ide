@@ -1,5 +1,3 @@
-import path from "path";
-
 export class StandardOutputFolder {
   /** "Config" */
   static readonly Config: string = "Config";
