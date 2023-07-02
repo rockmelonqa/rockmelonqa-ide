@@ -1,8 +1,6 @@
 import { EOL } from "os";
 import path from "path";
 import {
-  ActionType,
-  IRmProjFile,
   ISourceProjectMetadata,
   ITestCase,
   ITestRoutine,
@@ -14,12 +12,10 @@ import {
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { ICodeGen } from "../types";
-import { languageExtensionMap } from "../utils/languageExtensionMap";
-import { addIndent, hasPlaceholder, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
+import { addIndent, hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
 import { PlaywrightCsharpXUnitTemplatesProvider } from "./playwrightCsharpXUnitTemplatesProvider";
 import { XUnitProjectMeta } from "./xunitProjectMeta";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
-import { createCleanName } from "../utils/createName";
 import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCsharpCodeGen";
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
@@ -38,7 +34,9 @@ export class PlaywrightCsharpXUnitCodeGen extends PlaywrightCsharpCodeGen implem
   }
 
   protected override getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {
-    return new PlaywrightCsharpXUnitTemplatesProvider(path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates"));
+    return new PlaywrightCsharpXUnitTemplatesProvider(
+      path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates")
+    );
   }
 
   async generateCode(full: boolean, writeFile: WriteFileFn): Promise<string> {
@@ -94,7 +92,10 @@ export class PlaywrightCsharpXUnitCodeGen extends PlaywrightCsharpCodeGen implem
     // Filename: Support/TestSuiteBase.cs
     await writeFile(
       `${StandardOutputFolder.Support}/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
-      this._templateProvider.getTestSuiteBase(this._rmprojFile.content.rootNamespace, this._rmprojFile.content.testIdAttributeName)
+      this._templateProvider.getTestSuiteBase(
+        this._rmprojFile.content.rootNamespace,
+        this._rmprojFile.content.testIdAttributeName
+      )
     );
   }
 
@@ -301,7 +302,11 @@ export class PlaywrightCsharpXUnitCodeGen extends PlaywrightCsharpCodeGen implem
     const testRoutineName = this._outProjMeta.get(testRoutine.id)!.outputFileClassName;
     const finalOutputClassName = `${testRoutineName}${datasetInfo.name}`;
 
-    let routineFileContent = this._templateProvider.getTestRoutineClass(finalOutputClassName, testRoutine.description, testRoutineBody);
+    let routineFileContent = this._templateProvider.getTestRoutineClass(
+      finalOutputClassName,
+      testRoutine.description,
+      testRoutineBody
+    );
 
     return routineFileContent;
   }

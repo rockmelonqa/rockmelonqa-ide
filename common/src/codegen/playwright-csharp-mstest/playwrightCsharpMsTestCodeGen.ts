@@ -36,7 +36,9 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
   }
 
   protected override getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {
-    return new PlaywrightCsharpMsTestTemplatesProvider(path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates"));
+    return new PlaywrightCsharpMsTestTemplatesProvider(
+      path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates")
+    );
   }
 
   /** Generate MsTest project */
@@ -102,7 +104,10 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
 
     await writeFile(
       `${StandardOutputFolder.Support}/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
-      this._templateProvider.getTestSuiteBase(this._rmprojFile.content.rootNamespace, this._rmprojFile.content.testIdAttributeName)
+      this._templateProvider.getTestSuiteBase(
+        this._rmprojFile.content.rootNamespace,
+        this._rmprojFile.content.testIdAttributeName
+      )
     );
   }
 
@@ -293,7 +298,11 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     const testRoutineName = this._outProjMeta.get(testRoutine.id)!.outputFileClassName;
     const finalOutputClassName = `${testRoutineName}${datasetInfo.name}`;
 
-    let routineFileContent = this._templateProvider.getTestRoutineClass(finalOutputClassName, testRoutine.description, testRoutineBody);
+    let routineFileContent = this._templateProvider.getTestRoutineClass(
+      finalOutputClassName,
+      testRoutine.description,
+      testRoutineBody
+    );
 
     return routineFileContent;
   }
@@ -313,7 +322,10 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
 
   private generateTestCaseFunction(testCase: ITestCase) {
     const testcaseName = this._outProjMeta.get(testCase.id)!.outputFileClassName;
-    const testCaseMethod = this._templateProvider.getTestFunction(upperCaseFirstChar(testcaseName), testCase.description);
+    const testCaseMethod = this._templateProvider.getTestFunction(
+      upperCaseFirstChar(testcaseName),
+      testCase.description
+    );
     return testCaseMethod;
   }
 }

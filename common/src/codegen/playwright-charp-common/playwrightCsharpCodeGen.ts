@@ -14,7 +14,6 @@ import { IPage } from "../../file-defs/pageFile";
 import { addIndent, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
 import { IOutputProjectMetadataProcessor } from "./outputProjectMetadataProcessor";
 import { createCleanName } from "../utils/createName";
-import { languageExtensionMap } from "../utils/languageExtensionMap";
 import { DataSetCollection, IDataSetInfo } from "./dataSetInfo";
 import { IPlaywrightCsharpTemplatesProvider } from "./playwrightCsharpTemplatesProvider";
 import { ActionDataType, IActionData, WriteFileFn } from "../types";
@@ -24,7 +23,7 @@ import { ITestCaseActionStep } from "../../file-defs/testCaseFile";
 import { ITestStepComment } from "../../file-defs/shared";
 import { CodeGenBase } from "../codegen-common/codeGenBase";
 
-/** Base CodeGen for MsTest, Nunit, Xunit CodeGens */
+/** Base class for Dotnet CodeGe, including MsTest, Nunit, Xunit CodeGens */
 export class PlaywrightCsharpCodeGen extends CodeGenBase {
   protected _outProjMeta: IOutputProjectMetadataProcessor;
   protected _templateProvider: IPlaywrightCsharpTemplatesProvider;
@@ -34,7 +33,6 @@ export class PlaywrightCsharpCodeGen extends CodeGenBase {
 
   protected _rmprojFile: IRmProjFile;
   protected _rootNamespace: string;
-  protected _outputFileExt: string;
 
   constructor(projMeta: ISourceProjectMetadata) {
     super(projMeta);
@@ -44,8 +42,6 @@ export class PlaywrightCsharpCodeGen extends CodeGenBase {
     this._projMeta = projMeta;
     this._rmprojFile = rmprojFile;
     this._rootNamespace = rmprojFile.content.rootNamespace;
-
-    this._outputFileExt = languageExtensionMap[rmprojFile.content.language];
 
     /** Space char of tab char */
     this._indentChar = indentCharMap.get(rmprojFile.content.indent)!;

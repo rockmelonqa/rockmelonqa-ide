@@ -7,13 +7,17 @@ import {
   WindowEnvironmentVariableFileGenerator,
 } from "../codegen-common/environmentVariableFileGenerator";
 import { Platform } from "../../file-defs/platform";
+import { languageExtensionMap } from "../utils/languageExtensionMap";
 
 export class CodeGenBase {
   protected _projMeta: ISourceProjectMetadata;
   protected _envVarFileGenerator: IEnvironmentVariableFileGenerator;
+  protected _outputFileExt: string;
 
   constructor(projMeta: ISourceProjectMetadata) {
     this._projMeta = projMeta;
+
+    this._outputFileExt = languageExtensionMap[projMeta.project.content.language];
 
     this._envVarFileGenerator = Platform.IsWindows()
       ? new WindowEnvironmentVariableFileGenerator()
