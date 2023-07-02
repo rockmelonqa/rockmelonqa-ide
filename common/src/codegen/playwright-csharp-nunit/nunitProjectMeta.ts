@@ -12,9 +12,6 @@ export class NunitProjectMeta implements IOutputProjectMetadataProcessor {
   public readonly caseNameMap: Map<ITestCase, IOutputFileInfo> = new Map<ITestCase, IOutputFileInfo>();
   public readonly routineNameMap: Map<ITestRoutine, IOutputFileInfo> = new Map<ITestRoutine, IOutputFileInfo>();
 
-  /**
-   *
-   */
   constructor(codegenMeta: ISourceProjectMetadata) {
     this._projMeta = codegenMeta;
     const rmprojFile = codegenMeta.project;
