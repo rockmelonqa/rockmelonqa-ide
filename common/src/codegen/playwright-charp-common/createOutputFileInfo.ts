@@ -130,16 +130,16 @@ export class OutputFileInfoBuilderTypeScript implements IOutputFileInfoBuilder {
     // Path relative to the "standand folder", not the project root path;
     let inputFileRelPath = inputFilePath.substring(inputContainerFolder.length + 1);
     let outputFileCleanName = createName(inputFileRelPath);
-    let outputFilePath = path.join(outputContainerFolder, outputFileCleanName + outputFileExt);
 
     const nameSegments = outputFileCleanName.split("_");
     const namespaceSegments = [...nameSegments];
     const outputFileClassName = namespaceSegments.pop() || "";
     const outputFileName = outputFileClassName + outputFileExt;
-    const outputFileSubNamespace = namespaceSegments.length ? namespaceSegments.join(".") : "";
-    const outputFileFullNamespace = `${proj.content.rootNamespace}.${standardOutputFolder}${
-      outputFileSubNamespace ? "." + outputFileSubNamespace : ""
-    }`;
+    const outputFileSubNamespace = namespaceSegments.length ? namespaceSegments.join("/") : "";
+    const outputFileFullNamespace = outputFileSubNamespace
+      ? `~/pages/${outputFileSubNamespace}/${outputFileClassName}`
+      : `~/pages/${outputFileClassName}`;
+    let outputFilePath = path.join(outputContainerFolder, nameSegments.join(path.sep) + outputFileExt);
     const outputFileRelPath = outputFilePath.replace(outputCodeDir, "").substring(1);
 
     return {
