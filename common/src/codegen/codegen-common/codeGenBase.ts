@@ -1,4 +1,10 @@
-import { ISetting, ISourceProjectMetadata, StandardFileExtension, StandardOutputFolder } from "../../file-defs";
+import {
+  IRmProjFile,
+  ISetting,
+  ISourceProjectMetadata,
+  StandardFileExtension,
+  StandardOutputFolder,
+} from "../../file-defs";
 import { WriteFileFn } from "../types";
 import path from "path";
 import {
@@ -8,6 +14,7 @@ import {
 } from "../codegen-common/environmentVariableFileGenerator";
 import { Platform } from "../../file-defs/platform";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
+import { indentCharMap } from "../utils/stringUtils";
 
 export class CodeGenBase {
   protected _projMeta: ISourceProjectMetadata;
@@ -15,10 +22,21 @@ export class CodeGenBase {
   protected _outputFileExt: string;
   protected _rmprojFile: IRmProjFile;
 
+  protected _indentString: string;
+  protected _indentChar: string;
+  protected _indentSize: number;
+
   constructor(projMeta: ISourceProjectMetadata) {
     this._projMeta = projMeta;
     this._rmprojFile = projMeta.project;
     this._outputFileExt = languageExtensionMap[projMeta.project.content.language];
+
+    /** Space char of tab char */
+    this._indentChar = indentCharMap.get(projMeta.project.content.indent)!;
+    /** Size of 1 index: eg. 2 spaces or 4 spaces */
+    this._indentSize = projMeta.project.content.indentSize;
+    /** String representing 1 indent */
+    this._indentString = this._indentChar.repeat(this._indentSize);
 
     this._envVarFileGenerator = Platform.IsWindows()
       ? new WindowEnvironmentVariableFileGenerator()

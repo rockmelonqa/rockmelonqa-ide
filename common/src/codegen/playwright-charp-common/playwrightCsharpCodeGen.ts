@@ -1,24 +1,19 @@
 import { EOL } from "os";
 import {
   ActionType,
-  IRmProjFile,
-  ISetting,
   ISourceProjectMetadata,
   ITestCase,
   ITestRoutine,
-  StandardFileExtension,
   StandardOutputFile,
   StandardOutputFolder,
 } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
-import { addIndent, indentCharMap, upperCaseFirstChar } from "../utils/stringUtils";
+import { addIndent, upperCaseFirstChar } from "../utils/stringUtils";
 import { IOutputProjectMetadataProcessor } from "./outputProjectMetadataProcessor";
 import { createCleanName } from "../utils/createName";
 import { DataSetCollection, IDataSetInfo } from "./dataSetInfo";
 import { IPlaywrightCsharpTemplatesProvider } from "./playwrightCsharpTemplatesProvider";
 import { ActionDataType, IActionData, WriteFileFn } from "../types";
-import path from "path";
-import { Platform } from "../../file-defs/platform";
 import { ITestCaseActionStep } from "../../file-defs/testCaseFile";
 import { ITestStepComment } from "../../file-defs/shared";
 import { CodeGenBase } from "../codegen-common/codeGenBase";
@@ -27,9 +22,6 @@ import { CodeGenBase } from "../codegen-common/codeGenBase";
 export class PlaywrightCsharpCodeGen extends CodeGenBase {
   protected _outProjMeta: IOutputProjectMetadataProcessor;
   protected _templateProvider: IPlaywrightCsharpTemplatesProvider;
-  protected _indentString: string;
-  protected _indentChar: string;
-  protected _indentSize: number;
 
   protected _rootNamespace: string;
 
@@ -38,13 +30,6 @@ export class PlaywrightCsharpCodeGen extends CodeGenBase {
 
     this._projMeta = projMeta;
     this._rootNamespace = projMeta.project.content.rootNamespace;
-
-    /** Space char of tab char */
-    this._indentChar = indentCharMap.get(projMeta.project.content.indent)!;
-    /** Size of 1 index: eg. 2 spaces or 4 spaces */
-    this._indentSize = projMeta.project.content.indentSize;
-    /** String representing 1 indent */
-    this._indentString = this._indentChar.repeat(this._indentSize);
 
     this._outProjMeta = this.getOutProjMeta();
     this._templateProvider = this.getTemplateProvider();
