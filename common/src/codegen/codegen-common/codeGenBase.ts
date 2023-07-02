@@ -26,6 +26,9 @@ export class CodeGenBase {
   protected _indentChar: string;
   protected _indentSize: number;
 
+  /** Regex to test for Environment variable data: e.g "{TestUser}", "{TestPassword}" */
+  protected readonly EnvironmentVariableDataRegex = /{(.+)}/;
+
   constructor(projMeta: ISourceProjectMetadata) {
     this._projMeta = projMeta;
     this._rmprojFile = projMeta.project;
