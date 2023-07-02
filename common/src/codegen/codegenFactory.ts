@@ -2,9 +2,14 @@ import { AutomationFramework, ISourceProjectMetadata, TestFramework, Language } 
 import { PlaywrightCsharpMSTestCodeGen } from "./playwright-csharp-mstest/playwrightCsharpMsTestCodeGen";
 import { PlaywrightCsharpNunitCodeGen } from "./playwright-csharp-nunit/playwrightCsharpNunitCodeGen";
 import { PlaywrightCsharpXUnitCodeGen } from "./playwright-csharp-xunit/playwrightCsharpXUnitCodeGen";
+import { PlaywrightTypeScriptCodeGen } from "./playwright-typescript/playwrightTypescriptCodeGen";
 import { ICodeGen } from "./types";
 
-export type LookupKey = [automationFramework: AutomationFramework, language: Language, testFramework: TestFramework | ""];
+export type LookupKey = [
+  automationFramework: AutomationFramework,
+  language: Language,
+  testFramework: TestFramework | ""
+];
 
 export const isEqual = (
   [automationFramework1, language1, testFramework1]: LookupKey,
@@ -30,7 +35,10 @@ registry.set(
   (projMeta) => new PlaywrightCsharpXUnitCodeGen(projMeta)
 );
 
-//registry.set([AutomationFramework.Playwright, Language.Typescript, undefined], (projMeta) => new PlaywrightCsharpXUnitCodeGen(projMeta));
+registry.set(
+  [AutomationFramework.Playwright, Language.Typescript, ""],
+  (projMeta) => new PlaywrightTypeScriptCodeGen(projMeta)
+);
 
 /** Creates new instance of Codegen based on  { automationFramework, testFramework }*/
 export class CodeGenFactory {
