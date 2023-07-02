@@ -1,5 +1,8 @@
-it("{{{name}}}", async () => {
-    let defs: PageDefinitions = new PageDefinitions(page);
+import { Page } from "@playwright/test";
 
-{{{body}}}
-});
+export default class {
+  public page: Page;
+  constructor(page: Page) {
+    this.page = page;
+  }
+}

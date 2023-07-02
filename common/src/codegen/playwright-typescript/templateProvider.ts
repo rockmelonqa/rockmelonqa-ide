@@ -1,10 +1,10 @@
 import path from "path";
 import { Indent } from "../../file-defs";
-import { IActionTemplateParam, ILocatorTemplateParam } from "../types";
 import { indentCharMap, lowerCaseFirstChar, upperCaseFirstChar } from "../utils/stringUtils";
 import { actionRegistyPlaywright } from "./action-registry";
 import { JestTemplateCollection } from "./templateCollection";
 import { locatorRegisty } from "./locator-registry";
+import { IActionTemplateParam, ILocatorTemplateParam } from "../types";
 
 export class PlaywrightTypescriptTemplateProvider {
   private _templateCollection: JestTemplateCollection;
@@ -65,6 +65,15 @@ export class PlaywrightTypescriptTemplateProvider {
     return output;
   }
 
+  getTestCaseBase() {
+    return this._templateCollection.TEST_CASE_BASE_FILE({});
+  }
+  getPageBase() {
+    return this._templateCollection.PAGE_BASE_FILE({});
+  }
+  getPageTest() {
+    return this._templateCollection.PAGE_TEST_FILE({});
+  }
   getNodePackageFile() {
     return this._templateCollection.NODE_PACKAGE_FILE({});
   }
