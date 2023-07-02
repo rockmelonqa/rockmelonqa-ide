@@ -15,12 +15,12 @@ export default (params: IActionTemplateParam) => {
 
   if (params.data.dataType === ActionDataType.LiteralValue) {
     const [attributeName, attributeValue] = getValuesFromDataString(params.data.rawData);
-    return `await Expect(defs.${pageName}.${elementName}(${getParameters(parameters)})).ToHaveAttributeAsync(\"${escapeStr(
+    return `await expect(defs.${pageName}.${elementName}()).toHaveAttribute(\"${escapeStr(
       attributeName
     )}\", \"${attributeValue}\");`;
   }
 
   const data = `${StandardOutputFile.EnvironmentSettings}.${params.data.rawData}.Split("=").ElementAtOrDefault(0) ?? "", ${StandardOutputFile.EnvironmentSettings}.${params.data.rawData}.Split("=").ElementAtOrDefault(1) ?? ""`;
 
-  return `await Expect(defs.${pageName}.${elementName}(${getParameters(parameters)})).ToHaveAttributeAsync(${data});`;
+  return `await expect(defs.${pageName}.${elementName}()).toHaveAttribute(${data});`;
 };

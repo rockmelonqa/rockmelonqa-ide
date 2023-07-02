@@ -10,5 +10,5 @@ export default (params: IActionTemplateParam) => {
       ? `"${escapeStr(String(params.data.rawData))}"`
       : createEenvironmentVariableString(String(params.data.rawData));
 
-  return `await Expect(defs.${pageName}.${elementName}(${getParameters(parameters)})).ToHaveValueAsync(${data});`;
+  return `await expect(defs.${pageName}.${elementName}(${getParameters(parameters)})).toHaveValue(${data});`;
 };

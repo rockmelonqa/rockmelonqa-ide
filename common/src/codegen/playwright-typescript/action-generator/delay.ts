@@ -8,5 +8,5 @@ export default (params: IActionTemplateParam) => {
     params.data.dataType === ActionDataType.LiteralValue
       ? parseInt(String(params.data.rawData)) || 0
       : `Int32.Parse(${createEenvironmentVariableString(String(params.data.rawData))})`;
-  return `await Task.Delay(${data});`;
+  return `await this.delay(${data});`;
 };

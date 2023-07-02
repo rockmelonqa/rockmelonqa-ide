@@ -7,5 +7,5 @@ export default (params: IActionTemplateParam) => {
     params.data.dataType === ActionDataType.LiteralValue
       ? `"${String(params.data.rawData)}"`
       : createEenvironmentVariableString(String(params.data.rawData));
-  return `await Page.GotoAsync(${data});`;
+  return `await this.page.goto(${data});`;
 };

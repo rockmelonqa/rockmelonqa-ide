@@ -8,5 +8,5 @@ export default (params: IActionTemplateParam) => {
       ? `"${escapeStr(String(params.data.rawData))}"`
       : createEenvironmentVariableString(String(params.data.rawData));
 
-  return `await Expect(defs.Page).ToHaveTitleAsync(${data});`;
+  return `await expect(this.page).toHaveTitle(${data});`;
 };

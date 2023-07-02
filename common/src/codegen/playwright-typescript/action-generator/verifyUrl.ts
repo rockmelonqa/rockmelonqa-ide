@@ -7,5 +7,5 @@ export default (params: IActionTemplateParam) => {
     params.data.dataType === ActionDataType.LiteralValue
       ? `"${escapeStr(String(params.data.rawData))}"`
       : createEenvironmentVariableString(String(params.data.rawData));
-  return `await Expect(defs.Page).ToHaveURLAsync(${data});`;
+  return `await expect(this.page).toHaveURL(${data});`;
 };

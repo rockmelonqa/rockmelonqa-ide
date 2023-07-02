@@ -1,18 +1,19 @@
-import { Page, Browser, chromium } from "playwright";
-import { PageDefinitions } from "../src/pageDefinitions";
-import "../src/customMatcher";
+import { Page, test, expect } from "@playwright/test";
+import { TestCaseBase } from "~/support/TestCaseBase";
+import PageDefinitions from "~/PageDefinitions";
+import EnvironmentSettings from "~/config/EnvironmentSettings";
 
-let browser: Browser;
-let page: Page;
+{{#if description}}
+/** {{{description}}} */
+{{/if}}
+export default class extends TestCaseBase {
+  constructor(page: Page) {
+    super(page);
+  }
 
-beforeAll(async () => {
-    browser = await chromium.launch({ headless: false });
-    page = await browser.newPage();
-});
-
-afterAll(async () => {
-    page.close();
-    browser.close();
-});
+  public async run() {
+    const defs: PageDefinitions = new PageDefinitions(this.page);
 
 {{{body}}}
+  }
+}

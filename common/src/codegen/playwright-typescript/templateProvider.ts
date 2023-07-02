@@ -54,7 +54,7 @@ export class PlaywrightTypescriptTemplateProvider {
     }
     const getter = generateGetter(params);
 
-    let output = this._templateCollection.LOCATOR_FILE({
+    let output = this._templateCollection.LOCATOR({
       hasParams: params.hasParams,
       elementName: lowerCaseFirstChar(elementName),
       getter,
@@ -90,8 +90,8 @@ export class PlaywrightTypescriptTemplateProvider {
     return this._templateCollection.PLAYWRIGHT_CONFIG_FILE({});
   }
 
-  getTestCase(name: string, body: string) {
-    return this._templateCollection.TEST_CASE_FILE({ name, body });
+  getTestCaseFile(testCaseName: string, description: string, body: string) {
+    return this._templateCollection.TEST_CASE_FILE({ testCaseName, description, body });
   }
 
   getPageDefinitions(pageImports: string, pageDeclarations: string, pageAssignments: string) {
@@ -112,11 +112,11 @@ export class PlaywrightTypescriptTemplateProvider {
     return `${indent}public ${lowerCaseFirstChar(pageName)}: ${upperCaseFirstChar(pageName)};`;
   }
 
-  getPage(pageName: string, pageDescription: string | undefined, pageBody: string) {
-    return this._templateCollection.PAGE_FILE({ pageName, pageDescription, pageBody });
+  getPage(pageDescription: string | undefined, pageBody: string) {
+    return this._templateCollection.PAGE_FILE({ pageDescription, pageBody });
   }
 
-  GetComment(message: string) {
+  getComment(message: string) {
     return this._templateCollection.COMMENT({ message, indent: this._indentString });
   }
 }

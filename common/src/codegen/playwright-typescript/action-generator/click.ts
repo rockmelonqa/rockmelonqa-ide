@@ -3,5 +3,5 @@ import { getParameters } from "../../utils/stringUtils";
 
 /** Generates Csharp code for action Click */
 export default (params: IActionTemplateParam) => {
-  return `await defs.${params.pageName}.${params.elementName}(${getParameters(params.parameters)}).ClickAsync();`;
+  return `await defs.${params.pageName}.${params.elementName}().click();`;
 };

@@ -1,4 +1,6 @@
-    /** {{{description}}} */
-    public {{{elementName}}}({{#if hasParams}}parameters?: string[]{{/if}}): {{{returnedLocatorType}}} {
-        return {{{getter}}};
-    }
+{{#if description}}
+/** {{{description}}} */
+{{/if}}
+public {{{elementName}}}(): {{{returnedLocatorType}}} {
+  return {{{getter}}};
+}
