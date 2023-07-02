@@ -3,6 +3,8 @@ export class StandardOutputFile {
   static readonly EnvironmentSettings: string = "EnvironmentSettings";
   static readonly RunSettings: string = ".runsettings";
   static readonly Usings: string = "Usings";
+  static readonly PageBase: string = "PageBase";
+  static readonly PageTest: string = "PageTest";
   static readonly PageDefinitions: string = "PageDefinitions";
   static readonly LocatorHelper: string = "LocatorHelper";
   static readonly TestCaseBase: string = "TestCaseBase";
