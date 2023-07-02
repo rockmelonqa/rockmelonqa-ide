@@ -4,6 +4,10 @@ const config: Config.InitialOptions = {
   verbose: true,
   transform: { "^.+\\.ts?$": "ts-jest" },
 
-  testPathIgnorePatterns: ["dist", "dist/commonjs", "unit-test-files"],
+  testPathIgnorePatterns: ["dist"],
+
+  moduleNameMapper: {
+    "~/(.*)": "<rootDir>/src/$1",
+  },
 };
 export default config;
