@@ -66,3 +66,9 @@ export const addIndent = (sourceStr: string, indentStr: string) => {
 export function startsWithNumber(str: string): boolean {
   return /^\d/.test(str);
 }
+
+export function camelCaseToDash(myStr: string) {
+  return myStr
+    .replace(/(^[A-Z])/, ([first]) => first.toLowerCase())
+    .replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`);
+}
