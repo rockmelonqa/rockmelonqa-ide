@@ -1,5 +1,5 @@
 import path from "path";
-import { IFileDef, StandardFolder, StandardOutputFolder } from "../../file-defs";
+import { IFileDef, StandardFolder, StandardOutputFolder, StandardOutputFolderTypeScript } from "../../file-defs";
 import { IRmProjFile, Language } from "../../file-defs/rmProjFile";
 import { IOutputFileInfo } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
@@ -11,6 +11,14 @@ const inputOutputFolderMap = new Map<string, string>([
   [StandardFolder.TestCases, StandardOutputFolder.TestCases],
   [StandardFolder.TestSuites, StandardOutputFolder.TestSuites],
   [StandardFolder.TestRoutines, StandardOutputFolder.TestRoutines],
+]);
+
+/** Map from standard input folder to standard output folder */
+const inputOutputFolderMapTypeScript = new Map<string, string>([
+  [StandardFolder.PageDefinitions, StandardOutputFolderTypeScript.Pages],
+  [StandardFolder.TestCases, StandardOutputFolderTypeScript.TestCases],
+  [StandardFolder.TestSuites, StandardOutputFolderTypeScript.TestSuites],
+  [StandardFolder.TestRoutines, StandardOutputFolderTypeScript.TestRoutines],
 ]);
 
 /** Gets the standard folder name (e.g "test-suites", "test-cases", etc...) from the provided folder path */
@@ -123,7 +131,7 @@ export class OutputFileInfoBuilderTypeScript implements IOutputFileInfoBuilder {
     const inputContainerFolder = path.join(proj.folderPath, inputFileStandardFolder);
     const outputFileExt = languageExtensionMap[proj.content.language];
     const outputCodeDir = path.join(proj.folderPath, StandardFolder.OutputCode);
-    const standardOutputFolder = inputOutputFolderMap.get(inputFileStandardFolder)!;
+    const standardOutputFolder = inputOutputFolderMapTypeScript.get(inputFileStandardFolder)!;
     const outputContainerFolder = path.join(outputCodeDir, standardOutputFolder);
     const inputFilePath = path.join(folderPath, fileName);
 
