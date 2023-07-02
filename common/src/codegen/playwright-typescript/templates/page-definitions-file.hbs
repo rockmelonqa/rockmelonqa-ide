@@ -1,8 +1,9 @@
-import { Page } from "playwright";
+import { Page } from "@playwright/test";
+
 {{{pageImports}}}
 
-export class PageDefinitions {
-    public page: Page;
+export default class {
+    public readonly page: Page;
 
 {{{pageDeclarations}}}
 

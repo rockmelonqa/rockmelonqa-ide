@@ -78,8 +78,8 @@ export class PlaywrightTypescriptTemplateProvider {
   getPageTest() {
     return this._templateCollection.PAGE_TEST_FILE({});
   }
-  getNodePackageFile() {
-    return this._templateCollection.NODE_PACKAGE_FILE({});
+  getNodePackageFile(projectName: string) {
+    return this._templateCollection.NODE_PACKAGE_FILE({ projectName });
   }
 
   getTsConfigFile() {

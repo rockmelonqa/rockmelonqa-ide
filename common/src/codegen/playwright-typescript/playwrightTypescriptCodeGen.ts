@@ -14,15 +14,26 @@ import { ICodeGen, WriteFileFn } from "../types";
 import { PlaywrightTypescriptTemplateProvider } from "./templateProvider";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import { CodeGenBase } from "../codegen-common/codeGenBase";
+import { addIndent, upperCaseFirstChar } from "../utils/stringUtils";
+import { EOL } from "os";
+import { PlaywrightTypeScriptProjMeta } from "./playwrightTypeScriptMeta";
+import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
 
 export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen {
   _templateProvider: PlaywrightTypescriptTemplateProvider;
+  _outProjMeta: IOutputProjectMetadataProcessor;
 
   constructor(projMeta: ISourceProjectMetadata) {
     super(projMeta);
     this._templateProvider = new PlaywrightTypescriptTemplateProvider(
       path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates")
     );
+
+    this._outProjMeta = this.getOutProjMeta();
+  }
+
+  protected getOutProjMeta(): IOutputProjectMetadataProcessor {
+    return new PlaywrightTypeScriptProjMeta(this._projMeta);
   }
 
   /** Generate Playwright Typescript project */
@@ -83,6 +94,14 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
       `${StandardOutputFolderTypeScript.Support}/${StandardOutputFile.PageTest}${this._outputFileExt}`,
       this._templateProvider.getPageTest()
     );
+
+    await writeFile(
+      `${StandardOutputFile.NodePackage}`,
+      this._templateProvider.getNodePackageFile(this._projMeta.project.content.name)
+    );
+
+    await writeFile(`${StandardOutputFile.PlaywrightConfig}`, this._templateProvider.getPlaywrightConfigFile());
+    await writeFile(`${StandardOutputFile.TsConfig}`, this._templateProvider.getTsConfigFile());
   }
 
   private async generateSuiteFiles(writeFile: WriteFileFn) {}
@@ -94,7 +113,40 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
   private async generateRoutineFiles(writeFile: WriteFileFn) {}
 
   private generatePageDefinitions(pages: IPage[]): string {
-    return "";
+    let importStatements: string[] = [];
+    for (let page of pages) {
+      let pageNamespace = this._outProjMeta.get(page.id)!.outputFileFullNamespace;
+      let pageName = this._outProjMeta.get(page.id)!.outputFileClassName;
+      let importStatement = `import ${pageName} from "${pageNamespace}";`;
+      if (!importStatements.includes(importStatement)) {
+        importStatements.push(importStatement);
+      }
+    }
+
+    let allImports = importStatements.join(EOL);
+
+    let pagesDeclarationItems = [];
+    for (let page of pages) {
+      let pageName = upperCaseFirstChar(this._outProjMeta.get(page.id)!.outputFileClassName);
+      pagesDeclarationItems.push(`public readonly ${pageName}: ${pageName};`);
+    }
+    let pagesDeclarations = pagesDeclarationItems.join(EOL);
+    pagesDeclarations = addIndent(pagesDeclarations, this._indentString);
+    //
+    // Build constructor body
+    // Example:
+    // this.LoginPage = new LoginPage(this);
+    //
+    let pageInitItems = [];
+    for (let page of pages) {
+      let pageName = upperCaseFirstChar(this._outProjMeta.get(page.id)!.outputFileClassName);
+      pageInitItems.push(`this.${pageName} = new ${pageName}(page);`);
+    }
+
+    let pageInits = pageInitItems.join(EOL);
+    pageInits = addIndent(pageInits, this._indentString.repeat(2));
+
+    return this._templateProvider.getPageDefinitions(allImports, pagesDeclarations, pageInits);
   }
 
   private generateTestSuiteFile(testSuite: ITestSuite, testcases: ITestCase[]) {}
