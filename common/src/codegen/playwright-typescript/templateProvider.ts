@@ -65,6 +65,10 @@ export class PlaywrightTypescriptTemplateProvider {
     return output;
   }
 
+  getEnvironmentSettingsFiles(allVariableNames: string[]): string {
+    return this._templateCollection.ENVIRONMENT_SETTINGS({ allVariableNames });
+  }
+
   getTestCaseBase() {
     return this._templateCollection.TEST_CASE_BASE_FILE({});
   }

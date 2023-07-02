@@ -44,7 +44,21 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
     return "";
   }
 
-  private async generateEnvironmentSettingsFile(writeFile: WriteFileFn) {}
+  private async generateEnvironmentSettingsFile(writeFile: WriteFileFn) {
+    // Aggregate all variable names in all config file
+    let allNames: string[] = [];
+    for (let configFile of this._projMeta.environmentFiles) {
+      let namesInFile = configFile.content.settings.map((setting) => setting.name);
+      allNames.push(...namesInFile);
+    }
+    allNames = Array.from(new Set(allNames));
+    const content = this._templateProvider.getEnvironmentSettingsFiles(allNames);
+
+    await writeFile(
+      `${StandardOutputFolderTypeScript.Config}/${StandardOutputFile.EnvironmentSettings}${this._outputFileExt}`,
+      content
+    );
+  }
 
   private async generateProjectFiles(writeFile: WriteFileFn) {}
 

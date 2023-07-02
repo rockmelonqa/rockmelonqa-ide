@@ -4,6 +4,7 @@ import { loadTemplate } from "../utils/templateLoader";
 /** Templates collection for PlaywrightTypescriptJest codegen*/
 export class JestTemplateCollection {
   public COMMENT: HandlebarsTemplateDelegate<any>;
+  public ENVIRONMENT_SETTINGS: HandlebarsTemplateDelegate<any>;
   public LOCATOR_FILE: HandlebarsTemplateDelegate<any>;
   public NODE_PACKAGE_FILE: HandlebarsTemplateDelegate<any>;
   public PAGE_BASE_FILE: HandlebarsTemplateDelegate<any>;
@@ -20,6 +21,7 @@ export class JestTemplateCollection {
       compile(loadTemplate(templatesDir, customTemplatesDir, templateFileName + fileExtension));
 
     this.COMMENT = loadAndCompile("comment");
+    this.ENVIRONMENT_SETTINGS = loadAndCompile("environment-settings");
     this.LOCATOR_FILE = loadAndCompile("locator");
     this.NODE_PACKAGE_FILE = loadAndCompile("node-package");
     this.PAGE_BASE_FILE = loadAndCompile("page-base-file");
