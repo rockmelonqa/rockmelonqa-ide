@@ -5,7 +5,7 @@ import path from "path";
 import { StandardFolder } from "../../../src/file-defs";
 import { IProgressEvent } from "../../../src/ipc-defs";
 import { generateCode } from "../../../src/codegen";
-import { prepareOutputProject, createRmTestProject } from "../../test-helpers/rm-project-generator";
+import { writeOutputProjectFiles, createRmTestProject } from "../../test-helpers/rm-project-generator";
 import { doAssert } from "../../test-helpers/assert-helper";
 import { createPlaywrightXUnitTestData } from "./playwright-csharp-xunit.test-data";
 import { createTempDir } from "../../test-helpers/fsHelpers";
@@ -20,7 +20,7 @@ test("CodeGen Playwright CSharp xUnit - General", async () => {
 
   const sampleOutputDir = path.join(tmpDir, "result");
   fs.mkdirSync(sampleOutputDir);
-  prepareOutputProject(projSpec.outputFiles!, sampleOutputDir);
+  writeOutputProjectFiles(projSpec.outputFiles!, sampleOutputDir);
 
   // Act
   await generateCode(projFile, (event: IProgressEvent) => console.log(event));
