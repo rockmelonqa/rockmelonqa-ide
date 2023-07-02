@@ -13,10 +13,11 @@ export class CodeGenBase {
   protected _projMeta: ISourceProjectMetadata;
   protected _envVarFileGenerator: IEnvironmentVariableFileGenerator;
   protected _outputFileExt: string;
+  protected _rmprojFile: IRmProjFile;
 
   constructor(projMeta: ISourceProjectMetadata) {
     this._projMeta = projMeta;
-
+    this._rmprojFile = projMeta.project;
     this._outputFileExt = languageExtensionMap[projMeta.project.content.language];
 
     this._envVarFileGenerator = Platform.IsWindows()

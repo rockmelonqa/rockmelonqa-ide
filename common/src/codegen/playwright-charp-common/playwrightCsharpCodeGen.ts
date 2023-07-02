@@ -31,22 +31,18 @@ export class PlaywrightCsharpCodeGen extends CodeGenBase {
   protected _indentChar: string;
   protected _indentSize: number;
 
-  protected _rmprojFile: IRmProjFile;
   protected _rootNamespace: string;
 
   constructor(projMeta: ISourceProjectMetadata) {
     super(projMeta);
 
-    const rmprojFile = projMeta.project;
-
     this._projMeta = projMeta;
-    this._rmprojFile = rmprojFile;
-    this._rootNamespace = rmprojFile.content.rootNamespace;
+    this._rootNamespace = projMeta.project.content.rootNamespace;
 
     /** Space char of tab char */
-    this._indentChar = indentCharMap.get(rmprojFile.content.indent)!;
+    this._indentChar = indentCharMap.get(projMeta.project.content.indent)!;
     /** Size of 1 index: eg. 2 spaces or 4 spaces */
-    this._indentSize = rmprojFile.content.indentSize;
+    this._indentSize = projMeta.project.content.indentSize;
     /** String representing 1 indent */
     this._indentString = this._indentChar.repeat(this._indentSize);
 
