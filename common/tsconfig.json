@@ -15,5 +15,5 @@
     "target": "es2017"
   },
   "include": ["src/**/*"],
-  "exclude": ["dist/**/*"]
+  "exclude": ["dist/**/*", ".tmp/**/*"]
 }
