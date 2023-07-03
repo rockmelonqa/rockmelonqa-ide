@@ -9,7 +9,8 @@
     "outDir": "dist/commonjs",
     "declaration": true,
     "target": "es2021",
-    "module": "commonjs"
+    "module": "commonjs",
+    "sourceMap": true
   },
   "include": ["src/**/*"],
   "exclude": ["dist/**/*"]
