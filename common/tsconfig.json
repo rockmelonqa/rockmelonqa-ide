@@ -1,9 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
-    "paths": {
-      "~/*": ["*"]
-    },
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -12,7 +8,8 @@
     "lib": ["ESNext", "es2021", "es2021.String"],
     "outDir": "dist/module",
     "declaration": true,
-    "target": "es2017"
+    "target": "es2017",
+    "sourceMap": true
   },
   "include": ["src/**/*"],
   "exclude": ["dist/**/*", ".tmp/**/*"]
