@@ -1,5 +1,4 @@
-import { EOL } from "os";
-import { Indent, StandardOutputFile } from "../../file-defs";
+import { StandardOutputFile } from "../../file-defs";
 
 /** Escapse double quotes and back slash characters so that the string can be inlined in the output code */
 export const escapeStr = (text: string) => {
@@ -47,20 +46,6 @@ export const lowerCaseFirstChar = (str: string) => {
 /** Creates a new string with UPPERCASE first letter from the given source string   */
 export const upperCaseFirstChar = (str: string) => {
   return str.substring(0, 1).toUpperCase() + str.substring(1);
-};
-
-/** Map from `Indent` to actual character of that `Indent` */
-export const indentCharMap = new Map<Indent, string>([
-  [Indent.Tabs, "\t"],
-  [Indent.Spaces, " "],
-]);
-
-/** Add indent to a block of strings */
-export const addIndent = (sourceStr: string, indentStr: string) => {
-  let lines = sourceStr.split(EOL);
-  lines = lines.map((l) => (l.trim() ? indentStr + l : l));
-  let result = lines.join(EOL);
-  return result;
 };
 
 export function startsWithNumber(str: string): boolean {

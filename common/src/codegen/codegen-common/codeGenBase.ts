@@ -14,7 +14,7 @@ import {
 } from "../codegen-common/environmentVariableFileGenerator";
 import { Platform } from "../../file-defs/platform";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
-import { indentCharMap } from "../utils/stringUtils";
+import { indentCharMap } from "../../file-defs/shared";
 
 export class CodeGenBase {
   protected _projMeta: ISourceProjectMetadata;

@@ -4,6 +4,7 @@ import fse from "fs-extra";
 import path from "path";
 import { IRmProjFile, StandardFolder } from "../../file-defs";
 import { ProgressEventCallback } from "../types";
+import { EOL } from "os";
 
 export const buildWriteFileFn = (rmprojFile: IRmProjFile, progressNotify: ProgressEventCallback) => {
   return async (relativeFilePath: string, content: string) => {
@@ -20,11 +21,18 @@ export const buildWriteFileFn = (rmprojFile: IRmProjFile, progressNotify: Progre
   };
 };
 
-export const copyCustomCode = async (rmprojFile: IRmProjFile, outputDir: string, progressNotify: ProgressEventCallback) => {
+export const copyCustomCode = async (
+  rmprojFile: IRmProjFile,
+  outputDir: string,
+  progressNotify: ProgressEventCallback
+) => {
   try {
     const customCodeDir = path.join(rmprojFile.folderPath, StandardFolder.CustomCode);
     if (fs.existsSync(customCodeDir)) {
-      progressNotify({ type: "copy-custom-code", log: `Copying custom code from '${customCodeDir}' to '${outputDir}'` });
+      progressNotify({
+        type: "copy-custom-code",
+        log: `Copying custom code from '${customCodeDir}' to '${outputDir}'`,
+      });
       await fs.promises.cp(customCodeDir, outputDir, {
         recursive: true,
       });
@@ -34,4 +42,12 @@ export const copyCustomCode = async (rmprojFile: IRmProjFile, outputDir: string,
     console.error(err);
     throw err;
   }
+};
+
+/** Add indent to a block of strings */
+export const addIndent = (sourceStr: string, indentStr: string) => {
+  let lines = sourceStr.split(EOL);
+  lines = lines.map((l) => (l.trim() ? indentStr + l : l));
+  let result = lines.join(EOL);
+  return result;
 };

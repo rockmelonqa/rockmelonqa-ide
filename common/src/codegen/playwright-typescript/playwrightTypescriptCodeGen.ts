@@ -17,12 +17,13 @@ import { ActionDataType, IActionData, ICodeGen, WriteFileFn } from "../types";
 import { PlaywrightTypescriptTemplateProvider } from "./templateProvider";
 import { DataSetCollection, IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import { CodeGenBase } from "../codegen-common/codeGenBase";
-import { addIndent, hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
+import { upperCaseFirstChar } from "../utils/stringUtils";
 import { EOL } from "os";
 import { PlaywrightTypeScriptProjMeta } from "./playwrightTypeScriptMeta";
 import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { createCleanName } from "../utils/createName";
-import { ITestStepComment } from "~/file-defs/shared";
+import { ITestStepComment } from "../../file-defs/shared";
+import { addIndent } from "../utils/codegenUtils";
 
 export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen {
   _templateProvider: PlaywrightTypescriptTemplateProvider;

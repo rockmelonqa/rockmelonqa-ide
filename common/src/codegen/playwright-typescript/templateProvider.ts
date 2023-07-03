@@ -1,10 +1,11 @@
 import path from "path";
 import { Indent } from "../../file-defs";
-import { indentCharMap, lowerCaseFirstChar, upperCaseFirstChar } from "../utils/stringUtils";
+import { lowerCaseFirstChar, upperCaseFirstChar } from "../utils/stringUtils";
 import { actionRegistyPlaywright } from "./action-registry";
 import { JestTemplateCollection } from "./templateCollection";
 import { locatorRegisty } from "./locator-registry";
 import { IActionTemplateParam, ILocatorTemplateParam } from "../types";
+import { indentCharMap } from "../../file-defs/shared";
 
 export class PlaywrightTypescriptTemplateProvider {
   private _templateCollection: JestTemplateCollection;

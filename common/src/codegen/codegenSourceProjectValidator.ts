@@ -1,6 +1,5 @@
-import { ActionType, ISourceProjectMetadata, ITestCase } from "../file-defs";
+import { ActionType, ISourceProjectMetadata, ITestCase, SourceFileValidationError } from "../file-defs";
 import { actionValidatorRegistry } from "./codegen-common/action-validator-registry";
-import { SourceFileValidationError } from "./types";
 import path from "path";
 import { ITestCaseFile, ITestCaseStep, ITestCaseActionStep } from "../file-defs/testCaseFile";
 

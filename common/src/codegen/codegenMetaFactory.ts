@@ -1,4 +1,4 @@
-import { AutomationFramework, ISourceProjectMetadata, Language, TestFramework } from "~/file-defs";
+import { AutomationFramework, ISourceProjectMetadata, Language, TestFramework } from "../file-defs";
 import { LookupKey, isEqual } from "./codegenFactory";
 import { IOutputProjectMetadataProcessor } from "./playwright-charp-common/outputProjectMetadataProcessor";
 import { MsTestProjMeta } from "./playwright-csharp-mstest/msTestProjMeta";

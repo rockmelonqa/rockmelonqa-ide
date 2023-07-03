@@ -12,7 +12,7 @@ import {
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { ICodeGen } from "../types";
-import { addIndent, hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
+import { hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
 import { PlaywrightCsharpXUnitTemplatesProvider } from "./playwrightCsharpXUnitTemplatesProvider";
 import { XUnitProjectMeta } from "./xunitProjectMeta";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
@@ -21,6 +21,7 @@ import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/p
 import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfos";
 import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
+import { addIndent } from "../utils/codegenUtils";
 
 type WriteFileFn = (path: string, content: string) => Promise<void>;
 

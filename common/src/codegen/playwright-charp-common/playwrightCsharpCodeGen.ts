@@ -8,7 +8,7 @@ import {
   StandardOutputFolder,
 } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
-import { addIndent, upperCaseFirstChar } from "../utils/stringUtils";
+import { upperCaseFirstChar } from "../utils/stringUtils";
 import { IOutputProjectMetadataProcessor } from "./outputProjectMetadataProcessor";
 import { createCleanName } from "../utils/createName";
 import { DataSetCollection, IDataSetInfo } from "./dataSetInfo";
@@ -17,6 +17,7 @@ import { ActionDataType, IActionData, WriteFileFn } from "../types";
 import { ITestCaseActionStep } from "../../file-defs/testCaseFile";
 import { ITestStepComment } from "../../file-defs/shared";
 import { CodeGenBase } from "../codegen-common/codeGenBase";
+import { addIndent } from "../utils/codegenUtils";
 
 /** Base class for Dotnet CodeGe, including MsTest, Nunit, Xunit CodeGens */
 export class PlaywrightCsharpCodeGen extends CodeGenBase {

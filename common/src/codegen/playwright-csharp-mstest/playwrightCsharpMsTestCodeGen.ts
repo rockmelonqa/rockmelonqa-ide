@@ -13,7 +13,7 @@ import {
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { ICodeGen, WriteFileFn } from "../types";
-import { addIndent, hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
+import { hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
 import { MsTestProjMeta } from "./msTestProjMeta";
 import { PlaywrightCsharpMsTestTemplatesProvider } from "./playwrightCsharpMsTestTemplatesProvider";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
@@ -22,6 +22,7 @@ import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCs
 import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
+import { addIndent } from "../utils/codegenUtils";
 
 export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen implements ICodeGen {
   /**

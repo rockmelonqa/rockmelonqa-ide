@@ -4,13 +4,14 @@ import { IFileDef } from "./fileDef";
 import { fileDefFactory } from "./fileDefFactory";
 import { LocatorType } from "./locatorType";
 import { Platform, PlatformName } from "./platform";
-import { AutomationFramework, Browser, Indent, IRmProj, IRmProjFile, Language, TestFramework } from "./rmProjFile";
+import { AutomationFramework, Browser, IRmProj, IRmProjFile, Indent, Language, TestFramework } from "./rmProjFile";
 import { ISourceProjectMetadata } from "./sourceProjectMetadata";
 import { StandardOutputFile } from "./standardOutputFile";
 import { ITestCase, ITestCaseFile, ITestCaseStep, ITestCaseActionStep } from "./testCaseFile";
 import { IDataSet, ITestRoutine, ITestRoutineFile, ITestRoutineActionStep, IRoutineStep } from "./testRoutineFile";
 import { ITestSuite, ITestSuiteFile } from "./testSuiteFile";
 import { IRecentFile, IUserSettings, IUserSettingsFile } from "./userSettingsFile";
+import { SourceFileValidationError } from "./shared";
 
 export * from "./standardFileExtension";
 export * from "./standardFolder";
@@ -48,4 +49,5 @@ export {
   ITestCaseFile,
   ITestCaseStep,
   IRoutineStep,
+  SourceFileValidationError,
 };

@@ -1,4 +1,4 @@
-import { camelCaseToDash } from "~/codegen/utils/stringUtils";
+import { camelCaseToDash } from "../codegen/utils/stringUtils";
 
 export class StandardOutputFolder {
   /** "Config" */
