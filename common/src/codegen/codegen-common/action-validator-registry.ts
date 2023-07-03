@@ -24,9 +24,9 @@ import verifyTitleContains from "./action-validators/verifyTitleContains";
 import verifyUrl from "./action-validators/verifyUrl";
 
 /** A registry (map) of step validator for each ActionType */
-export const actionValidatorRegistryDotnet = new Map<ActionType, (step: ITestCaseActionStep) => string | undefined>();
+export const actionValidatorRegistry = new Map<ActionType, (step: ITestCaseActionStep) => string | undefined>();
 
-actionValidatorRegistryDotnet
+actionValidatorRegistry
   .set(ActionType.Clear, clear)
   .set(ActionType.Click, click)
   .set(ActionType.ClickPopup, clickPopup)
