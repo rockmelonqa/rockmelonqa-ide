@@ -10,8 +10,8 @@ import { IProgressEvent } from "../../../src";
 
 test("Generate Test project Playwright Typescript", async () => {
   // Arrange
-  const tmpDir = createTempDir("playwright-typescript-general");
   const projSpec = createTestDataGeneral();
+  const tmpDir = createTempDir("playwright-typescript-general");
   const copyToDir = path.join(tmpDir, "rmproj");
   fs.mkdirSync(copyToDir);
   const projFile = createRmTestProject(projSpec, copyToDir);
