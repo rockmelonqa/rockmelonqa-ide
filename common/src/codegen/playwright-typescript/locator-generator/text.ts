@@ -4,6 +4,6 @@ import { escapeStr } from "../../utils/stringUtils";
 export default (params: ILocatorTemplateParam) => {
   const { locatorStr, hasParams } = params;
   return hasParams
-    ? `this._page.getByText(\"${escapeStr(locatorStr)}\".format(...parameters}))`
-    : `this._page.getByText(\"${escapeStr(locatorStr)}\")`;
+    ? `this.page.getByText(\"${escapeStr(locatorStr)}\".format(...parameters}))`
+    : `this.page.getByText(\"${escapeStr(locatorStr)}\")`;
 };
