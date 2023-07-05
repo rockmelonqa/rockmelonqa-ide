@@ -1,35 +1,49 @@
-import { ISourceProjectMetadata, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
+import { IEnvironmentContent, ISourceProjectMetadata, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
-import { createDotnetProjectMetadata } from "../playwright-charp-common/createDotnetProjectMetadata";
 import { IOutputProjectMetadataProcessor, MapCreator } from "../playwright-charp-common/outputProjectMetadataProcessor";
-import { IOutputFileInfo, IOutputProjectMetadata } from "../types";
+import {
+  IEnvironmentFileInfo,
+  IOutputFileInfo,
+  IOutputProjectMetadata,
+  IPageInfo,
+  ISuiteInfo,
+  ITestCaseInfo,
+} from "../types";
 
 /** PlaywrightTypeScriptProjMeta project meta: Contains info of all files and other resources */
 export class PlaywrightTypeScriptProjMeta implements IOutputProjectMetadataProcessor {
-  private _projMeta: ISourceProjectMetadata;
+  private projMeta: ISourceProjectMetadata;
 
   public readonly pageMetaMap: Map<IPage, IOutputFileInfo> = new Map<IPage, IOutputFileInfo>();
   public readonly suiteMetaMap: Map<ITestSuite, IOutputFileInfo> = new Map<ITestSuite, IOutputFileInfo>();
   public readonly caseMetaMap: Map<ITestCase, IOutputFileInfo> = new Map<ITestCase, IOutputFileInfo>();
   public readonly routineMetaMap: Map<ITestRoutine, IOutputFileInfo> = new Map<ITestRoutine, IOutputFileInfo>();
+  public readonly environmentFileMetaMap: Map<IEnvironmentContent, IOutputFileInfo> = new Map<
+    IEnvironmentContent,
+    IOutputFileInfo
+  >();
 
-  constructor(codegenMeta: ISourceProjectMetadata) {
-    this._projMeta = codegenMeta;
+  constructor(projMeta: ISourceProjectMetadata) {
+    this.projMeta = projMeta;
 
-    const rmprojFile = codegenMeta.project;
+    const rmprojFile = projMeta.project;
 
     const mapCreator: MapCreator = new MapCreator(rmprojFile);
-
-    this.pageMetaMap = mapCreator.createMapForPages(rmprojFile, codegenMeta.pages);
-    this.suiteMetaMap = mapCreator.createMapForTestSuites(rmprojFile, codegenMeta.testSuites);
-    this.caseMetaMap = mapCreator.createMapForTestCases(rmprojFile, codegenMeta.testCases);
-    this.routineMetaMap = mapCreator.createMapForTestRoutines(rmprojFile, codegenMeta.testRoutines);
+    this.pageMetaMap = mapCreator.createMapForPages(rmprojFile, projMeta.pages);
+    this.suiteMetaMap = mapCreator.createMapForTestSuites(rmprojFile, projMeta.testSuites);
+    this.caseMetaMap = mapCreator.createMapForTestCases(rmprojFile, projMeta.testCases);
+    this.routineMetaMap = mapCreator.createMapForTestRoutines(rmprojFile, projMeta.testRoutines);
+    this.environmentFileMetaMap = mapCreator.createMapForEnvironmentFiles(rmprojFile, projMeta.environmentFiles);
 
     this.verifyDuplication();
   }
 
   public createOutputProjectMetadata(): IOutputProjectMetadata {
-    return createDotnetProjectMetadata(this._projMeta);
+    const environments: IEnvironmentFileInfo[] = this.generateEnvMeta();
+    const suites: ISuiteInfo[] = this.generateSuitesMeta();
+    const cases: ITestCaseInfo[] = this.generateCasesMeta();
+    const pages: IPageInfo[] = this.generatePagesMeta();
+    return { suites, cases, pages, environments };
   }
 
   private verifyDuplication() {
@@ -46,6 +60,109 @@ export class PlaywrightTypeScriptProjMeta implements IOutputProjectMetadataProce
       //throw new Error(`Duplicate output file: ${firstDuplication}`);
       console.error(`Duplicate output file: ${firstDuplication}`);
     }
+  }
+
+  generateEnvMeta() {
+    const environments: IEnvironmentFileInfo[] = [];
+
+    for (let { content: environmentContent } of this.projMeta.environmentFiles) {
+      let envMeta = this.environmentFileMetaMap.get(environmentContent)!;
+
+      let envInfo: IEnvironmentFileInfo = {
+        name: envMeta.outputFileClassName,
+        inputFileName: envMeta.inputFileName,
+        inputFilePath: envMeta.inputFilePath,
+        inputFileRelPath: envMeta.inputFileRelPath,
+        outputFileName: envMeta.outputFileName,
+        outputFilePath: envMeta.outputFilePath,
+        outputFileRelPath: envMeta.outputFileRelPath,
+        isValid: envMeta.isValid,
+      };
+      environments.push(envInfo);
+    }
+    return environments;
+  }
+
+  generateSuitesMeta() {
+    const suites: ISuiteInfo[] = [];
+
+    for (let { content: testsuite } of this.projMeta.testSuites) {
+      let testCases = this.projMeta.testCases.filter((c) => testsuite.testcases.includes(c.content.id));
+      let suiteMeta = this.suiteMetaMap.get(testsuite)!;
+
+      let suiteInfo: ISuiteInfo = {
+        name: suiteMeta.outputFileClassName,
+        fullyQualifiedName: `${suiteMeta.outputFileFullNamespace}.${suiteMeta.outputFileClassName}`,
+        inputFileName: suiteMeta.inputFileName,
+        inputFilePath: suiteMeta.inputFilePath,
+        inputFileRelPath: suiteMeta.inputFileRelPath,
+        outputFileName: suiteMeta.outputFileName,
+        outputFilePath: suiteMeta.outputFilePath,
+        outputFileRelPath: suiteMeta.outputFileRelPath,
+        isValid: suiteMeta.isValid,
+        testCases: testCases.map((tc) => {
+          let caseMeta = this.caseMetaMap.get(tc.content)!;
+          let caseInfo: ITestCaseInfo = {
+            name: caseMeta.outputFileClassName,
+            fullyQualifiedName: `${suiteMeta.outputFileFullNamespace}.${suiteMeta.outputFileClassName}.${caseMeta.outputFileClassName}`,
+            inputFileName: caseMeta.inputFileName,
+            inputFilePath: caseMeta.inputFilePath,
+            inputFileRelPath: caseMeta.inputFileRelPath,
+            outputFileName: caseMeta.outputFileName,
+            outputFilePath: caseMeta.outputFilePath,
+            outputFileRelPath: caseMeta.outputFileRelPath,
+            isValid: caseMeta.isValid,
+          };
+          return caseInfo;
+        }),
+      };
+      suites.push(suiteInfo);
+    }
+    return suites;
+  }
+
+  generateCasesMeta() {
+    const cases: ITestCaseInfo[] = [];
+
+    for (let { content: testcase, isValid } of this.projMeta.testCases) {
+      let caseMeta = this.caseMetaMap.get(testcase)!;
+
+      let caseInfo: ITestCaseInfo = {
+        name: caseMeta.outputFileClassName,
+        fullyQualifiedName: `${caseMeta.outputFileFullNamespace}.${caseMeta.outputFileClassName}`,
+        inputFileName: caseMeta.inputFileName,
+        inputFilePath: caseMeta.inputFilePath,
+        inputFileRelPath: caseMeta.inputFileRelPath,
+        outputFileName: caseMeta.outputFileName,
+        outputFilePath: caseMeta.outputFilePath,
+        outputFileRelPath: caseMeta.outputFileRelPath,
+        isValid: caseMeta.isValid,
+      };
+      cases.push(caseInfo);
+    }
+    return cases;
+  }
+
+  generatePagesMeta() {
+    const pages: IPageInfo[] = [];
+    for (let { content: page, isValid } of this.projMeta.pages) {
+      let pageMeta = this.pageMetaMap.get(page)!;
+
+      let pageInfo: IPageInfo = {
+        name: pageMeta.outputFileClassName,
+        fullyQualifiedName: `${pageMeta.outputFileFullNamespace}.${pageMeta.outputFileClassName}`,
+        inputFileName: pageMeta.inputFileName,
+        inputFilePath: pageMeta.inputFilePath,
+        inputFileRelPath: pageMeta.inputFileRelPath,
+        outputFileName: pageMeta.outputFileName,
+        outputFilePath: pageMeta.outputFilePath,
+        outputFileRelPath: pageMeta.outputFileRelPath,
+        isValid: pageMeta.isValid,
+      };
+      pages.push(pageInfo);
+    }
+
+    return pages;
   }
 
   /** Get an instance of IOutputFileInfo with the provided guid of an item in the rmProj  */

@@ -24,6 +24,7 @@ import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outp
 import { createCleanName } from "../utils/createName";
 import { ITestStepComment } from "../../file-defs/shared";
 import { addIndent } from "../utils/codegenUtils";
+import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
 
 export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen {
   _templateProvider: PlaywrightTypescriptTemplateProvider;
@@ -79,7 +80,11 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
 
   private async generateProjectFiles(writeFile: WriteFileFn) {}
 
-  private async generateMetaFiles(writeFile: WriteFileFn) {}
+  private async generateMetaFiles(writeFile: WriteFileFn) {
+    // Write output project metadata
+    const outputProjectMetadata = await createOutputProjectMetadata(this._rmprojFile);
+    await writeFile(StandardOutputFile.MetaData, JSON.stringify(outputProjectMetadata, null, 2));
+  }
   private async generatePageDefinitionsFiles(writeFile: WriteFileFn) {
     await writeFile(
       `${StandardOutputFile.PageDefinitions}${this._outputFileExt}`,
