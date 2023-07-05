@@ -15,7 +15,7 @@
     import { writable } from "svelte/store";
     import { SourceProjectValidator } from "./CodeGenerationDialog/sourceProjectValidator";
     import { toPrerequisiteText } from "./CodeGenerationDialog/utils";
-    import type { SourceFileValidationError } from "rockmelonqa.common/codegen/types";
+    import type { SourceFileValidationError } from "rockmelonqa.common/file-defs";
     import { getActionTypeDropDownOptions } from "$lib/utils/dropdowns";
     import type { IDropdownOption } from "$lib/controls/DropdownField";
 
