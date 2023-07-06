@@ -209,20 +209,15 @@
         isProcessing = true;
         allowRunTest = false;
 
-        // TODO: build filter based on Language and Framework
-        const filter = buildDotnetFilter();
-
-        if (filter) {
+        const selectedTestCases = findSelectedCases($testExplorerState.nodes).map((node) => node.caseInfo!);
+        if (selectedTestCases.length > 0) {
             const serializer = new FormSerializer(uiContext);
             const model = serializer.serialize($formData.values, formDef.fields);
             testRunner.runTest({
                 projFile: $appState.projectFile!,
-                setting: {
-                    browser: model.browser,
-                    dotnetFilterStr: filter,
-                    environmentFile: model.environmentFile,
-                    outputCodeDir: "",
-                },
+                browser: model.browser,
+                environmentFile: model.environmentFile,
+                testCases: selectedTestCases,
             });
         } else {
             showWarning = true;
@@ -230,11 +225,6 @@
             allowRunTest = true;
             isProcessing = false;
         }
-    };
-
-    const buildDotnetFilter = (): string => {
-        const selectedCases = findSelectedCases($testExplorerState.nodes);
-        return selectedCases.map((node) => node.caseInfo!.fullyQualifiedName).join("|");
     };
 
     function findSelectedCases(nodes: NodeInfo[]): NodeInfo[] {
