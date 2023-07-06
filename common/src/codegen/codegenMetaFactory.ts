@@ -1,13 +1,13 @@
 import { AutomationFramework, ISourceProjectMetadata, Language, TestFramework } from "../file-defs";
 import { LookupKey, isEqual } from "./codegenFactory";
-import { IOutputProjectMetadataProcessor } from "./playwright-charp-common/outputProjectMetadataProcessor";
+import { IOutputProjectMetadataGenerator } from "./playwright-charp-common/outputProjectMetadataProcessor";
 import { MsTestProjMeta } from "./playwright-csharp-mstest/msTestProjMeta";
 import { NunitProjectMeta } from "./playwright-csharp-nunit/nunitProjectMeta";
 import { XUnitProjectMeta } from "./playwright-csharp-xunit/xunitProjectMeta";
-import { PlaywrightTypeScriptProjMeta } from "./playwright-typescript/playwrightTypeScriptMeta";
+import { PlaywrightTypeScriptProjMetaGenerator } from "./playwright-typescript/playwrightTypeScriptMeta";
 
 /** Registy that contains mapping between LookupKey and a generator function that return ProjectMeta Processor */
-const registry = new Map<LookupKey, (projMeta: ISourceProjectMetadata) => IOutputProjectMetadataProcessor>();
+const registry = new Map<LookupKey, (projMeta: ISourceProjectMetadata) => IOutputProjectMetadataGenerator>();
 
 registry.set(
   [AutomationFramework.Playwright, Language.CSharp, TestFramework.MSTest],
@@ -26,13 +26,13 @@ registry.set(
 
 registry.set(
   [AutomationFramework.Playwright, Language.Typescript, ""],
-  (projMeta) => new PlaywrightTypeScriptProjMeta(projMeta)
+  (projMeta) => new PlaywrightTypeScriptProjMetaGenerator(projMeta)
 );
 
 /** Contains factory method that generate new instance of ProjectMeta Processor */
 export class CodeGenMetaFactory {
   /** Creates new instance of Codegen Meta Generator based on  { automationFramework, testFramework }*/
-  static newInstance(projMeta: ISourceProjectMetadata): IOutputProjectMetadataProcessor {
+  static newInstance(projMeta: ISourceProjectMetadata): IOutputProjectMetadataGenerator {
     const { automationFramework, language, testFramework } = projMeta.project.content;
     const keyToLookup: LookupKey = [automationFramework, language, testFramework];
 

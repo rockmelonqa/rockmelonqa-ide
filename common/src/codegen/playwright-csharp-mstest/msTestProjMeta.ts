@@ -1,11 +1,11 @@
 import { ISourceProjectMetadata, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { createDotnetProjectMetadata } from "../playwright-charp-common/createDotnetProjectMetadata";
-import { IOutputProjectMetadataProcessor, MapCreator } from "../playwright-charp-common/outputProjectMetadataProcessor";
+import { IOutputProjectMetadataGenerator, MapCreator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { IOutputFileInfo, IOutputProjectMetadata } from "../types";
 
 /** MsTest project meta: Contains info of all files and other resources */
-export class MsTestProjMeta implements IOutputProjectMetadataProcessor {
+export class MsTestProjMeta implements IOutputProjectMetadataGenerator {
   private _projMeta: ISourceProjectMetadata;
 
   public readonly pageMetaMap: Map<IPage, IOutputFileInfo> = new Map<IPage, IOutputFileInfo>();

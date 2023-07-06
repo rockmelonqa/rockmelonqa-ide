@@ -17,7 +17,7 @@ import { NunitProjectMeta } from "./nunitProjectMeta";
 import { PlaywrightCsharpNunitTemplatesProvider } from "./playwrightCsharpNunitTemplatesProvider";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCsharpCodeGen";
-import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
+import { IOutputProjectMetadataGenerator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfos";
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
@@ -28,7 +28,7 @@ export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implem
     super(projMeta);
   }
 
-  protected override getOutProjMeta(): IOutputProjectMetadataProcessor {
+  protected override getOutProjMeta(): IOutputProjectMetadataGenerator {
     return new NunitProjectMeta(this._projMeta);
   }
 

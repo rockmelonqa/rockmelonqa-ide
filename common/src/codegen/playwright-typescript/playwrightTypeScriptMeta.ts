@@ -1,7 +1,7 @@
 import fs from "fs";
 import { IEnvironmentContent, ISourceProjectMetadata, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
-import { IOutputProjectMetadataProcessor, MapCreator } from "../playwright-charp-common/outputProjectMetadataProcessor";
+import { IOutputProjectMetadataGenerator, MapCreator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import {
   IEnvironmentFileInfo,
   IOutputFileInfo,
@@ -14,7 +14,7 @@ import path from "path";
 import { EOL } from "os";
 
 /** PlaywrightTypeScriptProjMeta project meta: Contains info of all files and other resources */
-export class PlaywrightTypeScriptProjMeta implements IOutputProjectMetadataProcessor {
+export class PlaywrightTypeScriptProjMetaGenerator implements IOutputProjectMetadataGenerator {
   private projMeta: ISourceProjectMetadata;
 
   public readonly pageMetaMap: Map<IPage, IOutputFileInfo> = new Map<IPage, IOutputFileInfo>();

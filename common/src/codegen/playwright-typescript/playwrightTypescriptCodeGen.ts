@@ -19,8 +19,8 @@ import { DataSetCollection, IDataSetInfo } from "../playwright-charp-common/data
 import { CodeGenBase } from "../codegen-common/codeGenBase";
 import { upperCaseFirstChar } from "../utils/stringUtils";
 import { EOL } from "os";
-import { PlaywrightTypeScriptProjMeta } from "./playwrightTypeScriptMeta";
-import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
+import { PlaywrightTypeScriptProjMetaGenerator } from "./playwrightTypeScriptMeta";
+import { IOutputProjectMetadataGenerator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { createCleanName } from "../utils/createName";
 import { ITestStepComment } from "../../file-defs/shared";
 import { addIndent } from "../utils/codegenUtils";
@@ -28,7 +28,7 @@ import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
 
 export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen {
   _templateProvider: PlaywrightTypescriptTemplateProvider;
-  _outProjMeta: IOutputProjectMetadataProcessor;
+  _outProjMeta: IOutputProjectMetadataGenerator;
 
   constructor(projMeta: ISourceProjectMetadata) {
     super(projMeta);
@@ -39,8 +39,8 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
     this._outProjMeta = this.getOutProjMeta();
   }
 
-  protected getOutProjMeta(): IOutputProjectMetadataProcessor {
-    return new PlaywrightTypeScriptProjMeta(this._projMeta);
+  protected getOutProjMeta(): IOutputProjectMetadataGenerator {
+    return new PlaywrightTypeScriptProjMetaGenerator(this._projMeta);
   }
 
   /** Generate Playwright Typescript project */

@@ -18,7 +18,7 @@ import { XUnitProjectMeta } from "./xunitProjectMeta";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCsharpCodeGen";
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
-import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
+import { IOutputProjectMetadataGenerator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfos";
 import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
 import { addIndent } from "../utils/codegenUtils";
@@ -30,7 +30,7 @@ export class PlaywrightCsharpXUnitCodeGen extends PlaywrightCsharpCodeGen implem
     super(projMeta);
   }
 
-  protected override getOutProjMeta(): IOutputProjectMetadataProcessor {
+  protected override getOutProjMeta(): IOutputProjectMetadataGenerator {
     return new XUnitProjectMeta(this._projMeta);
   }
 

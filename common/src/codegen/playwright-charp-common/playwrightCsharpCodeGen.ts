@@ -9,7 +9,7 @@ import {
 } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { upperCaseFirstChar } from "../utils/stringUtils";
-import { IOutputProjectMetadataProcessor } from "./outputProjectMetadataProcessor";
+import { IOutputProjectMetadataGenerator } from "./outputProjectMetadataProcessor";
 import { createCleanName } from "../utils/createName";
 import { DataSetCollection, IDataSetInfo } from "./dataSetInfo";
 import { IPlaywrightCsharpTemplatesProvider } from "./playwrightCsharpTemplatesProvider";
@@ -21,7 +21,7 @@ import { addIndent } from "../utils/codegenUtils";
 
 /** Base class for Dotnet CodeGe, including MsTest, Nunit, Xunit CodeGens */
 export class PlaywrightCsharpCodeGen extends CodeGenBase {
-  protected _outProjMeta: IOutputProjectMetadataProcessor;
+  protected _outProjMeta: IOutputProjectMetadataGenerator;
   protected _templateProvider: IPlaywrightCsharpTemplatesProvider;
 
   protected _rootNamespace: string;
@@ -36,7 +36,7 @@ export class PlaywrightCsharpCodeGen extends CodeGenBase {
     this._templateProvider = this.getTemplateProvider();
   }
 
-  protected getOutProjMeta(): IOutputProjectMetadataProcessor {
+  protected getOutProjMeta(): IOutputProjectMetadataGenerator {
     throw new Error("Must implement getOutProjMeta in sub class");
   }
 

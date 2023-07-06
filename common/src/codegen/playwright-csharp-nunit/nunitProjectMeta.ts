@@ -1,10 +1,10 @@
 import { ISourceProjectMetadata, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import { createDotnetProjectMetadata } from "../playwright-charp-common/createDotnetProjectMetadata";
-import { IOutputProjectMetadataProcessor, MapCreator } from "../playwright-charp-common/outputProjectMetadataProcessor";
+import { IOutputProjectMetadataGenerator, MapCreator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { IOutputFileInfo, IOutputProjectMetadata } from "../types";
 
-export class NunitProjectMeta implements IOutputProjectMetadataProcessor {
+export class NunitProjectMeta implements IOutputProjectMetadataGenerator {
   private _projMeta: ISourceProjectMetadata;
 
   public readonly pageNameMap: Map<IPage, IOutputFileInfo> = new Map<IPage, IOutputFileInfo>();
