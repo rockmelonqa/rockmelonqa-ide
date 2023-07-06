@@ -21,6 +21,10 @@ export class CommandBuilderFactory {
         return new RunXUnitCommandBuilder();
       }
     }
-    throw new Error(`Cannot create command builder for Language ${language} and Test Framework ${testFramework}`);
+    throw new Error(
+      `Cannot create command builder for Language "${language}" "${
+        testFramework ? " and Test Framework " + testFramework : ""
+      }"`
+    );
   }
 }
