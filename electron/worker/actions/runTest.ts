@@ -12,6 +12,7 @@ import { WorkerAction, WorkerMessage } from '../worker';
 import { executeCommand, IGenericActionResult } from './shared';
 import { CommandBuilderFactory } from './runTest/commandBuilder';
 import { Browser } from 'rockmelonqa.common/file-defs';
+import { ITestCaseInfo } from 'rockmelonqa.common/codegen/types';
 
 export interface IRunTestContext {
     rmProjFile: IRmProjFile;
@@ -32,8 +33,7 @@ export interface IRunTestSettings {
     /** Relative path of the environment file being selected */
     environmentFile: string;
 
-    /** The string to use as `--filter` when running `dotnet test` command */
-    filter: string;
+    testCases: ITestCaseInfo[];
 }
 
 export type IRunTestActionResult = IGenericActionResult<{

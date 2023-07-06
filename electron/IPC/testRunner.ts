@@ -41,7 +41,7 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
       testResultFileName: toTestResultFileName(projFile),
       browser,
       environmentFile,
-      filter: testCases.map(x => x.fullyQualifiedName).join("|"),
+      testCases
     },
   };
 
