@@ -1,27 +1,27 @@
 import { AutomationFramework, ISourceProjectMetadata, Language, TestFramework } from "../file-defs";
 import { LookupKey, isEqual } from "./codegenFactory";
 import { IOutputProjectMetadataGenerator } from "./playwright-charp-common/outputProjectMetadataProcessor";
-import { MsTestProjMeta } from "./playwright-csharp-mstest/msTestProjMeta";
-import { NunitProjectMeta } from "./playwright-csharp-nunit/nunitProjectMeta";
-import { XUnitProjectMeta } from "./playwright-csharp-xunit/xunitProjectMeta";
-import { PlaywrightTypeScriptProjMetaGenerator } from "./playwright-typescript/playwrightTypeScriptMeta";
+import { MsTestProjMetaGenerator } from "./playwright-csharp-mstest/msTestProjMetaGenerator";
+import { NunitProjectMetaGenerator } from "./playwright-csharp-nunit/nunitProjectMetaGenerator";
+import { XUnitProjectMetaGenerator } from "./playwright-csharp-xunit/xunitProjectMetaGenerator";
+import { PlaywrightTypeScriptProjMetaGenerator } from "./playwright-typescript/playwrightTypeScriptMetaGenerator";
 
 /** Registy that contains mapping between LookupKey and a generator function that return ProjectMeta Processor */
 const registry = new Map<LookupKey, (projMeta: ISourceProjectMetadata) => IOutputProjectMetadataGenerator>();
 
 registry.set(
   [AutomationFramework.Playwright, Language.CSharp, TestFramework.MSTest],
-  (projMeta) => new MsTestProjMeta(projMeta)
+  (projMeta) => new MsTestProjMetaGenerator(projMeta)
 );
 
 registry.set(
   [AutomationFramework.Playwright, Language.CSharp, TestFramework.NUnit],
-  (projMeta) => new NunitProjectMeta(projMeta)
+  (projMeta) => new NunitProjectMetaGenerator(projMeta)
 );
 
 registry.set(
   [AutomationFramework.Playwright, Language.CSharp, TestFramework.xUnit],
-  (projMeta) => new XUnitProjectMeta(projMeta)
+  (projMeta) => new XUnitProjectMetaGenerator(projMeta)
 );
 
 registry.set(

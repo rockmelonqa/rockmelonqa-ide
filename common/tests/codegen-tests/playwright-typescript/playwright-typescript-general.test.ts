@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { createTestDataGeneral } from "./playwright-typescript-general.test-data";
 import { createRmTestProject, writeOutputProjectFiles } from "../../test-helpers/rm-project-generator";
-import { PlaywrightTypeScriptProjMetaGenerator } from "../../../src/codegen/playwright-typescript/playwrightTypeScriptMeta";
+import { PlaywrightTypeScriptProjMetaGenerator } from "../../../src/codegen/playwright-typescript/playwrightTypeScriptMetaGenerator";
 import { createTempDir } from "../../test-helpers/fsHelpers";
 import { generateCode } from "../../../src/codegen";
 import { IProgressEvent } from "../../../src";

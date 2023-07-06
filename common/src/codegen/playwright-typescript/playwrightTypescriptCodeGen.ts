@@ -19,7 +19,7 @@ import { DataSetCollection, IDataSetInfo } from "../playwright-charp-common/data
 import { CodeGenBase } from "../codegen-common/codeGenBase";
 import { upperCaseFirstChar } from "../utils/stringUtils";
 import { EOL } from "os";
-import { PlaywrightTypeScriptProjMetaGenerator } from "./playwrightTypeScriptMeta";
+import { PlaywrightTypeScriptProjMetaGenerator } from "./playwrightTypeScriptMetaGenerator";
 import { IOutputProjectMetadataGenerator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { createCleanName } from "../utils/createName";
 import { ITestStepComment } from "../../file-defs/shared";

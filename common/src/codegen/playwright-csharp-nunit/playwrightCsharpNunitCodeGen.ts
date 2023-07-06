@@ -13,7 +13,7 @@ import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { ICodeGen, WriteFileFn } from "../types";
 import { hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
-import { NunitProjectMeta } from "./nunitProjectMeta";
+import { NunitProjectMetaGenerator } from "./nunitProjectMetaGenerator";
 import { PlaywrightCsharpNunitTemplatesProvider } from "./playwrightCsharpNunitTemplatesProvider";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCsharpCodeGen";
@@ -29,7 +29,7 @@ export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implem
   }
 
   protected override getOutProjMeta(): IOutputProjectMetadataGenerator {
-    return new NunitProjectMeta(this._projMeta);
+    return new NunitProjectMetaGenerator(this._projMeta);
   }
 
   protected override getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {

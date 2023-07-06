@@ -14,7 +14,7 @@ import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { ICodeGen, WriteFileFn } from "../types";
 import { hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
-import { MsTestProjMeta } from "./msTestProjMeta";
+import { MsTestProjMetaGenerator } from "./msTestProjMetaGenerator";
 import { PlaywrightCsharpMsTestTemplatesProvider } from "./playwrightCsharpMsTestTemplatesProvider";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfos";
@@ -33,7 +33,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
   }
 
   protected override getOutProjMeta(): IOutputProjectMetadataGenerator {
-    return new MsTestProjMeta(this._projMeta);
+    return new MsTestProjMetaGenerator(this._projMeta);
   }
 
   protected override getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {

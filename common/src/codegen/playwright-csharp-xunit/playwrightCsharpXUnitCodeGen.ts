@@ -14,7 +14,7 @@ import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { ICodeGen } from "../types";
 import { hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
 import { PlaywrightCsharpXUnitTemplatesProvider } from "./playwrightCsharpXUnitTemplatesProvider";
-import { XUnitProjectMeta } from "./xunitProjectMeta";
+import { XUnitProjectMetaGenerator } from "./xunitProjectMetaGenerator";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCsharpCodeGen";
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
@@ -31,7 +31,7 @@ export class PlaywrightCsharpXUnitCodeGen extends PlaywrightCsharpCodeGen implem
   }
 
   protected override getOutProjMeta(): IOutputProjectMetadataGenerator {
-    return new XUnitProjectMeta(this._projMeta);
+    return new XUnitProjectMetaGenerator(this._projMeta);
   }
 
   protected override getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {
