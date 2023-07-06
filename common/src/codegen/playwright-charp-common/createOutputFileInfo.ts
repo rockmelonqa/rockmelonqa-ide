@@ -145,8 +145,8 @@ export class OutputFileInfoBuilderTypeScript implements IOutputFileInfoBuilder {
     const outputFileName = outputFileClassName + outputFileExt;
     const outputFileSubNamespace = namespaceSegments.length ? namespaceSegments.join("/") : "";
     const outputFileFullNamespace = outputFileSubNamespace
-      ? `~/pages/${outputFileSubNamespace}/${outputFileClassName}`
-      : `~/pages/${outputFileClassName}`;
+      ? `~/${standardOutputFolder}/${outputFileSubNamespace}/${outputFileClassName}`
+      : `~/${standardOutputFolder}/${outputFileClassName}`;
     let outputFilePath = path.join(outputContainerFolder, nameSegments.join(path.sep) + outputFileExt);
     const outputFileRelPath = outputFilePath.replace(outputCodeDir, "").substring(1);
 

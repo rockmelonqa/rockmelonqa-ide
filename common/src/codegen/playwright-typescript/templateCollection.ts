@@ -14,6 +14,8 @@ export class JestTemplateCollection {
   public PLAYWRIGHT_CONFIG_FILE: HandlebarsTemplateDelegate<any>;
   public TEST_CASE_BASE_FILE: HandlebarsTemplateDelegate<any>;
   public TEST_CASE_FILE: HandlebarsTemplateDelegate<any>;
+  public TEST_FUNCTION: HandlebarsTemplateDelegate<any>;
+  public TEST_SUITE_FILE: HandlebarsTemplateDelegate<any>;
   public TS_CONFIG_FILE: HandlebarsTemplateDelegate<any>;
 
   constructor(templatesDir: string, customTemplatesDir: string, fileExtension: string) {
@@ -31,6 +33,8 @@ export class JestTemplateCollection {
     this.PLAYWRIGHT_CONFIG_FILE = loadAndCompile("playwright-config");
     this.TEST_CASE_BASE_FILE = loadAndCompile("test-case-base-file");
     this.TEST_CASE_FILE = loadAndCompile("test-case-file");
+    this.TEST_FUNCTION = loadAndCompile("test-function");
+    this.TEST_SUITE_FILE = loadAndCompile("test-suite-file");
     this.TS_CONFIG_FILE = loadAndCompile("ts-config");
   }
 }
