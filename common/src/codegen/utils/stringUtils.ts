@@ -6,7 +6,7 @@ export const escapeStr = (text: string) => {
   return text.replaceAll("\\", "\\\\").replaceAll('"', '\\"');
 };
 
-export const createEenvironmentVariableString = (varName: string) => {
+export const createEnvironmentVariableString = (varName: string) => {
   return `${StandardOutputFile.EnvironmentSettings}.${varName}`;
 };
 

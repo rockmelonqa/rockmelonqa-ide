@@ -197,10 +197,6 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     return this._templateProvider.getPageDefinitions(this._rootNamespace, usings, propertyDeclarations, propertyInits);
   }
 
-  private generateEnvironmentSettingsContent(page: IEnvironmentContent): string {
-    return "";
-  }
-
   private generatePage(page: IPage): string {
     let pageItems = [];
     for (let element of page.elements) {

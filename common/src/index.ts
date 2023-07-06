@@ -43,7 +43,6 @@ import {
   IRenameFileRequest,
   IRunTestRequest,
   IRunTestResponseData,
-  IRunTestSettings,
   IShowHideMenuRequest,
   IWriteFileRequest,
 } from "./ipc-defs";
@@ -74,7 +73,6 @@ export {
   IRmProj,
   IRunTestRequest,
   IRunTestResponseData,
-  IRunTestSettings,
   ISetting,
   IShowHideMenuRequest,
   ISourceProjectMetadata,
