@@ -31,7 +31,8 @@ export default class RunXUnitCommandBuilder implements ICommandBuilder {
     const settingXml = convert.json2xml(settingJson, XML_OPTIONS);
     fs.writeFileSync(path.join(settings.sourceCodeFolderPath, StandardOutputFile.RunSettings), settingXml);
 
-    const filterStr = settings.filter ? `--filter "${settings.filter}"` : '';
+    const filter = settings.testCases.map(x => x.fullyQualifiedName).join("|");
+    const filterStr = filter ? `--filter "${filter}"` : '';
     const testResultFileRelPath = path.join(settings.testResultFolderRelPath, settings.testResultFileName);
 
     commands.push(`dotnet test ${filterStr} -l:"trx;LogFileName=${`..${path.sep}..${path.sep}${testResultFileRelPath}`}"`);

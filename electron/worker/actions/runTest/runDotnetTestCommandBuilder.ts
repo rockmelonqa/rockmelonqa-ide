@@ -26,7 +26,8 @@ export default class RunDotnetTestCommandBuilder implements ICommandBuilder {
       commands.push(invokeFileCmd);
     }
 
-    const filterStr = settings.filter ? `--filter "${settings.filter}"` : '';
+    const filter = settings.testCases.map(x => x.fullyQualifiedName).join("|");
+    const filterStr = filter ? `--filter "${filter}"` : '';
     const testResultFileRelPath = path.join(settings.testResultFolderRelPath, settings.testResultFileName);
     const browserStr = settings.browser
       ? `Playwright.BrowserName=${settings.browser}`
