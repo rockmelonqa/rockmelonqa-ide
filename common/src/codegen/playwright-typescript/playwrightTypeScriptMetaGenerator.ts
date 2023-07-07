@@ -119,7 +119,7 @@ export class PlaywrightTypeScriptProjMetaGenerator implements IOutputProjectMeta
 
           let caseInfo: ITestCaseInfo = {
             name: caseMeta.outputFileClassName,
-            fullyQualifiedName: `${suiteMeta.outputFileFullNamespace}.${suiteMeta.outputFileClassName}.${caseMeta.outputFileClassName}`,
+            fullyQualifiedName: `${suiteMeta.outputFileFullNamespace}.${caseMeta.outputFileClassName}`,
             inputFileName: caseMeta.inputFileName,
             inputFilePath: caseMeta.inputFilePath,
             inputFileRelPath: caseMeta.inputFileRelPath,
@@ -127,6 +127,7 @@ export class PlaywrightTypeScriptProjMetaGenerator implements IOutputProjectMeta
             outputFilePath: caseMeta.outputFilePath,
             outputFileRelPath: caseMeta.outputFileRelPath,
             isValid: caseMeta.isValid,
+            constainerSuiteFileRelPath: suiteInfo.outputFileRelPath,
             lineNumber,
           };
           return caseInfo;
@@ -152,6 +153,7 @@ export class PlaywrightTypeScriptProjMetaGenerator implements IOutputProjectMeta
         outputFileName: caseMeta.outputFileName,
         outputFilePath: caseMeta.outputFilePath,
         outputFileRelPath: caseMeta.outputFileRelPath,
+        constainerSuiteFileRelPath: "",
         isValid: caseMeta.isValid,
       };
       cases.push(caseInfo);

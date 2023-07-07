@@ -101,6 +101,7 @@ export class DotnetTestProjectMetaGenerator {
             outputFileName: caseMeta.outputFileName,
             outputFilePath: caseMeta.outputFilePath,
             outputFileRelPath: caseMeta.outputFileRelPath,
+            constainerSuiteFileRelPath: suiteInfo.outputFileRelPath,
             isValid: caseMeta.isValid,
           };
           return caseInfo;
@@ -122,6 +123,7 @@ export class DotnetTestProjectMetaGenerator {
         outputFileName: caseMeta.outputFileName,
         outputFilePath: caseMeta.outputFilePath,
         outputFileRelPath: caseMeta.outputFileRelPath,
+        constainerSuiteFileRelPath: "",
         isValid: caseMeta.isValid,
       };
       cases.push(caseInfo);

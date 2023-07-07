@@ -63,6 +63,7 @@ export interface ITestCaseInfo {
   outputFilePath: string;
   outputFileRelPath: string;
   isValid: boolean;
+  constainerSuiteFileRelPath: string;
   lineNumber?: number;
 }
 
