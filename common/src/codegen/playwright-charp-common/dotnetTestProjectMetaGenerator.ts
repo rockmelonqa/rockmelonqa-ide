@@ -1,5 +1,4 @@
-import { ITestSuite } from "rockmelonqa.common";
-import { ISourceProjectMetadata, ITestCase, ITestRoutine } from "../../file-defs";
+import { ISourceProjectMetadata, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
 import {
   IEnvironmentFileInfo,
