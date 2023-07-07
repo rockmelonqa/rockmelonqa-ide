@@ -1,6 +1,6 @@
 import { StandardOutputFile } from "../../../file-defs";
 import { ActionDataType, IActionTemplateParam } from "../../types";
-import { createEenvironmentVariableString, escapeStr, getParameters } from "../../utils/stringUtils";
+import { createEnvironmentVariableString, escapeStr, getParameters } from "../../utils/stringUtils";
 
 const getValuesFromDataString = (dataString: string) => {
   let temp = dataString.split("=");

@@ -1,8 +1,8 @@
-import { IRunTestSettings } from "rockmelonqa.common/ipc-defs/testRunner";
 import { ICommandBuilder } from "./commandBuilder";
 import RunDotnetTestCommandBuilder from "./runDotnetTestCommandBuilder";
 import { IInvokeEnvironmentFileCmdBuilder, UnixInvokeEnvironmentFileCmdBuilder, WindowsInvokeEnvironmentFileCmdBuilder } from "./invokeEnvironmentFileCmdBuilder";
 import { Platform } from "rockmelonqa.common/file-defs";
+import { IRunTestSettings } from "../runTest";
 
 export default class RunMsTestCommandBuilder implements ICommandBuilder {
   private readonly invokeEnvironmentFileCmdBuilder: IInvokeEnvironmentFileCmdBuilder
@@ -11,8 +11,8 @@ export default class RunMsTestCommandBuilder implements ICommandBuilder {
     this.invokeEnvironmentFileCmdBuilder = Platform.IsWindows() ? new WindowsInvokeEnvironmentFileCmdBuilder() : new UnixInvokeEnvironmentFileCmdBuilder()
   }
   
-  build(settings: IRunTestSettings, resultFilePath: string) {
-    let cmd = new RunDotnetTestCommandBuilder(this.invokeEnvironmentFileCmdBuilder).build(settings, resultFilePath);
+  build(settings: IRunTestSettings) {
+    let cmd = new RunDotnetTestCommandBuilder(this.invokeEnvironmentFileCmdBuilder).build(settings);
     return cmd;
   }
 }

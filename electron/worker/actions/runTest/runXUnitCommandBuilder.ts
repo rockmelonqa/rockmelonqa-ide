@@ -21,7 +21,7 @@ export default class RunXUnitCommandBuilder implements ICommandBuilder {
       : new UnixInvokeEnvironmentFileCmdBuilder();
   }
 
-  build(settings: IRunTestSettings, resultFilePath: string) {
+  build(settings: IRunTestSettings) {
     const commands = [];
 
     if (settings.environmentFile) {
@@ -34,11 +34,13 @@ export default class RunXUnitCommandBuilder implements ICommandBuilder {
     runSettingsFile.RunSettings.Playwright.BrowserName = settings.browser;
     const settingJson = JSON.stringify(runSettingsFile);
     const settingXml = convert.json2xml(settingJson, XML_OPTIONS);
-    fs.writeFileSync(path.join(settings.outputCodeDir, StandardOutputFile.RunSettings), settingXml);
+    fs.writeFileSync(path.join(settings.sourceCodeFolderPath, StandardOutputFile.RunSettings), settingXml);
 
-    const filterStr = settings.dotnetFilterStr ? `--filter "${settings.dotnetFilterStr}"` : "";
+    const filter = settings.testCases.map(x => x.fullyQualifiedName).join("|");
+    const filterStr = filter ? `--filter "${filter}"` : '';
+    const testResultFileRelPath = path.join(settings.testResultFolderRelPath, settings.testResultFileName);
 
-    commands.push(`dotnet test ${filterStr} -l:"trx;LogFileName=${`..${path.sep}..${path.sep}${resultFilePath}`}"`);
+    commands.push(`dotnet test ${filterStr} -l:"trx;LogFileName=${`..${path.sep}..${path.sep}${testResultFileRelPath}`}"`);
 
     const cmd = commands.join(" && ");
 

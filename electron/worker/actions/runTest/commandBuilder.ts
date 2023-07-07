@@ -6,7 +6,7 @@ import RunMsTestCommandBuilder from "./runMsTestCommandBuilder";
 import RunPlaywrightCommandBuilder from "./runPlaywrightCommandBuilder";
 
 export interface ICommandBuilder {
-  build: (settings: IRunTestSettings, resultFilePath: string) => string;
+    build: (settings: IRunTestSettings) => string;
 }
 
 export class CommandBuilderFactory {
