@@ -1,18 +1,18 @@
-import { profile } from 'console';
-import { BrowserWindow } from 'electron';
-import fs from 'fs';
-import moment from 'moment';
-import path from 'path';
-import { IIpcGenericResponse, IProgressDetail, IProgressEvent, StandardFolder } from 'rockmelonqa.common';
-import { IRmProjFile, Language, StandardOutputFile } from 'rockmelonqa.common/file-defs';
-import { IRunTestRequest, IRunTestResponseData } from 'rockmelonqa.common/ipc-defs';
-import * as fileSystem from '../utils/fileSystem';
-import { StringBuilder } from '../utils/stringBuilder';
-import { IRunTestActionResult, IRunTestContext, runTest as runTestInWorker } from '../worker/actions/runTest';
-import { IChannels } from './core/channelsInterface';
-import IPC from './core/ipc';
+import { profile } from "console";
+import { BrowserWindow } from "electron";
+import fs from "fs";
+import moment from "moment";
+import path from "path";
+import { IIpcGenericResponse, IProgressDetail, IProgressEvent, StandardFolder } from "rockmelonqa.common";
+import { IRmProjFile, Language, StandardOutputFile } from "rockmelonqa.common/file-defs";
+import { IRunTestContext, IRunTestRequest, IRunTestResponseData } from "rockmelonqa.common/ipc-defs";
+import * as fileSystem from "../utils/fileSystem";
+import { StringBuilder } from "../utils/stringBuilder";
+import { IRunTestActionResult, runTest as runTestInWorker } from "../worker/actions/runTest";
+import { IChannels } from "./core/channelsInterface";
+import IPC from "./core/ipc";
 
-const nameAPI = 'testRunner';
+const nameAPI = "testRunner";
 
 // to Main
 const validSendChannel: IChannels = { runTest: runTest };
@@ -20,7 +20,7 @@ const validSendChannel: IChannels = { runTest: runTest };
 const validInvokeChannel: IChannels = {};
 
 // from Main
-const validReceiveChannel: string[] = ['running-test', 'finish'];
+const validReceiveChannel: string[] = ["running-test", "finish"];
 
 const testRunner = new IPC({
   nameAPI,
@@ -37,11 +37,11 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
     rmProjFile: projFile,
     settings: {
       sourceCodeFolderPath: path.join(projFile.folderPath, StandardFolder.OutputCode),
-      testResultFolderRelPath: path.join(StandardFolder.TestRuns, moment().format('YYYYMMDD_HHmmss')),
+      testResultFolderRelPath: path.join(StandardFolder.TestRuns, moment().format("YYYYMMDD_HHmmss")),
       testResultFileName: toTestResultFileName(projFile),
       browser,
       environmentFile,
-      testCases
+      testCases,
     },
   };
 
@@ -56,8 +56,9 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
     // Copy .code-metadata file to test run folder of this run
     console.log("Copy '.code-metadata' file to test-result folder");
     fs.copyFileSync(
-      path.join(context.settings.sourceCodeFolderPath, StandardOutputFile.MetaData), 
-      path.join(projFile.folderPath, context.settings.testResultFolderRelPath, StandardOutputFile.MetaData));    
+      path.join(context.settings.sourceCodeFolderPath, StandardOutputFile.MetaData),
+      path.join(projFile.folderPath, context.settings.testResultFolderRelPath, StandardOutputFile.MetaData)
+    );
 
     actionRs = await runTestInWorker(context, (event: IProgressEvent) => {
       const { type, ...details } = event;
@@ -73,23 +74,28 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
     actionRs = { isSuccess: false, errorMessage: String(error) };
   }
 
-  console.log('Finish runTest', actionRs);
+  console.log("Finish runTest", actionRs);
 
   const ipcRs: IIpcGenericResponse<IRunTestResponseData> = {
     isSuccess: actionRs.isSuccess,
     errorMessage: actionRs.errorMessage,
     data: {
       storageFolder: context.settings.testResultFolderRelPath,
-      resultFileName: await hasTestResultFile(path.join(
-        context.rmProjFile.folderPath,
-        context.settings.testResultFolderRelPath,
-        context.settings.testResultFileName)) ? context.settings.testResultFileName : undefined,
+      resultFileName: (await hasTestResultFile(
+        path.join(
+          context.rmProjFile.folderPath,
+          context.settings.testResultFolderRelPath,
+          context.settings.testResultFileName
+        )
+      ))
+        ? context.settings.testResultFileName
+        : undefined,
     },
   };
 
   // Print log file
   try {
-    sb.appendLine(`*** Finish at ${moment().format('MMMM Do YYYY, h:mm:ss a')}`);
+    sb.appendLine(`*** Finish at ${moment().format("MMMM Do YYYY, h:mm:ss a")}`);
     sb.appendLine(JSON.stringify(ipcRs, null, 4));
 
     const logFileName = `run-test.log`;
@@ -98,22 +104,22 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
 
     ipcRs.data = { ...ipcRs.data, logFileName: logFileName } as IRunTestResponseData;
   } finally {
-    browserWindow.webContents.send('finish', ipcRs);
+    browserWindow.webContents.send("finish", ipcRs);
   }
 }
 
 const toTestResultFileName = (rmProjFile: IRmProjFile) => {
   const { language } = rmProjFile.content;
   switch (language) {
-      case Language.CSharp:
-          return 'test-result.trx';
-      case Language.Typescript:
-          return 'test-result.json';
-      default:
-          throw new Error('Language not supported: ' + language);
+    case Language.CSharp:
+      return "test-result.trx";
+    case Language.Typescript:
+      return "test-result.json";
+    default:
+      throw new Error("Language not supported: " + language);
   }
 };
 
 const hasTestResultFile = async (testResultFileRelPath: string) => {
   return await fileSystem.checkExists(testResultFileRelPath);
-}
+};

@@ -25,7 +25,7 @@ export default class RunPlaywrightCommandBuilder implements ICommandBuilder {
       : new UnixInvokeEnvironmentFileCmdBuilder();
   }
 
-  build(settings: IRunTestSettings, resultFilePath: string) {
+  build(settings: IRunTestSettings) {
     const commands = [];
 
     if (settings.environmentFile) {

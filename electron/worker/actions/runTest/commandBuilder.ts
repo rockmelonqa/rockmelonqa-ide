@@ -1,12 +1,12 @@
 import { Language, TestFramework } from "rockmelonqa.common/file-defs/rmProjFile";
-import { IRunTestSettings } from "rockmelonqa.common/ipc-defs/testRunner";
 import RunNunitCommandBuilder from "./runNunitCommandBuilder";
 import RunXUnitCommandBuilder from "./runXUnitCommandBuilder";
 import RunMsTestCommandBuilder from "./runMsTestCommandBuilder";
 import RunPlaywrightCommandBuilder from "./runPlaywrightCommandBuilder";
+import { IRunTestSettings } from "rockmelonqa.common/ipc-defs";
 
 export interface ICommandBuilder {
-    build: (settings: IRunTestSettings) => string;
+  build: (settings: IRunTestSettings) => string;
 }
 
 export class CommandBuilderFactory {
