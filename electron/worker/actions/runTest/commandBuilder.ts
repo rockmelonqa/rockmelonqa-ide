@@ -3,6 +3,7 @@ import { IRunTestSettings } from "rockmelonqa.common/ipc-defs/testRunner";
 import RunNunitCommandBuilder from "./runNunitCommandBuilder";
 import RunXUnitCommandBuilder from "./runXUnitCommandBuilder";
 import RunMsTestCommandBuilder from "./runMsTestCommandBuilder";
+import RunPlaywrightCommandBuilder from "./runPlaywrightCommandBuilder";
 
 export interface ICommandBuilder {
   build: (settings: IRunTestSettings, resultFilePath: string) => string;
@@ -20,6 +21,10 @@ export class CommandBuilderFactory {
       if (testFramework === TestFramework.xUnit) {
         return new RunXUnitCommandBuilder();
       }
+    }
+
+    if (language === Language.Typescript) {
+      return new RunPlaywrightCommandBuilder();
     }
     throw new Error(`Cannot create command builder for Language ${language} and Test Framework ${testFramework}`);
   }
