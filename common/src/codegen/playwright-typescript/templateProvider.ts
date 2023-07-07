@@ -94,7 +94,9 @@ export class PlaywrightTypescriptTemplateProvider {
   getTestCaseFile(testCaseName: string, description: string, body: string) {
     return this._templateCollection.TEST_CASE_FILE({ testCaseName, description, body });
   }
-
+  getTestSuiteFile(imports: string, name: string, description: string, body: string) {
+    return this._templateCollection.TEST_SUITE_FILE({ imports, name, description, body });
+  }
   getPageDefinitions(pageImports: string, pageDeclarations: string, pageAssignments: string) {
     return this._templateCollection.PAGE_DEFINITIONS_FILE({ pageImports, pageDeclarations, pageAssignments });
   }
@@ -115,6 +117,10 @@ export class PlaywrightTypescriptTemplateProvider {
 
   getPage(pageDescription: string | undefined, pageBody: string) {
     return this._templateCollection.PAGE_FILE({ pageDescription, pageBody });
+  }
+
+  getTestFunction(name: string, description: string) {
+    return this._templateCollection.TEST_FUNCTION({ name, description });
   }
 
   getComment(message: string) {

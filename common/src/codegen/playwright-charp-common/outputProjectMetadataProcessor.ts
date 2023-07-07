@@ -18,7 +18,7 @@ import { IOutputFileInfoBuilder, OutputFileInfoBuilderFactory, createOutputFileI
 import { Platform } from "../../file-defs/platform";
 
 /** For generating output project metadata */
-export interface IOutputProjectMetadataProcessor {
+export interface IOutputProjectMetadataGenerator {
   createOutputProjectMetadata: () => IOutputProjectMetadata;
   get: (guid: string) => IOutputFileInfo;
 }

@@ -14,12 +14,12 @@ import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { ICodeGen, WriteFileFn } from "../types";
 import { hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
-import { MsTestProjMeta } from "./msTestProjMeta";
+import { MsTestProjMetaGenerator } from "./msTestProjMetaGenerator";
 import { PlaywrightCsharpMsTestTemplatesProvider } from "./playwrightCsharpMsTestTemplatesProvider";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfos";
 import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCsharpCodeGen";
-import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
+import { IOutputProjectMetadataGenerator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
 import { addIndent } from "../utils/codegenUtils";
@@ -32,8 +32,8 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     super(projMeta);
   }
 
-  protected override getOutProjMeta(): IOutputProjectMetadataProcessor {
-    return new MsTestProjMeta(this._projMeta);
+  protected override getOutProjMeta(): IOutputProjectMetadataGenerator {
+    return new MsTestProjMetaGenerator(this._projMeta);
   }
 
   protected override getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {

@@ -1,6 +1,7 @@
 /* eslint-disable no-debugger */
-import { get, writable, type Readable } from 'svelte/store';
-import { NodeType, type NodeInfo } from './NodeInfo';
+import { get, writable, type Readable } from "svelte/store";
+import { NodeType, type NodeInfo } from "./NodeInfo";
+import { Language } from "rockmelonqa.common";
 
 export interface ITestExplorerState {
     nodes: NodeInfo[];
@@ -14,9 +15,9 @@ const initialState: ITestExplorerState = {
  * Actions supported
  */
 export enum TestExplorerActionType {
-    Load = 'Load',
-    SelectAllNode = 'SelectAllNode',
-    SelectNode = 'SelectNode',
+    Load = "Load",
+    SelectAllNode = "SelectAllNode",
+    SelectNode = "SelectNode",
 }
 
 /**

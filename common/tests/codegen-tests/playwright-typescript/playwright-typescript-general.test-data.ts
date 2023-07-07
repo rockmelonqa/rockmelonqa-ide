@@ -343,6 +343,22 @@ export const createTestDataGeneral = (): RmpSpec => {
     testcases: [
       {
         id: "",
+        name: "Rooms/LivingRoom",
+        description: "",
+        steps: [
+          {
+            id: "",
+            type: "testStep",
+            page: "",
+            element: "",
+            action: "GoToUrl",
+            // Chechkout repo https://dev.azure.com/zapcentral/zap-forks/_git/playwright-test-pages and run the local website
+            data: "http://localhost:3000/routines/kitchen-sink.html",
+          },
+        ],
+      },
+      {
+        id: "",
         name: "KichenSink",
         description: "Contains everything possible",
         steps: [
@@ -492,14 +508,14 @@ export const createTestDataGeneral = (): RmpSpec => {
             action: "VerifyUrl",
             data: "http://localhost:3000/kitchen-sink.html",
           },
-          // {
-          //   id: "",
-          //   type: "testStep",
-          //   page: "",
-          //   element: "",
-          //   action: "VerifyUrlContains",
-          //   data: "kitchen-sink",
-          // },
+          {
+            id: "",
+            type: "testStep",
+            page: "",
+            element: "",
+            action: "RunTestRoutine",
+            data: "KichenSink",
+          },
         ],
       },
     ],
@@ -516,26 +532,26 @@ export const createTestDataGeneral = (): RmpSpec => {
             element: "name",
             action: "Input",
             data: {
-              "DataSet Number One": "John",
-              "DataSet Number Two": "Jane",
-              "DataSet Number Three": "Jim",
+              "DS One": "John",
+              "DS Two": "Jane",
+              "DS Three": "Jim",
             },
           },
         ],
         dataSets: [
           {
             id: "",
-            name: "DataSet Number One",
+            name: "DS One",
             description: "One One One",
           },
           {
             id: "",
-            name: "DataSet Number Two",
+            name: "DS Two",
             description: "Two Two Two",
           },
           {
             id: "",
-            name: "DataSet Number Three",
+            name: "DS Three",
             description: "Three Three Three",
           },
         ],
@@ -546,7 +562,7 @@ export const createTestDataGeneral = (): RmpSpec => {
         id: "",
         name: "KichenSink",
         description: "Test KichenSink",
-        testcases: ["KichenSink"],
+        testcases: ["KichenSink", "Rooms/LivingRoom"],
       },
     ],
     outputFiles: [],

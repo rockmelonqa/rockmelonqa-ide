@@ -1,6 +1,7 @@
+import fs from "fs";
 import { IEnvironmentContent, ISourceProjectMetadata, ITestCase, ITestRoutine, ITestSuite } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
-import { IOutputProjectMetadataProcessor, MapCreator } from "../playwright-charp-common/outputProjectMetadataProcessor";
+import { IOutputProjectMetadataGenerator, MapCreator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import {
   IEnvironmentFileInfo,
   IOutputFileInfo,
@@ -9,9 +10,11 @@ import {
   ISuiteInfo,
   ITestCaseInfo,
 } from "../types";
+import path from "path";
+import { EOL } from "os";
 
 /** PlaywrightTypeScriptProjMeta project meta: Contains info of all files and other resources */
-export class PlaywrightTypeScriptProjMeta implements IOutputProjectMetadataProcessor {
+export class PlaywrightTypeScriptProjMetaGenerator implements IOutputProjectMetadataGenerator {
   private projMeta: ISourceProjectMetadata;
 
   public readonly pageMetaMap: Map<IPage, IOutputFileInfo> = new Map<IPage, IOutputFileInfo>();
@@ -89,6 +92,8 @@ export class PlaywrightTypeScriptProjMeta implements IOutputProjectMetadataProce
     for (let { content: testsuite } of this.projMeta.testSuites) {
       let testCases = this.projMeta.testCases.filter((c) => testsuite.testcases.includes(c.content.id));
       let suiteMeta = this.suiteMetaMap.get(testsuite)!;
+      let suiteRaw = fs.readFileSync(suiteMeta.outputFilePath, "utf-8");
+      let fileLines = suiteRaw.split(/\r?\n/);
 
       let suiteInfo: ISuiteInfo = {
         name: suiteMeta.outputFileClassName,
@@ -102,6 +107,16 @@ export class PlaywrightTypeScriptProjMeta implements IOutputProjectMetadataProce
         isValid: suiteMeta.isValid,
         testCases: testCases.map((tc) => {
           let caseMeta = this.caseMetaMap.get(tc.content)!;
+          let caseFuntionStartWith = `test("${caseMeta.outputFileClassName}",`;
+
+          let lineNumber = 0;
+          for (const [index, value] of fileLines.entries()) {
+            if (value.startsWith(caseFuntionStartWith)) {
+              lineNumber = index + 1;
+              break;
+            }
+          }
+
           let caseInfo: ITestCaseInfo = {
             name: caseMeta.outputFileClassName,
             fullyQualifiedName: `${suiteMeta.outputFileFullNamespace}.${suiteMeta.outputFileClassName}.${caseMeta.outputFileClassName}`,
@@ -112,6 +127,7 @@ export class PlaywrightTypeScriptProjMeta implements IOutputProjectMetadataProce
             outputFilePath: caseMeta.outputFilePath,
             outputFileRelPath: caseMeta.outputFileRelPath,
             isValid: caseMeta.isValid,
+            lineNumber,
           };
           return caseInfo;
         }),

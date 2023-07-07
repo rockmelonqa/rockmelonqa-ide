@@ -34,6 +34,7 @@
     import { createTestExplorerContext, TestExplorerActionType } from "./TestExplorerContext";
     import TestExplorerContext from "./TestExplorerContext.svelte";
     import type { IDropdownOption } from "$lib/controls/DropdownField";
+    import { TestFilterBuilderFactory } from "$lib/utils/filterBuilder/testFilterBuilderFactory";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -210,7 +211,7 @@
         allowRunTest = false;
 
         // TODO: build filter based on Language and Framework
-        const filter = buildDotnetFilter();
+        const filter = buildTestFilter();
 
         if (filter) {
             const serializer = new FormSerializer(uiContext);
@@ -224,17 +225,19 @@
                     outputCodeDir: "",
                 },
             });
-        } else {
-            showWarning = true;
-
-            allowRunTest = true;
-            isProcessing = false;
+            return;
         }
+
+        showWarning = true;
+        allowRunTest = true;
+        isProcessing = false;
     };
 
-    const buildDotnetFilter = (): string => {
+    const buildTestFilter = (): string => {
+        const filterBuilder = TestFilterBuilderFactory.newInstance($appState.projectFile!.content.language, uiContext);
         const selectedCases = findSelectedCases($testExplorerState.nodes);
-        return selectedCases.map((node) => node.caseInfo!.fullyQualifiedName).join("|");
+        const filterStr = filterBuilder.build(selectedCases);
+        return filterStr;
     };
 
     function findSelectedCases(nodes: NodeInfo[]): NodeInfo[] {

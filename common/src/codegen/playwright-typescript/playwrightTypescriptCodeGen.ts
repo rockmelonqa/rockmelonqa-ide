@@ -19,8 +19,8 @@ import { DataSetCollection, IDataSetInfo } from "../playwright-charp-common/data
 import { CodeGenBase } from "../codegen-common/codeGenBase";
 import { upperCaseFirstChar } from "../utils/stringUtils";
 import { EOL } from "os";
-import { PlaywrightTypeScriptProjMeta } from "./playwrightTypeScriptMeta";
-import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
+import { PlaywrightTypeScriptProjMetaGenerator } from "./playwrightTypeScriptMetaGenerator";
+import { IOutputProjectMetadataGenerator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { createCleanName } from "../utils/createName";
 import { ITestStepComment } from "../../file-defs/shared";
 import { addIndent } from "../utils/codegenUtils";
@@ -28,7 +28,7 @@ import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
 
 export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen {
   _templateProvider: PlaywrightTypescriptTemplateProvider;
-  _outProjMeta: IOutputProjectMetadataProcessor;
+  _outProjMeta: IOutputProjectMetadataGenerator;
 
   constructor(projMeta: ISourceProjectMetadata) {
     super(projMeta);
@@ -39,8 +39,8 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
     this._outProjMeta = this.getOutProjMeta();
   }
 
-  protected getOutProjMeta(): IOutputProjectMetadataProcessor {
-    return new PlaywrightTypeScriptProjMeta(this._projMeta);
+  protected getOutProjMeta(): IOutputProjectMetadataGenerator {
+    return new PlaywrightTypeScriptProjMetaGenerator(this._projMeta);
   }
 
   /** Generate Playwright Typescript project */
@@ -115,7 +115,17 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
     await writeFile(`${StandardOutputFile.TsConfig}`, this._templateProvider.getTsConfigFile());
   }
 
-  private async generateSuiteFiles(writeFile: WriteFileFn) {}
+  private async generateSuiteFiles(writeFile: WriteFileFn) {
+    // Filename: TestSuites/{TestClassName}.cs
+    for (let testSuite of this._projMeta.testSuites) {
+      let fileRelPath = this._outProjMeta.get(testSuite.content.id)!.outputFileRelPath;
+      let classContent = this.generateTestSuiteFile(
+        testSuite.content,
+        this._projMeta.testCases.map((tcFile) => tcFile.content)
+      );
+      await writeFile(fileRelPath, classContent);
+    }
+  }
 
   private async generatePageFiles(writeFile: WriteFileFn) {
     for (let page of this._projMeta.pages) {
@@ -210,7 +220,39 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
     return this._templateProvider.getPage(page.description || "", pageBody);
   }
 
-  private generateTestSuiteFile(testSuite: ITestSuite, testcases: ITestCase[]) {}
+  private generateTestSuiteFile(testSuite: ITestSuite, testcases: ITestCase[]) {
+    const testcaseMethods: string[] = [];
+    const importStatements: string[] = [];
+
+    for (let testcaseId of testSuite.testcases) {
+      let testcase = testcases.find((tc) => tc.id === testcaseId);
+      if (!testcase) {
+        throw new Error("DEV ERROR: cannot find testcase with id: " + testcaseId);
+      }
+      let testCaseFileMeta = this._outProjMeta.get(testcase.id)!;
+
+      let fullNamespace = testCaseFileMeta.outputFileFullNamespace;
+      let className = testCaseFileMeta.outputFileClassName;
+
+      let usingDirective = `import ${className} from "${fullNamespace}";`;
+      if (!importStatements.includes(usingDirective)) {
+        importStatements.push(usingDirective);
+      }
+
+      let testcaseFunction = this.generateTestCaseFunction(testcase);
+      testcaseMethods.push(testcaseFunction);
+    }
+    let imports = importStatements.join(EOL);
+    let classBody = testcaseMethods.join(EOL + EOL);
+
+    let testClass = this._templateProvider.getTestSuiteFile(
+      imports,
+      this._outProjMeta.get(testSuite.id)!.outputFileClassName,
+      testSuite.description,
+      classBody
+    );
+    return testClass;
+  }
 
   private generateTestRoutineFile(testRoutine: ITestRoutine, testRoutineClasses: string[]) {}
 
@@ -342,5 +384,9 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
     return this._templateProvider.getComment(step.comment!);
   }
 
-  private generateTestCaseFunction(testCase: ITestCase) {}
+  private generateTestCaseFunction(testCase: ITestCase) {
+    const testcaseName = this._outProjMeta.get(testCase.id)!.outputFileClassName;
+    const testCaseMethod = this._templateProvider.getTestFunction(testcaseName, testCase.description);
+    return testCaseMethod;
+  }
 }
