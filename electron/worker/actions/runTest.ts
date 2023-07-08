@@ -7,7 +7,12 @@ import * as fileSystem from "../../utils/fileSystem";
 import { WorkerAction, WorkerMessage } from "../worker";
 import { executeCommand, IGenericActionResult } from "./shared";
 import { CommandBuilderFactory } from "./runTest/commandBuilder";
-import { Browser } from "rockmelonqa.common/file-defs";
+import {
+  Browser,
+  StandardFolder,
+  StandardOutputFolder,
+  StandardOutputFolderTypeScript,
+} from "rockmelonqa.common/file-defs";
 import { ITestCaseInfo } from "rockmelonqa.common/codegen/types";
 import { IRunTestContext } from "rockmelonqa.common/ipc-defs";
 
@@ -51,6 +56,22 @@ export const doRunTest = async (port: MessagePort | null, context: IRunTestConte
   postMessage(port, { type: "running-test", log: `Executing: '${cmd}'` });
   const rs = executeCommand(cmd, { cwd: settings.sourceCodeFolderPath });
   postMessage(port, { type: "running-test", log: rs.output });
+
+  if (context.rmProjFile.content.language === Language.Typescript) {
+    const playwrightReportFile = path.join(
+      context.rmProjFile.folderPath,
+      StandardFolder.OutputCode,
+      StandardOutputFolderTypeScript.PlaywrightReport,
+      "index.html"
+    );
+    // Copy test result file to "test-runs" folder
+    const runResultFilePath = path.join(
+      context.rmProjFile.folderPath,
+      context.settings.testResultFolderRelPath,
+      `test-run-result.html`
+    );
+    await fileSystem.copyFile(playwrightReportFile, runResultFilePath);
+  }
 
   postMessage(port, { type: "finish" });
 };
