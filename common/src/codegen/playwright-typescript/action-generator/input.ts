@@ -10,5 +10,5 @@ export default (params: IActionTemplateParam) => {
       ? `"${escapeStr(String(params.data.rawData))}"`
       : createEnvironmentVariableString(String(params.data.rawData));
 
-  return `await defs.${pageName}.${elementName}().FillAsync(${data});`;
+  return `await defs.${pageName}.${elementName}().fill(${data});`;
 };

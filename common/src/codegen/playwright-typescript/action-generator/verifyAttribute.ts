@@ -20,7 +20,7 @@ export default (params: IActionTemplateParam) => {
     )}\", \"${attributeValue}\");`;
   }
 
-  const data = `${StandardOutputFile.EnvironmentSettings}.${params.data.rawData}.Split("=").ElementAtOrDefault(0) ?? "", ${StandardOutputFile.EnvironmentSettings}.${params.data.rawData}.Split("=").ElementAtOrDefault(1) ?? ""`;
+  const data = `${StandardOutputFile.EnvironmentSettings}.${params.data.rawData}.split("=")[0] ?? "", ${StandardOutputFile.EnvironmentSettings}.${params.data.rawData}.split("=")[1] ?? ""`;
 
   return `await expect(defs.${pageName}.${elementName}()).toHaveAttribute(${data});`;
 };

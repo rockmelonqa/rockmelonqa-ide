@@ -54,6 +54,10 @@ export const createTestDataGeneral = (): RmpSpec => {
             name: "Attr",
             value: "name=Test",
           },
+          {
+            name: "MyMessage",
+            value: "hello world",
+          },
         ],
       },
       {
@@ -401,7 +405,7 @@ export const createTestDataGeneral = (): RmpSpec => {
             page: "",
             element: "",
             action: "Delay",
-            data: "200",
+            data: "{DelayMs}",
           },
           {
             id: "",
@@ -409,7 +413,7 @@ export const createTestDataGeneral = (): RmpSpec => {
             page: "KitchenSinkScreen",
             element: "input",
             action: "Input",
-            data: "Hello World",
+            data: "{MyMessage}",
           },
           {
             id: "",
@@ -442,6 +446,14 @@ export const createTestDataGeneral = (): RmpSpec => {
             element: "verifyAttribute",
             action: "VerifyAttribute",
             data: "my-o-attr=value",
+          },
+          {
+            id: "",
+            type: "testStep",
+            page: "KitchenSinkScreen",
+            element: "verifyAttribute",
+            action: "VerifyAttribute",
+            data: "{Attr}",
           },
           {
             id: "",
