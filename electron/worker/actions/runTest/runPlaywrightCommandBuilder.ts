@@ -15,6 +15,7 @@ import {
   UnixInvokeEnvironmentFileCmdBuilder,
   WindowsInvokeEnvironmentFileCmdBuilder,
 } from "./invokeEnvironmentFileCmdBuilder";
+import { ITestCaseInfo } from "rockmelonqa.common/codegen/types";
 
 export default class RunPlaywrightCommandBuilder implements ICommandBuilder {
   private readonly invokeEnvironmentFileCmdBuilder: IInvokeEnvironmentFileCmdBuilder;
@@ -23,6 +24,23 @@ export default class RunPlaywrightCommandBuilder implements ICommandBuilder {
     this.invokeEnvironmentFileCmdBuilder = Platform.IsWindows()
       ? new WindowsInvokeEnvironmentFileCmdBuilder()
       : new UnixInvokeEnvironmentFileCmdBuilder();
+  }
+
+  private buildFilter(testCases: ITestCaseInfo[]): string {
+    const individualTestCaseFilters: string[] = [];
+    for (const testCaseInfo of testCases) {
+      if (!testCaseInfo.lineNumber) {
+        continue;
+      }
+      if (!testCaseInfo.constainerSuiteFileRelPath) {
+        continue;
+      }
+
+      const testSuiteRelPath = testCaseInfo.constainerSuiteFileRelPath.split(path.sep).join("/");
+      const testCaseFilter = `${testSuiteRelPath}:${testCaseInfo.lineNumber}`;
+      individualTestCaseFilters.push(testCaseFilter);
+    }
+    return individualTestCaseFilters.join(" ");
   }
 
   build(settings: IRunTestSettings) {
@@ -40,7 +58,7 @@ export default class RunPlaywrightCommandBuilder implements ICommandBuilder {
       commands.push(invokeFileCmd);
     }
 
-    const filterStr = "";
+    const filterStr = this.buildFilter(settings.testCases);
     const browserStr = settings.browser ? `--headed --project=${settings.browser}` : "";
 
     commands.push(
