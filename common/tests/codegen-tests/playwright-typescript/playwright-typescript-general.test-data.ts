@@ -352,8 +352,7 @@ export const createTestDataGeneral = (): RmpSpec => {
             page: "",
             element: "",
             action: "GoToUrl",
-            // Chechkout repo https://dev.azure.com/zapcentral/zap-forks/_git/playwright-test-pages and run the local website
-            data: "http://localhost:3000/routines/kitchen-sink.html",
+            data: "http://localhost:3000/kitchen-sink.html",
           },
         ],
       },
@@ -369,7 +368,7 @@ export const createTestDataGeneral = (): RmpSpec => {
             element: "",
             action: "GoToUrl",
             // Chechkout repo https://dev.azure.com/zapcentral/zap-forks/_git/playwright-test-pages and run the local website
-            data: "http://localhost:3000/routines/kitchen-sink.html",
+            data: "http://localhost:3000/kitchen-sink.html",
           },
           actionClear("KitchenSinkScreen", "clear"),
           {
@@ -518,6 +517,22 @@ export const createTestDataGeneral = (): RmpSpec => {
           },
         ],
       },
+      {
+        id: "",
+        name: "BedRoom",
+        description: "",
+        steps: [
+          {
+            id: "",
+            type: "testStep",
+            page: "",
+            element: "",
+            action: "RunTestRoutine",
+            data: "KichenSink",
+            parameters: ["DS One", "DS Three"],
+          },
+        ],
+      },
     ],
     testroutines: [
       {
@@ -530,11 +545,23 @@ export const createTestDataGeneral = (): RmpSpec => {
             type: "testStep",
             page: "KitchenSinkScreen",
             element: "name",
-            action: "Input",
+            action: "GoToUrl",
             data: {
-              "DS One": "John",
-              "DS Two": "Jane",
-              "DS Three": "Jim",
+              "DS One": "http://localhost:3000/actions/clear.html",
+              "DS Two": "http://localhost:3000/actions/click.html",
+              "DS Three": "http://localhost:3000/actions/input.html",
+            },
+          },
+          {
+            id: "",
+            type: "testStep",
+            page: "KitchenSinkScreen",
+            element: "name",
+            action: "VerifyUrl",
+            data: {
+              "DS One": "Clear",
+              "DS Two": "Click",
+              "DS Three": "Input",
             },
           },
         ],

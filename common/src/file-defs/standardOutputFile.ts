@@ -8,6 +8,7 @@ export class StandardOutputFile {
   static readonly PageDefinitions: string = "PageDefinitions";
   static readonly LocatorHelper: string = "LocatorHelper";
   static readonly TestCaseBase: string = "TestCaseBase";
+  static readonly TestRoutineBase: string = "TestRoutineBase";
   static readonly TestSuiteBase: string = "TestSuiteBase";
   static readonly MetaData: string = ".code-metadata";
 

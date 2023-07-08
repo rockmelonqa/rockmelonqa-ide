@@ -17,7 +17,7 @@ import { ActionDataType, IActionData, ICodeGen, WriteFileFn } from "../types";
 import { PlaywrightTypescriptTemplateProvider } from "./templateProvider";
 import { DataSetCollection, IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import { CodeGenBase } from "../codegen-common/codeGenBase";
-import { upperCaseFirstChar } from "../utils/stringUtils";
+import { lowerCaseFirstChar, upperCaseFirstChar } from "../utils/stringUtils";
 import { EOL } from "os";
 import { PlaywrightTypeScriptProjMetaGenerator } from "./playwrightTypeScriptMetaGenerator";
 import { IOutputProjectMetadataGenerator } from "../playwright-charp-common/outputProjectMetadataProcessor";
@@ -25,6 +25,7 @@ import { createCleanName } from "../utils/createName";
 import { ITestStepComment } from "../../file-defs/shared";
 import { addIndent } from "../utils/codegenUtils";
 import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
+import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfos";
 
 export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen {
   _templateProvider: PlaywrightTypescriptTemplateProvider;
@@ -105,6 +106,10 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
       `${StandardOutputFolderTypeScript.Support}/${StandardOutputFile.PageTest}${this._outputFileExt}`,
       this._templateProvider.getPageTest()
     );
+    await writeFile(
+      `${StandardOutputFolderTypeScript.Support}/${StandardOutputFile.TestRoutineBase}${this._outputFileExt}`,
+      this._templateProvider.getTestRoutineBase()
+    );
 
     await writeFile(
       `${StandardOutputFile.NodePackage}`,
@@ -147,7 +152,26 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
     }
   }
 
-  private async generateRoutineFiles(writeFile: WriteFileFn) {}
+  private async generateRoutineFiles(writeFile: WriteFileFn) {
+    for (let { content: testRoutine } of this._projMeta.testRoutines) {
+      const datasets: IDataSetInfo[] = generateDatasetInfos(testRoutine);
+      const testRoutinesClasses: string[] = [];
+
+      // For each dataset, we generate a separate routine class
+      for (let dataset of datasets) {
+        let testRoutineClass = this.generateTestRoutineClass(
+          testRoutine,
+          this._projMeta.pages.map((p) => p.content),
+          dataset
+        );
+        testRoutinesClasses.push(testRoutineClass);
+      }
+
+      let testRoutineFile = this.generateTestRoutineFile(testRoutinesClasses);
+      let outputFileRelPath = this._outProjMeta.get(testRoutine.id)!.outputFileRelPath;
+      await writeFile(outputFileRelPath, testRoutineFile);
+    }
+  }
 
   private generatePageDefinitions(pages: IPage[]): string {
     let importStatements: string[] = [];
@@ -254,9 +278,83 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
     return testClass;
   }
 
-  private generateTestRoutineFile(testRoutine: ITestRoutine, testRoutineClasses: string[]) {}
+  private generateTestRoutineFile(testRoutineClasses: string[]) {
+    let routineFileContent = this._templateProvider.getTestRoutineFile(testRoutineClasses);
+    return routineFileContent;
+  }
 
-  private generateTestRoutineClass(testRoutine: ITestRoutine, pages: IPage[], datasetInfo: IDataSetInfo) {}
+  private generateTestRoutineClass(testRoutine: ITestRoutine, pages: IPage[], datasetInfo: IDataSetInfo) {
+    const testRoutineBody = this.generateTestRoutineBody(testRoutine, pages, datasetInfo);
+
+    // Output class name will be "{testRoutineClassName}{datasetName}";
+    const testRoutineName = this._outProjMeta.get(testRoutine.id)!.outputFileClassName;
+    const finalOutputClassName = `${testRoutineName}${datasetInfo.name}`;
+
+    let routineFileContent = this._templateProvider.getTestRoutineClass(
+      finalOutputClassName,
+      testRoutine.description,
+      testRoutineBody
+    );
+
+    return routineFileContent;
+  }
+
+  protected generateTestRoutineBody(testRoutine: ITestRoutine, pages: IPage[], datasetInfo: IDataSetInfo) {
+    let stepItems = [];
+    for (let [stepIndex, step] of testRoutine.steps.entries()) {
+      if (step.type === "testStep") {
+        let pageName = "";
+        let elementName = "";
+
+        if (step.page) {
+          let pageId = step.page;
+          let page = pages.find((p) => p.id === pageId);
+          if (!page) {
+            throw new Error("DEV ERROR: " + `Cannot find page with ID ${step.page}`);
+          }
+          pageName = this._outProjMeta.get(page.id)!.outputFileClassName;
+
+          if (step.element) {
+            let elementId = step.element;
+            let element = page.elements.find((e) => e.id === elementId);
+            if (!element) {
+              throw new Error("DEV ERROR: " + `Cannot find element with ID ${elementId} on page ${pageName}`);
+            }
+            elementName = element.name || "";
+          }
+        }
+
+        let actionData = this.getActionData(datasetInfo.values[stepIndex]);
+        stepItems.push(
+          this._templateProvider.getAction({
+            pageName: pageName,
+            elementName: lowerCaseFirstChar(elementName),
+            action: step.action! as unknown as ActionType,
+            data: actionData,
+            parameters: step.parameters || [],
+          })
+        );
+        continue;
+      }
+
+      if (step.type === "comment") {
+        // Add an empty line before the comment
+        stepItems.push("");
+        stepItems.push(this._templateProvider.getComment(step.comment!));
+      }
+    }
+
+    let testcaseBody = stepItems.join(EOL);
+
+    // If there is no step, we add an `await` so that there is no build warning about `async` method
+    if (testcaseBody.length === 0) {
+      testcaseBody = `await Task.CompletedTask;`;
+    }
+
+    // Indent test method body with 1 indent;
+    testcaseBody = addIndent(testcaseBody, this._indentString.repeat(2));
+    return testcaseBody;
+  }
 
   private generateTestCaseFile(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {
     const testcaseBody = this.generateTestCaseBody(testCase, pages, routines);
@@ -285,7 +383,7 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
 
     // If there is no step, we add an `await` so that there is no build warning about `async` method
     if (body.length === 0) {
-      body = `await Task.CompletedTask;`;
+      body = `await delay(0);`;
     }
 
     // Indent test method body with 1 indent;
@@ -358,7 +456,7 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
       let dataset = routine.dataSets.find((ds) => ds.id === dataSetId)!;
       let datasetName = createCleanName(dataset.name);
       let finalRoutineClassName = `${routineName}${datasetName}`;
-      routineCalls.push(`await new ${finalRoutineClassName}(this.Page).RunAsync();`);
+      routineCalls.push(`await new ${finalRoutineClassName}(this.page).run();`);
     }
 
     return routineCalls;

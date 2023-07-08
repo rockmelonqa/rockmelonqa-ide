@@ -15,6 +15,9 @@ export class JestTemplateCollection {
   public TEST_CASE_BASE_FILE: HandlebarsTemplateDelegate<any>;
   public TEST_CASE_FILE: HandlebarsTemplateDelegate<any>;
   public TEST_FUNCTION: HandlebarsTemplateDelegate<any>;
+  public TEST_ROUTINE_CLASS: HandlebarsTemplateDelegate<any>;
+  public TEST_ROUTINE_FILE: HandlebarsTemplateDelegate<any>;
+  public TEST_ROUTINE_BASE_FILE: HandlebarsTemplateDelegate<any>;
   public TEST_SUITE_FILE: HandlebarsTemplateDelegate<any>;
   public TS_CONFIG_FILE: HandlebarsTemplateDelegate<any>;
 
@@ -34,6 +37,9 @@ export class JestTemplateCollection {
     this.TEST_CASE_BASE_FILE = loadAndCompile("test-case-base-file");
     this.TEST_CASE_FILE = loadAndCompile("test-case-file");
     this.TEST_FUNCTION = loadAndCompile("test-function");
+    this.TEST_ROUTINE_BASE_FILE = loadAndCompile("test-routine-base");
+    this.TEST_ROUTINE_FILE = loadAndCompile("test-routine-file");
+    this.TEST_ROUTINE_CLASS = loadAndCompile("test-routine-class");
     this.TEST_SUITE_FILE = loadAndCompile("test-suite-file");
     this.TS_CONFIG_FILE = loadAndCompile("ts-config");
   }

@@ -1,0 +1,8 @@
+import { Page, expect } from "@playwright/test";
+import PageDefinitions from "~/PageDefinitions";
+import EnvironmentSettings from "~/config/EnvironmentSettings";
+import { TestRoutineBase } from "~/support/TestRoutineBase";
+
+{{#each testRoutineClasses as |testRoutineClass|}}
+{{{testRoutineClass}}}
+{{/each}}

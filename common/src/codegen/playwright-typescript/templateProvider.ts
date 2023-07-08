@@ -79,6 +79,9 @@ export class PlaywrightTypescriptTemplateProvider {
   getPageTest() {
     return this._templateCollection.PAGE_TEST_FILE({});
   }
+  getTestRoutineBase() {
+    return this._templateCollection.TEST_ROUTINE_BASE_FILE({});
+  }
   getNodePackageFile(projectName: string) {
     return this._templateCollection.NODE_PACKAGE_FILE({ projectName });
   }
@@ -125,5 +128,17 @@ export class PlaywrightTypescriptTemplateProvider {
 
   getComment(message: string) {
     return this._templateCollection.COMMENT({ message, indent: this._indentString });
+  }
+  getTestRoutineClass(testRoutineName: string, description: string, body: string) {
+    return this._templateCollection.TEST_ROUTINE_CLASS({
+      testRoutineName,
+      description,
+      body,
+    });
+  }
+  getTestRoutineFile(testRoutineClasses: string[]) {
+    return this._templateCollection.TEST_ROUTINE_FILE({
+      testRoutineClasses,
+    });
   }
 }
