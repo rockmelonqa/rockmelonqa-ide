@@ -63,7 +63,9 @@ export interface ITestCaseInfo {
   outputFilePath: string;
   outputFileRelPath: string;
   isValid: boolean;
+  /** The file relative path of the test suite (spec). Used for playwright to build test filter */
   constainerSuiteFileRelPath: string;
+  /** Line number of the test method inside the test suite (spec). Used for playwright to build test filter */
   lineNumber?: number;
 }
 
