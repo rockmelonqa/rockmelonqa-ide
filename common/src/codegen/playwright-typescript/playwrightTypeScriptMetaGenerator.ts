@@ -127,7 +127,7 @@ export class PlaywrightTypeScriptProjMetaGenerator implements IOutputProjectMeta
             outputFilePath: caseMeta.outputFilePath,
             outputFileRelPath: caseMeta.outputFileRelPath,
             isValid: caseMeta.isValid,
-            constainerSuiteFileRelPath: suiteInfo.outputFileRelPath,
+            constainerSuiteFileRelPath: suiteMeta.outputFileRelPath,
             lineNumber,
           };
           return caseInfo;
