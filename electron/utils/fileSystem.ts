@@ -33,6 +33,19 @@ export async function createFolder(folderPath: string): Promise<void> {
 }
 
 /**
+ * Copy file
+ */
+export async function copyFile(srcPath: string, destPath: string): Promise<void> {
+  try {
+    await fs.promises.copyFile(srcPath, destPath);
+  } catch (error) {
+    console.log("CANNOT copy file:", srcPath);
+    console.error(error);
+    throw error;
+  }
+}
+
+/**
  * Delete file or folder at given path
  */
 export async function deleteFileSystem(fullPath: string): Promise<void> {
