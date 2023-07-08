@@ -36,4 +36,5 @@ export class StandardOutputFolderTypeScript {
   static readonly TestRoutines: string = camelCaseToDash(StandardOutputFolder.TestRoutines);
   /** "Support" */
   static readonly Support: string = camelCaseToDash(StandardOutputFolder.Support);
+  static readonly PlaywrightReport: string = "playwright-report";
 }
