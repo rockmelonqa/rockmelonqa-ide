@@ -46,6 +46,22 @@ export const runTest = async function (
   });
 };
 
+const copyPlaywrightReportToTestRuns = async (context: IRunTestContext) => {
+  const playwrightReportFile = path.join(
+    context.rmProjFile.folderPath,
+    StandardFolder.OutputCode,
+    StandardOutputFolderTypeScript.PlaywrightReport,
+    "index.html"
+  );
+  // Copy test result file to "test-runs" folder
+  const runResultFilePath = path.join(
+    context.rmProjFile.folderPath,
+    context.settings.testResultFolderRelPath,
+    `test-run-result.html`
+  );
+  await fileSystem.copyFile(playwrightReportFile, runResultFilePath);
+};
+
 export const doRunTest = async (port: MessagePort | null, context: IRunTestContext) => {
   const { settings } = context;
   const { language, testFramework } = context.rmProjFile.content;
@@ -58,19 +74,7 @@ export const doRunTest = async (port: MessagePort | null, context: IRunTestConte
   postMessage(port, { type: "running-test", log: rs.output });
 
   if (context.rmProjFile.content.language === Language.Typescript) {
-    const playwrightReportFile = path.join(
-      context.rmProjFile.folderPath,
-      StandardFolder.OutputCode,
-      StandardOutputFolderTypeScript.PlaywrightReport,
-      "index.html"
-    );
-    // Copy test result file to "test-runs" folder
-    const runResultFilePath = path.join(
-      context.rmProjFile.folderPath,
-      context.settings.testResultFolderRelPath,
-      `test-run-result.html`
-    );
-    await fileSystem.copyFile(playwrightReportFile, runResultFilePath);
+    await copyPlaywrightReportToTestRuns(context);
   }
 
   postMessage(port, { type: "finish" });
