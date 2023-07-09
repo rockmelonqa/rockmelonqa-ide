@@ -11,9 +11,10 @@ import {
 import { actionClear } from "../../test-helpers/action-helpers";
 import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
 
-export const createTestDataGeneral = (): RmpSpec => {
+/** Creates test spec with everything possible */
+export const createTestDataKitchenSink = (): RmpSpec => {
   return {
-    projectName: "rm-playwright-typescript",
+    projectName: "playwright-typescript-kitchen-sink",
     content: {
       fileVersion: 1,
       name: "",
@@ -52,7 +53,7 @@ export const createTestDataGeneral = (): RmpSpec => {
           },
           {
             name: "Attr",
-            value: "name=Test",
+            value: "my-o-attr=my-value",
           },
           {
             name: "MyMessage",
