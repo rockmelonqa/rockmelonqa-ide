@@ -96,6 +96,8 @@ export interface IEnvironmentFileInfo {
 export interface IOutputFileInfo {
   /** Input file name without extension */
   inputFileName: string;
+  /** Input file name extension */
+  inputFileExt: string;
   /** Full input file path */
   inputFilePath: string;
   /** File path relative to the  "standand input folder" ("test-cases", "test-suites", etc...), not the project root path */

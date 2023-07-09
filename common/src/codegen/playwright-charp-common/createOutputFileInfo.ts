@@ -1,5 +1,11 @@
 import path from "path";
-import { IFileDef, StandardFolder, StandardOutputFolder, StandardOutputFolderTypeScript } from "../../file-defs";
+import {
+  IFileDef,
+  StandardFileExtension,
+  StandardFolder,
+  StandardOutputFolder,
+  StandardOutputFolderTypeScript,
+} from "../../file-defs";
 import { IRmProjFile, Language } from "../../file-defs/rmProjFile";
 import { IOutputFileInfo } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
@@ -39,6 +45,7 @@ const createOutputFileInfo = (metaParams: IMetaParams, proj: IRmProjFile): IOutp
   const { folderPath, fileName, isValid } = metaParams;
 
   const inputFileStandardFolder = getContainerFolder(folderPath, proj.folderPath);
+  const inputFileExt = path.parse(fileName).ext;
   const inputContainerFolder = path.join(proj.folderPath, inputFileStandardFolder);
   const outputFileExt = languageExtensionMap[proj.content.language];
   const outputCodeDir = path.join(proj.folderPath, StandardFolder.OutputCode);
@@ -63,6 +70,7 @@ const createOutputFileInfo = (metaParams: IMetaParams, proj: IRmProjFile): IOutp
 
   return {
     inputFileName: path.parse(fileName).name,
+    inputFileExt,
     inputFilePath,
     inputFileRelPath,
     outputFileCleanName,
@@ -82,15 +90,16 @@ export interface IOutputFileInfoBuilder {
 
 export class OutputFileInfoBuilderDotnet implements IOutputFileInfoBuilder {
   build(metaParams: IMetaParams, proj: IRmProjFile): IOutputFileInfo {
-    const { folderPath, fileName, isValid } = metaParams;
+    const { folderPath, fileName: inputFileName, isValid } = metaParams;
 
     const inputFileStandardFolder = getContainerFolder(folderPath, proj.folderPath);
+    const inputFileExt = path.parse(inputFileName).ext;
     const inputContainerFolder = path.join(proj.folderPath, inputFileStandardFolder);
     const outputFileExt = languageExtensionMap[proj.content.language];
     const outputCodeDir = path.join(proj.folderPath, StandardFolder.OutputCode);
     const standardOutputFolder = inputOutputFolderMap.get(inputFileStandardFolder)!;
     const outputContainerFolder = path.join(outputCodeDir, standardOutputFolder);
-    const inputFilePath = path.join(folderPath, fileName);
+    const inputFilePath = path.join(folderPath, inputFileName);
 
     // Path relative to the "standand folder", not the project root path;
     let inputFileRelPath = inputFilePath.substring(inputContainerFolder.length + 1);
@@ -108,7 +117,8 @@ export class OutputFileInfoBuilderDotnet implements IOutputFileInfoBuilder {
     const outputFileRelPath = outputFilePath.replace(outputCodeDir, "").substring(1);
 
     return {
-      inputFileName: path.parse(fileName).name,
+      inputFileName: path.parse(inputFileName).name,
+      inputFileExt,
       inputFilePath,
       inputFileRelPath,
       outputFileCleanName,
@@ -125,15 +135,22 @@ export class OutputFileInfoBuilderDotnet implements IOutputFileInfoBuilder {
 
 export class OutputFileInfoBuilderTypeScript implements IOutputFileInfoBuilder {
   build(metaParams: IMetaParams, proj: IRmProjFile): IOutputFileInfo {
-    const { folderPath, fileName, isValid } = metaParams;
+    const { folderPath, fileName: inputFileName, isValid } = metaParams;
 
     const inputFileStandardFolder = getContainerFolder(folderPath, proj.folderPath);
+    const inputFileExt = path.parse(inputFileName).ext;
     const inputContainerFolder = path.join(proj.folderPath, inputFileStandardFolder);
-    const outputFileExt = languageExtensionMap[proj.content.language];
+
+    // Playwright test suite file extension should follow the convention .spec.ts
+    const outputFileExt =
+      inputFileExt === StandardFileExtension.TestSuite
+        ? `.spec${languageExtensionMap[proj.content.language]}`
+        : languageExtensionMap[proj.content.language];
+
     const outputCodeDir = path.join(proj.folderPath, StandardFolder.OutputCode);
     const standardOutputFolder = inputOutputFolderMapTypeScript.get(inputFileStandardFolder)!;
     const outputContainerFolder = path.join(outputCodeDir, standardOutputFolder);
-    const inputFilePath = path.join(folderPath, fileName);
+    const inputFilePath = path.join(folderPath, inputFileName);
 
     // Path relative to the "standand folder", not the project root path;
     let inputFileRelPath = inputFilePath.substring(inputContainerFolder.length + 1);
@@ -151,7 +168,8 @@ export class OutputFileInfoBuilderTypeScript implements IOutputFileInfoBuilder {
     const outputFileRelPath = outputFilePath.replace(outputCodeDir, "").substring(1);
 
     return {
-      inputFileName: path.parse(fileName).name,
+      inputFileName: path.parse(inputFileName).name,
+      inputFileExt,
       inputFilePath,
       inputFileRelPath,
       outputFileCleanName,

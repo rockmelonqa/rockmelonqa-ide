@@ -50,8 +50,9 @@ export class MapCreator {
       let outputFilePath = path.join(outputContainerFolder, outputFileName);
       const outputFileRelPath = outputFilePath.replace(outputCodeDir, "").substring(1);
 
-      const nameInfo = {
+      const nameInfo: IOutputFileInfo = {
         inputFileName: path.parse(envFile.fileName).name,
+        inputFileExt: path.parse(envFile.fileName).ext,
         inputFilePath,
         inputFileRelPath,
         outputFileName,
