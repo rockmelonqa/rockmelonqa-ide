@@ -3,10 +3,15 @@ import os from "os";
 import fs from "fs";
 import fse from "fs-extra";
 
-const tempDir = os.tmpdir();
+// const tempDir = os.tmpdir();
+const tempDir = path.resolve(__dirname, "../../.tmp");
 
 /** Creates folder in the tmp directory; If the folder exists, it will be emptied; Returns the path to the new folder */
 export const createTempDir = (desc: string) => {
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir);
+  }
+
   const commonTmpDir = path.join(tempDir, "rockmelon-sample-rmproj");
 
   if (!fs.existsSync(commonTmpDir)) {

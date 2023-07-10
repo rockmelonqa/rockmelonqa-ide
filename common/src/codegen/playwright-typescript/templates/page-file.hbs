@@ -1,0 +1,13 @@
+import { Locator, Page, FrameLocator } from "@playwright/test";
+import PageBase from "~/support/PageBase";
+
+{{#if pageDescription}}
+/** {{{pageDescription}}} */
+{{/if}}
+export default class extends PageBase {
+  constructor(page: Page) {
+    super(page);
+  }
+
+{{{pageBody}}}
+}

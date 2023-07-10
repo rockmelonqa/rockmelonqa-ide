@@ -1,17 +1,18 @@
-import { ActionType, StandardFileExtension } from 'rockmelonqa.common';
-import type { ComponentType } from 'svelte';
-import PageDefinitionEditor from './PageDefinitionEditor.svelte';
-import RmProjectEditor from './RmProjectEditor.svelte';
-import TestCaseEditor from './TestCaseEditor.svelte';
-import TestRoutineEditor from './TestRoutineEditor/TestRoutineEditor.svelte';
-import TestSuiteEditor from './TestSuiteEditor.svelte';
-import TextEditor from './TextEditor.svelte';
-import TrxViewer from './TrxViewer/TrxViewer.svelte';
-import EnvEditor from './EnvironmentEditor.svelte';
+import { ActionType, StandardFileExtension } from "rockmelonqa.common";
+import type { ComponentType } from "svelte";
+import PageDefinitionEditor from "./PageDefinitionEditor.svelte";
+import RmProjectEditor from "./RmProjectEditor.svelte";
+import TestCaseEditor from "./TestCaseEditor.svelte";
+import TestRoutineEditor from "./TestRoutineEditor/TestRoutineEditor.svelte";
+import TestSuiteEditor from "./TestSuiteEditor.svelte";
+import TextEditor from "./TextEditor.svelte";
+import TrxViewer from "./TrxViewer/TrxViewer.svelte";
+import EnvEditor from "./EnvironmentEditor.svelte";
+import HtmlViewer from "./HtmlViewer.svelte";
 
 export const getEditor = (fileName: string): ComponentType | undefined => {
-    const lastIndex = fileName.lastIndexOf('.');
-    const ext = lastIndex < 0 ? '' : fileName.substring(lastIndex).toLowerCase();
+    const lastIndex = fileName.lastIndexOf(".");
+    const ext = lastIndex < 0 ? "" : fileName.substring(lastIndex).toLowerCase();
     switch (ext) {
         case StandardFileExtension.Environment:
             return EnvEditor;
@@ -25,8 +26,10 @@ export const getEditor = (fileName: string): ComponentType | undefined => {
             return TestRoutineEditor;
         case StandardFileExtension.TestSuite:
             return TestSuiteEditor;
-        case '.trx':
+        case ".trx":
             return TrxViewer;
+        case ".html":
+            return HtmlViewer;
         default:
             return TextEditor;
     }
@@ -37,42 +40,42 @@ export const getEditor = (fileName: string): ComponentType | undefined => {
  */
 export const toTitle = (fileName: string): string => {
     // handle extension
-    const lastIndex = fileName.lastIndexOf('.');
-    const ext = lastIndex < 0 ? '' : fileName.substring(lastIndex).toLowerCase();
+    const lastIndex = fileName.lastIndexOf(".");
+    const ext = lastIndex < 0 ? "" : fileName.substring(lastIndex).toLowerCase();
     switch (ext) {
         case StandardFileExtension.Environment:
-            fileName = fileName.slice(0, -StandardFileExtension.Environment.length) + ' Environment';
+            fileName = fileName.slice(0, -StandardFileExtension.Environment.length) + " Environment";
             break;
         case StandardFileExtension.Page:
-            fileName = fileName.slice(0, -StandardFileExtension.Page.length) + ' Page';
+            fileName = fileName.slice(0, -StandardFileExtension.Page.length) + " Page";
             break;
         case StandardFileExtension.TestCase:
-            fileName = fileName.slice(0, -StandardFileExtension.TestCase.length) + ' Test Case';
+            fileName = fileName.slice(0, -StandardFileExtension.TestCase.length) + " Test Case";
             break;
         case StandardFileExtension.TestRoutine:
-            fileName = fileName.slice(0, -StandardFileExtension.TestRoutine.length) + ' Test Routine';
+            fileName = fileName.slice(0, -StandardFileExtension.TestRoutine.length) + " Test Routine";
             break;
         case StandardFileExtension.TestSuite:
-            fileName = fileName.slice(0, -StandardFileExtension.TestSuite.length) + ' Test Suite';
+            fileName = fileName.slice(0, -StandardFileExtension.TestSuite.length) + " Test Suite";
             break;
     }
 
     // insert spaces between words
     // example: 'businessInsurance' -> 'Business Insurance'
-    let formatted = fileName.replace(/([a-z])([A-Z])/g, '$1 $2');
+    let formatted = fileName.replace(/([a-z])([A-Z])/g, "$1 $2");
 
     // replace special characters with spaces
     // example: 'Business---Insruance' -> 'Business   Insurance'
-    formatted = formatted.replace(/[^a-zA-Z0-9]/g, ' ');
+    formatted = formatted.replace(/[^a-zA-Z0-9]/g, " ");
 
     // remove extra whitespace and capitalize words
     formatted = formatted
         .trim()
-        .replace(/\s+/g, ' ') // replace multiple spaces by single space
+        .replace(/\s+/g, " ") // replace multiple spaces by single space
         .toLowerCase()
-        .split(' ')
+        .split(" ")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // first character of each word should be uppercase
-        .join(' ');
+        .join(" ");
 
     return formatted;
 };
@@ -85,7 +88,7 @@ export const pagelessActions = [
     ActionType.RunTestRoutine.toString(),
     ActionType.VerifyTitle.toString(),
     ActionType.VerifyTitleContains.toString(),
-    ActionType.VerifyUrl.toString()
+    ActionType.VerifyUrl.toString(),
 ];
 
 export const isPagelessAction = (action: string) => {

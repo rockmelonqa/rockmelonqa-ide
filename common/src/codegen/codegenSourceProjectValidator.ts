@@ -1,6 +1,5 @@
-import { ActionType, ISourceProjectMetadata, ITestCase } from "../file-defs";
-import { actionValidatorRegistryDotnet } from "./codegen-common/action-validator-registry";
-import { SourceFileValidationError } from "./types";
+import { ActionType, ISourceProjectMetadata, ITestCase, SourceFileValidationError } from "../file-defs";
+import { actionValidatorRegistry } from "./codegen-common/action-validator-registry";
 import path from "path";
 import { ITestCaseFile, ITestCaseStep, ITestCaseActionStep } from "../file-defs/testCaseFile";
 
@@ -93,7 +92,7 @@ export class CodegenSourceProjectValidator {
    */
   private validateTestStep(step: ITestCaseActionStep): string | undefined {
     const actionType = step.action! as unknown as ActionType;
-    const actionValidator = actionValidatorRegistryDotnet.get(actionType);
+    const actionValidator = actionValidatorRegistry.get(actionType);
 
     if (!actionValidator) {
       throw new Error("DEV ERROR: Cannot find validator for action: " + actionType);

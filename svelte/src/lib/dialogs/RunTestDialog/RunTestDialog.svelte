@@ -34,6 +34,7 @@
     import { createTestExplorerContext, TestExplorerActionType } from "./TestExplorerContext";
     import TestExplorerContext from "./TestExplorerContext.svelte";
     import type { IDropdownOption } from "$lib/controls/DropdownField";
+    import { TestFilterBuilderFactory } from "$lib/utils/filterBuilder/testFilterBuilderFactory";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -219,12 +220,12 @@
                 environmentFile: model.environmentFile,
                 testCases: selectedTestCases,
             });
-        } else {
-            showWarning = true;
-
-            allowRunTest = true;
-            isProcessing = false;
+            return;
         }
+
+        showWarning = true;
+        allowRunTest = true;
+        isProcessing = false;
     };
 
     function findSelectedCases(nodes: NodeInfo[]): NodeInfo[] {

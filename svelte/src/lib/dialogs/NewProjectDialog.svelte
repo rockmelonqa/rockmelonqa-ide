@@ -257,8 +257,6 @@
                             <FormGroup columns={2} class="mb-2">
                                 <FormGroupColumn>
                                     <TextField name="name" />
-                                </FormGroupColumn>
-                                <FormGroupColumn>
                                     <FolderPicker name="folder" />
                                 </FormGroupColumn>
                             </FormGroup>
@@ -276,6 +274,11 @@
                                             on:change={(e) => handleAutomationFrameworkChange(e.detail.value)}
                                         />
                                         <DropdownField
+                                            name="language"
+                                            options={languageDropdownOptions}
+                                            on:change={(e) => handleLanguageChange(e.detail.value)}
+                                        />
+                                        <DropdownField
                                             name="testFramework"
                                             options={testFrameworkDropdownOptions}
                                             disabled={$formData.values.language === Language.Typescript}
@@ -283,11 +286,6 @@
                                         <DropdownField name="indent" options={indentOptions} />
                                     </FormGroupColumn>
                                     <FormGroupColumn>
-                                        <DropdownField
-                                            name="language"
-                                            options={languageDropdownOptions}
-                                            on:change={(e) => handleLanguageChange(e.detail.value)}
-                                        />
                                         <TextField name="rootNamespace" />
                                         <NumberField name="indentSize" />
                                     </FormGroupColumn>

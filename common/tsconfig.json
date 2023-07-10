@@ -8,8 +8,9 @@
     "lib": ["ESNext", "es2021", "es2021.String"],
     "outDir": "dist/module",
     "declaration": true,
-    "target": "es2017"
+    "target": "es2017",
+    "sourceMap": true
   },
   "include": ["src/**/*"],
-  "exclude": ["dist/**/*"]
+  "exclude": ["dist/**/*", ".tmp/**/*"]
 }

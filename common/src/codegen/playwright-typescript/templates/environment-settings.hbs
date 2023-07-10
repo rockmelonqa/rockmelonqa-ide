@@ -1,0 +1,5 @@
+export default class {
+  {{#each allVariableNames as |name|}}
+  public static get {{{name}}}(): string { return process.env.{{{name}}} || ""; }
+  {{/each}}
+}

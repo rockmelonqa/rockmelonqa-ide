@@ -1,0 +1,14 @@
+{{#if description}}
+/** {{{description}}} */
+{{/if}}
+export class {{{testRoutineName}}} extends TestRoutineBase {
+  constructor(page: Page) {
+    super(page);
+  }
+
+  public async run() {
+    const defs: PageDefinitions = new PageDefinitions(this.page);
+
+{{{body}}}
+  }
+}

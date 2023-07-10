@@ -1,16 +1,17 @@
-import { IRmProjFile } from 'rockmelonqa.common';
-import { parentPort } from 'worker_threads';
-import { doGenerateCode, doGenerateSourceProjectMetadata } from './actions';
-import { doBuildCode } from './actions/buildCode';
-import { doGenerateOutputProjectMetadata } from './actions/generateOutputProjectMetadata';
-import { IRunTestContext, doRunTest } from './actions/runTest';
+import { IRmProjFile } from "rockmelonqa.common";
+import { parentPort } from "worker_threads";
+import { doGenerateCode, doGenerateSourceProjectMetadata } from "./actions";
+import { doBuildCode } from "./actions/buildCode";
+import { doGenerateOutputProjectMetadata } from "./actions/generateOutputProjectMetadata";
+import { doRunTest } from "./actions/runTest";
+import { IRunTestContext } from "rockmelonqa.common/ipc-defs";
 
 export enum WorkerAction {
-  BuildCode = 'BuildCode',
-  GenCode = 'GenCode',
-  GenProjectMetadata = 'GenProjectMetadata',
-  GenOutputProjectMetadata = 'GenOutputProjectMetadata',
-  RunTest = 'RunTest',
+  BuildCode = "BuildCode",
+  GenCode = "GenCode",
+  GenProjectMetadata = "GenProjectMetadata",
+  GenOutputProjectMetadata = "GenOutputProjectMetadata",
+  RunTest = "RunTest",
 }
 
 export type WorkerMessage =
@@ -20,7 +21,7 @@ export type WorkerMessage =
   | { action: WorkerAction.RunTest; context: IRunTestContext }
   | { action: WorkerAction.BuildCode; rmProjectFile: IRmProjFile };
 
-parentPort?.on('message', async (msg: WorkerMessage) => {
+parentPort?.on("message", async (msg: WorkerMessage) => {
   switch (msg.action) {
     case WorkerAction.GenCode:
       await doGenerateCode(parentPort, msg.rmProjectFile);

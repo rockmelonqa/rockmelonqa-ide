@@ -111,4 +111,5 @@ obj/
 TestResults/
 test-runs/
 output-code/
+.tmp/
 

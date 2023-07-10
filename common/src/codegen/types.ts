@@ -63,6 +63,10 @@ export interface ITestCaseInfo {
   outputFilePath: string;
   outputFileRelPath: string;
   isValid: boolean;
+  /** The file relative path of the test suite (spec). Used for playwright to build test filter */
+  constainerSuiteFileRelPath: string;
+  /** Line number of the test method inside the test suite (spec). Used for playwright to build test filter */
+  lineNumber?: number;
 }
 
 export interface IPageInfo {
@@ -92,6 +96,8 @@ export interface IEnvironmentFileInfo {
 export interface IOutputFileInfo {
   /** Input file name without extension */
   inputFileName: string;
+  /** Input file name extension */
+  inputFileExt: string;
   /** Full input file path */
   inputFilePath: string;
   /** File path relative to the  "standand input folder" ("test-cases", "test-suites", etc...), not the project root path */
@@ -125,26 +131,3 @@ export interface IOutputProjectMetadata {
 }
 
 export type ReturnedLocatorType = "IFrameLocator" | "ILocator" | "FrameLocator" | "Locator";
-
-export class SourceFileValidationError {
-  /** Name of the file */
-  readonly fileName: string;
-  /** Full path of the file */
-  readonly filePath: string;
-  /** Line number (i.e step index) of the error step */
-  readonly lineNumber: number;
-  /** Error message TEMPLATE, which might contain placeholders for filling with StringRes */
-  readonly message: string;
-  /** Action type */
-  readonly actionType?: ActionType;
-  /**
-   *
-   */
-  constructor(fileName: string, filePath: string, lineNumber: number, message: string, actionType?: ActionType) {
-    this.fileName = fileName;
-    this.filePath = filePath;
-    this.lineNumber = lineNumber;
-    this.message = message;
-    this.actionType = actionType;
-  }
-}

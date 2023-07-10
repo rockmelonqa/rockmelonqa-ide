@@ -12,27 +12,30 @@ import {
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { ICodeGen, WriteFileFn } from "../types";
-import { addIndent, hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
-import { NunitProjectMeta } from "./nunitProjectMeta";
+import { hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
+import { NunitProjectMetaGenerator } from "./nunitProjectMetaGenerator";
 import { PlaywrightCsharpNunitTemplatesProvider } from "./playwrightCsharpNunitTemplatesProvider";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCsharpCodeGen";
-import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
+import { IOutputProjectMetadataGenerator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfos";
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
+import { addIndent } from "../utils/codegenUtils";
 
 export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implements ICodeGen {
   constructor(projMeta: ISourceProjectMetadata) {
     super(projMeta);
   }
 
-  protected override getOutProjMeta(): IOutputProjectMetadataProcessor {
-    return new NunitProjectMeta(this._projMeta);
+  protected override getOutProjMeta(): IOutputProjectMetadataGenerator {
+    return new NunitProjectMetaGenerator(this._projMeta);
   }
 
   protected override getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {
-    return new PlaywrightCsharpNunitTemplatesProvider(path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates"));
+    return new PlaywrightCsharpNunitTemplatesProvider(
+      path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates")
+    );
   }
 
   async generateCode(full: boolean, writeFile: (path: string, content: string) => Promise<void>): Promise<string> {
@@ -132,7 +135,10 @@ export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implem
     // Filename: Support/TestSuiteBase.cs
     await writeFile(
       `${StandardOutputFolder.Support}/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
-      this._templateProvider.getTestSuiteBase(this._rmprojFile.content.rootNamespace, this._rmprojFile.content.testIdAttributeName)
+      this._templateProvider.getTestSuiteBase(
+        this._rmprojFile.content.rootNamespace,
+        this._rmprojFile.content.testIdAttributeName
+      )
     );
   }
   async generateMetaFiles(writeFile: WriteFileFn) {
@@ -291,7 +297,11 @@ export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implem
     const testRoutineName = this._outProjMeta.get(testRoutine.id)!.outputFileClassName;
     const finalOutputClassName = `${testRoutineName}${datasetInfo.name}`;
 
-    let routineFileContent = this._templateProvider.getTestRoutineClass(finalOutputClassName, testRoutine.description, testRoutineBody);
+    let routineFileContent = this._templateProvider.getTestRoutineClass(
+      finalOutputClassName,
+      testRoutine.description,
+      testRoutineBody
+    );
 
     return routineFileContent;
   }

@@ -13,15 +13,16 @@ import {
 import { IPage } from "../../file-defs/pageFile";
 import { StandardOutputFile } from "../../file-defs/standardOutputFile";
 import { ICodeGen, WriteFileFn } from "../types";
-import { addIndent, hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
-import { MsTestProjMeta } from "./msTestProjMeta";
+import { hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
+import { MsTestProjMetaGenerator } from "./msTestProjMetaGenerator";
 import { PlaywrightCsharpMsTestTemplatesProvider } from "./playwrightCsharpMsTestTemplatesProvider";
 import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfos";
 import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCsharpCodeGen";
-import { IOutputProjectMetadataProcessor } from "../playwright-charp-common/outputProjectMetadataProcessor";
+import { IOutputProjectMetadataGenerator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
+import { addIndent } from "../utils/codegenUtils";
 
 export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen implements ICodeGen {
   /**
@@ -31,12 +32,14 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     super(projMeta);
   }
 
-  protected override getOutProjMeta(): IOutputProjectMetadataProcessor {
-    return new MsTestProjMeta(this._projMeta);
+  protected override getOutProjMeta(): IOutputProjectMetadataGenerator {
+    return new MsTestProjMetaGenerator(this._projMeta);
   }
 
   protected override getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {
-    return new PlaywrightCsharpMsTestTemplatesProvider(path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates"));
+    return new PlaywrightCsharpMsTestTemplatesProvider(
+      path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates")
+    );
   }
 
   /** Generate MsTest project */
@@ -102,7 +105,10 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
 
     await writeFile(
       `${StandardOutputFolder.Support}/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
-      this._templateProvider.getTestSuiteBase(this._rmprojFile.content.rootNamespace, this._rmprojFile.content.testIdAttributeName)
+      this._templateProvider.getTestSuiteBase(
+        this._rmprojFile.content.rootNamespace,
+        this._rmprojFile.content.testIdAttributeName
+      )
     );
   }
 
@@ -289,7 +295,11 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     const testRoutineName = this._outProjMeta.get(testRoutine.id)!.outputFileClassName;
     const finalOutputClassName = `${testRoutineName}${datasetInfo.name}`;
 
-    let routineFileContent = this._templateProvider.getTestRoutineClass(finalOutputClassName, testRoutine.description, testRoutineBody);
+    let routineFileContent = this._templateProvider.getTestRoutineClass(
+      finalOutputClassName,
+      testRoutine.description,
+      testRoutineBody
+    );
 
     return routineFileContent;
   }
@@ -309,7 +319,10 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
 
   private generateTestCaseFunction(testCase: ITestCase) {
     const testcaseName = this._outProjMeta.get(testCase.id)!.outputFileClassName;
-    const testCaseMethod = this._templateProvider.getTestFunction(upperCaseFirstChar(testcaseName), testCase.description);
+    const testCaseMethod = this._templateProvider.getTestFunction(
+      upperCaseFirstChar(testcaseName),
+      testCase.description
+    );
     return testCaseMethod;
   }
 }

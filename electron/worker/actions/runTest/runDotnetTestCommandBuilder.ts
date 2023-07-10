@@ -1,8 +1,8 @@
-import { ICommandBuilder } from './commandBuilder';
-import path from 'path';
-import { IInvokeEnvironmentFileCmdBuilder } from './invokeEnvironmentFileCmdBuilder';
-import { Platform, StandardFileExtension, StandardOutputFolder } from 'rockmelonqa.common/file-defs';
-import { IRunTestSettings } from '../runTest';
+import { ICommandBuilder } from "./commandBuilder";
+import path from "path";
+import { IInvokeEnvironmentFileCmdBuilder } from "./invokeEnvironmentFileCmdBuilder";
+import { Platform, StandardFileExtension, StandardOutputFolder } from "rockmelonqa.common/file-defs";
+import { IRunTestSettings } from "rockmelonqa.common/ipc-defs";
 
 export default class RunDotnetTestCommandBuilder implements ICommandBuilder {
   private readonly invokeEnvironmentFileCmdBuilder: IInvokeEnvironmentFileCmdBuilder;
@@ -26,12 +26,12 @@ export default class RunDotnetTestCommandBuilder implements ICommandBuilder {
       commands.push(invokeFileCmd);
     }
 
-    const filter = settings.testCases.map(x => x.fullyQualifiedName).join("|");
-    const filterStr = filter ? `--filter "${filter}"` : '';
+    const filter = settings.testCases.map((x) => x.fullyQualifiedName).join("|");
+    const filterStr = filter ? `--filter "${filter}"` : "";
     const testResultFileRelPath = path.join(settings.testResultFolderRelPath, settings.testResultFileName);
     const browserStr = settings.browser
       ? `Playwright.BrowserName=${settings.browser}`
-      : 'Playwright.LaunchOptions.Headless=true';
+      : "Playwright.LaunchOptions.Headless=true";
 
     commands.push(
       // See https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-test for more details about `dotnet test`
@@ -39,7 +39,7 @@ export default class RunDotnetTestCommandBuilder implements ICommandBuilder {
       `dotnet test ${filterStr} -l:"trx;LogFileName=${`..${path.sep}..${path.sep}${testResultFileRelPath}`}" -- ${browserStr}`
     );
 
-    let cmd = commands.join(' && ');
+    let cmd = commands.join(" && ");
 
     return cmd;
   }

@@ -1,0 +1,19 @@
+import { Page, test, expect } from "@playwright/test";
+import { TestCaseBase } from "~/support/TestCaseBase";
+import PageDefinitions from "~/PageDefinitions";
+import EnvironmentSettings from "~/config/EnvironmentSettings";
+
+{{#if description}}
+/** {{{description}}} */
+{{/if}}
+export default class extends TestCaseBase {
+  constructor(page: Page) {
+    super(page);
+  }
+
+  public async run() {
+    var defs: PageDefinitions = new PageDefinitions(this.page);
+
+{{{body}}}
+  }
+}

@@ -1,0 +1,15 @@
+import { Page } from "@playwright/test";
+
+{{{pageImports}}}
+
+export default class {
+    public readonly page: Page;
+
+{{{pageDeclarations}}}
+
+    constructor(page: Page) {
+        this.page = page;
+        
+{{{pageAssignments}}}
+    }
+}
