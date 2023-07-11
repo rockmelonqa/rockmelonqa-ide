@@ -5,7 +5,7 @@ import path from "path";
 import { StandardFolder } from "../../../../src/file-defs";
 import { IProgressEvent } from "../../../../src/ipc-defs";
 import { createSourceProjectMetadata, generateCode } from "../../../../src/codegen";
-import { prepareOutputProject, createRmTestProject } from "../../../test-helpers/rm-project-generator";
+import { writeOutputProjectFiles, createRmTestProject } from "../../../test-helpers/rm-project-generator";
 import { doAssert } from "../../../test-helpers/assert-helper";
 import { createTempDir } from "../../../test-helpers/fsHelpers";
 import { createCodegenWithConfigVarTestData } from "./codegen-config-var.test-data";
@@ -21,7 +21,7 @@ test("CodeGen Configuration Variables Test", async () => {
 
   const sampleOutputDir = path.join(tmpDir, "result");
   fs.mkdirSync(sampleOutputDir);
-  prepareOutputProject(projSpec.outputFiles, sampleOutputDir);
+  writeOutputProjectFiles(projSpec.outputFiles, sampleOutputDir);
 
   // Act
   const sucess = await generateCode(rmprojFile, (event: IProgressEvent) => {
