@@ -3,9 +3,30 @@ using System.Xml.Serialization;
 namespace {{{rootNamespace}}}.Support;
 
 /// <summary>
+/// Base class that provide basic playwright Expect() method
+/// </summary>
+public abstract class Expectator
+{
+    public ILocatorAssertions Expect(ILocator locator)
+    {
+        return Assertions.Expect(locator);
+    }
+
+    public IPageAssertions Expect(IPage page)
+    {
+        return Assertions.Expect(page);
+    }
+
+    public IAPIResponseAssertions Expect(IAPIResponse response)
+    {
+        return Assertions.Expect(response);
+    }
+}
+
+/// <summary>
 /// Implement our PageTest for XUnit 
 /// </summary>
-public abstract class PageTest
+public abstract class PageTest : Expectator
 {
     protected IPlaywright Playwright {get; }
     private IBrowser Browser {get;}
@@ -43,21 +64,6 @@ public abstract class PageTest
         await Page.CloseAsync();
         await Browser.DisposeAsync();
         Playwright.Dispose();
-    }
-
-    public ILocatorAssertions Expect(ILocator locator)
-    {
-        return Assertions.Expect(locator);
-    }
-
-    public IPageAssertions Expect(IPage page)
-    {
-        return Assertions.Expect(page);
-    }
-
-    public IAPIResponseAssertions Expect(IAPIResponse response)
-    {
-        return Assertions.Expect(response);
     }
 
     private IBrowserType GetBrowser(string browserName)

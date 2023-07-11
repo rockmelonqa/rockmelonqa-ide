@@ -21,20 +21,12 @@ public abstract class TestCaseBase : PageTest
     public TestCaseBase(PageTest testSuiteInstance) : base(testSuiteInstance)
     {
     }
-
-    /// <summary>
-    /// Custom Expect method that works from IFrameLocator
-    /// </summary>
-    public ILocatorAssertions Expect(IFrameLocator locator)
-    {
-        return Expect(locator.Locator(":root"));
-    }
 }
 
 /// <summary>
 /// Base class for RM test routine 
 /// </summary>
-public abstract class TestRoutineBase
+public abstract class TestRoutineBase: Expectator
 {
     protected IPage Page { get; init; }
 
