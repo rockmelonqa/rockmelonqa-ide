@@ -1,5 +1,5 @@
 /* Fonts for Mullish, Roboto Condense, Heebo */
-@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;500;600;700&family=Mulish:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;500;600;700&family=Mulish:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -27,9 +27,9 @@
     --color-secondary--extra-light: #fbfbfb;
 
     /* Fonts */
-    --font-family--default: 'Mulish', sans-serif;
-    --font-family--condensed: 'Roboto Condensed', sans-serif;
-    --font-family--heading: 'Heebo', sans-serif;
+    --font-family--default: "Mulish", sans-serif;
+    --font-family--condensed: "Roboto Condensed", sans-serif;
+    --font-family--heading: "Heebo", sans-serif;
 
     /* General Colors */
     --color-white: rgba(255, 255, 255, 1);
@@ -175,7 +175,7 @@ hr {
 }
 
 .dropdown-field-root.inline-fancy .svelte-select {
-    --border: 'none';
+    --border: "none";
     --height: 2.5rem;
 }
 
@@ -247,13 +247,14 @@ input.folder-picker-field-input.folder-picker-field-error:focus {
  * SF-PRO fonts
  ********************************************/
 @font-face {
-    font-family: 'SF Pro Text';
+    font-family: "SF Pro Text";
     font-style: normal;
-    src: url('/fonts/SF-Pro-Text-Regular.otf');
+    src: url("/fonts/SF-Pro-Text-Regular.otf");
 }
 
-* {
-    font-family: 'SF Pro Text';
+html,
+body {
+    font-family: "SF Pro Text";
     font-style: normal;
 }
 
@@ -276,7 +277,7 @@ input.folder-picker-field-input.folder-picker-field-error:focus {
 }
 
 .splitpanes.modern-theme .splitpanes__splitter:before {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     top: 0;
@@ -362,7 +363,7 @@ input.folder-picker-field-input.folder-picker-field-error:focus {
 }
 .treeview-toggle:after {
     transition-duration: 0.2s;
-    content: '';
+    content: "";
     position: absolute;
     left: 50%;
     top: 50%;
