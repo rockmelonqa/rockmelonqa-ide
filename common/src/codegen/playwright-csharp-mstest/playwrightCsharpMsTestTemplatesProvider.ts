@@ -6,6 +6,7 @@ import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/p
 import { actionRegistyDotnet } from "../playwright-charp-common/action-registry-dotnet";
 import { locatorRegistyDotnet } from "../playwright-charp-common/locator-registry-dotnet";
 import { BasePlaywrightDotnetTemplatesProvider } from "../playwright-charp-common/basePlaywrightDotnetTemplatesProvider";
+import { Indent } from "../../file-defs";
 
 export class PlaywrightCsharpMsTestTemplatesProvider
   extends BasePlaywrightDotnetTemplatesProvider
@@ -13,16 +14,31 @@ export class PlaywrightCsharpMsTestTemplatesProvider
 {
   private _templateCollection: MsTestTemplateCollection;
 
-  constructor(customTemplatesDir: string) {
+  constructor(customTemplatesDir: string, requiredIndenChar: Indent, requiredIndexSize: number) {
     super();
-    this._templateCollection = new MsTestTemplateCollection(path.resolve(__dirname, "./templates"), customTemplatesDir, ".hbs");
+    this._templateCollection = new MsTestTemplateCollection({
+      templatesDir: path.resolve(__dirname, "./templates"),
+      customTemplatesDir,
+      fileExtension: ".hbs",
+      requiredIndentChar: requiredIndenChar,
+      requiredIndentSize: requiredIndexSize,
+      sourceIndentChar: Indent.Spaces,
+      sourceIndentSize: 4,
+    });
   }
 
   getEnvironmentSettingsFiles(rootNamespace: string, allVariableNames: string[]): string {
     return this._templateCollection.ENVIRONMENT_SETTINGS_FILE({ rootNamespace, allVariableNames });
   }
 
-  getTestSuiteFile(usings: string, name: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
+  getTestSuiteFile(
+    usings: string,
+    name: string,
+    description: string,
+    body: string,
+    rootNamespace: string,
+    fullNamespace: string
+  ) {
     return this._templateCollection.TEST_SUITE_FILE({ usings, rootNamespace, name, description, body, fullNamespace });
   }
 
@@ -30,7 +46,13 @@ export class PlaywrightCsharpMsTestTemplatesProvider
     return this._templateCollection.TEST_SUITE_BASE_FILE({ rootNamespace, testIdAttributeName });
   }
 
-  getTestCaseFile(testCaseName: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
+  getTestCaseFile(
+    testCaseName: string,
+    description: string,
+    body: string,
+    rootNamespace: string,
+    fullNamespace: string
+  ) {
     return this._templateCollection.TEST_CASE_FILE({ rootNamespace, testCaseName, description, body, fullNamespace });
   }
 

@@ -38,7 +38,9 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
 
   protected override getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {
     return new PlaywrightCsharpMsTestTemplatesProvider(
-      path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates")
+      path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates"),
+      this._rmprojFile.content.indent,
+      this._rmprojFile.content.indentSize
     );
   }
 
