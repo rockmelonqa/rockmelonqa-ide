@@ -1,19 +1,11 @@
-import os from "os";
-import fs from "fs";
 import path from "path";
-import { createRmTestProject, writeOutputProjectFiles } from "../../test-helpers/rm-project-generator";
-import { PlaywrightTypeScriptProjMetaGenerator } from "../../../src/codegen/playwright-typescript/playwrightTypeScriptMetaGenerator";
-import { createTempDir } from "../../test-helpers/fsHelpers";
 import { normalizeLineEndings } from "../../test-helpers/stringHelpers";
-import { generateCode } from "../../../src/codegen";
-import { IProgressEvent, Indent } from "../../../src";
-import { execSync } from "child_process";
+import { Indent } from "../../../src";
 import { TemplateReindenter } from "../../../src/codegen/playwright-csharp-mstest/templateCollection";
-const tempDir = path.resolve(__dirname, "../../.tmp");
 
-// ####
+// ############################################
 // # Test the conversion of indentations
-// ####
+// ############################################
 
 // Concept:
 // An indentation of a file is specified with 2 values:
