@@ -14,9 +14,9 @@ test("CodeGen Playwright CSharp MsTest", async () => {
   // Arrange
   const tmpDir = createTempDir("playwright-csharp-mstest");
   const projSpec = createPlaywrightMsTestTestData();
-  const copyToDir = path.join(tmpDir, "rmproj");
-  fs.mkdirSync(copyToDir);
-  const projFile = createRmTestProject(projSpec, copyToDir);
+  const createSourceProjectInDir = path.join(tmpDir, "rmproj");
+  fs.mkdirSync(createSourceProjectInDir);
+  const projFile = createRmTestProject(projSpec, createSourceProjectInDir);
 
   const sampleOutputDir = path.join(tmpDir, "result");
   fs.mkdirSync(sampleOutputDir);
