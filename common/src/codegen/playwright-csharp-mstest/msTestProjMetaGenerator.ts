@@ -4,11 +4,13 @@ import { DotnetTestProjectMetaGenerator } from "../playwright-charp-common/dotne
 import { IOutputProjectMetadataGenerator, MapCreator } from "../playwright-charp-common/outputProjectMetadataProcessor";
 import { IOutputFileInfo, IOutputProjectMetadata } from "../types";
 
-/** MsTest project meta: Contains info of all files and other resources */
+/** MsTest project meta generator */
 export class MsTestProjMetaGenerator extends DotnetTestProjectMetaGenerator implements IOutputProjectMetadataGenerator {
+  /** Creates new instance of MsTestProjMetaGenerator with the provided source project metadata */
   constructor(codegenMeta: ISourceProjectMetadata) {
     super(codegenMeta);
   }
+  /** Creates Output Project Metadata */
   public createOutputProjectMetadata(): IOutputProjectMetadata {
     return this.createDotnetProjectMetadata();
   }

@@ -3,14 +3,17 @@ import { IProgressEvent } from "../ipc-defs";
 
 /** Action data type indicator */
 export enum ActionDataType {
-  /** Indicates that the data string is a literal value: string, number, ... */
+  /** Indicates that the data string is a literal value: string, number, boolean ... */
   LiteralValue = "LiteralValue",
   /** Indicates that the data string is a Environment variable notation, e.g {TestUser}, {TestPassword}*/
   EnvironmentVar = "EnvironmentVar",
 }
 
+/** Wrapper for action data */
 export interface IActionData {
+  /** The actual data being wrapped */
   rawData: any;
+  /** Data type */
   dataType: ActionDataType;
 }
 
@@ -18,10 +21,13 @@ export interface ICodeGen {
   generateCode: (full: boolean, writeFile: (path: string, content: string) => Promise<void>) => Promise<string>;
 }
 
+/** Progress event callback function */
 export type ProgressEventCallback = (event: IProgressEvent) => void;
 
+/** Write File function */
 export type WriteFileFn = (path: string, content: string) => Promise<void>;
 
+/** Wrapper for the parameters needed to generate code for an Action */
 export interface IActionTemplateParam {
   pageName: string;
   elementName: string;
@@ -30,6 +36,7 @@ export interface IActionTemplateParam {
   parameters: string[];
 }
 
+/** Wrapper for the parameters needed to generate code for a Locator */
 export interface ILocatorTemplateParam {
   elementName: string;
   locatorStr: string;
@@ -39,6 +46,7 @@ export interface ILocatorTemplateParam {
   returnedLocatorType: ReturnedLocatorType;
 }
 
+/** Metadata of a test suite */
 export interface ISuiteInfo {
   name: string;
   fullyQualifiedName: string;
@@ -53,6 +61,7 @@ export interface ISuiteInfo {
   isValid: boolean;
 }
 
+/** Metadata of a test case */
 export interface ITestCaseInfo {
   name: string;
   fullyQualifiedName: string;
@@ -69,6 +78,7 @@ export interface ITestCaseInfo {
   lineNumber?: number;
 }
 
+/** Metadata of a page */
 export interface IPageInfo {
   name: string;
   fullyQualifiedName: string;
@@ -81,6 +91,7 @@ export interface IPageInfo {
   isValid: boolean;
 }
 
+/** Metadata of the env file */
 export interface IEnvironmentFileInfo {
   name: string;
   inputFileName: string;
@@ -130,4 +141,5 @@ export interface IOutputProjectMetadata {
   error?: { message: string; data?: string };
 }
 
+/** Locator return type. For dotnet: `"IFrameLocator"` and `"ILocator"`; for typescript: `"FrameLocator"` and `"Locator"` */
 export type ReturnedLocatorType = "IFrameLocator" | "ILocator" | "FrameLocator" | "Locator";

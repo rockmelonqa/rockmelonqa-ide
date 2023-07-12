@@ -10,13 +10,14 @@ import {
 } from "../types";
 import { MapCreator } from "./outputProjectMetadataProcessor";
 
+/** Base class for meta generator of dotnet projects */
 export class DotnetTestProjectMetaGenerator {
   private projMeta: ISourceProjectMetadata;
 
-  public readonly pageMetaMap: Map<IPage, IOutputFileInfo> = new Map<IPage, IOutputFileInfo>();
-  public readonly suiteMetaMap: Map<ITestSuite, IOutputFileInfo> = new Map<ITestSuite, IOutputFileInfo>();
-  public readonly caseMetaMap: Map<ITestCase, IOutputFileInfo> = new Map<ITestCase, IOutputFileInfo>();
-  public readonly routineMetaMap: Map<ITestRoutine, IOutputFileInfo> = new Map<ITestRoutine, IOutputFileInfo>();
+  public readonly pageMetaMap: Map<IPage, IOutputFileInfo>;
+  public readonly suiteMetaMap: Map<ITestSuite, IOutputFileInfo>;
+  public readonly caseMetaMap: Map<ITestCase, IOutputFileInfo>;
+  public readonly routineMetaMap: Map<ITestRoutine, IOutputFileInfo>;
 
   constructor(projMeta: ISourceProjectMetadata) {
     this.projMeta = projMeta;
