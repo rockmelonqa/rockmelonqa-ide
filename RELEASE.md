@@ -13,6 +13,8 @@ GitHub [personal access token](https://docs.github.com/en/authentication/keeping
   - Execute `npm run publish:win` to create the installer, then publish Github.
   - Visit [Rockmelon's release page](https://github.com/rockmelonqa/ide/releases), select new release, edit, then publish it. (We need this step to enable auto update, and people who are not contributors can download via direct link)
 
+(If we want to create and publish all installers, let's run `npm run publish:all`)
+
 # 2 MacOS installer
 
 (TODO)
