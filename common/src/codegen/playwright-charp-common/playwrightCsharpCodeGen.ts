@@ -86,7 +86,7 @@ export class PlaywrightCsharpCodeGen extends CodeGenBase {
     }
 
     // Indent test method body with 1 indent;
-    routineBody = addIndent(routineBody, this._indentString.repeat(2));
+    routineBody = addIndent(routineBody, this._indentString, 2);
     return routineBody;
   }
 
@@ -218,7 +218,7 @@ export class PlaywrightCsharpCodeGen extends CodeGenBase {
     }
 
     // Indent test method body with 1 indent;
-    testcaseBody = addIndent(testcaseBody, this._indentString.repeat(2));
+    testcaseBody = addIndent(testcaseBody, this._indentString, 2);
     return testcaseBody;
   }
 

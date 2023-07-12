@@ -200,7 +200,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     }
 
     let propertyInits = propertyInitList.join(EOL);
-    propertyInits = addIndent(propertyInits, this._indentString.repeat(2));
+    propertyInits = addIndent(propertyInits, this._indentString, 2);
 
     return this._templateProvider.getPageDefinitions(this._rootNamespace, usings, propertyDeclarations, propertyInits);
   }

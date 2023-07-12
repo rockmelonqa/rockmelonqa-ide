@@ -205,7 +205,7 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
     }
 
     let pageInits = pageInitItems.join(EOL);
-    pageInits = addIndent(pageInits, this._indentString.repeat(2));
+    pageInits = addIndent(pageInits, this._indentString, 2);
 
     return this._templateProvider.getPageDefinitions(allImports, pagesDeclarations, pageInits);
   }
@@ -351,8 +351,8 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
       testcaseBody = `await Task.CompletedTask;`;
     }
 
-    // Indent test method body with 1 indent;
-    testcaseBody = addIndent(testcaseBody, this._indentString.repeat(2));
+    // Indent test method body with 2 indent;
+    testcaseBody = addIndent(testcaseBody, this._indentString, 2);
     return testcaseBody;
   }
 
@@ -386,8 +386,8 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
       body = `await delay(0);`;
     }
 
-    // Indent test method body with 1 indent;
-    body = addIndent(body, this._indentString.repeat(2));
+    // Indent test method body with 2 indent;
+    body = addIndent(body, this._indentString, 2);
     return body;
   }
 

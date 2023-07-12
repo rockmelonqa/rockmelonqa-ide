@@ -5,6 +5,7 @@ import path from "path";
 import { IRmProjFile, StandardFolder } from "../../file-defs";
 import { ProgressEventCallback } from "../types";
 import { EOL } from "os";
+import { LINE_ENDING_REGEX } from "./stringUtils";
 
 export const buildWriteFileFn = (rmprojFile: IRmProjFile, progressNotify: ProgressEventCallback) => {
   return async (relativeFilePath: string, content: string) => {
@@ -45,9 +46,10 @@ export const copyCustomCode = async (
 };
 
 /** Add indent to a block of strings */
-export const addIndent = (sourceStr: string, indentStr: string) => {
-  let lines = sourceStr.split(EOL);
-  lines = lines.map((l) => (l.trim() ? indentStr + l : l));
+export const addIndent = (sourceStr: string, indentStr: string, indentCount: number = 1): string => {
+  let lines = sourceStr.split(LINE_ENDING_REGEX);
+  let totalIndentString = indentStr.repeat(indentCount);
+  lines = lines.map((l) => (l.trim() ? totalIndentString + l : l));
   let result = lines.join(EOL);
   return result;
 };
