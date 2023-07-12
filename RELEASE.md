@@ -19,4 +19,4 @@ GitHub [personal access token](https://docs.github.com/en/authentication/keeping
 
 # 3 Linux installer
 
-(TODO)
+- Same as Windows installer but let's use `npm run out:linux` or `npm run publish:linux`
