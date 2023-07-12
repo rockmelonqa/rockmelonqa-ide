@@ -131,7 +131,7 @@ const parseTestResults = (jsonTestRun: any): ITestResult[] => {
 
 const parseTestResult = (jsonUnitTestResult: any, jsonUnitTests: any[]): ITestResult => {
     const testResult: ITestResult = {
-        name: jsonUnitTestResult['@_testName'],
+        name: parseTestCaseName(jsonUnitTestResult, jsonUnitTests),
         suite: parseTestSuiteName(jsonUnitTestResult, jsonUnitTests),
         outcome: jsonUnitTestResult['@_outcome'],
         start: new Date(Date.parse(jsonUnitTestResult['@_startTime'])),
@@ -148,6 +148,12 @@ const parseTestResult = (jsonUnitTestResult: any, jsonUnitTests: any[]): ITestRe
     }
 
     return testResult;
+};
+
+const parseTestCaseName = (jsonUnitTestResult: any, jsonUnitTests: any[]): string => {
+    const executionId = jsonUnitTestResult['@_executionId'];
+    const unitTest: any = jsonUnitTests.find((x: any) => x.Execution['@_id'] === executionId);
+    return unitTest ? unitTest.TestMethod['@_name'] : '';
 };
 
 const parseTestSuiteName = (jsonUnitTestResult: any, jsonUnitTests: any[]): string => {
