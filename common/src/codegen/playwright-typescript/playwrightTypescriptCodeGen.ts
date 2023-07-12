@@ -34,7 +34,9 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
   constructor(projMeta: ISourceProjectMetadata) {
     super(projMeta);
     this._templateProvider = new PlaywrightTypescriptTemplateProvider(
-      path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates")
+      path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates"),
+      this._rmprojFile.content.indent,
+      this._rmprojFile.content.indentSize
     );
 
     this._outProjMeta = this.getOutProjMeta();
