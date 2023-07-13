@@ -57,6 +57,7 @@ export const doBuildCode = async (port: MessagePort | null, rmProjectFile: IRmPr
       }
 
       // Assume PowerShell is installed and available on the system PATH
+      // Ensure Playwright browsers are downloaded
       const dotnetVersion = execSync("dotnet --version").toString().trim();
       const scriptPath = path.join(
         outputCodeFolder,
@@ -74,9 +75,16 @@ export const doBuildCode = async (port: MessagePort | null, rmProjectFile: IRmPr
       break;
     }
     case Language.Typescript: {
-      const cmd = "npm install";
+      // Install npm packages
+      let cmd = "npm install";
       postMessage(port, { type: "install-dependencies", log: `Executing: '${cmd}'` });
-      const rs = executeCommand(cmd, { cwd: outputCodeFolder });
+      let rs = executeCommand(cmd, { cwd: outputCodeFolder });
+      postMessage(port, { type: "install-dependencies", log: rs.output });
+
+      // Ensure Playwright browsers are downloaded
+      cmd = "npx playwright install";
+      postMessage(port, { type: "install-dependencies", log: `Executing: '${cmd}'` });
+      rs = executeCommand(cmd, { cwd: outputCodeFolder });
       postMessage(port, { type: "install-dependencies", log: rs.output });
       break;
     }
