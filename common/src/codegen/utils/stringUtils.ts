@@ -57,3 +57,5 @@ export function camelCaseToDash(myStr: string) {
     .replace(/(^[A-Z])/, ([first]) => first.toLowerCase())
     .replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`);
 }
+
+export const LINE_ENDING_REGEX = /\r?\n/;

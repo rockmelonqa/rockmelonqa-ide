@@ -6,23 +6,45 @@ import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import { actionRegistyDotnet } from "../playwright-charp-common/action-registry-dotnet";
 import { locatorRegistyDotnet } from "../playwright-charp-common/locator-registry-dotnet";
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
+import { Indent } from "../../file-defs";
 
 export class PlaywrightCsharpNunitTemplatesProvider implements IPlaywrightCsharpTemplatesProvider {
   private _templateCollection: NunitTemplateCollection;
 
-  constructor(customTemplatesDir: string) {
-    this._templateCollection = new NunitTemplateCollection(path.resolve(__dirname, "./templates"), customTemplatesDir, ".hbs");
+  constructor(customTemplatesDir: string, requiredIndenChar: Indent, requiredIndexSize: number) {
+    this._templateCollection = new NunitTemplateCollection({
+      templatesDir: path.resolve(__dirname, "./templates"),
+      customTemplatesDir,
+      fileExtension: ".hbs",
+      requiredIndentChar: requiredIndenChar,
+      requiredIndentSize: requiredIndexSize,
+      sourceIndentChar: Indent.Spaces,
+      sourceIndentSize: 4,
+    });
   }
 
   getEnvironmentSettingsFiles(rootNamespace: string, allVariableNames: string[]): string {
     return this._templateCollection.ENVIRONMENT_SETTINGS_FILE({ rootNamespace, allVariableNames });
   }
 
-  getTestSuiteFile(usings: string, name: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
+  getTestSuiteFile(
+    usings: string,
+    name: string,
+    description: string,
+    body: string,
+    rootNamespace: string,
+    fullNamespace: string
+  ) {
     return this._templateCollection.TEST_SUITE_FILE({ usings, name, description, body, rootNamespace, fullNamespace });
   }
 
-  getTestCaseFile(testCaseName: string, description: string, body: string, rootNamespace: string, fullNamespace: string) {
+  getTestCaseFile(
+    testCaseName: string,
+    description: string,
+    body: string,
+    rootNamespace: string,
+    fullNamespace: string
+  ) {
     return this._templateCollection.TEST_CASE_FILE({ rootNamespace, testCaseName, description, body, fullNamespace });
   }
 

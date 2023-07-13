@@ -1,22 +1,51 @@
-import os from "os";
 import fs from "fs";
 import path from "path";
 
-import { StandardFolder } from "../../../src/file-defs";
+import { AutomationFramework, Indent, Language, StandardFolder, TestFramework } from "../../../src/file-defs";
 import { IProgressEvent } from "../../../src/ipc-defs";
 import { generateCode } from "../../../src/codegen";
 import { writeOutputProjectFiles, createRmTestProject } from "../../test-helpers/rm-project-generator";
 import { doAssert } from "../../test-helpers/assert-helper";
-import { createPlaywrightMsTestTestData } from "./playwright-csharp-mstest.test-data";
 import { createTempDir } from "../../test-helpers/fsHelpers";
+import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
+import { createTestDataKitchenSink } from "../playwright-typescript/playwright-typescript-kitchen-sink.test-data";
+
+const createPlaywrightMsTestTestData = (): RmpSpec => {
+  const kitchenSinkData = createTestDataKitchenSink();
+
+  return {
+    // Name of the project file, should be unique among tests in `codegen` test
+    projectName: "google-test-playwright-mstest",
+    // The content of the rmproj file
+    content: {
+      fileVersion: 1,
+      name: "",
+      description: "",
+      automationFramework: AutomationFramework.Playwright,
+      testFramework: TestFramework.xUnit,
+      language: Language.CSharp,
+      rootNamespace: "",
+      indent: Indent.Spaces,
+      indentSize: 2,
+      testIdAttributeName: "",
+    },
+
+    configFiles: kitchenSinkData.configFiles,
+    pages: kitchenSinkData.pages,
+    testcases: kitchenSinkData.testcases,
+    testroutines: kitchenSinkData.testroutines,
+    testsuites: kitchenSinkData.testsuites,
+    outputFiles: [],
+  };
+};
 
 test("CodeGen Playwright CSharp MsTest", async () => {
   // Arrange
   const tmpDir = createTempDir("playwright-csharp-mstest");
   const projSpec = createPlaywrightMsTestTestData();
-  const copyToDir = path.join(tmpDir, "rmproj");
-  fs.mkdirSync(copyToDir);
-  const projFile = createRmTestProject(projSpec, copyToDir);
+  const createSourceProjectInDir = path.join(tmpDir, "rmproj");
+  fs.mkdirSync(createSourceProjectInDir);
+  const projFile = createRmTestProject(projSpec, createSourceProjectInDir);
 
   const sampleOutputDir = path.join(tmpDir, "result");
   fs.mkdirSync(sampleOutputDir);

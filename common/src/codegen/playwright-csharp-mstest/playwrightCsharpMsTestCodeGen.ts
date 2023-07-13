@@ -38,7 +38,9 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
 
   protected override getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {
     return new PlaywrightCsharpMsTestTemplatesProvider(
-      path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates")
+      path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates"),
+      this._rmprojFile.content.indent,
+      this._rmprojFile.content.indentSize
     );
   }
 
@@ -198,7 +200,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     }
 
     let propertyInits = propertyInitList.join(EOL);
-    propertyInits = addIndent(propertyInits, this._indentString.repeat(2));
+    propertyInits = addIndent(propertyInits, this._indentString, 2);
 
     return this._templateProvider.getPageDefinitions(this._rootNamespace, usings, propertyDeclarations, propertyInits);
   }

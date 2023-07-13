@@ -13,14 +13,20 @@ export class PlaywrightTypescriptTemplateProvider {
   private _indentChar: string;
   private _indentString: string;
 
-  constructor(customTemplatesDir: string, indent: Indent = Indent.Spaces, indentSize: number = 4) {
-    this._templateCollection = new JestTemplateCollection(
-      path.resolve(__dirname, "./templates"),
+  constructor(customTemplatesDir: string, requiredIndenChar: Indent, requiredIndexSize: number) {
+    this._templateCollection = new JestTemplateCollection({
+      templatesDir: path.resolve(__dirname, "./templates"),
       customTemplatesDir,
-      ".hbs"
-    );
-    this._indentChar = indentCharMap.get(indent)!;
-    this._indentString = this._indentChar.repeat(indentSize);
+      fileExtension: ".hbs",
+      requiredIndentChar: requiredIndenChar,
+      requiredIndentSize: requiredIndexSize,
+
+      sourceIndentChar: Indent.Spaces,
+      sourceIndentSize: 2,
+    });
+
+    this._indentChar = indentCharMap.get(requiredIndenChar)!;
+    this._indentString = this._indentChar.repeat(requiredIndexSize);
   }
 
   private Indent(sourceStr: string, indentSpaces?: number) {

@@ -6,14 +6,42 @@ import { createRmTestProject, writeOutputProjectFiles } from "../../test-helpers
 import { PlaywrightTypeScriptProjMetaGenerator } from "../../../src/codegen/playwright-typescript/playwrightTypeScriptMetaGenerator";
 import { createTempDir } from "../../test-helpers/fsHelpers";
 import { generateCode } from "../../../src/codegen";
-import { IProgressEvent } from "../../../src";
+import { AutomationFramework, IProgressEvent, Indent, Language } from "../../../src";
 import { execSync } from "child_process";
 import { createTestDataKitchenSink } from "./playwright-typescript-kitchen-sink.test-data";
+import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
 const tempDir = path.resolve(__dirname, "../../.tmp");
+
+const createTestDataPlaywrightTypeScript = (): RmpSpec => {
+  const kitchenSinkData = createTestDataKitchenSink();
+
+  return {
+    projectName: "playwright-typescript-kitchen-sink",
+    content: {
+      fileVersion: 1,
+      name: "",
+      description: "",
+      automationFramework: AutomationFramework.Playwright,
+      testFramework: "",
+      language: Language.Typescript,
+      rootNamespace: "",
+      indent: Indent.Spaces,
+      indentSize: 2,
+      testIdAttributeName: "",
+    },
+
+    configFiles: kitchenSinkData.configFiles,
+    pages: kitchenSinkData.pages,
+    testcases: kitchenSinkData.testcases,
+    testroutines: kitchenSinkData.testroutines,
+    testsuites: kitchenSinkData.testsuites,
+    outputFiles: [],
+  };
+};
 
 test("Generate Test project Playwright Typescript KitchenSink", async () => {
   // Arrange
-  const projSpec = createTestDataKitchenSink();
+  const projSpec = createTestDataPlaywrightTypeScript();
   const tmpDir = createTempDir("playwright-typescript-kitchen-sink");
   const copyToDir = path.join(tmpDir, "rmproj");
   fs.mkdirSync(copyToDir);

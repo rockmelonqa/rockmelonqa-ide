@@ -1,12 +1,11 @@
-import { compile } from "handlebars";
-import { loadTemplate } from "../utils/templateLoader";
+import { TemplateCollectionOptions } from "../playwright-csharp-mstest/templateCollection";
+import { BaseTemplateCollection } from "../codegen-common/baseTemplateCollection";
 
-export class BaseDotnetTemplateCollection {
+export class BaseDotnetTemplateCollection extends BaseTemplateCollection {
   public readonly ENVIRONMENT_SETTINGS_FILE: HandlebarsTemplateDelegate<any>;
 
-  constructor(templatesDir: string, customTemplatesDir: string, fileExtension: string) {
-    const loadAndCompile = (templateFileName: string) =>
-      compile(loadTemplate(templatesDir, customTemplatesDir, templateFileName + fileExtension));
-    this.ENVIRONMENT_SETTINGS_FILE = loadAndCompile("EnvironmentSettings");
+  constructor(templateCollectionOptions: TemplateCollectionOptions) {
+    super(templateCollectionOptions);
+    this.ENVIRONMENT_SETTINGS_FILE = this.loadAndCompile("EnvironmentSettings");
   }
 }

@@ -36,7 +36,9 @@ export class PlaywrightCsharpXUnitCodeGen extends PlaywrightCsharpCodeGen implem
 
   protected override getTemplateProvider(): IPlaywrightCsharpTemplatesProvider {
     return new PlaywrightCsharpXUnitTemplatesProvider(
-      path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates")
+      path.join(this._rmprojFile.folderPath, StandardFolder.CustomCode, "templates"),
+      this._rmprojFile.content.indent,
+      this._rmprojFile.content.indentSize
     );
   }
 
@@ -196,7 +198,7 @@ export class PlaywrightCsharpXUnitCodeGen extends PlaywrightCsharpCodeGen implem
     }
 
     let pageInits = pageInitItems.join(EOL);
-    pageInits = addIndent(pageInits, this._indentString.repeat(2));
+    pageInits = addIndent(pageInits, this._indentString, 2);
 
     return this._templateProvider.getPageDefinitions(usings, this._rootNamespace, pagesDeclarations, pageInits);
   }
