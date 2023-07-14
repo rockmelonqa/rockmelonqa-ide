@@ -8,7 +8,6 @@ import {
   ITestSuite,
   LocatorType,
   StandardFolder,
-  StandardOutputFolder,
   StandardOutputFolderTypeScript,
 } from "../../file-defs";
 import { IPage } from "../../file-defs/pageFile";
@@ -360,12 +359,71 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
 
   private generateTestCaseFile(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {
     const testcaseBody = this.generateTestCaseBody(testCase, pages, routines);
+    const routineImports = this.generateRoutineImports(testCase, routines);
     const testCaseName = this._outProjMeta.get(testCase.id)!.outputFileClassName;
-    let testFile = this._templateProvider.getTestCaseFile(testCaseName, testCase.description, testcaseBody);
+    let testFile = this._templateProvider.getTestCaseFile(
+      testCaseName,
+      routineImports,
+      testCase.description,
+      testcaseBody
+    );
     return testFile;
   }
 
-  protected generateTestCaseBody(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {
+  /** Generates import routine statements for a test case */
+  private generateRoutineImports(testCase: ITestCase, routines: ITestRoutine[]): string[] {
+    const runTestRoutineSteps: ITestCaseActionStep[] = testCase.steps
+      .filter((s) => s.type === "testStep" && s.action === "RunTestRoutine")
+      .map((s) => s as ITestCaseActionStep);
+
+    const allRoutineImports: string[] = [];
+    for (let step of runTestRoutineSteps) {
+      let { routineImportNames, routineImportFile } = this.getRoutineImportNames(step, routines);
+      if (routineImportNames.length) {
+        allRoutineImports.push(`import { ${routineImportNames.join(", ")} } from "${routineImportFile}";`);
+      }
+    }
+    return allRoutineImports;
+  }
+
+  /** Gets routine import class names. Each routine class name is specified by the routine and the selected data sets. */
+  private getRoutineImportNames(
+    step: ITestCaseActionStep,
+    routines: ITestRoutine[]
+  ): { routineImportFile: string; routineImportNames: string[] } {
+    let routineId = step.data;
+    if (!routineId) {
+      return { routineImportFile: "", routineImportNames: [] };
+    }
+
+    let routine = routines.find((r) => r.id === routineId);
+
+    if (!routine) {
+      throw new Error(`DEV ERROR: routine with id "${routineId}" not found`);
+    }
+
+    let routineMeta = this._outProjMeta.get(routineId)!;
+
+    let dataSetCollection = new DataSetCollection(step.parameters);
+
+    if (dataSetCollection.isAll()) {
+      dataSetCollection.empty();
+      dataSetCollection.addMany(routine.dataSets.map((ds) => ds.id));
+    }
+
+    const routineImportNames = [];
+    for (let dataSetId of dataSetCollection.get()) {
+      let routineName = routineMeta.outputFileClassName;
+      let dataset = routine.dataSets.find((ds) => ds.id === dataSetId)!;
+      let datasetName = createCleanName(dataset.name);
+      let finalRoutineClassName = `${routineName}${datasetName}`;
+      routineImportNames.push(finalRoutineClassName);
+    }
+
+    return { routineImportFile: routineMeta.outputFileFullNamespace, routineImportNames };
+  }
+
+  protected generateTestCaseBody(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]): string {
     let stepItems: string[] = [];
     for (let step of testCase.steps) {
       if (step.type === "testStep") {
