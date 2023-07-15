@@ -9,7 +9,6 @@ const getApi = (apiKey?: string) => {
 };
 
 const runTest = (data: IRunTestRequest, options?: { apiKey?: string }) => {
-    console.log("runTest() data", data);
     getApi(options?.apiKey).send("runTest", data);
 };
 
