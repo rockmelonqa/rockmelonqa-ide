@@ -2,6 +2,11 @@ import { Page, test, expect } from "@playwright/test";
 import { TestCaseBase } from "~/support/TestCaseBase";
 import PageDefinitions from "~/PageDefinitions";
 import EnvironmentSettings from "~/config/EnvironmentSettings";
+{{#if routineImports.length}}
+{{#each routineImports as |routineImport|}}
+{{{routineImport}}}
+{{/each}}
+{{/if}}
 
 {{#if description}}
 /** {{{description}}} */

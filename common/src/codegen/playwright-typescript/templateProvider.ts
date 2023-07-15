@@ -100,8 +100,8 @@ export class PlaywrightTypescriptTemplateProvider {
     return this._templateCollection.PLAYWRIGHT_CONFIG_FILE({});
   }
 
-  getTestCaseFile(testCaseName: string, description: string, body: string) {
-    return this._templateCollection.TEST_CASE_FILE({ testCaseName, description, body });
+  getTestCaseFile(testCaseName: string, routineImports: string[], description: string, body: string) {
+    return this._templateCollection.TEST_CASE_FILE({ testCaseName, routineImports, description, body });
   }
   getTestSuiteFile(imports: string, name: string, description: string, body: string) {
     return this._templateCollection.TEST_SUITE_FILE({ imports, name, description, body });
