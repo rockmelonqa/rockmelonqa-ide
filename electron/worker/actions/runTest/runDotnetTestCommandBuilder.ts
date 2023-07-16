@@ -15,14 +15,16 @@ export default class RunDotnetTestCommandBuilder implements ICommandBuilder {
     const commands = [];
 
     if (settings.environmentFile) {
-      const invokeFileCmd = this.invokeEnvironmentFileCmdBuilder.build(settings.environmentFile);
-      commands.push(invokeFileCmd);
-    } else if (Platform.IsWindows()) {
-      // On Windows, we need to clean the environment variable of previous run
-      const invokeFileCmd = this.invokeEnvironmentFileCmdBuilder.build(
-        `${StandardOutputFolder.DotEnvironment}${path.sep}rmv.env${StandardFileExtension.Bat}`
-      );
+      if (Platform.IsWindows()) {
+        // On Windows, we need to clean the environment variable of previous run
+        const invokeFileCmd = this.invokeEnvironmentFileCmdBuilder.build(
+          `${StandardOutputFolder.DotEnvironment}${path.sep}rmv.env${StandardFileExtension.Bat}`
+        );
 
+        commands.push(invokeFileCmd);
+      }
+
+      const invokeFileCmd = this.invokeEnvironmentFileCmdBuilder.build(settings.environmentFile);
       commands.push(invokeFileCmd);
     }
 
