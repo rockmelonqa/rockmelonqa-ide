@@ -11,6 +11,9 @@ import { StringBuilder } from "../utils/stringBuilder";
 import { IRunTestActionResult, runTest as runTestInWorker } from "../worker/actions/runTest";
 import { IChannels } from "./core/channelsInterface";
 import IPC from "./core/ipc";
+import { AfterRunHandlerFactory } from "../worker/actions/runTest/afterRunHandler";
+import { cleanUpStrangeChars } from "../utils/stringUtils";
+import { EOL } from "os";
 
 const nameAPI = "testRunner";
 
@@ -64,7 +67,7 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
       const { type, ...details } = event;
 
       if (details.log) {
-        sb.appendLine(details.log);
+        sb.appendLine(cleanUpStrangeChars(details.log));
       }
 
       browserWindow.webContents.send(type, details as IProgressDetail);
@@ -93,16 +96,25 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
     },
   };
 
-  // Print log file
   try {
+    const afterRunHandler = AfterRunHandlerFactory.getInstance(context.rmProjFile.content.language);
+    await afterRunHandler.handle(context);
+    const failedTestScreenshots = await afterRunHandler.getFailedTestScreenshots(context);
+
+    // Print log file
     sb.appendLine(`*** Finish at ${moment().format("MMMM Do YYYY, h:mm:ss a")}`);
     sb.appendLine(JSON.stringify(ipcRs, null, 4));
+    sb.appendLine("");
+    sb.appendLine("*** Failed test screenshot files ***");
+    sb.appendLine(failedTestScreenshots.map((f) => `- ${f}`).join(EOL));
 
     const logFileName = `run-test.log`;
     const logFilePath = path.join(context.settings.testResultFolderRelPath, logFileName);
     await fileSystem.writeFile(path.join(projFile.folderPath, logFilePath), sb.toString());
 
     ipcRs.data = { ...ipcRs.data, logFileName: logFileName } as IRunTestResponseData;
+  } catch (err) {
+    console.error(err);
   } finally {
     browserWindow.webContents.send("finish", ipcRs);
   }
