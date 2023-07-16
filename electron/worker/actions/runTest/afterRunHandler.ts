@@ -50,10 +50,20 @@ class AfterRunHandlerDotnet extends AfterRunHandlerBase implements IAfterRunHand
     const dotnetOutputFolder = path.join(context.rmProjFile.folderPath, StandardFolder.OutputCode, "bin", "Debug");
     const files = await fs.readdir(dotnetOutputFolder);
     const errorScreenshotFiles = files.filter((f) => f.toLowerCase().endsWith("_error.png"));
-    for (let file of errorScreenshotFiles) {
-      let filePath = path.join(dotnetOutputFolder, file);
-      let copyToPath = path.join(context.rmProjFile.folderPath, context.settings.testResultFolderRelPath, file);
-      await fs.copyFile(filePath, copyToPath);
+    if (errorScreenshotFiles.length) {
+      let errorScreenShotsFolder = path.join(
+        context.rmProjFile.folderPath,
+        context.settings.testResultFolderRelPath,
+        "error-screenshots"
+      );
+      fs.mkdir(errorScreenShotsFolder);
+
+      for (let file of errorScreenshotFiles) {
+        let filePath = path.join(dotnetOutputFolder, file);
+        let copyToPath = path.join(errorScreenShotsFolder, file);
+        await fs.copyFile(filePath, copyToPath);
+        await fs.unlink(filePath);
+      }
     }
   }
 }
