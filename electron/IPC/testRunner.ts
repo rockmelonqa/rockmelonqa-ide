@@ -98,18 +98,12 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
 
   try {
     const afterRunHandler = AfterRunHandlerFactory.getInstance(context.rmProjFile.content.language);
-    const failedTestScreenshots = await afterRunHandler.getFailedTestScreenshots(context);
-    await afterRunHandler.handle(context);
+    await afterRunHandler.handle(context, sb);
 
     // Print log file
+    sb.appendLine("");
     sb.appendLine(`*** Finish at ${moment().format("MMMM Do YYYY, h:mm:ss a")}`);
     sb.appendLine(JSON.stringify(ipcRs, null, 4));
-
-    if (failedTestScreenshots.length) {
-      sb.appendLine("");
-      sb.appendLine("*** Failed test screenshot files ***");
-      sb.appendLine(failedTestScreenshots.map((f) => `- ${f}`).join(EOL));
-    }
 
     const logFileName = `run-test.log`;
     const logFilePath = path.join(context.settings.testResultFolderRelPath, logFileName);
