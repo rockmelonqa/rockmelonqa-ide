@@ -14,4 +14,22 @@ public abstract class TestSuiteBase : PageTest
         await base.PageSetup();
     }
 {{/if}}
+
+
+
+    [TestCleanup]
+    public void Cleanup()
+    {
+        if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+        {
+            return;
+        }
+
+        if (!EnvironmentSettings.TakeScreenshotOnError)
+        {
+            return;
+        }
+
+        this.Page.ScreenshotAsync(new PageScreenshotOptions { Path = $"{TestContext.ManagedType}_{TestContext.ManagedMethod}_error.png", FullPage = true }).Wait();
+    }
 }
