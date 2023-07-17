@@ -51,6 +51,10 @@ export class PlaywrightTypescriptTemplateProvider {
     return actionGenerate(params);
   }
 
+  getExtendPlaywrightFile() {
+    return this._templateCollection.EXTEND_PLAYWRIGHT_FILE({});
+  }
+
   getLocator(params: ILocatorTemplateParam) {
     let { elementName, locatorType, returnedLocatorType, description } = params;
 

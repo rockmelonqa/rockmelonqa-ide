@@ -111,6 +111,10 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
       `${StandardOutputFolderTypeScript.Support}/${StandardOutputFile.TestRoutineBase}${this._outputFileExt}`,
       this._templateProvider.getTestRoutineBase()
     );
+    await writeFile(
+      `${StandardOutputFolderTypeScript.Support}/${StandardOutputFile.ExtendPlaywright}${this._outputFileExt}`,
+      this._templateProvider.getExtendPlaywrightFile()
+    );
 
     await writeFile(
       `${StandardOutputFile.NodePackage}`,
