@@ -28,11 +28,8 @@ export class AfterRunHandlerFactory {
   }
 }
 
-/** Base class for AfterRunHandler */
-class AfterRunHandlerBase {}
-
 /** AfterRunHandler for Dotnet project */
-class AfterRunHandlerDotnet extends AfterRunHandlerBase implements IAfterRunHandler {
+class AfterRunHandlerDotnet implements IAfterRunHandler {
   /** Performs additional operations after dotnet test is finished */
   async handle(context: IRunTestContext, logBuilder: StringBuilder) {
     if (context.rmProjFile.content.testFramework === TestFramework.xUnit) {
@@ -78,7 +75,7 @@ class AfterRunHandlerDotnet extends AfterRunHandlerBase implements IAfterRunHand
 }
 
 /** AfterRunHandler for Playwright Typescript project */
-class AfterRunHandlerTypeScript extends AfterRunHandlerBase implements IAfterRunHandler {
+class AfterRunHandlerTypeScript implements IAfterRunHandler {
   async handle(context: IRunTestContext, logBuilder: StringBuilder) {
     const failedTestScreenshots = await this.getFailedTestScreenshots(context);
     if (failedTestScreenshots.length) {
