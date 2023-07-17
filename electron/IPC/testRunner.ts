@@ -67,7 +67,8 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
       const { type, ...details } = event;
 
       if (details.log) {
-        sb.appendLine(cleanUpStrangeChars(details.log));
+        details.log = cleanUpStrangeChars(details.log);
+        sb.appendLine(details.log);
       }
 
       browserWindow.webContents.send(type, details as IProgressDetail);
