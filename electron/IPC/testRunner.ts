@@ -80,6 +80,9 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
 
   console.log("Finish runTest", actionRs);
 
+  const afterRunHandler = AfterRunHandlerFactory.getInstance(context.rmProjFile.content.language);
+  await afterRunHandler.handle(context, sb);
+
   const ipcRs: IIpcGenericResponse<IRunTestResponseData> = {
     isSuccess: actionRs.isSuccess,
     errorMessage: actionRs.errorMessage,
@@ -98,9 +101,6 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
   };
 
   try {
-    const afterRunHandler = AfterRunHandlerFactory.getInstance(context.rmProjFile.content.language);
-    await afterRunHandler.handle(context, sb);
-
     // Print log file
     sb.appendLine("");
     sb.appendLine(`*** Finish at ${moment().format("MMMM Do YYYY, h:mm:ss a")}`);
