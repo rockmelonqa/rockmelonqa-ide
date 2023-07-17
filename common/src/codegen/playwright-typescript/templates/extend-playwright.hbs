@@ -8,16 +8,16 @@ export const test = base.extend<{ page: Page }>({
   },
 });
 
-test.afterEach(async ({ page }, tesetInfo) => {
+test.afterEach(async ({ page }, testInfo) => {
   if (!EnvironmentSettings.TakeScreenshotOnError) {
     return;
   }
 
-  if (tesetInfo.status === "passed") {
+  if (testInfo.status === "passed") {
     return;
   }
 
-  let [suiteFileName, testCaseName] = tesetInfo.titlePath;
+  let [suiteFileName, testCaseName] = testInfo.titlePath;
   suiteFileName = suiteFileName
     // Remove .spec.ts from suite file name
     .replace(/\.spec\.ts$/i, "")
