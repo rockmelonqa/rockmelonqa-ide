@@ -1,6 +1,6 @@
-import chokidar, { FSWatcher } from 'chokidar';
-import { BrowserWindow, dialog } from 'electron';
-import path from 'path';
+import chokidar, { FSWatcher } from "chokidar";
+import { BrowserWindow, dialog } from "electron";
+import path from "path";
 import {
   IAddFileWatchEventArgs,
   IFileSystemInfo,
@@ -8,12 +8,12 @@ import {
   IIpcResponse,
   IRenameFileRequest,
   IWriteFileRequest,
-} from 'rockmelonqa.common';
-import * as fs from '../utils/fileSystem';
-import { IChannels } from './core/channelsInterface';
-import IPC from './core/ipc';
+} from "rockmelonqa.common";
+import * as fs from "../utils/fileSystem";
+import { IChannels } from "./core/channelsInterface";
+import IPC from "./core/ipc";
 
-const nameAPI = 'fileSystem';
+const nameAPI = "fileSystem";
 
 // to Main
 const validSendChannel: IChannels = {
@@ -27,13 +27,14 @@ const validInvokeChannel: IChannels = {
   getFolder: getFolder,
   pickFolder: pickFolder,
   readFile: readFile,
+  readFileBase64: readFileBase64,
   rename: rename,
   walkFolder: walkFolder,
   writeFile: writeFile,
 };
 
 // from Main
-const validReceiveChannel: string[] = ['watch:add', 'watch:unlink', 'watch:addDir', 'watch:unlinkDir', 'watch:change'];
+const validReceiveChannel: string[] = ["watch:add", "watch:unlink", "watch:addDir", "watch:unlinkDir", "watch:change"];
 
 const fileSystem = new IPC({
   nameAPI,
@@ -69,7 +70,7 @@ async function deleteFileSystem(
     await fs.deleteFileSystem(path);
     return { isSuccess: true } as IIpcResponse;
   } catch (error: any) {
-    return { isSuccess: false, errorMessage: 'Cannot delete file' } as IIpcResponse;
+    return { isSuccess: false, errorMessage: "Cannot delete file" } as IIpcResponse;
   }
 }
 
@@ -112,7 +113,7 @@ async function getCloneFilePath(
       pastingTries += 1;
     }
   } catch (error) {
-    console.log('CANNOT clone file:', filePath);
+    console.log("CANNOT clone file:", filePath);
     console.error(error);
     throw error;
   }
@@ -133,7 +134,7 @@ async function getFolder(
  * Invoke OS folder picker to select a folder
  */
 async function pickFolder(browserWindow: BrowserWindow, event: Electron.IpcMainEvent): Promise<string | void> {
-  const { canceled, filePaths } = await dialog.showOpenDialog(browserWindow, { properties: ['openDirectory'] });
+  const { canceled, filePaths } = await dialog.showOpenDialog(browserWindow, { properties: ["openDirectory"] });
   if (canceled) {
     return;
   } else {
@@ -155,7 +156,20 @@ async function readFile(
     return null;
   }
 }
-
+/**
+ * Read file content as base64 string
+ */
+async function readFileBase64(
+  browserWindow: BrowserWindow,
+  event: Electron.IpcMainEvent,
+  filePath: string
+): Promise<string | null> {
+  try {
+    return await fs.readFile(filePath, "base64");
+  } catch (error) {
+    return null;
+  }
+}
 /**
  * Rename file system
  */
@@ -168,7 +182,7 @@ async function rename(
     await fs.rename(data.oldPath, data.newPath);
     return { isSuccess: true } as IIpcResponse;
   } catch (error: any) {
-    return { isSuccess: false, errorMessage: 'Cannot rename file' } as IIpcResponse;
+    return { isSuccess: false, errorMessage: "Cannot rename file" } as IIpcResponse;
   }
 }
 
@@ -184,7 +198,7 @@ async function walkFolder(
     const files = await fs.walkFolder(folderPath);
     return { isSuccess: true, data: files } as IIpcResponse;
   } catch (error) {
-    return { isSuccess: false, errorMessage: 'Cannot walk folder' };
+    return { isSuccess: false, errorMessage: "Cannot walk folder" };
   }
 }
 
@@ -203,33 +217,33 @@ async function watch(browserWindow: BrowserWindow, event: Electron.IpcMainEvent,
   let isReady = false;
   fsWatcher = chokidar.watch(path);
   fsWatcher
-    .on('add', function (path) {
-      browserWindow.webContents.send('watch:add', {
+    .on("add", function (path) {
+      browserWindow.webContents.send("watch:add", {
         path,
         isReady,
       } as IAddFileWatchEventArgs);
     })
-    .on('unlink', function (path) {
+    .on("unlink", function (path) {
       if (isReady) {
-        browserWindow.webContents.send('watch:unlink', path);
+        browserWindow.webContents.send("watch:unlink", path);
       }
     })
-    .on('addDir', function (path) {
+    .on("addDir", function (path) {
       if (isReady) {
-        browserWindow.webContents.send('watch:addDir', path);
+        browserWindow.webContents.send("watch:addDir", path);
       }
     })
-    .on('unlinkDir', function (path) {
+    .on("unlinkDir", function (path) {
       if (isReady) {
-        browserWindow.webContents.send('watch:unlinkDir', path);
+        browserWindow.webContents.send("watch:unlinkDir", path);
       }
     })
-    .on('change', function (path) {
+    .on("change", function (path) {
       if (isReady) {
-        browserWindow.webContents.send('watch:change', path);
+        browserWindow.webContents.send("watch:change", path);
       }
     })
-    .on('ready', function () {
+    .on("ready", function () {
       isReady = true;
     });
 }
