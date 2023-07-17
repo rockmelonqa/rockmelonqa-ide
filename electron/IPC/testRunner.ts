@@ -114,7 +114,7 @@ const toTestResultFileName = (rmProjFile: IRmProjFile) => {
     case Language.CSharp:
       return "test-result.trx";
     case Language.Typescript:
-      return "test-result.json";
+      return "test-result.html";
     default:
       throw new Error("Language not supported: " + language);
   }

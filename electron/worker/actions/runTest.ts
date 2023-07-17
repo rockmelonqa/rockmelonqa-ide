@@ -1,5 +1,6 @@
 import path from "path";
 import { Worker } from "worker_threads";
+import "ts-replace-all";
 
 import { IProgressEvent, IRmProjFile, Language } from "rockmelonqa.common";
 import { MessagePort } from "worker_threads";
@@ -57,7 +58,7 @@ const copyPlaywrightReportToTestRuns = async (context: IRunTestContext) => {
   const runResultFilePath = path.join(
     context.rmProjFile.folderPath,
     context.settings.testResultFolderRelPath,
-    `test-run-result.html`
+    `test-result.html`
   );
   await fileSystem.copyFile(playwrightReportFile, runResultFilePath);
 };
@@ -70,12 +71,16 @@ export const doRunTest = async (port: MessagePort | null, context: IRunTestConte
   let cmd: string = commandBuilder.build(settings);
 
   postMessage(port, { type: "running-test", log: `Executing: '${cmd}'` });
-  const rs = executeCommand(cmd, { cwd: settings.sourceCodeFolderPath });
-  postMessage(port, { type: "running-test", log: rs.output });
+  const rs = executeCommand(cmd, { cwd: settings.sourceCodeFolderPath, encoding: "utf-8" });
+  let rsOutput = rs.output;
 
   if (context.rmProjFile.content.language === Language.Typescript) {
     await copyPlaywrightReportToTestRuns(context);
+    // Not sure why output from `npx playwright` has '\x1B' characters
+    rsOutput = rsOutput?.replaceAll("\x1B", "");
   }
+
+  postMessage(port, { type: "running-test", log: rsOutput });
 
   postMessage(port, { type: "finish" });
 };

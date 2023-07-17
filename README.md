@@ -172,3 +172,26 @@ See release process [here](./RELEASE.md)
 To run tests from **C#** generated code, we have to install [playwright browser](https://playwright.dev/docs/browsers) by executing `pwsh bin/Debug/netX/playwright.ps1 install` (run at `output-code` folder, `X` is dotnet version like `6.0`). The IDE already covers this step during code generation stage.
 
 However, it only installs Chromium, Firefox and Webkit (Safari). Therefore, to execute test cases with **MS Edge & Google Chrome in Linux** (which does not include MS Edge browser by default), we need to install MS Edge manually by `pwsh bin/DebugX/playwright.ps1 install msedge`
+
+## 6 Debugging Electron code using Chrome
+
+### 6.1 Reqirements
+
+- Windows (Not tried this on Ubuntu yet, but it should works the same way)
+- IDE has been set up to run Svelte Development Mode. See 3.4
+- Google Chrome has been install natively on current machine
+
+### 6.2 Launch IDE
+
+-- Run `npm run dev` in svelte folder
+-- Run `start:debug-electron` in the root folder. This will run `electron --inspect=5858 .`, which launch the IDE with an "inpectable" website on `localhost:5858`.
+
+### 6.3 Launch Chrome inspection
+
+-- Open Chrome
+-- Goto `chrome://inspect/#devices`: The list "Remote Target" is empty initially
+-- Click button Configure
+-- The Target discovery settings dialog opens. Add `localhost:5858` to list of inspectable sites. Click Done. The list "Remote Target" now contains 1 site for inspection, which is the Electron code
+-- Click on the "Open dedicated DevTools for Node" link. A special Chrome DevTools windows appears
+-- Navigate to the Sources tab and see the source code of Electron under `file://`
+-- Locate the file you want to debug and start debugging.
