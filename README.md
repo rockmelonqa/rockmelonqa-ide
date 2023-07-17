@@ -195,3 +195,8 @@ However, it only installs Chromium, Firefox and Webkit (Safari). Therefore, to e
 -- Click on the "Open dedicated DevTools for Node" link. A special Chrome DevTools windows appears
 -- Navigate to the Sources tab and see the source code of Electron under `file://`
 -- Locate the file you want to debug and start debugging.
+
+### Tips
+
+- Don't interact with the UI when a breakpoint is hit in the debugging DevTools, the UI will be freezed.
+- After closing the IDE, the DevTools will unload the source. If you are going to run debug again, then keep the DevTools open. when the IDE is reopened, the DevTools will reload the source automatically (might a few seconds).
