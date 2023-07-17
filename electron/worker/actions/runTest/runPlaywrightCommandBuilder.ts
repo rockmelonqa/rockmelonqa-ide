@@ -59,7 +59,10 @@ export default class RunPlaywrightCommandBuilder implements ICommandBuilder {
     }
 
     const filterStr = this.buildFilter(settings.testCases);
-    const browserStr = settings.browser ? `--headed --project=${settings.browser}` : "";
+    const browserStr = settings.browser
+      ? `--headed --project=${settings.browser}`
+      : // Use chromium in headless mode
+        "--project=chromium";
 
     commands.push(
       // See https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-test for more details about `dotnet test`
