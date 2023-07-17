@@ -72,7 +72,6 @@
 
         registerListener(
             codeGenerator.onGenerateCode((data: IProgressDetail) => {
-                console.log("onGenerateCode", data);
                 spinnerText = uiContext.str(stringResKeys.codeGenerationDialog.generateCodeMsg);
                 addLog(data.log);
             })
