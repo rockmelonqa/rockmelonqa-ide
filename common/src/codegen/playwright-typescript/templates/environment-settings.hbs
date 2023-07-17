@@ -1,4 +1,7 @@
 export default class {
+  public static get TakeScreenshotOnError(): boolean {
+    return (process.env.TakeScreenshotOnError ?? "true") === "true";
+  }
   {{#each allVariableNames as |name|}}
   public static get {{{name}}}(): string { return process.env.{{{name}}} || ""; }
   {{/each}}
