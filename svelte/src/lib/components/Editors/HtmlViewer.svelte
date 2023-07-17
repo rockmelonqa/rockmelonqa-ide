@@ -2,7 +2,7 @@
     import { appContextKey, type IAppContext } from "$lib/context/AppContext";
     import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
     import { fileSystem } from "$lib/ipc";
-    import { createEventDispatcher, getContext, onMount } from "svelte";
+    import { getContext, onMount } from "svelte";
     import { combinePath } from "../FileExplorer/Node";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
@@ -14,8 +14,7 @@
     let appContext = getContext(appContextKey) as IAppContext;
     let { state: appState, dispatch: appStateDispatch } = appContext;
 
-    const dispatch = createEventDispatcher();
-    let frameEl: HTMLDivElement;
+    let frameEl: HTMLIFrameElement;
     onMount(async () => {
         const fileContent = (await fileSystem.readFile(filePath)) ?? "";
         frameEl.src = "data:text/html;charset=utf-8," + escape(fileContent);
