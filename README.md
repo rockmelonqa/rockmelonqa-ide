@@ -158,16 +158,7 @@ See release process [here](./RELEASE.md)
 
 ## 5 Troubleshooting
 
-### 5.1 Debugging Electron code in Chrome DevTool
-
-- Start svelte by `npm run dev`
-- Open chrome, visit `chrome://inspect`
-- Click **[Configure...]** button, then add `localhost:58585` (see `package.json` file), click **[Done]**
-- Then click **[Open dedicated DevTools for Node]** link
-- Now start electron app by `npm run dev:debug-electron`
-- Back to DevTools for Node, set break point then debug
-
-### 5.2 Manually install 'playwright msedge' in Linux
+### 5.1 Manually install 'playwright msedge' in Linux
 
 To run tests from **C#** generated code, we have to install [playwright browser](https://playwright.dev/docs/browsers) by executing `pwsh bin/Debug/netX/playwright.ps1 install` (run at `output-code` folder, `X` is dotnet version like `6.0`). The IDE already covers this step during code generation stage.
 
