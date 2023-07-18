@@ -64,6 +64,13 @@ const readFile = async (filePath: string, options?: { apiKey?: string }): Promis
 };
 
 /**
+ * Read file content as base64 string
+ */
+const readFileBase64 = async (filePath: string, options?: { apiKey?: string }): Promise<string | null> => {
+    return await getApi(options?.apiKey).invoke("readFileBase64", filePath);
+};
+
+/**
  * Rename file system
  */
 const rename = async (oldPath: string, newPath: string, options?: { apiKey?: string }): Promise<IIpcResponse> => {
@@ -142,6 +149,7 @@ export const fileSystem = {
     getFolder,
     pickFolder,
     readFile,
+    readFileBase64,
     rename,
     walkFolder,
     watch,

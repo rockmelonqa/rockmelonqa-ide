@@ -109,9 +109,9 @@ export async function isEmptyFolder(folderPath: string): Promise<boolean> {
  * @param filePath
  * @returns
  */
-export async function readFile(filePath: string): Promise<string> {
+export async function readFile(filePath: string, encoding: BufferEncoding = "utf-8"): Promise<string> {
   try {
-    return await fs.promises.readFile(filePath, "utf-8");
+    return await fs.promises.readFile(filePath, { encoding });
   } catch (error) {
     console.log("CANNOT read file:", filePath);
     console.error(error);

@@ -9,6 +9,7 @@ import TextEditor from "./TextEditor.svelte";
 import TrxViewer from "./TrxViewer/TrxViewer.svelte";
 import EnvEditor from "./EnvironmentEditor.svelte";
 import HtmlViewer from "./HtmlViewer.svelte";
+import PhotoViewer from "./PhotoViewer.svelte";
 
 export const getEditor = (fileName: string): ComponentType | undefined => {
     const lastIndex = fileName.lastIndexOf(".");
@@ -30,6 +31,13 @@ export const getEditor = (fileName: string): ComponentType | undefined => {
             return TrxViewer;
         case ".html":
             return HtmlViewer;
+        case ".jpg":
+        case ".png":
+        case ".gif":
+        case ".bmp":
+        case ".webp":
+            // Maybe more image formats
+            return PhotoViewer;
         default:
             return TextEditor;
     }

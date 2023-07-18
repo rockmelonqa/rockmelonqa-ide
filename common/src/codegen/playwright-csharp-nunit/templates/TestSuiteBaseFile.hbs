@@ -11,4 +11,21 @@ public abstract class TestSuiteBase : PageTest
         playwright.Selectors.SetTestIdAttribute("{{testIdAttributeName}}");
     }
 {{/if}}
+
+    [TearDown]
+    public void Cleanup()
+    {
+        if (TestContext.CurrentContext.Result.Outcome == NUnit.Framework.Interfaces.ResultState.Success)
+        {
+            return;
+        }
+
+        if (!EnvironmentSettings.TakeScreenshotOnError)
+        {
+            return;
+        }
+
+        this.Page.ScreenshotAsync(new PageScreenshotOptions { Path = $"{TestContext.CurrentContext.Test.ClassName}_{TestContext.CurrentContext.Test.Name}_error.png", FullPage = true }).Wait();
+    }
+
 }

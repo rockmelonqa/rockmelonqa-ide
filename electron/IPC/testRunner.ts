@@ -11,6 +11,9 @@ import { StringBuilder } from "../utils/stringBuilder";
 import { IRunTestActionResult, runTest as runTestInWorker } from "../worker/actions/runTest";
 import { IChannels } from "./core/channelsInterface";
 import IPC from "./core/ipc";
+import { AfterRunHandlerFactory } from "../worker/actions/runTest/afterRunHandler";
+import { cleanUpStrangeChars } from "../utils/stringUtils";
+import { EOL } from "os";
 
 const nameAPI = "testRunner";
 
@@ -64,6 +67,7 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
       const { type, ...details } = event;
 
       if (details.log) {
+        details.log = cleanUpStrangeChars(details.log);
         sb.appendLine(details.log);
       }
 
@@ -75,6 +79,9 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
   }
 
   console.log("Finish runTest", actionRs);
+
+  const afterRunHandler = AfterRunHandlerFactory.getInstance(context.rmProjFile.content.language);
+  await afterRunHandler.handle(context, sb);
 
   const ipcRs: IIpcGenericResponse<IRunTestResponseData> = {
     isSuccess: actionRs.isSuccess,
@@ -93,8 +100,9 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
     },
   };
 
-  // Print log file
   try {
+    // Print log file
+    sb.appendLine("");
     sb.appendLine(`*** Finish at ${moment().format("MMMM Do YYYY, h:mm:ss a")}`);
     sb.appendLine(JSON.stringify(ipcRs, null, 4));
 
@@ -103,6 +111,8 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
     await fileSystem.writeFile(path.join(projFile.folderPath, logFilePath), sb.toString());
 
     ipcRs.data = { ...ipcRs.data, logFileName: logFileName } as IRunTestResponseData;
+  } catch (err) {
+    console.error(err);
   } finally {
     browserWindow.webContents.send("finish", ipcRs);
   }

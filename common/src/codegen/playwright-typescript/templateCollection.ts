@@ -7,6 +7,7 @@ import { TemplateCollectionOptions } from "../playwright-csharp-mstest/templateC
 export class JestTemplateCollection extends BaseTemplateCollection {
   public COMMENT: HandlebarsTemplateDelegate<any>;
   public ENVIRONMENT_SETTINGS: HandlebarsTemplateDelegate<any>;
+  public EXTEND_PLAYWRIGHT_FILE: HandlebarsTemplateDelegate<any>;
   public LOCATOR: HandlebarsTemplateDelegate<any>;
   public NODE_PACKAGE_FILE: HandlebarsTemplateDelegate<any>;
   public PAGE_BASE_FILE: HandlebarsTemplateDelegate<any>;
@@ -28,6 +29,7 @@ export class JestTemplateCollection extends BaseTemplateCollection {
 
     this.COMMENT = this.loadAndCompile("comment");
     this.ENVIRONMENT_SETTINGS = this.loadAndCompile("environment-settings");
+    this.EXTEND_PLAYWRIGHT_FILE = this.loadAndCompile("extend-playwright");
     this.LOCATOR = this.loadAndCompile("locator");
     this.NODE_PACKAGE_FILE = this.loadAndCompile("node-package");
     this.PAGE_BASE_FILE = this.loadAndCompile("page-base-file");

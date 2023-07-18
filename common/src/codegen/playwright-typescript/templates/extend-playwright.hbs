@@ -1,0 +1,35 @@
+import path from "path";
+import { Page, test as base } from "@playwright/test";
+import EnvironmentSettings from "~/config/EnvironmentSettings";
+
+export const test = base.extend<{ page: Page }>({
+  page: async ({ page }, use) => {
+    await use(page);
+  },
+});
+
+test.afterEach(async ({ page }, testInfo) => {
+  if (!EnvironmentSettings.TakeScreenshotOnError) {
+    return;
+  }
+
+  if (testInfo.status === "passed") {
+    return;
+  }
+
+  let [suiteFileName, testCaseName] = testInfo.titlePath;
+  suiteFileName = suiteFileName
+    // Remove .spec.ts from suite file name
+    .replace(/\.spec\.ts$/i, "")
+    // Replace path sep with _
+    .replace(path.sep, "_");
+
+  const screenshotFileName = `${suiteFileName}_${testCaseName}_error.png`;
+
+  const playwrightReportDir = path.resolve("./test-results");
+  const saveScreenshotTo = path.join(playwrightReportDir, screenshotFileName);
+
+  await page.screenshot({ path: saveScreenshotTo, fullPage: true });
+});
+
+export { expect } from "@playwright/test";

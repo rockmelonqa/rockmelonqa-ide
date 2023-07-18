@@ -13,6 +13,7 @@ export class StandardOutputFile {
   static readonly MetaData: string = ".code-metadata";
 
   // Nodejs
+  static readonly ExtendPlaywright: string = "ExtendPlaywright";
   static readonly NodePackage: string = "package.json";
   static readonly TsConfig: string = "tsconfig.json";
   static readonly PrettierConfig: string = ".prettierrc";

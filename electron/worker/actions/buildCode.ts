@@ -58,14 +58,7 @@ export const doBuildCode = async (port: MessagePort | null, rmProjectFile: IRmPr
 
       // Assume PowerShell is installed and available on the system PATH
       // Ensure Playwright browsers are downloaded
-      const dotnetVersion = execSync("dotnet --version").toString().trim();
-      const scriptPath = path.join(
-        outputCodeFolder,
-        "bin",
-        "Debug",
-        `net${extractMajorMinorVersion(dotnetVersion)}`,
-        "playwright.ps1"
-      );
+      const scriptPath = path.join(outputCodeFolder, "bin", "Debug", "playwright.ps1");
       if (await fileSystem.checkExists(scriptPath)) {
         const cmd = `pwsh ${scriptPath} install`;
         postMessage(port, { type: "install-dependencies", log: `Executing: '${cmd}'` });

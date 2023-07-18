@@ -2,6 +2,7 @@ namespace {{{rootNamespace}}}.Config;
 
 public static class EnvironmentSettings
 {
+    public static readonly bool TakeScreenshotOnError = (Environment.GetEnvironmentVariable(nameof(TakeScreenshotOnError), EnvironmentVariableTarget.Process) ?? "true") == "true";
     {{#each allVariableNames as |name|}}
     public static readonly string {{{name}}} = Environment.GetEnvironmentVariable(nameof({{{name}}})) ?? string.Empty;
     {{/each}}
