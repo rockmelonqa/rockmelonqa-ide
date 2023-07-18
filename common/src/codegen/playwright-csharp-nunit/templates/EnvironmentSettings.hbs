@@ -3,7 +3,9 @@ namespace {{{rootNamespace}}}.Config;
 public static class EnvironmentSettings
 {
     public static readonly bool TakeScreenshotOnError = (Environment.GetEnvironmentVariable(nameof(TakeScreenshotOnError), EnvironmentVariableTarget.Process) ?? "true") == "true";
-    {{#each allVariableNames as |name|}}
+    {{#each allVariableNames as |name|}}    
+    {{#if (isnt name "TakeScreenshotOnError")}}
     public static readonly string {{{name}}} = Environment.GetEnvironmentVariable(nameof({{{name}}})) ?? string.Empty;
+    {{/if}}
     {{/each}}
 }
