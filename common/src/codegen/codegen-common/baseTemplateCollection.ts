@@ -1,10 +1,13 @@
-import { compile } from "handlebars";
+import handlebars, { compile } from "handlebars";
+import helpers from "handlebars-helpers";
 import { loadTemplate } from "../utils/templateLoader";
 import { ICsharpTemplateCollection } from "../playwright-charp-common/csharpTemplateCollection";
 import { Indent } from "../../file-defs";
 import { EOL } from "os";
 import { indentCharMap } from "../../file-defs/shared";
 import { TemplateCollectionOptions } from "../playwright-csharp-mstest/templateCollection";
+
+helpers({ handlebars });
 
 export class BaseTemplateCollection {
   protected readonly templateLoader: TemplateLoader;

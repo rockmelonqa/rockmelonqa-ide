@@ -3,6 +3,8 @@ export default class {
     return (process.env.TakeScreenshotOnError ?? "true") === "true";
   }
   {{#each allVariableNames as |name|}}
+  {{#if (isnt name "TakeScreenshotOnError")}}
   public static get {{{name}}}(): string { return process.env.{{{name}}} || ""; }
+  {{/if}}
   {{/each}}
 }
