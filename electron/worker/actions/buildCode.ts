@@ -7,7 +7,6 @@ import { MessagePort } from "worker_threads";
 import * as fileSystem from "../../utils/fileSystem";
 import { WorkerAction, WorkerMessage } from "../worker";
 import { executeCommand, extractMajorMinorVersion, IActionResult } from "./shared";
-import { Platform } from "rockmelonqa.common/file-defs";
 
 export const buildCode = async function (
   rmProjectFile: IRmProjFile,
@@ -59,10 +58,7 @@ export const doBuildCode = async (port: MessagePort | null, rmProjectFile: IRmPr
 
       // Assume PowerShell is installed and available on the system PATH
       // Ensure Playwright browsers are downloaded
-      const dotnetVersion = execSync("dotnet --version").toString().trim();
-      const scriptPath = Platform.IsWindows()
-        ? path.join(outputCodeFolder, "bin", "Debug", "playwright.ps1")
-        : path.join(outputCodeFolder, "bin", "Debug", `net${extractMajorMinorVersion(dotnetVersion)}`, "playwright.ps1");
+      const scriptPath = path.join(outputCodeFolder, "bin", "Debug", "playwright.ps1");
       if (await fileSystem.checkExists(scriptPath)) {
         const cmd = `pwsh ${scriptPath} install`;
         postMessage(port, { type: "install-dependencies", log: `Executing: '${cmd}'` });
