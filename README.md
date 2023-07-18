@@ -160,7 +160,7 @@ See release process [here](./RELEASE.md)
 
 ### 5.1 Manually install 'playwright msedge' in Linux
 
-To run tests from **C#** generated code, we have to install [playwright browser](https://playwright.dev/docs/browsers) by executing `pwsh bin/Debug/playwright.ps1 install` (run at `output-code` folder, `X` is dotnet version like `6.0`). The IDE already covers this step during code generation stage.
+To run tests from **C#** generated code, we have to install [playwright browser](https://playwright.dev/docs/browsers) by executing `pwsh bin/Debug/playwright.ps1 install`. The IDE already covers this step during code generation stage.
 
 However, it only installs Chromium, Firefox and Webkit (Safari). Therefore, to execute test cases with **MS Edge & Google Chrome in Linux** (which does not include MS Edge browser by default), we need to install MS Edge manually by `pwsh bin/Debug/playwright.ps1 install msedge`
 
