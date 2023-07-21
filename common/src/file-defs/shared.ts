@@ -18,7 +18,7 @@ export interface ITestActionStep extends Omit<ITestStepBase, "type"> {
   page?: string;
   element?: string;
   action?: string;
-  data: string;
+  data: string | { [datasetId: string]: string };
   parameters?: string[];
 }
 
