@@ -1,6 +1,6 @@
-import { ITestCaseActionStep } from "../../../file-defs/testCaseFile";
+import { ITestActionStep } from "../../../file-defs/shared";
 
 /** Validate step with action RunTestRoutine */
-export default (step: ITestCaseActionStep) => {
+export default (step: ITestActionStep) => {
   return ``;
 };

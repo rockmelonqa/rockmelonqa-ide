@@ -1,7 +1,7 @@
-import { ITestCaseActionStep } from "../../../file-defs/testCaseFile";
-import { validateStepRequireData } from "../action-validator-registry";
+import { ITestActionStep } from "../../../file-defs/shared";
+import { StepValidator } from "../action-validator-registry";
 
-/** Validate step with action Clear */
-export default (step: ITestCaseActionStep) => {
-  return validateStepRequireData(step);
+/** Validate step with action Verify Title Contains */
+export default (step: ITestActionStep) => {
+  return StepValidator.validateRequireDataAsString(step);
 };
