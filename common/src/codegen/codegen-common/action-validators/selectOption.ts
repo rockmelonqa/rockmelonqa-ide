@@ -1,7 +1,7 @@
-import { ITestCaseActionStep } from "../../../file-defs/testCaseFile";
-import { validateStepRequirePageAndElementAndData } from "../action-validator-registry";
+import { ITestActionStep } from "../../../file-defs/shared";
+import { StepValidator } from "../action-validator-registry";
 
-/** Validate step with action Clear */
-export default (step: ITestCaseActionStep) => {
-  return validateStepRequirePageAndElementAndData(step);
+/** Validate step with action Select Option */
+export default (step: ITestActionStep) => {
+  return StepValidator.validateRequirePageAndElement(step);
 };

@@ -1,4 +1,5 @@
-import { ActionType } from "../../file-defs";
+import { ActionType, ITestRoutineActionStep } from "../../file-defs";
+import { ITestActionStep } from "../../file-defs/shared";
 import { ITestCaseActionStep } from "../../file-defs/testCaseFile";
 import { IActionTemplateParam } from "../types";
 import clear from "./action-validators/clear";
@@ -24,7 +25,7 @@ import verifyTitleContains from "./action-validators/verifyTitleContains";
 import verifyUrl from "./action-validators/verifyUrl";
 
 /** A registry (map) of step validator for each ActionType */
-export const actionValidatorRegistry = new Map<ActionType, (step: ITestCaseActionStep) => string | undefined>();
+export const actionValidatorRegistry = new Map<ActionType, (step: ITestActionStep) => string | undefined>();
 
 actionValidatorRegistry
   .set(ActionType.Clear, clear)
@@ -50,46 +51,185 @@ actionValidatorRegistry
   .set(ActionType.VerifyTitleContains, verifyTitleContains)
   .set(ActionType.VerifyUrl, verifyUrl);
 
-/**
- * Validates a testStep that requires "Page" and "Element" and "Data"
- * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
- */
-export const validateStepRequirePageAndElementAndData = (step: ITestCaseActionStep): string => {
-  if (!step.page && !step.element) {
-    return `Action "{{${step.action}}}" is missing "Page" and "Element"`;
+class TestCaseStepValidator {
+  /**
+   * Validates a testStep that requires "Page" and "Element" and "Data"
+   * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
+   */
+  static validateRequirePageAndElementAndData(step: ITestCaseActionStep): string {
+    if (!step.page && !step.element) {
+      return `Action "{{${step.action}}}" is missing "Page" and "Element"`;
+    }
+    if (step.page && !step.element) {
+      return `Action "{{${step.action}}}" is missing "Element"`;
+    }
+
+    if (step.page && step.element && !step.data) {
+      return `Action "{{${step.action}}}" is missing "Data"`;
+    }
+
+    return ``;
   }
-  if (step.page && !step.element) {
-    return `Action "{{${step.action}}}" is missing "Element"`;
+  /**
+   * Validates a testStep that requires "Page" and "Element"
+   * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
+   */
+  static validateRequirePageAndElement(step: ITestCaseActionStep): string {
+    if (!step.page && !step.element) {
+      return `Action "{{${step.action}}}" is missing "Page" and "Element"`;
+    }
+    if (step.page && !step.element) {
+      return `Action "{{${step.action}}}" is missing "Element"`;
+    }
+
+    // The UI should have prevented user from selecting an element before selecting a page
+
+    return ``;
   }
 
-  if (step.page && step.element && !step.data) {
-    return `Action "{{${step.action}}}" is missing "Data"`;
+  /**
+   * Validates a testStep that requires "Data"
+   * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
+   * */
+  static validateRequireData(step: ITestCaseActionStep): string {
+    return step.data ? "" : `Action "{{${step.action}}}" is missing "Data"`;
   }
 
-  return ``;
-};
-
-/**
- * Validates a testStep that requires "Page" and "Element"
- * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
- */
-export const validateStepRequirePageAndElement = (step: ITestCaseActionStep): string => {
-  if (!step.page && !step.element) {
-    return `Action "{{${step.action}}}" is missing "Page" and "Element"`;
+  /**
+   * Validates a testStep that requires "Data" as string
+   * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
+   * */
+  static validateRequireDataAsString(step: ITestCaseActionStep): string {
+    return typeof step.data === "string" ? "" : `Action "{{${step.action}}}" is missing "Data"`;
   }
-  if (step.page && !step.element) {
-    return `Action "{{${step.action}}}" is missing "Element"`;
+}
+
+class TestRoutineStepValidator {
+  /**
+   * Validates a testStep that requires "Page" and "Element" and "Data"
+   * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
+   */
+  static validateRequirePageAndElementAndData(step: ITestRoutineActionStep): string {
+    if (!step.page && !step.element) {
+      return `Action "{{${step.action}}}" is missing "Page" and "Element"`;
+    }
+    if (step.page && !step.element) {
+      return `Action "{{${step.action}}}" is missing "Element"`;
+    }
+
+    if (step.page && step.element && !step.data) {
+      return `Action "{{${step.action}}}" is missing "Data" object`;
+    }
+
+    for (const [dsKey, value] of Object.entries(step.data)) {
+      if (!value) {
+        return `Action "{{${step.action}}}" is missing "Data" for one of the datasets`;
+      }
+    }
+
+    return ``;
+  }
+  /**
+   * Validates a testStep that requires "Page" and "Element"
+   * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
+   */
+  static validateRequirePageAndElement(step: ITestRoutineActionStep): string {
+    if (!step.page && !step.element) {
+      return `Action "{{${step.action}}}" is missing "Page" and "Element"`;
+    }
+    if (step.page && !step.element) {
+      return `Action "{{${step.action}}}" is missing "Element"`;
+    }
+
+    // The UI should have prevented user from selecting an element before selecting a page
+
+    return ``;
   }
 
-  // The UI should have prevented user from selecting an element before selecting a page
+  /**
+   * Validates a testStep that requires "Data"
+   * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
+   * */
+  static validateRequireData(step: ITestRoutineActionStep): string {
+    if (!step.data) {
+      return `Action "{{${step.action}}}" is missing "Data"`;
+    }
 
-  return ``;
-};
+    for (const [dsKey, value] of Object.entries(step.data)) {
+      if (!value) {
+        return `Action "{{${step.action}}}" is missing "Data" for one or more of the datasets`;
+      }
+    }
 
-/**
- * Validates a testStep that requires "Data"
- * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
- * */
-export const validateStepRequireData = (step: ITestCaseActionStep): string => {
-  return step.data ? "" : `Action "{{${step.action}}}" is missing "Data"`;
-};
+    return "";
+  }
+
+  /**
+   * Validates a testStep that requires "Data" as string
+   * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
+   * */
+  static validateRequireDataAsString(step: ITestRoutineActionStep): string {
+    if (!step.data) {
+      return `Action "{{${step.action}}}" is missing "Data"`;
+    }
+
+    for (const [dsKey, value] of Object.entries(step.data)) {
+      if (typeof value !== "string") {
+        return `Action "{{${step.action}}}" is missing "Data" for one or more of the datasets`;
+      }
+    }
+
+    return "";
+  }
+}
+
+export class StepValidator {
+  /**
+   *
+   */
+  constructor() {}
+
+  /**
+   * Validates a testStep that requires "Page" and "Element" and "Data"
+   * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
+   */
+  static validateRequirePageAndElementAndData = (step: ITestActionStep): string => {
+    if (typeof step.data === "string") {
+      return TestCaseStepValidator.validateRequirePageAndElementAndData(step as ITestCaseActionStep);
+    }
+    return TestRoutineStepValidator.validateRequirePageAndElementAndData(step as ITestRoutineActionStep);
+  };
+
+  /**
+   * Validates a testStep that requires "Page" and "Element"
+   * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
+   */
+  static validateRequirePageAndElement = (step: ITestActionStep): string => {
+    if (typeof step.data === "string") {
+      return TestCaseStepValidator.validateRequirePageAndElement(step as ITestCaseActionStep);
+    }
+    return TestRoutineStepValidator.validateRequirePageAndElement(step as ITestRoutineActionStep);
+  };
+
+  /**
+   * Validates a testStep that requires "Data"
+   * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
+   * */
+  static validateRequireData = (step: ITestActionStep): string => {
+    if (typeof step.data === "string") {
+      return TestCaseStepValidator.validateRequireData(step as ITestCaseActionStep);
+    }
+    return TestRoutineStepValidator.validateRequireData(step as ITestRoutineActionStep);
+  };
+
+  /**
+   * Validates a testStep that requires "Data" is a string, including empty string
+   * @return {string} The message TEMPLATE to indicate the missing values. Empty string if the testStep is valid.
+   * */
+  static validateRequireDataAsString = (step: ITestActionStep): string => {
+    if (typeof step.data === "string") {
+      return TestCaseStepValidator.validateRequireDataAsString(step as ITestCaseActionStep);
+    }
+    return TestRoutineStepValidator.validateRequireDataAsString(step as ITestRoutineActionStep);
+  };
+}
