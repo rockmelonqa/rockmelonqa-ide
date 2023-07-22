@@ -11,8 +11,6 @@ public abstract partial class TestSuiteBase : PageTest
     [TestInitialize]
     public new async Task PageSetup()
     {        
-        DeleteExistingVideos();
-        DeleteExistingScreenshots();
         {{#if testIdAttributeName}}
         Playwright.Selectors.SetTestIdAttribute("{{testIdAttributeName}}");
         {{/if}}
@@ -24,6 +22,7 @@ public abstract partial class TestSuiteBase : PageTest
 {{!-- This partial should contain code that is static (no hbs parameters).
     i.e the whole class can be copy without changing
  --}}
+ 
 public abstract partial class TestSuiteBase : PageTest
 {
     /// <summary>
@@ -102,9 +101,9 @@ public abstract partial class TestSuiteBase : PageTest
 
     private string GetRecordingFileName()
     {
-        string baseName = $"{TestContext.ManagedType}_{TestContext.ManagedMethod}";
+        string baseName = $"{GetBaseTestName()}";
 
-        if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+        if (IsTestSuccess())
         {
             return $"{baseName}{VideoExtension}";
         }
@@ -121,7 +120,7 @@ public abstract partial class TestSuiteBase : PageTest
 
         if (EnvironmentSettings.RecordVideoMode == RecordVideoMode.RetainOnFailure)
         {
-            if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+            if (IsTestSuccess())
             {
                 return false;
             }
@@ -167,12 +166,17 @@ public abstract partial class TestSuiteBase : PageTest
 
         string moveToFileName = Path.Combine(KeepVideoDir, videoFileName);
 
+        if (File.Exists(moveToFileName))
+        {
+            File.Delete(moveToFileName);
+        }
+
         File.Move(autoNameVideo, moveToFileName);
     }
 
     private void SaveScreenshots()
     {
-        if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+        if (IsTestSuccess())
         {
             return;
         }
@@ -181,7 +185,24 @@ public abstract partial class TestSuiteBase : PageTest
         {
             return;
         }
+        
+        string screenshotFile = Path.Combine(ScreenshotDir, $"{GetBaseTestName()}_error.png");
 
-        this.Page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(ScreenshotDir, $"{TestContext.ManagedType}_{TestContext.ManagedMethod}_error.png"), FullPage = true }).Wait();
+        if (File.Exists(screenshotFile))
+        {
+            File.Delete(screenshotFile);
+        }
+
+        this.Page.ScreenshotAsync(new PageScreenshotOptions { Path = screenshotFile, FullPage = true }).Wait();
+    }
+
+    private string GetBaseTestName()
+    {
+        return $"{TestContext.ManagedType}_{TestContext.ManagedMethod}";
+    }
+
+    private bool IsTestSuccess()
+    {
+        return (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed);
     }
 }
