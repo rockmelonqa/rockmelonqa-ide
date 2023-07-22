@@ -73,15 +73,15 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
 
       browserWindow.webContents.send(type, details as IProgressDetail);
     });
+
+    const afterRunHandler = AfterRunHandlerFactory.getInstance(context.rmProjFile.content.language);
+    await afterRunHandler.handle(context, sb);
   } catch (error) {
     console.error(`runTest error: ${String(error)}`);
     actionRs = { isSuccess: false, errorMessage: String(error) };
   }
 
   console.log("Finish runTest", actionRs);
-
-  const afterRunHandler = AfterRunHandlerFactory.getInstance(context.rmProjFile.content.language);
-  await afterRunHandler.handle(context, sb);
 
   const ipcRs: IIpcGenericResponse<IRunTestResponseData> = {
     isSuccess: actionRs.isSuccess,
