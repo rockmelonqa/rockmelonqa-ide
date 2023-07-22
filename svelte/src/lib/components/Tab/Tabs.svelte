@@ -1,17 +1,17 @@
 <script lang="ts">
-    import { AppActionType, appContextKey, type IAppContext } from '$lib/context/AppContext';
-    import CircleIcon from '$lib/icons/CircleIcon.svelte';
-    import CloseIcon from '$lib/icons/CloseIcon.svelte';
-    import { application } from '$lib/ipc';
-    import getWindow from '$lib/utils/getWindow';
-    import type { Action } from 'rockmelonqa.common';
-    import { afterUpdate, getContext, onDestroy, onMount } from 'svelte';
-    import { AlertDialogButtons, AlertDialogType } from '../Alert';
-    import AlertDialog from '../AlertDialog.svelte';
-    import { appActionContextKey, type IAppActionContext } from '../Application';
-    import FileIcon from '../FileIcon.svelte';
-    import { getFileType } from '../FileType';
-    import type { ITab } from './Tab';
+    import { AppActionType, appContextKey, type IAppContext } from "$lib/context/AppContext";
+    import CircleIcon from "$lib/icons/CircleIcon.svelte";
+    import CloseIcon from "$lib/icons/CloseIcon.svelte";
+    import { application } from "$lib/ipc";
+    import getWindow from "$lib/utils/getWindow";
+    import type { Action } from "rockmelonqa.common";
+    import { afterUpdate, getContext, onDestroy, onMount } from "svelte";
+    import { AlertDialogButtons, AlertDialogType } from "../Alert";
+    import AlertDialog from "../AlertDialog.svelte";
+    import { appActionContextKey, type IAppActionContext } from "../Application";
+    import FileIcon from "../FileIcon.svelte";
+    import { getFileType } from "../FileType";
+    import type { ITab } from "./Tab";
 
     const window = getWindow();
 
@@ -27,12 +27,12 @@
     let closeTabDialogType: AlertDialogType = AlertDialogType.None;
     let tabToClose: number;
 
-    $: tabTitleContainerCss = 'tab-item-title-container pl-4 pr-2 py-3 flex items-center gap-x-3';
-    $: tabContentCss = 'tab-item-content flex-1 overflow-y-auto';
+    $: tabTitleContainerCss = "tab-item-title-container pl-4 pr-2 py-3 flex items-center gap-x-3";
+    $: tabContentCss = "tab-item-content flex-1 overflow-y-auto";
 
     onMount(() => {
         // Enable horizontal scroll
-        titleBar.addEventListener('wheel', function (e) {
+        titleBar.addEventListener("wheel", function (e) {
             titleBar.scrollLeft = titleBar.scrollLeft + (e.deltaY > 0 ? 100 : -100);
             e.preventDefault();
         });
@@ -48,9 +48,9 @@
             if (recentActiveTabIndex !== $appState.activeTabIndex) {
                 const activeTabElement = titleBar.childNodes.item($appState.activeTabIndex) as HTMLElement;
                 activeTabElement?.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'end',
-                    inline: 'nearest',
+                    behavior: "smooth",
+                    block: "end",
+                    inline: "nearest",
                 });
 
                 recentActiveTabIndex = $appState.activeTabIndex;
@@ -60,6 +60,22 @@
 
     const handleSelectTab = async (tab: ITab, tabIndex: number) => {
         appStateDispatch({ type: AppActionType.SelectTab, tabIndex });
+    };
+
+    const handleMouseDown = async (e: MouseEvent, tab: ITab, tabIndex: number) => {
+        switch (e.button) {
+            case 0:
+                //console.log("Left button clicked.");
+                break;
+            case 1:
+                await handleCloseTab(e, tab, tabIndex);
+                break;
+            case 2:
+                //console.log("Right button clicked.");
+                break;
+            default:
+            //console.log(`Unknown button code: ${e.button}`);
+        }
     };
 
     const { getOnSaveHandler } = getContext(appActionContextKey) as IAppActionContext;
@@ -85,12 +101,12 @@
 
     const handleCloseConfirmation = async (event: any) => {
         const button = event.detail.button;
-        if (button === 'cancel') {
+        if (button === "cancel") {
             return;
         }
 
         // yes || no
-        if (button === 'yes') {
+        if (button === "yes") {
             const handler = getOnSaveHandler(tabToClose);
             if (handler != null) {
                 const success = await handler();
@@ -119,11 +135,11 @@
 <div class="tabs h-screen flex flex-col">
     <div class="tab-item-title-bar flex bg-neutral-200" bind:this={titleBar}>
         {#each tabs as tab, idx (tab.id)}
-            <button on:click={() => handleSelectTab(tab, idx)}>
+            <button on:mousedown={(e) => handleMouseDown(e, tab, idx)} on:click={() => handleSelectTab(tab, idx)}>
                 <div
                     class={`${tabTitleContainerCss}
-                    ${idx === $appState.activeTabIndex ? 'active bg-white font-bold' : 'bg-neutral-100'}
-                    ${tab.isDirty ? 'dirty' : ''}`}
+                    ${idx === $appState.activeTabIndex ? "active bg-white font-bold" : "bg-neutral-100"}
+                    ${tab.isDirty ? "dirty" : ""}`}
                 >
                     <div class="tab-item-icon">
                         <FileIcon type={getFileType(tab.id)} class="h-5 w-5" />
@@ -142,7 +158,7 @@
         {/each}
     </div>
     {#each tabs as tab, idx (tab.id)}
-        <div class={`${tabContentCss} ${idx === $appState.activeTabIndex ? '' : 'hidden'}`}>
+        <div class={`${tabContentCss} ${idx === $appState.activeTabIndex ? "" : "hidden"}`}>
             <svelte:component
                 this={tab.content.component}
                 {...tab.content.data}
@@ -162,4 +178,3 @@
 >
     <div slot="content">Do you want to save pending changes?</div>
 </AlertDialog>
-
