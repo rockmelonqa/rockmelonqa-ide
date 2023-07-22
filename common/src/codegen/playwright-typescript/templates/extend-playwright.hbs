@@ -1,15 +1,7 @@
 import path from "path";
+import fs from "fs";
 import { BrowserContext, Page, TestInfo, test as base } from "@playwright/test";
 import EnvironmentSettings from "~/config/EnvironmentSettings";
-
-let browserContext: BrowserContext;
-
-export const test = base.extend<{ page: Page; context: BrowserContext }>({
-  page: async ({ page, context }, use) => {
-    browserContext = context;
-    await use(page);
-  },
-});
 
 const saveScreenshots = async (page: Page, testInfo: TestInfo) => {
   if (!EnvironmentSettings.TakeScreenshotOnError) {
@@ -29,13 +21,24 @@ const saveScreenshots = async (page: Page, testInfo: TestInfo) => {
 
   const screenshotFileName = `${suiteFileName}_${testCaseName}_error.png`;
 
-  const playwrightReportDir = path.resolve("./test-results");
-  const saveScreenshotTo = path.join(playwrightReportDir, screenshotFileName);
+  const playwrightResultScreenshotsDir = path.resolve("./test-results/screenshots");
 
-  await page.screenshot({ path: saveScreenshotTo, fullPage: true });
+  if (!fs.existsSync(playwrightResultScreenshotsDir)) {
+    fs.mkdirSync(playwrightResultScreenshotsDir);
+  }
+
+  try {
+    const saveScreenshotTo = path.join(playwrightResultScreenshotsDir, screenshotFileName);
+    await page.screenshot({ path: saveScreenshotTo, fullPage: true });
+    console.log("Saved screenshot to", saveScreenshotTo);
+  } catch (err) {
+    console.log("saveScreenshots Failed");
+    console.error(err);
+  }
 };
 
-const saveVideos = async (page: Page, testInfo: TestInfo) => {
+const saveVideos = async (page: Page, browserContext: BrowserContext, testInfo: TestInfo) => {
+  console.log("Save video", EnvironmentSettings.RecordVideoMode, testInfo.status);
   if (EnvironmentSettings.RecordVideoMode === "off") {
     return;
   }
@@ -57,9 +60,12 @@ const saveVideos = async (page: Page, testInfo: TestInfo) => {
     // Replace path sep with _
     .replace(path.sep, "_");
   const errorIndicator = testInfo.status === "passed" ? "" : "_error";
-  const playwrightReportDir = path.resolve("./test-results");
+  const playwrightResultVideosDir = path.resolve("./test-results/videos");
+  if (!fs.existsSync(playwrightResultVideosDir)) {
+    fs.mkdirSync(playwrightResultVideosDir);
+  }
   const videoFileName = `${suiteFileName}_${testCaseName}${errorIndicator}.webm`;
-  const saveVideoTo = path.join(playwrightReportDir, videoFileName);
+  const saveVideoTo = path.join(playwrightResultVideosDir, videoFileName);
   const pageVideo = page.video();
 
   try {
@@ -70,9 +76,19 @@ const saveVideos = async (page: Page, testInfo: TestInfo) => {
   }
 };
 
-test.afterEach(async ({ page }, testInfo) => {
-  await saveScreenshots(page, testInfo);
-  await saveVideos(page, testInfo);
-});
+export const initTest = () => {
+  const test = base.extend<{ page: Page; context: BrowserContext }>({
+    page: async ({ page }, use) => {
+      await use(page);
+    },
+  });
+
+  test.afterEach(async ({ page, context }, testInfo) => {
+    await saveScreenshots(page, testInfo);
+    await saveVideos(page, context, testInfo);
+  });
+
+  return test;
+};
 
 export { expect } from "@playwright/test";
