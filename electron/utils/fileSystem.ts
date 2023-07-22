@@ -4,12 +4,12 @@ import { IFileSystemInfo } from "rockmelonqa.common";
 
 /**
  * Determine whether file or folder exist or not
- * @param filePath
+ * @param path
  * @returns
  */
-export async function checkExists(filePath: string): Promise<boolean> {
+export async function checkExists(path: fs.PathLike): Promise<boolean> {
   try {
-    await fs.promises.access(filePath);
+    await fs.promises.access(path);
     return true;
   } catch (error) {
     return false;
