@@ -11,9 +11,9 @@ import { StringBuilder } from "../utils/stringBuilder";
 import { IRunTestActionResult, runTest as runTestInWorker } from "../worker/actions/runTest";
 import { IChannels } from "./core/channelsInterface";
 import IPC from "./core/ipc";
-import { AfterRunHandlerFactory } from "../worker/actions/runTest/afterRunHandler";
 import { cleanUpStrangeChars } from "../utils/stringUtils";
 import { EOL } from "os";
+import { AfterRunHandlerFactory } from "./testRunner/afterRunHandler";
 
 const nameAPI = "testRunner";
 
