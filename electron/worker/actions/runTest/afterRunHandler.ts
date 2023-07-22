@@ -39,6 +39,7 @@ class AfterRunHandlerDotnet implements IAfterRunHandler {
 
     await this.processScreenshots(context, logBuilder);
     await this.processRecordings(context, logBuilder);
+    await this.cleanupRedundantRecordings(context);
   }
 
   async processScreenshots(context: IRunTestContext, logBuilder: StringBuilder) {
@@ -63,7 +64,7 @@ class AfterRunHandlerDotnet implements IAfterRunHandler {
     }
   }
   async getRecordings(context: IRunTestContext) {
-    const dotnetOutputFolder = path.join(
+    const dotnetOutputVideoFolder = path.join(
       context.rmProjFile.folderPath,
       StandardFolder.OutputCode,
       "bin",
@@ -71,10 +72,26 @@ class AfterRunHandlerDotnet implements IAfterRunHandler {
       "videos",
       "keep"
     );
-    const files = await fs.readdir(dotnetOutputFolder);
+    const files = await fs.readdir(dotnetOutputVideoFolder);
     const recordings = files.filter((f) => f.toLowerCase().endsWith(".webm"));
     return recordings;
   }
+
+  async cleanupRedundantRecordings(context: IRunTestContext) {
+    const dotnetOutputVideoFolder = path.join(
+      context.rmProjFile.folderPath,
+      StandardFolder.OutputCode,
+      "bin",
+      "Debug",
+      "videos"
+    );
+    const files = await fs.readdir(dotnetOutputVideoFolder);
+    const recordings = files.filter((f) => f.toLowerCase().endsWith(".webm"));
+    for (let recording of recordings) {
+      await fs.unlink(path.join(dotnetOutputVideoFolder, recording));
+    }
+  }
+
   /** Gets the list of names of the failed test screenshots */
   async getFailedTestScreenshots(context: IRunTestContext): Promise<string[]> {
     const dotnetOutputFolder = path.join(
