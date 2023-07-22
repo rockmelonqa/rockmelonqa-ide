@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import EnvironmentSettings from "./config/EnvironmentSettings";
 
 export default defineConfig({
   testMatch: '*.spec.ts',
@@ -19,6 +20,7 @@ export default defineConfig({
 
     headless: true,
     testIdAttribute: "data-testid",
+    video: EnvironmentSettings.RecordVideoMode,
   },
 
   /* Configure projects for major browsers */
