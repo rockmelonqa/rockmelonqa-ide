@@ -12,11 +12,8 @@
     import type { IListDef } from "$lib/form/ListDef";
     import AddIcon from "$lib/icons/AddIcon.svelte";
     import DeleteIcon from "$lib/icons/DeleteIcon.svelte";
-    import MoveDownIcon from "$lib/icons/MoveDownIcon.svelte";
-    import MoveUpIcon from "$lib/icons/MoveUpIcon.svelte";
     import SaveIcon from "$lib/icons/SaveIcon.svelte";
     import { fileSystem } from "$lib/ipc";
-    import { getLocatorTypeDropDownOptions } from "$lib/utils/dropdowns";
     import { fileDefFactory, type IEnvironmentContent, type ISetting } from "rockmelonqa.common";
     import { createEventDispatcher, getContext, onMount } from "svelte";
     import { AlertDialogButtons, AlertDialogType } from "../Alert";
@@ -189,7 +186,7 @@
 
     const validateName = (name: string): string => {
         if (!name?.trim()) {
-            return uiContext.str(stringResKeys.form.isRequiredError)
+            return uiContext.str(stringResKeys.form.isRequiredError);
         }
 
         const regex = /^[A-Za-z0-9_-]+$/;
@@ -197,10 +194,21 @@
             return uiContext.str(stringResKeys.environmentEditor.invalidNameMessage);
         }
 
-        return '';  // no error message == valid
+        return ""; // no error message == valid
     };
     $: isListDataValid = $listData.items.every((item) => !validateName(item.name));
     $: isDataValid = $formData.isValid && isListDataValid;
+
+    const getDefaultPlaceholder = (varName: string): string => {
+        switch (varName) {
+            case "TakeScreenshotOnError":
+                return "true/false";
+            case "RecordVideoMode":
+                return "On/Off/RetainOnFailure";
+            default:
+                return "";
+        }
+    };
 </script>
 
 <div class="environment-editor p-8">
@@ -238,6 +246,7 @@
                         <TextField
                             name={`${formContext.formName}_${index}_value`}
                             value={item.value}
+                            placeholder={getDefaultPlaceholder(item.name)}
                             on:input={(event) => handleItemChange(index, "value", event.detail.value)}
                         />
                     </ListTableBodyCell>
