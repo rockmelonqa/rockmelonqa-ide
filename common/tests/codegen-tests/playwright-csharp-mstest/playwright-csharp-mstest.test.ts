@@ -22,7 +22,7 @@ const createPlaywrightMsTestTestData = (): RmpSpec => {
       name: "",
       description: "",
       automationFramework: AutomationFramework.Playwright,
-      testFramework: TestFramework.xUnit,
+      testFramework: TestFramework.MSTest,
       language: Language.CSharp,
       rootNamespace: "",
       indent: Indent.Spaces,
@@ -39,7 +39,7 @@ const createPlaywrightMsTestTestData = (): RmpSpec => {
   };
 };
 
-test("CodeGen Playwright CSharp MsTest", async () => {
+test("CodeGen Playwright CSharp MsTest - General", async () => {
   // Arrange
   const tmpDir = createTempDir("playwright-csharp-mstest");
   const projSpec = createPlaywrightMsTestTestData();

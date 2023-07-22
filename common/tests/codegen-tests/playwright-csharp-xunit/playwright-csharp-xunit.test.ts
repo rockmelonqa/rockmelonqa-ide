@@ -1,14 +1,40 @@
-import os from "os";
 import fs from "fs";
 import path from "path";
 
-import { StandardFolder } from "../../../src/file-defs";
+import { AutomationFramework, Indent, Language, TestFramework } from "../../../src/file-defs";
+
 import { IProgressEvent } from "../../../src/ipc-defs";
 import { generateCode } from "../../../src/codegen";
 import { writeOutputProjectFiles, createRmTestProject } from "../../test-helpers/rm-project-generator";
-import { doAssert } from "../../test-helpers/assert-helper";
-import { createPlaywrightXUnitTestData } from "./playwright-csharp-xunit.test-data";
 import { createTempDir } from "../../test-helpers/fsHelpers";
+import { createTestDataKitchenSink } from "../playwright-typescript/playwright-typescript-kitchen-sink.test-data";
+import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
+
+export const createPlaywrightXUnitTestData = (): RmpSpec => {
+  const kitchenSinkData = createTestDataKitchenSink();
+  return {
+    projectName: "google-test-playwright-nunit",
+    content: {
+      fileVersion: 1,
+      name: "",
+      description: "",
+      automationFramework: AutomationFramework.Playwright,
+      testFramework: TestFramework.xUnit,
+      language: Language.CSharp,
+      rootNamespace: "",
+      indent: Indent.Spaces,
+      indentSize: 4,
+      testIdAttributeName: "",
+    },
+
+    configFiles: kitchenSinkData.configFiles,
+    pages: kitchenSinkData.pages,
+    testcases: kitchenSinkData.testcases,
+    testroutines: kitchenSinkData.testroutines,
+    testsuites: kitchenSinkData.testsuites,
+    outputFiles: [],
+  };
+};
 
 test("CodeGen Playwright CSharp xUnit - General", async () => {
   // Arrange
