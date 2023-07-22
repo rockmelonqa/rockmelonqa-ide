@@ -48,9 +48,9 @@
 
     $: expanded = node.expanded || addMode;
 
-    $: containerClass = `treeview-item 
+    $: containerClass = `treeview-item relative
         ${expanded ? "treeview-item-opened" : ""}`;
-    $: rootItemClass = `treeview-item-root 
+    $: rootItemClass = `treeview-item-root relative
         ${toggleable ? "treeview-item-toggle" : ""} 
         ${selectable ? "treeview-item-selectable" : ""} 
         ${selected ? "treeview-item-selected" : ""}

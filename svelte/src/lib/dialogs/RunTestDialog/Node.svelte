@@ -1,10 +1,10 @@
 <script lang="ts">
-    import FolderIcon from '$lib/icons/FolderIcon.svelte';
-    import TCaseIcon from '$lib/icons/TCaseIcon.svelte';
-    import TSuiteIcon from '$lib/icons/TSuiteIcon.svelte';
-    import { getContext } from 'svelte';
-    import { NodeInfo, NodeType } from './NodeInfo';
-    import { TestExplorerActionType, testExplorerContextKey, type ITestExplorerContext } from './TestExplorerContext';
+    import FolderIcon from "$lib/icons/FolderIcon.svelte";
+    import TCaseIcon from "$lib/icons/TCaseIcon.svelte";
+    import TSuiteIcon from "$lib/icons/TSuiteIcon.svelte";
+    import { getContext } from "svelte";
+    import { NodeInfo, NodeType } from "./NodeInfo";
+    import { TestExplorerActionType, testExplorerContextKey, type ITestExplorerContext } from "./TestExplorerContext";
 
     export let node: NodeInfo;
     export let level: number = 0;
@@ -25,10 +25,10 @@
     $: expanded = node.expanded;
 
     $: containerClass = `treeview-item 
-        ${expanded ? 'treeview-item-opened' : ''}`;
-    $: rootItemClass = `treeview-item-root 
-        ${toggleable ? 'treeview-item-toggle' : ''} 
-        ${selectable ? 'treeview-item-selectable' : ''} 
+        ${expanded ? "treeview-item-opened" : ""}`;
+    $: rootItemClass = `treeview-item-root relative
+        ${toggleable ? "treeview-item-toggle" : ""} 
+        ${selectable ? "treeview-item-selectable" : ""} 
         min-w-fit`;
     $: rootItemStyle = `padding-left: calc(var(--f7-treeview-item-padding-left) + var(--f7-treeview-children-offset) * ${level})`;
 

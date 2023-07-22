@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { slide } from 'svelte/transition';
-    export let title: string = '';
+    import { slide } from "svelte/transition";
+    export let title: string = "";
     export let open: boolean = false;
 
     const handleToggle = () => {
@@ -8,8 +8,8 @@
     };
 
     $: containerClass = `treeview-item
-        ${open ? 'treeview-item-opened' : ''} min-w-fit`;
-    $: rootItemClass = 'treeview-item-root treeview-item-toggle bg-neutral-200';
+        ${open ? "treeview-item-opened" : ""} min-w-fit`;
+    $: rootItemClass = "treeview-item-root treeview-item-toggle";
 </script>
 
 <div class={containerClass}>
