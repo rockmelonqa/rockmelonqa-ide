@@ -9,6 +9,7 @@ import {
   IPageInfo,
   ISuiteInfo,
   ITestCaseInfo,
+  ITestRoutineInfo,
 } from "../types";
 import path from "path";
 import { EOL } from "os";
@@ -46,7 +47,8 @@ export class PlaywrightTypeScriptProjMetaGenerator implements IOutputProjectMeta
     const suites: ISuiteInfo[] = this.generateSuitesMeta();
     const cases: ITestCaseInfo[] = this.generateCasesMeta();
     const pages: IPageInfo[] = this.generatePagesMeta();
-    return { suites, cases, pages, environments };
+    const routines: ITestRoutineInfo[] = this.generateRoutinesMeta();
+    return { suites, cases, routines, pages, environments };
   }
 
   private verifyDuplication() {
@@ -159,6 +161,28 @@ export class PlaywrightTypeScriptProjMetaGenerator implements IOutputProjectMeta
       cases.push(caseInfo);
     }
     return cases;
+  }
+
+  generateRoutinesMeta() {
+    const routines: ITestRoutineInfo[] = [];
+
+    for (let { content: testRoutine, isValid } of this.projMeta.testRoutines) {
+      let routineMeta = this.routineMetaMap.get(testRoutine)!;
+
+      let routineInfo: ITestRoutineInfo = {
+        name: routineMeta.outputFileClassName,
+        fullyQualifiedName: `${routineMeta.outputFileFullNamespace}.${routineMeta.outputFileClassName}`,
+        inputFileName: routineMeta.inputFileName,
+        inputFilePath: routineMeta.inputFilePath,
+        inputFileRelPath: routineMeta.inputFileRelPath,
+        outputFileName: routineMeta.outputFileName,
+        outputFilePath: routineMeta.outputFilePath,
+        outputFileRelPath: routineMeta.outputFileRelPath,
+        isValid: routineMeta.isValid,
+      };
+      routines.push(routineInfo);
+    }
+    return routines;
   }
 
   generatePagesMeta() {

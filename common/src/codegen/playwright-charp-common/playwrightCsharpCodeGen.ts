@@ -78,16 +78,50 @@ export class PlaywrightCsharpCodeGen extends CodeGenBase {
       }
     }
 
-    let routineBody = stepItems.join(EOL);
+    let body = stepItems.join(EOL);
 
     // If there is no step, we add an `await` so that there is no build warning about `async` method
-    if (routineBody.length === 0) {
-      routineBody = `await Task.CompletedTask;`;
+    if (body.length === 0) {
+      body = `await Task.CompletedTask;`;
     }
 
     // Indent test method body with 1 indent;
-    routineBody = addIndent(routineBody, this._indentString, 2);
-    return routineBody;
+    body = addIndent(body, this._indentString, 2);
+    return body;
+  }
+
+  generateRoutineUsings(testCase: ITestCase, routines: ITestRoutine[]): string[] {
+    const usingStatements: string[] = [];
+
+    for (let step of testCase.steps) {
+      if (step.type !== "testStep") {
+        continue;
+      }
+      if (step.action !== "RunTestRoutine") {
+        continue;
+      }
+      let routineId = step.data;
+      if (!routineId) {
+        return [];
+      }
+
+      let routine = routines.find((r) => r.id === routineId);
+
+      if (!routine) {
+        throw new Error(`DEV ERROR: routine with id "${routineId}" not found`);
+      }
+
+      let dataSetCollection = new DataSetCollection(step.parameters);
+
+      if (dataSetCollection.isAll()) {
+        dataSetCollection.empty();
+        dataSetCollection.addMany(routine.dataSets.map((ds) => ds.id));
+      }
+
+      let namespace = this._outProjMeta.get(routineId)!.outputFileFullNamespace;
+      usingStatements.push(`using ${namespace};`);
+    }
+    return usingStatements;
   }
 
   /** Generates one or more code lines for the step */

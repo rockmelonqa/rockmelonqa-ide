@@ -50,7 +50,8 @@ export class PlaywrightCsharpXUnitTemplatesProvider implements IPlaywrightCsharp
     description: string,
     body: string,
     rootNamespace: string,
-    fullNamespace: string
+    fullNamespace: string,
+    usings: string[]
   ) {
     return this._templateCollection.TEST_CASE_FILE({
       rootNamespace,
@@ -58,6 +59,7 @@ export class PlaywrightCsharpXUnitTemplatesProvider implements IPlaywrightCsharp
       description,
       body,
       fullNamespace,
+      usings,
     });
   }
 

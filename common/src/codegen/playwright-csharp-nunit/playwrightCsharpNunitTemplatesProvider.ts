@@ -43,9 +43,17 @@ export class PlaywrightCsharpNunitTemplatesProvider implements IPlaywrightCsharp
     description: string,
     body: string,
     rootNamespace: string,
-    fullNamespace: string
+    fullNamespace: string,
+    usings: string[]
   ) {
-    return this._templateCollection.TEST_CASE_FILE({ rootNamespace, testCaseName, description, body, fullNamespace });
+    return this._templateCollection.TEST_CASE_FILE({
+      rootNamespace,
+      testCaseName,
+      description,
+      body,
+      fullNamespace,
+      usings,
+    });
   }
 
   getAction(params: IActionTemplateParam) {

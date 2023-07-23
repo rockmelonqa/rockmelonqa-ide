@@ -9,7 +9,7 @@ import {
 import { IRmProjFile, Language } from "../../file-defs/rmProjFile";
 import { IOutputFileInfo } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
-import createName from "../utils/createName";
+import createName, { createCleanName } from "../utils/createName";
 
 /** Map from standard input folder to standard output folder */
 const inputOutputFolderMap = new Map<string, string>([
@@ -103,18 +103,23 @@ export class OutputFileInfoBuilderDotnet implements IOutputFileInfoBuilder {
 
     // Path relative to the "standand folder", not the project root path;
     let inputFileRelPath = inputFilePath.substring(inputContainerFolder.length + 1);
-    let outputFileCleanName = createName(inputFileRelPath);
-    let outputFilePath = path.join(outputContainerFolder, outputFileCleanName + outputFileExt);
-
-    const nameSegments = outputFileCleanName.split("_");
-    const namespaceSegments = [...nameSegments];
-    const outputFileClassName = namespaceSegments.pop() || "";
+    let outputNameSegments = [];
+    const inputFileNameSegments = inputFileRelPath.split(path.sep);
+    for (let i = 0; i < inputFileNameSegments.length; i++) {
+      outputNameSegments.push(createCleanName(inputFileNameSegments[i]));
+    }
+    let outputFileRelPath = path.join(standardOutputFolder, outputNameSegments.join(path.sep)) + outputFileExt;
+    // Remove the file name from  name segments
+    const outputFileCleanName = outputNameSegments.pop() || "";
+    const outputFileClassName = outputFileCleanName;
     const outputFileName = outputFileClassName + outputFileExt;
-    const outputFileSubNamespace = namespaceSegments.length ? namespaceSegments.join(".") : "";
+    let outputFileSubNamespace = outputNameSegments.length ? outputNameSegments.join(".") : "";
+
+    let outputFilePath = path.join(outputCodeDir, outputFileRelPath);
+
     const outputFileFullNamespace = `${proj.content.rootNamespace}.${standardOutputFolder}${
       outputFileSubNamespace ? "." + outputFileSubNamespace : ""
     }`;
-    const outputFileRelPath = outputFilePath.replace(outputCodeDir, "").substring(1);
 
     return {
       inputFileName: path.parse(inputFileName).name,

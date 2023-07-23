@@ -275,13 +275,15 @@ export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implem
 
   private generateTestCaseFile(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {
     const testcaseBody = this.generateTestCaseBody(testCase, pages, routines);
+    const routineUsings = this.generateRoutineUsings(testCase, routines);
 
     let testFile = this._templateProvider.getTestCaseFile(
       this._outProjMeta.get(testCase.id)!.outputFileClassName,
       testCase.description,
       testcaseBody,
       this._rootNamespace,
-      this._outProjMeta.get(testCase.id)!.outputFileFullNamespace
+      this._outProjMeta.get(testCase.id)!.outputFileFullNamespace,
+      routineUsings
     );
     return testFile;
   }
