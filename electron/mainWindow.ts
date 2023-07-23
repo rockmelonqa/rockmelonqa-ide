@@ -72,6 +72,7 @@ class Main {
         contextIsolation: true,
         sandbox: false,
         preload: path.join(__dirname, "preload.js"),
+        webSecurity: false,
       },
       icon: path.join(__dirname, "www", "favicon.png"),
     });
@@ -92,14 +93,14 @@ class Main {
       }
     }
 
-    window.on('maximize', () => {
+    window.on("maximize", () => {
       store.set("isMaximize", true);
     });
-    window.on('unmaximize', () => {
-      store.set('isMaximize', false);
+    window.on("unmaximize", () => {
+      store.set("isMaximize", false);
     });
 
-    if(store.get('isMaximize')) {
+    if (store.get("isMaximize")) {
       window.maximize();
     }
 
