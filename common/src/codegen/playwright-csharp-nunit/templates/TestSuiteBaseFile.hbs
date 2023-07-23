@@ -38,7 +38,8 @@ public abstract partial class TestSuiteBase : PageTest
     public override BrowserNewContextOptions ContextOptions() => new()
     {
         // If RecordVideoMode is Off, then don't record videos
-        RecordVideoDir = EnvironmentSettings.RecordVideoMode == RecordVideoMode.Off ? null : VideoDir
+        RecordVideoDir = EnvironmentSettings.RecordVideoMode == RecordVideoMode.Off ? null : VideoDir,
+        ViewportSize = new ViewportSize() { Width = 1920, Height = 1080 }
     };
 
     [TearDown]
