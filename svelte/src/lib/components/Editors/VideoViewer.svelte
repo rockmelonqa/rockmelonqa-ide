@@ -28,7 +28,7 @@
     });
 </script>
 
-<div class="h-full flex items-center">
+<div class="h-full flex items-center bg-gray-300">
     <media-controller class="w-full">
         <video slot="media" src={filePath}>
             <track kind="captions" />
