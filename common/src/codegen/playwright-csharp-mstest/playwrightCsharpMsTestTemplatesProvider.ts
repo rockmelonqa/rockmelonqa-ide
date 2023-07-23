@@ -51,9 +51,17 @@ export class PlaywrightCsharpMsTestTemplatesProvider
     description: string,
     body: string,
     rootNamespace: string,
-    fullNamespace: string
+    fullNamespace: string,
+    usings: string[]
   ) {
-    return this._templateCollection.TEST_CASE_FILE({ rootNamespace, testCaseName, description, body, fullNamespace });
+    return this._templateCollection.TEST_CASE_FILE({
+      rootNamespace,
+      testCaseName,
+      description,
+      body,
+      fullNamespace,
+      usings,
+    });
   }
 
   getTestRoutineClass(testRoutineName: string, description: string, body: string) {

@@ -16,7 +16,7 @@ import { ICodeGen, WriteFileFn } from "../types";
 import { hasPlaceholder, upperCaseFirstChar } from "../utils/stringUtils";
 import { MsTestProjMetaGenerator } from "./msTestProjMetaGenerator";
 import { PlaywrightCsharpMsTestTemplatesProvider } from "./playwrightCsharpMsTestTemplatesProvider";
-import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
+import { DataSetCollection, IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
 import generateDatasetInfos from "../playwright-charp-common/generateDatasetInfos";
 import { PlaywrightCsharpCodeGen } from "../playwright-charp-common/playwrightCsharpCodeGen";
 import { IOutputProjectMetadataGenerator } from "../playwright-charp-common/outputProjectMetadataProcessor";
@@ -309,12 +309,15 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
   private generateTestCaseFile(testCase: ITestCase, pages: IPage[], routines: ITestRoutine[]) {
     const testcaseBody = this.generateTestCaseBody(testCase, pages, routines);
 
+    const routineUsings = this.generateRoutineUsings(testCase, routines);
+
     let testFile = this._templateProvider.getTestCaseFile(
       this._outProjMeta.get(testCase.id)!.outputFileClassName,
       testCase.description,
       testcaseBody,
       this._rootNamespace,
-      this._outProjMeta.get(testCase.id)!.outputFileFullNamespace
+      this._outProjMeta.get(testCase.id)!.outputFileFullNamespace,
+      routineUsings
     );
     return testFile;
   }

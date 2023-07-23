@@ -1,3 +1,9 @@
+{{#if usings.length}}
+{{#each usings as |using|}}
+{{{using}}}
+{{/each}}
+{{/if}}
+
 namespace {{{fullNamespace}}};
 
 /// <summary>

@@ -13,7 +13,14 @@ export interface IPlaywrightCsharpTemplatesProvider {
   ) => string;
 
   getTestCaseBase: (rootNamespace: string) => string;
-  getTestCaseFile: (testCaseName: string, description: string, body: string, rootNamespace: string, fullNamespace: string) => string;
+  getTestCaseFile: (
+    testCaseName: string,
+    description: string,
+    body: string,
+    rootNamespace: string,
+    fullNamespace: string,
+    usings: string[]
+  ) => string;
 
   getTestRoutineClass: (testRoutineName: string, description: string, body: string) => string;
   getTestRoutineFile: (rootNamespace: string, fullNamespace: string, testRoutineClasses: string[]) => string;

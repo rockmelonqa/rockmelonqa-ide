@@ -429,7 +429,8 @@ export const createTestDataKitchenSink = (): RmpSpec => {
             page: "KitchenSinkScreen",
             element: "input",
             action: "InputByCode",
-            data: "(new Date()).getFullYear().toString()",
+            //data: "(new Date()).getFullYear().toString()",
+            data: '""',
           },
           {
             id: "",
@@ -437,7 +438,8 @@ export const createTestDataKitchenSink = (): RmpSpec => {
             page: "",
             element: "",
             action: "RunCode",
-            data: 'await defs.KitchenSinkScreenPage.selectOption().selectOption("hello"); // RunCode',
+            //data: 'await defs.KitchenSinkScreenPage.selectOption().selectOption("hello"); // RunCode',
+            data: "//",
           },
           {
             id: "",
@@ -551,6 +553,15 @@ export const createTestDataKitchenSink = (): RmpSpec => {
             data: "KichenSink",
             parameters: ["DS One", "DS Three"],
           },
+          {
+            id: "",
+            type: "testStep",
+            page: "",
+            element: "",
+            action: "RunTestRoutine",
+            data: "LivingRoom/Table",
+            parameters: ["Living One", "Living Two"],
+          },
         ],
       },
     ],
@@ -603,12 +614,53 @@ export const createTestDataKitchenSink = (): RmpSpec => {
           },
         ],
       },
+      {
+        id: "",
+        name: "LivingRoom/Table",
+        description: "LivingRoom Table routine",
+        steps: [
+          {
+            id: "",
+            type: "testStep",
+            page: "KitchenSinkScreen",
+            element: "name",
+            action: "GoToUrl",
+            data: {
+              "Living One": "http://localhost:3000/actions/clear.html",
+              "Living Two": "http://localhost:3000/actions/click.html",
+            },
+          },
+          {
+            id: "",
+            type: "testStep",
+            page: "KitchenSinkScreen",
+            element: "name",
+            action: "VerifyUrl",
+            data: {
+              "Living One": "Clear",
+              "Living Two": "Click",
+            },
+          },
+        ],
+        dataSets: [
+          {
+            id: "",
+            name: "Living One",
+            description: "One One One",
+          },
+          {
+            id: "",
+            name: "Living Two",
+            description: "Two Two Two",
+          },
+        ],
+      },
     ],
     testsuites: [
       {
         id: "",
-        name: "KichenSink",
-        description: "Test KichenSink",
+        name: "Kichen",
+        description: "Test Kichen",
         testcases: ["KichenSink"],
       },
       {
