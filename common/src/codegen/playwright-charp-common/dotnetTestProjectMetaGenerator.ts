@@ -7,6 +7,7 @@ import {
   IPageInfo,
   ISuiteInfo,
   ITestCaseInfo,
+  ITestRoutineInfo,
 } from "../types";
 import { MapCreator } from "./outputProjectMetadataProcessor";
 
@@ -148,7 +149,26 @@ export class DotnetTestProjectMetaGenerator {
       pages.push(pageInfo);
     }
 
-    return { suites, cases, pages, environments };
+    const routines: ITestRoutineInfo[] = [];
+
+    for (let { content: routine, isValid } of this.projMeta.testRoutines) {
+      let routineMeta = routineMetaMap.get(routine)!;
+
+      let routineInfo: ITestRoutineInfo = {
+        name: routineMeta.outputFileClassName,
+        fullyQualifiedName: `${routineMeta.outputFileFullNamespace}.${routineMeta.outputFileClassName}`,
+        inputFileName: routineMeta.inputFileName,
+        inputFilePath: routineMeta.inputFilePath,
+        inputFileRelPath: routineMeta.inputFileRelPath,
+        outputFileName: routineMeta.outputFileName,
+        outputFilePath: routineMeta.outputFilePath,
+        outputFileRelPath: routineMeta.outputFileRelPath,
+        isValid: routineMeta.isValid,
+      };
+      routines.push(routineInfo);
+    }
+
+    return { suites, cases, pages, routines, environments };
   }
 
   /** Get an instance of IOutputFileInfo with the provided guid of an item in the rmProj  */

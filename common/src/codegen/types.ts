@@ -78,6 +78,21 @@ export interface ITestCaseInfo {
   lineNumber?: number;
 }
 
+/** Metadata of a test routine */
+export interface ITestRoutineInfo {
+  name: string;
+  fullyQualifiedName: string;
+  inputFileName: string;
+  inputFilePath: string;
+  inputFileRelPath: string;
+  outputFileName: string;
+  outputFilePath: string;
+  outputFileRelPath: string;
+  isValid: boolean;
+  /** Line number of the test method inside the test suite (spec). Used for playwright to build test filter */
+  lineNumber?: number;
+}
+
 /** Metadata of a page */
 export interface IPageInfo {
   name: string;
@@ -136,6 +151,7 @@ export interface IOutputFileInfo {
 export interface IOutputProjectMetadata {
   suites: ISuiteInfo[];
   cases: ITestCaseInfo[];
+  routines: ITestRoutineInfo[];
   pages: IPageInfo[];
   environments: IEnvironmentFileInfo[];
   error?: { message: string; data?: string };
