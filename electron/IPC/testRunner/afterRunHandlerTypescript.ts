@@ -25,11 +25,6 @@ export default class AfterRunHandlerTypeScript implements IAfterRunHandler {
 
     const videoFiles = await this.getVideoFileNames(context);
     if (videoFiles.length) {
-      logBuilder.appendLine("");
-      logBuilder.appendLine("*** Recordings ***");
-      logBuilder.appendLine(videoFiles.map((f) => `- ${f}`).join(EOL));
-      logBuilder.appendLine("");
-
       await this.moveVideosToTestRuns(context, videoFiles);
     }
 
@@ -41,8 +36,8 @@ export default class AfterRunHandlerTypeScript implements IAfterRunHandler {
     const testResultFolder = path.join(
       context.rmProjFile.folderPath,
       StandardFolder.OutputCode,
-      "test-results",
-      "videos"
+      "playwright-report",
+      "data"
     );
     const files = await fs.readdir(testResultFolder);
     const videoFiles = files.filter((f) => f.toLowerCase().endsWith(".webm"));
@@ -68,14 +63,10 @@ export default class AfterRunHandlerTypeScript implements IAfterRunHandler {
     const testResultFolder = path.join(
       context.rmProjFile.folderPath,
       StandardFolder.OutputCode,
-      "test-results",
-      "videos"
+      "playwright-report",
+      "data"
     );
-    let recordingsFolder = path.join(
-      context.rmProjFile.folderPath,
-      context.settings.testResultFolderRelPath,
-      "recordings"
-    );
+    let recordingsFolder = path.join(context.rmProjFile.folderPath, context.settings.testResultFolderRelPath, "data");
 
     fs.mkdir(recordingsFolder);
 
