@@ -15,8 +15,8 @@
 
     let videoEl: HTMLImageElement;
     onMount(async () => {
-        const fileContentBase64 = (await fileSystem.readFileBase64(filePath)) ?? "";
-        videoEl.src = "data:image/png;base64," + fileContentBase64;
+        let handledPath = "rm-file://" + filePath;
+        videoEl.src = handledPath;
 
         const viewer = new Viewer(videoEl, {
             inline: true,

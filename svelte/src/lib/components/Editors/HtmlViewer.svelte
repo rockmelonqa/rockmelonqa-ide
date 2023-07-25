@@ -13,7 +13,8 @@
 
     let frameEl: HTMLIFrameElement;
     onMount(async () => {
-        frameEl.src = filePath;
+        let handledPath = "rm-file://" + filePath;
+        frameEl.src = handledPath;
     });
 </script>
 

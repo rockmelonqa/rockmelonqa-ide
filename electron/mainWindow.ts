@@ -1,9 +1,10 @@
-import { app, BrowserWindow, Menu } from "electron";
+import { app, BrowserWindow, Menu, protocol, net } from "electron";
 import EventEmitter from "events";
 import path from "path";
 import applicationMenu from "./applicationMenu";
 import ConfigureDev, { DeveloperOptions } from "./configureDev";
 import { store } from "./utils/appStore";
+import fileHandler from "./utils/fileHandler";
 
 const appName = "Rockmelon QA";
 const localHost = "http://localhost:7011";
@@ -34,6 +35,8 @@ class Main {
     this.configDev = new ConfigureDev(this.settingsDev);
 
     app.on("ready", async () => {
+      protocol.registerFileProtocol("rm-file", fileHandler);
+
       let loading = new BrowserWindow({
         show: false,
         frame: false,
@@ -72,7 +75,6 @@ class Main {
         contextIsolation: true,
         sandbox: false,
         preload: path.join(__dirname, "preload.js"),
-        webSecurity: false,
       },
       icon: path.join(__dirname, "www", "favicon.png"),
     });
