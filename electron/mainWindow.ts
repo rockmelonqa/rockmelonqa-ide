@@ -1,9 +1,10 @@
-import { app, BrowserWindow, Menu } from "electron";
+import { app, BrowserWindow, Menu, protocol, net } from "electron";
 import EventEmitter from "events";
 import path from "path";
 import applicationMenu from "./applicationMenu";
 import ConfigureDev, { DeveloperOptions } from "./configureDev";
 import { store } from "./utils/appStore";
+import fileHandler from "./utils/fileHandler";
 
 const appName = "Rockmelon QA";
 const localHost = "http://localhost:7011";
@@ -34,6 +35,8 @@ class Main {
     this.configDev = new ConfigureDev(this.settingsDev);
 
     app.on("ready", async () => {
+      protocol.registerFileProtocol("rm-file", fileHandler);
+
       let loading = new BrowserWindow({
         show: false,
         frame: false,
@@ -92,14 +95,14 @@ class Main {
       }
     }
 
-    window.on('maximize', () => {
+    window.on("maximize", () => {
       store.set("isMaximize", true);
     });
-    window.on('unmaximize', () => {
-      store.set('isMaximize', false);
+    window.on("unmaximize", () => {
+      store.set("isMaximize", false);
     });
 
-    if(store.get('isMaximize')) {
+    if (store.get("isMaximize")) {
       window.maximize();
     }
 

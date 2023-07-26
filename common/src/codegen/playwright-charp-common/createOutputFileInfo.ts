@@ -1,5 +1,6 @@
 import path from "path";
 import {
+  ExtensionToNameMap,
   IFileDef,
   StandardFileExtension,
   StandardFolder,
@@ -9,7 +10,8 @@ import {
 import { IRmProjFile, Language } from "../../file-defs/rmProjFile";
 import { IOutputFileInfo } from "../types";
 import { languageExtensionMap } from "../utils/languageExtensionMap";
-import createName, { createCleanName } from "../utils/createName";
+import { createName, createCleanName } from "../utils/createName";
+import { upperCaseFirstChar } from "../utils/stringUtils";
 
 /** Map from standard input folder to standard output folder */
 const inputOutputFolderMap = new Map<string, string>([
@@ -94,6 +96,8 @@ export class OutputFileInfoBuilderDotnet implements IOutputFileInfoBuilder {
 
     const inputFileStandardFolder = getContainerFolder(folderPath, proj.folderPath);
     const inputFileExt = path.parse(inputFileName).ext;
+
+    const outputFileNameSuffix = upperCaseFirstChar(ExtensionToNameMap[inputFileExt]);
     const inputContainerFolder = path.join(proj.folderPath, inputFileStandardFolder);
     const outputFileExt = languageExtensionMap[proj.content.language];
     const outputCodeDir = path.join(proj.folderPath, StandardFolder.OutputCode);
@@ -108,6 +112,8 @@ export class OutputFileInfoBuilderDotnet implements IOutputFileInfoBuilder {
     for (let i = 0; i < inputFileNameSegments.length; i++) {
       outputNameSegments.push(createCleanName(inputFileNameSegments[i]));
     }
+    outputNameSegments[inputFileNameSegments.length - 1] += outputFileNameSuffix;
+
     let outputFileRelPath = path.join(standardOutputFolder, outputNameSegments.join(path.sep)) + outputFileExt;
     // Remove the file name from  name segments
     const outputFileCleanName = outputNameSegments.pop() || "";

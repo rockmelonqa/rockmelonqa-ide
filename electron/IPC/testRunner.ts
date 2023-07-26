@@ -11,9 +11,9 @@ import { StringBuilder } from "../utils/stringBuilder";
 import { IRunTestActionResult, runTest as runTestInWorker } from "../worker/actions/runTest";
 import { IChannels } from "./core/channelsInterface";
 import IPC from "./core/ipc";
-import { AfterRunHandlerFactory } from "../worker/actions/runTest/afterRunHandler";
 import { cleanUpStrangeChars } from "../utils/stringUtils";
 import { EOL } from "os";
+import { AfterRunHandlerFactory } from "./testRunner/afterRunHandler";
 
 const nameAPI = "testRunner";
 
@@ -73,15 +73,15 @@ async function runTest(browserWindow: BrowserWindow, event: Electron.IpcMainEven
 
       browserWindow.webContents.send(type, details as IProgressDetail);
     });
+
+    const afterRunHandler = AfterRunHandlerFactory.getInstance(context.rmProjFile.content.language);
+    await afterRunHandler.handle(context, sb);
   } catch (error) {
     console.error(`runTest error: ${String(error)}`);
     actionRs = { isSuccess: false, errorMessage: String(error) };
   }
 
   console.log("Finish runTest", actionRs);
-
-  const afterRunHandler = AfterRunHandlerFactory.getInstance(context.rmProjFile.content.language);
-  await afterRunHandler.handle(context, sb);
 
   const ipcRs: IIpcGenericResponse<IRunTestResponseData> = {
     isSuccess: actionRs.isSuccess,

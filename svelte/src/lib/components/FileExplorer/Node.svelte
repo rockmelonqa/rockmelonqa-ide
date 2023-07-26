@@ -48,9 +48,9 @@
 
     $: expanded = node.expanded || addMode;
 
-    $: containerClass = `treeview-item 
+    $: containerClass = `treeview-item
         ${expanded ? "treeview-item-opened" : ""}`;
-    $: rootItemClass = `treeview-item-root 
+    $: rootItemClass = `treeview-item-root
         ${toggleable ? "treeview-item-toggle" : ""} 
         ${selectable ? "treeview-item-selectable" : ""} 
         ${selected ? "treeview-item-selected" : ""}
@@ -112,7 +112,7 @@
     };
 
     let position = { x: 0, y: 0 };
-    const handleRightClick = (e: any) => {
+    const handleRightClick = (e: MouseEvent) => {
         if (selectable) {
             position = { x: e.clientX, y: e.clientY };
             showMenuAt.set(nodePath);

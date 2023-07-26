@@ -10,6 +10,7 @@ import TrxViewer from "./TrxViewer/TrxViewer.svelte";
 import EnvEditor from "./EnvironmentEditor.svelte";
 import HtmlViewer from "./HtmlViewer.svelte";
 import PhotoViewer from "./PhotoViewer.svelte";
+import VideoViewer from "./VideoViewer.svelte";
 
 export const getEditor = (fileName: string): ComponentType | undefined => {
     const lastIndex = fileName.lastIndexOf(".");
@@ -38,6 +39,11 @@ export const getEditor = (fileName: string): ComponentType | undefined => {
         case ".webp":
             // Maybe more image formats
             return PhotoViewer;
+        case ".webm":
+        case ".mp4":
+        case ".mkv":
+            // Maybe more video formats
+            return VideoViewer;
         default:
             return TextEditor;
     }

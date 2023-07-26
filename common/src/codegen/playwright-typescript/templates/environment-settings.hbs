@@ -2,9 +2,24 @@ export default class {
   public static get TakeScreenshotOnError(): boolean {
     return (process.env.TakeScreenshotOnError ?? "true") === "true";
   }
+  public static get RecordVideoMode(): RecordVideoMode {
+    switch (process.env.RecordVideoMode) {
+      case "On":
+        return "on";
+      case "Off":
+        return "off";
+      case "RetainOnFailure":
+      default:
+        return "retain-on-failure";
+    }
+  }
   {{#each allVariableNames as |name|}}
   {{#if (isnt name "TakeScreenshotOnError")}}
+  {{#if (isnt name "RecordVideoMode")}}
   public static get {{{name}}}(): string { return process.env.{{{name}}} || ""; }
+  {{/if}}
   {{/if}}
   {{/each}}
 }
+
+export type RecordVideoMode = "retain-on-failure" | "on" | "off";

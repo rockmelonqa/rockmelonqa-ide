@@ -2,10 +2,10 @@ import path from "path";
 import { ExtensionToNameMap } from "../../file-defs";
 import { upperCaseFirstChar } from "./stringUtils";
 
-/** Creates a valid name (with extension) from the input file relative path */
-export default (sourceFileRelPath: string) => {
+/** Creates a valid output file name (without extension) from the input file relative path */
+export const createName = (sourceFileRelPath: string) => {
   let ext = path.extname(sourceFileRelPath).toLocaleLowerCase();
-  let extName = upperCaseFirstChar(ExtensionToNameMap[ext]);
+  let nameSuffix = upperCaseFirstChar(ExtensionToNameMap[ext]);
 
   let filenameWithoutExt = sourceFileRelPath
     .replace(/\..+$/, "") // Remove the extension
@@ -18,7 +18,7 @@ export default (sourceFileRelPath: string) => {
     .map((w) => upperCaseFirstChar(w))
     .join("_");
 
-  return `${filenameWithoutExt}${extName}`;
+  return `${filenameWithoutExt}${nameSuffix}`;
 };
 
 export const createCleanName = (sourceName: string) => {

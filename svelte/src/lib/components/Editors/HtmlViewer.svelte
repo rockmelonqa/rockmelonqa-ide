@@ -11,13 +11,10 @@
     export let fileName: string;
     $: filePath = combinePath([folderPath, fileName], uiContext.pathSeparator);
 
-    let appContext = getContext(appContextKey) as IAppContext;
-    let { state: appState, dispatch: appStateDispatch } = appContext;
-
     let frameEl: HTMLIFrameElement;
     onMount(async () => {
-        const fileContent = (await fileSystem.readFile(filePath)) ?? "";
-        frameEl.src = "data:text/html;charset=utf-8," + escape(fileContent);
+        let handledPath = "rm-file://" + filePath;
+        frameEl.src = handledPath;
     });
 </script>
 

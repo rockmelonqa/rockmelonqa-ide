@@ -7,6 +7,6 @@ public static class EnvironmentSettings
     
     {{#if (isnt name "TakeScreenshotOnError")}}
     public static readonly string {{{name}}} = Environment.GetEnvironmentVariable(nameof({{{name}}})) ?? string.Empty;
-    {/if}
+    {{/if}}
     {{/each}}
 }

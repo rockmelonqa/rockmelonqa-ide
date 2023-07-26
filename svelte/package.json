@@ -53,6 +53,7 @@
         "imask": "^6.6.1",
         "lodash": "^4.17.21",
         "luxon": "^3.3.0",
+        "media-chrome": "^1.1.5",
         "monaco-editor": "^0.34.1",
         "rockmelonqa.common": "file:../common/dist/module",
         "svelte-i18n": "^3.6.0",

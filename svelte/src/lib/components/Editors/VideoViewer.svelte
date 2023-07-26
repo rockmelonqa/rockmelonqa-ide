@@ -13,9 +13,12 @@
     export let fileName: string;
     $: filePath = combinePath([folderPath, fileName], uiContext.pathSeparator);
 
-    let imgEl: HTMLImageElement;
+    let videoEl: HTMLImageElement;
     onMount(async () => {
-        const viewer = new Viewer(imgEl, {
+        let handledPath = "rm-file://" + filePath;
+        videoEl.src = handledPath;
+
+        const viewer = new Viewer(videoEl, {
             inline: true,
             toolbar: false,
             navbar: false,
@@ -25,14 +28,20 @@
     });
 </script>
 
-<!-- This img tag is actually hidden from viewer, the photo is shown in ViewerJS  -->
-<img bind:this={imgEl} class="w-1/2 h-1/2 border-0 opacity-0" src={filePath} alt={fileName} />
+<div class="h-full flex items-center bg-gray-300">
+    <media-controller class="w-full">
+        <video slot="media" src={filePath}>
+            <track kind="captions" />
+        </video>
+        <media-control-bar>
+            <media-play-button />
+            <media-time-display showduration />
+            <media-mute-button />
+            <media-time-range />
+            <media-fullscreen-button />
+        </media-control-bar>
+    </media-controller>
+</div>
 
 <style>
-    /* Don't let the backdrop have fixed size */
-    :global(.rm-photo-viewer.viewer-backdrop) {
-        background-color: rgba(0, 0, 0, 80%);
-        width: 100% !important;
-        height: 100% !important;
-    }
 </style>

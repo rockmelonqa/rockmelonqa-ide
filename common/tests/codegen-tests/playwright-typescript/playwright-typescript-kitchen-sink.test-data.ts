@@ -429,8 +429,10 @@ export const createTestDataKitchenSink = (): RmpSpec => {
             page: "KitchenSinkScreen",
             element: "input",
             action: "InputByCode",
-            //data: "(new Date()).getFullYear().toString()",
-            data: '""',
+            // For typescript
+            // data: "(new Date()).getFullYear().toString()",
+            // For C#
+            data: "DateTime.Now.Year.ToString()",
           },
           {
             id: "",
@@ -438,8 +440,10 @@ export const createTestDataKitchenSink = (): RmpSpec => {
             page: "",
             element: "",
             action: "RunCode",
-            //data: 'await defs.KitchenSinkScreenPage.selectOption().selectOption("hello"); // RunCode',
-            data: "//",
+            // For typescript
+            // data: 'await defs.KitchenSinkScreenPage.selectOption().selectOption("hello"); // RunCode',
+            // For C#
+            data: 'await defs.KitchenSinkScreenPage.SelectOption().SelectOptionAsync("hello"); // RunCode',
           },
           {
             id: "",
@@ -502,6 +506,14 @@ export const createTestDataKitchenSink = (): RmpSpec => {
             type: "testStep",
             page: "KitchenSinkScreen",
             element: "verifyVisible",
+            action: "VerifyIsVisible",
+            data: "",
+          },
+          {
+            id: "",
+            type: "testStep",
+            page: "KitchenSinkScreen",
+            element: "verifyIsHidden",
             action: "VerifyIsHidden",
             data: "",
           },
