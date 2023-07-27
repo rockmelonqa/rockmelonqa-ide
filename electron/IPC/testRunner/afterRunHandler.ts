@@ -12,14 +12,18 @@ export interface IAfterRunHandler {
   handle(context: IRunTestContext, logBuilder: StringBuilder): Promise<void>;
 }
 
+const afterRunHandlersRegistry = new Map<Language, IAfterRunHandler>();
+afterRunHandlersRegistry.set(Language.Typescript, new AfterRunHandlerTypeScript());
+afterRunHandlersRegistry.set(Language.CSharp, new AfterRunHandlerDotnet());
+// ... Other types
+
 /** Contains factory method to create instance of AfterRunHandler  */
 export class AfterRunHandlerFactory {
   static getInstance(language: Language): IAfterRunHandler {
-    if (language === Language.Typescript) {
-      return new AfterRunHandlerTypeScript();
-    }
-    if (language === Language.CSharp) {
-      return new AfterRunHandlerDotnet();
+    const handler = afterRunHandlersRegistry.get(language);
+
+    if (handler) {
+      return handler;
     }
     throw new Error(`DEV ERROR: cannot get instance of AfterRunHandler for language ${language}`);
   }
