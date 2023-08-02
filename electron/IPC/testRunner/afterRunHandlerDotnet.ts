@@ -8,6 +8,7 @@ import * as fileSystem from "../../utils/fileSystem";
 import { StringBuilder } from "../../utils/stringBuilder";
 import { EOL } from "os";
 import { IAfterRunHandler } from "./afterRunHandler";
+import { existsSync } from "fs";
 
 /** AfterRunHandler for Dotnet project */
 export default class AfterRunHandlerDotnet implements IAfterRunHandler {
@@ -44,7 +45,7 @@ export default class AfterRunHandlerDotnet implements IAfterRunHandler {
       await this.moveRecordingsToTestRuns(context, recordings);
     }
   }
-  async getRecordings(context: IRunTestContext) {
+  async getRecordings(context: IRunTestContext):Promise<string[]> {
     const dotnetOutputVideoFolder = path.join(
       context.rmProjFile.folderPath,
       StandardFolder.OutputCode,
@@ -53,6 +54,11 @@ export default class AfterRunHandlerDotnet implements IAfterRunHandler {
       "videos",
       "keep"
     );
+
+    if (!existsSync(dotnetOutputVideoFolder)) {
+      return [];
+    }
+
     const files = await fs.readdir(dotnetOutputVideoFolder);
     const recordings = files.filter((f) => f.toLowerCase().endsWith(".webm"));
     return recordings;
@@ -66,6 +72,11 @@ export default class AfterRunHandlerDotnet implements IAfterRunHandler {
       "Debug",
       "videos"
     );
+
+    if (!existsSync(dotnetOutputVideoFolder)) {
+      return;
+    }
+
     const files = await fs.readdir(dotnetOutputVideoFolder);
     const recordings = files.filter((f) => f.toLowerCase().endsWith(".webm"));
     for (let recording of recordings) {
@@ -133,6 +144,11 @@ export default class AfterRunHandlerDotnet implements IAfterRunHandler {
       "videos",
       "keep"
     );
+
+    if (!existsSync(dotnetOutputFolder)) {
+      return [];
+    }
+    
     let recordingFolder = path.join(
       context.rmProjFile.folderPath,
       context.settings.testResultFolderRelPath,
