@@ -15,6 +15,8 @@
 
     let imgEl: HTMLImageElement;
     onMount(async () => {
+        let handledPath = "rm-file://" + filePath;
+        imgEl.src = handledPath;
         const viewer = new Viewer(imgEl, {
             inline: true,
             toolbar: false,
@@ -26,7 +28,7 @@
 </script>
 
 <!-- This img tag is actually hidden from viewer, the photo is shown in ViewerJS  -->
-<img bind:this={imgEl} class="w-1/2 h-1/2 border-0 opacity-0" src={filePath} alt={fileName} />
+<img bind:this={imgEl} class="w-1/2 h-1/2 border-0 opacity-0" src="javascript:void(0)" alt={fileName} />
 
 <style>
     /* Don't let the backdrop have fixed size */

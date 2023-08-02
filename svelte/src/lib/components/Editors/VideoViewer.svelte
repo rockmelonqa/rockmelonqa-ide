@@ -30,7 +30,7 @@
 
 <div class="h-full flex items-center bg-gray-300">
     <media-controller class="w-full">
-        <video slot="media" src={filePath}>
+        <video bind:this={videoEl} slot="media" src="javascript:void(0)">
             <track kind="captions" />
         </video>
         <media-control-bar>
