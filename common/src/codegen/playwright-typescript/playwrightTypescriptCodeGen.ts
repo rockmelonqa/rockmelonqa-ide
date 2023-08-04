@@ -222,7 +222,7 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
       if (element.type === "pageElement") {
         pageItems.push(
           this._templateProvider.getLocator({
-            elementName: upperCaseFirstChar(element.name!),
+            elementName: element.name!,
             locatorStr: element.locator || "",
             locatorType: element.findBy!,
             description: element.description!,
@@ -486,7 +486,7 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
     return [
       this._templateProvider.getAction({
         pageName: pageName,
-        elementName: elementName,
+        elementName: lowerCaseFirstChar(elementName),
         action: step.action! as unknown as ActionType,
         data: actionData,
         parameters: step.parameters || [],
