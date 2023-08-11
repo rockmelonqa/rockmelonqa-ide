@@ -40,6 +40,11 @@ export default class AfterRunHandlerTypeScript implements IAfterRunHandler {
       "playwright-report",
       "data"
     );
+
+    if (!existsSync(testResultFolder)) {
+      return [];
+    }
+
     const files = await fs.readdir(testResultFolder);
     const videoFiles = files.filter((f) => f.toLowerCase().endsWith(".webm"));
     return videoFiles;
