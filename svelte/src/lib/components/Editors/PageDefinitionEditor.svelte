@@ -41,6 +41,9 @@
     import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
     import { toTitle } from "./Editor";
+    import type { GridConfig } from "./DynamicGrid/DynamicGrid";
+    import DynamicGrid from "./DynamicGrid/DynamicGrid.svelte";
+    import DynamicCell from "./DynamicGrid/DynamicCell.svelte";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -314,6 +317,35 @@
     };
     $: isListDataValid = $listData.items.every((item) => isElementNameValid(item.name));
     $: isDataValid = $formData.isValid && isListDataValid;
+
+    let gridConfig: GridConfig = {
+        columns: [
+            {
+                sizePercentage: 15,
+                title: uiContext.str(stringResKeys.pageDefinitionEditor.elementName),
+            },
+            {
+                sizePercentage: 20,
+                title: uiContext.str(stringResKeys.pageDefinitionEditor.findBy),
+            },
+            {
+                sizePercentage: 30,
+                title: uiContext.str(stringResKeys.pageDefinitionEditor.locator),
+            },
+            {
+                sizePercentage: 20,
+                title: uiContext.str(stringResKeys.pageDefinitionEditor.description),
+            },
+            {
+                sizePercentage: 15,
+                title: uiContext.str(stringResKeys.pageDefinitionEditor.actions),
+            },
+        ],
+    };
+
+    const deleteItem = (item: IDictionary) => {};
+    const changeGridSizes = () => {};
+    const addItem = () => {};
 </script>
 
 <div class="page-definition-editor p-8">
@@ -331,6 +363,39 @@
             </FormGroupColumn>
         </FormGroup>
     </Form>
+
+    <DynamicGrid config={gridConfig} items={$listData.items}>
+        <svelte:fragment slot="item" let:item>
+            {#if item.type === "pageElement"}
+                <DynamicCell>
+                    {item.name}
+                </DynamicCell>
+                <DynamicCell>
+                    {item.findBy}
+                </DynamicCell>
+                <DynamicCell>
+                    {item.locator}
+                </DynamicCell>
+                <DynamicCell>
+                    {item.description}
+                </DynamicCell>
+                <DynamicCell isLast={true}>
+                    <button on:click={() => deleteItem(item)}> Delete </button>
+                </DynamicCell>
+            {:else if item.type === "comment"}
+                <DynamicCell colspan={gridConfig.columns.length - 1}>
+                    <span class="text-green-600"> {item.comment}</span>
+                </DynamicCell>
+                <DynamicCell isLast={true}>
+                    <button on:click={() => deleteItem(item)}> Delete </button>
+                </DynamicCell>
+            {:else}
+                <DynamicCell isLast={true} colspan={gridConfig.columns.length}>
+                    <i class="text-red">(This item cannot be shown)</i>
+                </DynamicCell>
+            {/if}
+        </svelte:fragment>
+    </DynamicGrid>
 
     <ListTable
         class="table-fixed mb-8"
