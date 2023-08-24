@@ -319,25 +319,26 @@
     $: isDataValid = $formData.isValid && isListDataValid;
 
     let gridConfig: GridConfig = {
+        gridType: "PageElements",
         columns: [
             {
-                sizePercentage: 15,
+                defaultSizePercentage: 15,
                 title: uiContext.str(stringResKeys.pageDefinitionEditor.elementName),
             },
             {
-                sizePercentage: 20,
+                defaultSizePercentage: 20,
                 title: uiContext.str(stringResKeys.pageDefinitionEditor.findBy),
             },
             {
-                sizePercentage: 30,
+                defaultSizePercentage: 30,
                 title: uiContext.str(stringResKeys.pageDefinitionEditor.locator),
             },
             {
-                sizePercentage: 20,
+                defaultSizePercentage: 20,
                 title: uiContext.str(stringResKeys.pageDefinitionEditor.description),
             },
             {
-                sizePercentage: 15,
+                defaultSizePercentage: 15,
                 title: uiContext.str(stringResKeys.pageDefinitionEditor.actions),
             },
         ],
@@ -365,29 +366,129 @@
     </Form>
 
     <DynamicGrid config={gridConfig} items={$listData.items}>
-        <svelte:fragment slot="item" let:item>
+        <svelte:fragment slot="item" let:item let:index>
             {#if item.type === "pageElement"}
                 <DynamicCell>
-                    {item.name}
+                    <TextField
+                        class="py-2 px-3 h-auto border-white "
+                        name={`${formContext.formName}_${index}_name`}
+                        value={item.name}
+                        on:input={(event) => handleItemChange(index, "name", event.detail.value)}
+                        errorMessage={isElementNameValid(item.name)
+                            ? ""
+                            : uiContext.str(stringResKeys.pageDefinitionEditor.elementNameInvalidMessage)}
+                        focus={`${formContext.formName}_${index}_name_input` === focusFieldId}
+                    />
                 </DynamicCell>
                 <DynamicCell>
-                    {item.findBy}
+                    <FancyDropdownField
+                        class="py-2 px-3 h-auto border-white "
+                        name={`${formContext.formName}_${index}_findBy`}
+                        value={item.findBy}
+                        options={locatorTypeOptions}
+                        on:change={(event) => handleItemChange(index, "findBy", event.detail.value)}
+                    />
                 </DynamicCell>
                 <DynamicCell>
-                    {item.locator}
+                    <TextField
+                        class="py-2 px-3 h-auto border-white"
+                        placeholder={(item.findBy === LocatorType.RelativeCss ? "MyField:.css-class-name" : "") ||
+                            (item.findBy === LocatorType.RelativeXpath ? "MyField://div[text() = 'abc']" : "")}
+                        name={`${formContext.formName}_${index}_locator`}
+                        value={item.locator}
+                        on:input={(event) => handleItemChange(index, "locator", event.detail.value)}
+                    />
                 </DynamicCell>
                 <DynamicCell>
-                    {item.description}
+                    <TextField
+                        class="py-2 px-3 h-auto border-white"
+                        name={`${formContext.formName}_${index}_description`}
+                        value={item.description}
+                        on:input={(event) => handleItemChange(index, "description", event.detail.value)}
+                    />
                 </DynamicCell>
                 <DynamicCell isLast={true}>
-                    <button on:click={() => deleteItem(item)}> Delete </button>
+                    <IconLinkButton
+                        on:click={() => handleInsertElement(index)}
+                        title={uiContext.str(stringResKeys.pageDefinitionEditor.addElement)}
+                    >
+                        <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
+                    </IconLinkButton>
+                    <IconLinkButton
+                        on:click={() => handleInsertComment(index)}
+                        title={uiContext.str(stringResKeys.pageDefinitionEditor.addComment)}
+                    >
+                        <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
+                    </IconLinkButton>
+                    <IconLinkButton
+                        on:click={() => handleDeleteClick(index)}
+                        title={uiContext.str(stringResKeys.general.delete)}
+                    >
+                        <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
+                    </IconLinkButton>
+                    {#if index > 0}
+                        <IconLinkButton
+                            on:click={() => handleMoveUpClick(index)}
+                            title={uiContext.str(stringResKeys.general.moveUp)}
+                        >
+                            <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>
+                        </IconLinkButton>
+                    {/if}
+                    {#if index < $listData.items.length - 1}
+                        <IconLinkButton
+                            on:click={() => handleMoveDownClick(index)}
+                            title={uiContext.str(stringResKeys.general.moveDown)}
+                        >
+                            <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>
+                        </IconLinkButton>
+                    {/if}
                 </DynamicCell>
             {:else if item.type === "comment"}
                 <DynamicCell colspan={gridConfig.columns.length - 1}>
-                    <span class="text-green-600"> {item.comment}</span>
+                    <CommentTextField
+                        class="py-2 px-3 h-auto"
+                        name={`${formContext.formName}_${index}_comment`}
+                        value={item.comment}
+                        placeholder={uiContext.str(stringResKeys.pageDefinitionEditor.comment)}
+                        on:input={(event) => handleItemChange(index, "comment", event.detail.value)}
+                        focus={`${formContext.formName}_${index}_comment_input` === focusFieldId}
+                    />
                 </DynamicCell>
                 <DynamicCell isLast={true}>
-                    <button on:click={() => deleteItem(item)}> Delete </button>
+                    <IconLinkButton
+                        on:click={() => handleInsertElement(index)}
+                        title={uiContext.str(stringResKeys.pageDefinitionEditor.addElement)}
+                    >
+                        <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
+                    </IconLinkButton>
+                    <IconLinkButton
+                        on:click={() => handleInsertComment(index)}
+                        title={uiContext.str(stringResKeys.pageDefinitionEditor.addComment)}
+                    >
+                        <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
+                    </IconLinkButton>
+                    <IconLinkButton
+                        on:click={() => handleDeleteClick(index)}
+                        title={uiContext.str(stringResKeys.general.delete)}
+                    >
+                        <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
+                    </IconLinkButton>
+                    {#if index > 0}
+                        <IconLinkButton
+                            on:click={() => handleMoveUpClick(index)}
+                            title={uiContext.str(stringResKeys.general.moveUp)}
+                        >
+                            <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>
+                        </IconLinkButton>
+                    {/if}
+                    {#if index < $listData.items.length - 1}
+                        <IconLinkButton
+                            on:click={() => handleMoveDownClick(index)}
+                            title={uiContext.str(stringResKeys.general.moveDown)}
+                        >
+                            <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>
+                        </IconLinkButton>
+                    {/if}
                 </DynamicCell>
             {:else}
                 <DynamicCell isLast={true} colspan={gridConfig.columns.length}>
@@ -396,6 +497,8 @@
             {/if}
         </svelte:fragment>
     </DynamicGrid>
+
+    <div class="py-3" />
 
     <ListTable
         class="table-fixed mb-8"

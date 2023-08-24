@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import type { GridConfig } from "./DynamicGrid";
+    import { DynamicGridSizeCache, type GridConfig } from "./DynamicGrid";
     import Split from "split.js";
 
     type ItemType = $$Generic;
@@ -12,7 +12,11 @@
     let gridStyle: string;
 
     onMount(() => {
-        let sizes = config.columns.map((c) => c.sizePercentage);
+        let cachedSizes = DynamicGridSizeCache.getByCollectionType(config.gridType);
+        let sizes = cachedSizes;
+        if (!sizes) {
+            sizes = config.columns.map((c) => c.defaultSizePercentage);
+        }
         columnSizes = sizes.map((n) => `${n}%`);
         gridStyle = `grid-template-columns: ${columnSizes.join(" ")};`;
         Split(cols, {
@@ -21,12 +25,13 @@
             onDrag(sizes) {
                 columnSizes = sizes.map((s) => `${s}%`);
                 gridStyle = `grid-template-columns: ${columnSizes.join(" ")};`;
+                DynamicGridSizeCache.setByCollectionType(config.gridType, sizes);
             },
         });
     });
 </script>
 
-<div data-role="style" class="text-gray-200">
+<div data-role="style">
     <div data-role="table-container">
         <div data-role="header" class="text-gray-800 flex flex-row bg-gray-200">
             {#each config.columns as column, i}
@@ -37,9 +42,9 @@
         </div>
 
         <div data-role="body">
-            {#each items as item}
+            {#each items as item, index}
                 <div data-role="row" class="grid border-b" style={gridStyle}>
-                    <slot name="item" {item} />
+                    <slot name="item" {item} {index} />
                 </div>
             {/each}
         </div>

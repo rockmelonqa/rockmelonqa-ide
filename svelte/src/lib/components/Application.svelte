@@ -251,8 +251,11 @@
 
     /** Determine whether there is dirty tab, to display save pending changes dialog */
     const onBeforeUnload = (event: any) => {
-        event.returnValue = "any-value-to-prevent-default";
-        return false;
+        if (localStorage.preventHotReloadClosing) {
+            event.returnValue = "any-value-to-prevent-default";
+            return false;
+        }
+
         const hasDirtyTab = $appState.tabs.some((x) => x.isDirty);
         if (hasDirtyTab) {
             event.returnValue = "any-value-to-prevent-default";
