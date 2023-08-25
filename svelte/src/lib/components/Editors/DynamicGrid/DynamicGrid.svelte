@@ -54,7 +54,7 @@
         {/each}
     </div>
 
-    <div data-role="body" class="overflow-y-auto border-b dynamic-grid-body" bind:this={gridBody}>
+    <div data-role="body" class="h-full overflow-y-auto border-b dynamic-grid-body" bind:this={gridBody}>
         {#each items as item, index}
             <div data-role="row" class="grid border-b" style={gridStyle}>
                 <slot name="item" {item} {index} />
