@@ -211,7 +211,7 @@
     };
 </script>
 
-<div class="environment-editor p-8">
+<div class="flex-1 environment-editor p-8">
     <div class="font-semibold text-xl mb-4">{title}</div>
 
     <ListTable

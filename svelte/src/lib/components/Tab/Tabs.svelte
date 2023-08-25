@@ -28,7 +28,7 @@
     let tabToClose: number;
 
     $: tabTitleContainerCss = "tab-item-title-container pl-4 pr-2 py-3 flex items-center gap-x-3";
-    $: tabContentCss = "tab-item-content flex-1 overflow-y-auto";
+    $: tabContentCss = "tab-item-content flex-1 overflow-y-auto flex";
 
     onMount(() => {
         // Enable horizontal scroll

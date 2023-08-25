@@ -13,7 +13,7 @@
     export let fileName: string;
     $: filePath = combinePath([folderPath, fileName], uiContext.pathSeparator);
 
-    let videoEl: HTMLImageElement;
+    let videoEl: HTMLVideoElement;
     onMount(async () => {
         let handledPath = "rm-file://" + filePath;
         videoEl.src = handledPath;
@@ -28,7 +28,7 @@
     });
 </script>
 
-<div class="h-full flex items-center bg-gray-300">
+<div class="flex-1 h-full flex items-center bg-gray-300">
     <media-controller class="w-full">
         <video bind:this={videoEl} slot="media" src="javascript:void(0)">
             <track kind="captions" />

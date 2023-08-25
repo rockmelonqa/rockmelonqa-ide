@@ -1,43 +1,43 @@
 <script lang="ts">
-    import { appContextKey, type IAppContext } from '$lib/context/AppContext';
-    import { stringResKeys } from '$lib/context/StringResKeys';
-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import type { IUiTheme } from '$lib/context/UiTheme';
-    import type { IDropdownOption } from '$lib/controls/DropdownField';
-    import FancyDropdownField from '$lib/controls/FancyDropdownField.svelte';
-    import FormGroup from '$lib/controls/layout/FormGroup.svelte';
-    import FormGroupColumn from '$lib/controls/layout/FormGroupColumn.svelte';
-    import Form from '$lib/form-controls/Form.svelte';
-    import FormTextField from '$lib/form-controls/TextField.svelte';
-    import { FieldDataType, type IDictionary } from '$lib/form/FieldDef';
-    import { createFormContext } from '$lib/form/FormContext';
-    import { FormDataActionType } from '$lib/form/FormData';
-    import type { IFormDef } from '$lib/form/FormDef';
-    import { FormModeState } from '$lib/form/FormMode';
-    import { FormSerializer } from '$lib/form/FormSerializer';
-    import { createListDataContext, ListDataActionType } from '$lib/form/ListData';
-    import type { IListDef } from '$lib/form/ListDef';
-    import AddIcon from '$lib/icons/AddIcon.svelte';
-    import DeleteIcon from '$lib/icons/DeleteIcon.svelte';
-    import MoveDownIcon from '$lib/icons/MoveDownIcon.svelte';
-    import MoveUpIcon from '$lib/icons/MoveUpIcon.svelte';
-    import SaveIcon from '$lib/icons/SaveIcon.svelte';
-    import { fileSystem } from '$lib/ipc';
-    import { fileDefFactory, type ITestSuite } from 'rockmelonqa.common';
-    import { createEventDispatcher, getContext, onMount } from 'svelte';
-    import { derived } from 'svelte/store';
-    import { AlertDialogButtons, AlertDialogType } from '../Alert';
-    import AlertDialog from '../AlertDialog.svelte';
-    import { appActionContextKey, type IAppActionContext } from '../Application';
-    import { combinePath } from '../FileExplorer/Node';
-    import IconLinkButton from '../IconLinkButton.svelte';
-    import { ListTableCellType } from '../ListTable';
-    import ListTable from '../ListTable.svelte';
-    import ListTableBodyCell from '../ListTableBodyCell.svelte';
-    import ListTableBodyRow from '../ListTableBodyRow.svelte';
-    import ListTableHeaderCell from '../ListTableHeaderCell.svelte';
-    import PrimaryButton from '../PrimaryButton.svelte';
-    import { toTitle } from './Editor';
+    import { appContextKey, type IAppContext } from "$lib/context/AppContext";
+    import { stringResKeys } from "$lib/context/StringResKeys";
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import type { IUiTheme } from "$lib/context/UiTheme";
+    import type { IDropdownOption } from "$lib/controls/DropdownField";
+    import FancyDropdownField from "$lib/controls/FancyDropdownField.svelte";
+    import FormGroup from "$lib/controls/layout/FormGroup.svelte";
+    import FormGroupColumn from "$lib/controls/layout/FormGroupColumn.svelte";
+    import Form from "$lib/form-controls/Form.svelte";
+    import FormTextField from "$lib/form-controls/TextField.svelte";
+    import { FieldDataType, type IDictionary } from "$lib/form/FieldDef";
+    import { createFormContext } from "$lib/form/FormContext";
+    import { FormDataActionType } from "$lib/form/FormData";
+    import type { IFormDef } from "$lib/form/FormDef";
+    import { FormModeState } from "$lib/form/FormMode";
+    import { FormSerializer } from "$lib/form/FormSerializer";
+    import { createListDataContext, ListDataActionType } from "$lib/form/ListData";
+    import type { IListDef } from "$lib/form/ListDef";
+    import AddIcon from "$lib/icons/AddIcon.svelte";
+    import DeleteIcon from "$lib/icons/DeleteIcon.svelte";
+    import MoveDownIcon from "$lib/icons/MoveDownIcon.svelte";
+    import MoveUpIcon from "$lib/icons/MoveUpIcon.svelte";
+    import SaveIcon from "$lib/icons/SaveIcon.svelte";
+    import { fileSystem } from "$lib/ipc";
+    import { fileDefFactory, type ITestSuite } from "rockmelonqa.common";
+    import { createEventDispatcher, getContext, onMount } from "svelte";
+    import { derived } from "svelte/store";
+    import { AlertDialogButtons, AlertDialogType } from "../Alert";
+    import AlertDialog from "../AlertDialog.svelte";
+    import { appActionContextKey, type IAppActionContext } from "../Application";
+    import { combinePath } from "../FileExplorer/Node";
+    import IconLinkButton from "../IconLinkButton.svelte";
+    import { ListTableCellType } from "../ListTable";
+    import ListTable from "../ListTable.svelte";
+    import ListTableBodyCell from "../ListTableBodyCell.svelte";
+    import ListTableBodyRow from "../ListTableBodyRow.svelte";
+    import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
+    import PrimaryButton from "../PrimaryButton.svelte";
+    import { toTitle } from "./Editor";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -56,16 +56,16 @@
         fields: {
             id: {
                 dataType: FieldDataType.Text,
-                dataPath: 'id',
+                dataPath: "id",
                 isRequired: true,
             },
             description: {
                 dataType: FieldDataType.Text,
-                dataPath: 'description',
+                dataPath: "description",
             },
         },
     };
-    let formContext = createFormContext('testSuiteEditor', formDef, uiContext, FormModeState.Edit);
+    let formContext = createFormContext("testSuiteEditor", formDef, uiContext, FormModeState.Edit);
     let {
         mode: formMode,
         modeDispatch: formModeDispatch,
@@ -77,7 +77,7 @@
         fields: {
             id: {
                 dataType: FieldDataType.Dropdown,
-                dataPath: 'id',
+                dataPath: "id",
             },
         },
     };
@@ -143,7 +143,7 @@
             const data = { ...model, testcases: testCases.map((x) => x.id) };
             await fileSystem.writeFile(filePath, JSON.stringify(data, null, 4));
 
-            dispatch('saved');
+            dispatch("saved");
             return true;
         }
 
@@ -169,7 +169,7 @@
     };
 
     const dispatchChange = () => {
-        dispatch('change');
+        dispatch("change");
     };
 
     const handleDeleteClick = (index: number) => {
@@ -190,7 +190,7 @@
     };
 
     const handleDeleteConfirmation = async (event: any) => {
-        if (event.detail.button === 'delete') {
+        if (event.detail.button === "delete") {
             doDeleteRow(indexToDelete);
         }
     };
@@ -239,7 +239,7 @@
     };
 </script>
 
-<div class="test-case-editor p-8">
+<div class="flex-1 test-case-editor p-8">
     <div class="font-semibold text-xl mb-4">{title}</div>
     <Form {formContext}>
         <FormGroup columns={1}>
@@ -276,7 +276,7 @@
                             name={`${formContext.formName}_${index}_id`}
                             value={item.id}
                             options={testCaseOptions}
-                            on:change={(event) => handleSelectTestCase(index, 'id', event.detail.value)}
+                            on:change={(event) => handleSelectTestCase(index, "id", event.detail.value)}
                         />
                     </ListTableBodyCell>
 

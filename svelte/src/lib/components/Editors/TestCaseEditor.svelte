@@ -428,7 +428,7 @@
     };
 </script>
 
-<div class="test-case-editor p-8">
+<div class="flex-1 test-case-editor p-8">
     <div class="font-semibold text-xl mb-4">{title}</div>
     <Form {formContext}>
         <FormGroup columns={1}>

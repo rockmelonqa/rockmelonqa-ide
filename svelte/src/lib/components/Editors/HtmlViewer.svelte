@@ -18,4 +18,4 @@
     });
 </script>
 
-<iframe title="" class="w-full h-full border-0" bind:this={frameEl} src="javascript:void(0);" />
+<iframe title="" class="flex-1 w-full h-full border-0" bind:this={frameEl} src="javascript:void(0);" />

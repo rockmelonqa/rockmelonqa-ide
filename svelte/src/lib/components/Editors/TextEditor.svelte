@@ -105,7 +105,7 @@
     };
 </script>
 
-<div bind:this={divEl} class="h-full font-mono font-consolas" />
+<div bind:this={divEl} class="flex-1 h-full font-mono font-consolas" />
 
 <style>
     .font-consolas {
