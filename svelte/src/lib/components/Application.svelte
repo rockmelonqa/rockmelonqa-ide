@@ -252,6 +252,11 @@
     /** Determine whether there is dirty tab, to display save pending changes dialog */
     const onBeforeUnload = (event: any) => {
         if (localStorage.preventHotReloadClosing) {
+            console.log(
+                "%c%s",
+                "color: red; font-size: 1rem",
+                "Press Ctrl+C in the command line to force close. Or run `delete localStorage.preventHotReloadClosing` and click the close button again."
+            );
             event.returnValue = "any-value-to-prevent-default";
             return false;
         }

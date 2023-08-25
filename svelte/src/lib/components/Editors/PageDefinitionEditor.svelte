@@ -347,7 +347,7 @@
     };
 </script>
 
-<div class="flex-1 page-definition-editor p-8 flex flex-col">
+<div class="flex-1 page-definition-editor p-8 pb-0 flex flex-col">
     <div class="font-semibold text-xl mb-4 flex-grow-0">{title}</div>
     <Form {formContext} class="flex-grow-0 ">
         <FormGroup columns={1}>
@@ -437,8 +437,7 @@
             </svelte:fragment>
         </DynamicGrid>
     </div>
-
-    <div class="flex items-center gap-x-2 flex-grow-0">
+    <div class="flex items-center gap-x-2 flex-grow-0 py-4">
         <IconLinkButton on:click={handleAddElement}>
             <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
             <svelte:fragment slot="label">
