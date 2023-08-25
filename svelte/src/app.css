@@ -171,7 +171,7 @@ hr {
 }
 
 .dropdown-field-root.inline-fancy .dropdown-field-select-container:focus-within {
-    border-bottom: 2px solid rgb(99 102 241); /* border-indigo-500 */
+    border-bottom: 1px solid rgb(99 102 241); /* border-indigo-500 */
 }
 
 .dropdown-field-root.inline-fancy .svelte-select {

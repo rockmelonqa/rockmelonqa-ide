@@ -1,32 +1,34 @@
 <script lang="ts">
-    import type { ITextFieldTheme, IUiTheme } from '$lib/context/UiTheme';
-    import { createEventDispatcher, getContext } from 'svelte';
+    import type { ITextFieldTheme, IUiTheme } from "$lib/context/UiTheme";
+    import { createEventDispatcher, getContext } from "svelte";
     import {
         FieldDataType,
         getFieldLabel,
         getFieldPlaceholder,
         isFieldRequired,
         type ITextFieldDef,
-    } from '../form/FieldDef';
-    import { formContextKey, type IFormContext } from '../form/FormContext';
-    import { FormDataActionType } from '../form/FormData';
+    } from "../form/FieldDef";
+    import { formContextKey, type IFormContext } from "../form/FormContext";
+    import { FormDataActionType } from "../form/FormData";
 
     //*****************************************
     // Props
     //*****************************************
     export let name: string;
-    export let type = 'text';
+    export let type = "text";
     export let readonly: boolean = false;
     export let disabled = false;
-    export let label = '';
-    export let autoComplete: string = 'off';
-    export let placeholder = '';
+    export let label = "";
+    export let autoComplete: string = "off";
+    export let placeholder = "";
     export let displayLabel = true;
-    export let prefixLabel = '';
-    export let prefixPadding = '';
-    export let suffixLabel = '';
-    export let suffixPadding = '';
+    export let prefixLabel = "";
+    export let prefixPadding = "";
+    export let suffixLabel = "";
+    export let suffixPadding = "";
     export let isRightAligned = false;
+    export { cssClass as class };
+    let cssClass = "";
 
     let desiredTheme: ITextFieldTheme | undefined = undefined;
     export { desiredTheme as theme };
@@ -59,24 +61,24 @@
     $: isEditable = !isReadOnly && !isDisabled;
     $: isRequired =
         isFieldRequired($formData.values, textFieldDef.isRequired) && ($formMode.isAdding() || $formMode.isEditing());
-    $: labelText = getFieldLabel(label, formName, name, fieldDef, uiContext) + (isRequired && isEditable ? ' *' : '');
+    $: labelText = getFieldLabel(label, formName, name, fieldDef, uiContext) + (isRequired && isEditable ? " *" : "");
     $: errorMessage = $formData.errorsToShow[name];
-    $: value = $formData.values[name] ?? '';
+    $: value = $formData.values[name] ?? "";
 
-    $: inputCssClassReadOnly = isReadOnly ? thisTheme.inputReadonly ?? '' : '';
-    $: inputCssClassDisabled = isDisabled ? thisTheme.inputDisabled ?? '' : '';
-    $: inputCssClassError = errorMessage ? `text-field-error ${thisTheme.inputError ?? ''}` : '';
-    $: inputCssClassValid = isEditable && !errorMessage ? thisTheme.inputValid ?? '' : '';
+    $: inputCssClassReadOnly = isReadOnly ? thisTheme.inputReadonly ?? "" : "";
+    $: inputCssClassDisabled = isDisabled ? thisTheme.inputDisabled ?? "" : "";
+    $: inputCssClassError = errorMessage ? `text-field-error ${thisTheme.inputError ?? ""}` : "";
+    $: inputCssClassValid = isEditable && !errorMessage ? thisTheme.inputValid ?? "" : "";
     $: inputCssClass =
-        `${thisTheme?.input} ${inputCssClassValid} ${inputCssClassError} ${inputCssClassReadOnly} ${inputCssClassDisabled}`.trim();
+        `${thisTheme?.input} ${inputCssClassValid} ${inputCssClassError} ${inputCssClassReadOnly} ${inputCssClassDisabled} ${cssClass}`.trim();
 
     $: inputStyle = (
-        `${prefixPadding ? 'padding-left: ' + prefixPadding + '; ' : ' '}` +
-        `${suffixPadding ? 'padding-right: ' + suffixPadding + '; ' : ' '}` +
-        `${isRightAligned ? 'text-align: right; ' : ' '}`
+        `${prefixPadding ? "padding-left: " + prefixPadding + "; " : " "}` +
+        `${suffixPadding ? "padding-right: " + suffixPadding + "; " : " "}` +
+        `${isRightAligned ? "text-align: right; " : " "}`
     ).trim();
 
-    $: inputPlaceholder = isEditable ? getFieldPlaceholder(placeholder, formName, name, fieldDef, uiContext) : '';
+    $: inputPlaceholder = isEditable ? getFieldPlaceholder(placeholder, formName, name, fieldDef, uiContext) : "";
 
     let rootId = `${formName}_${name}_root`;
     let labelId = `${formName}_${name}_label`;
@@ -91,7 +93,7 @@
     const handleInput = (e: any) => {
         const value = inputElement.value;
         formContext.dataDispatch({ type: FormDataActionType.SetValues, newValues: { [name]: value } });
-        dispatch('input', { value });
+        dispatch("input", { value });
     };
 
     const handleBlur = (e: any) => {
@@ -124,7 +126,7 @@
             {value}
             readonly={isReadOnly}
             disabled={isDisabled}
-            autocomplete={autoComplete ?? 'off'}
+            autocomplete={autoComplete ?? "off"}
             placeholder={inputPlaceholder}
             class={inputCssClass}
             style={inputStyle}
