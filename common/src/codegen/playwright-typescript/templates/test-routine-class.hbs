@@ -7,7 +7,7 @@ export class {{{testRoutineName}}} extends TestRoutineBase {
   }
 
   public async run() {
-    const defs: PageDefinitions = new PageDefinitions(this.page);
+    let defs: PageDefinitions = new PageDefinitions(this.page);
 
 {{{body}}}
   }
