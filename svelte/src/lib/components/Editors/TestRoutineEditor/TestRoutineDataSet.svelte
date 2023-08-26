@@ -198,7 +198,7 @@
     };
 </script>
 
-<div class="flex-1 min-h-0">
+<div class="flex-1 overflow-x-auto min-h-0">
     <DynamicGrid config={gridConfig} items={$listDataSet.items} class="h-full flex flex-col">
         <svelte:fragment slot="item" let:item let:index>
             <DynamicCell>

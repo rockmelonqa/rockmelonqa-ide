@@ -9,7 +9,7 @@
 
     let cols: HTMLElement[] = [];
     let columnSizes: string[] = [];
-    let gridStyle: string;
+    let gridRowStyle: string;
     let gridBody: HTMLElement;
     let gridBodyOverflow: boolean = false;
     export { cssClass as class };
@@ -22,17 +22,17 @@
     onMount(() => {
         let cachedSizes = DynamicGridSizeCache.getByCollectionType(config.gridType);
         let sizes = cachedSizes;
-        if (!sizes) {
+        if (!sizes || config.columns.length !== cachedSizes?.length) {
             sizes = config.columns.map((c) => c.defaultSizePercentage);
         }
         columnSizes = sizes.map((n) => `${n}%`);
-        gridStyle = `grid-template-columns: ${columnSizes.join(" ")};`;
+        gridRowStyle = `grid-template-columns: ${columnSizes.join(" ")};`;
         Split(cols, {
             gutterSize: 4,
             sizes,
             onDrag(sizes) {
                 columnSizes = sizes.map((s) => `${s}%`);
-                gridStyle = `grid-template-columns: ${columnSizes.join(" ")};`;
+                gridRowStyle = `grid-template-columns: ${columnSizes.join(" ")};`;
                 DynamicGridSizeCache.setByCollectionType(config.gridType, sizes);
                 checkOverflowBody();
             },
@@ -45,8 +45,8 @@
     });
 </script>
 
-<div data-role="table-container" {...$$restProps} class={cssClass}>
-    <div data-role="header" class="text-gray-800 flex flex-row bg-gray-200 {gridBodyOverflow ? 'pr-4' : ''}">
+<div data-role="table-container" {...$$restProps} class="flex flex-col overflow-x-auto {cssClass}">
+    <div data-role="header" class="flex-0 text-gray-800 flex flex-row bg-gray-200 {gridBodyOverflow ? 'pr-4' : ''}">
         {#each config.columns as column, i}
             <div bind:this={cols[i]} data-role="col-head" class="py-4 pl-4 pr-3">
                 {column.title}
@@ -54,9 +54,9 @@
         {/each}
     </div>
 
-    <div data-role="body" class="h-full overflow-y-auto border-b dynamic-grid-body" bind:this={gridBody}>
+    <div data-role="body" class="flex-1 w-full h-full overflow-y-auto border-b dynamic-grid-body" bind:this={gridBody}>
         {#each items as item, index}
-            <div data-role="row" class="grid border-b" style={gridStyle}>
+            <div data-role="row" class="w-full grid border-b" style={gridRowStyle}>
                 <slot name="item" {item} {index} />
             </div>
         {/each}
