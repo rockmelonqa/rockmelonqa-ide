@@ -3,6 +3,11 @@
     export let colspan: number = 1;
 </script>
 
-<div data-role="cell" class="text-base border-l {isLast ? 'border-r' : ''} {`col-span-${colspan}`}">
+<div data-role="cell" class="border-b text-base {isLast ? 'border-r' : ''} {`col-span-${colspan}`}">
     <slot />
 </div>
+{#if !isLast}
+    <div data-role="gutter" class="flex items-center justify-center border-gray-300 border-b">
+        <div class="border-l border-gray-300 h-full" />
+    </div>
+{/if}

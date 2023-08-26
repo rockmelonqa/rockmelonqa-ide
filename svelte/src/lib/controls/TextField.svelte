@@ -70,7 +70,7 @@
     };
 </script>
 
-<div id={rootId} class="text-field-root {thisTheme.root}">
+<div id={rootId} class="text-field-root {thisTheme.root} mt-0">
     {#if displayLabel}
         <label id={labelId} for={name} class="text-field-label {thisTheme?.label}">{label}</label>
     {/if}

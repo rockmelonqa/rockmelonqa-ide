@@ -10,33 +10,51 @@
     let cols: HTMLElement[] = [];
     let columnSizes: string[] = [];
     let gridRowStyle: string;
+    let gridHeadStyle: string;
     let gridBody: HTMLElement;
-    let gridBodyOverflow: boolean = false;
+    let gridBodyOverflowY: boolean = false;
     export { cssClass as class };
     let cssClass = "";
+    let gutterSizePx = 4;
 
     const checkOverflowBody = () => {
-        gridBodyOverflow = gridBody.scrollHeight > gridBody.clientHeight;
+        gridBodyOverflowY = gridBody.scrollHeight > gridBody.clientHeight;
+    };
+
+    const setSizes = (sizes: number[]) => {
+        columnSizes = sizes.map((n) => `${n}%`);
+        gridRowStyle = `grid-template-columns: ${sizes
+            .map((n) => `calc((100% - ${(sizes.length - 1) * gutterSizePx}px) * ${n} / 100)`)
+            .join(` ${gutterSizePx}px `)}`;
+        gridHeadStyle = `grid-template-columns: ${sizes
+            .map((n) => `calc((100% - ${(sizes.length - 1) * gutterSizePx}px) * ${n} / 100)`)
+            .join(` ${gutterSizePx}px `)};`;
     };
 
     onMount(() => {
+        checkOverflowBody();
+
         let cachedSizes = DynamicGridSizeCache.getByCollectionType(config.gridType);
         let sizes = cachedSizes;
         if (!sizes || config.columns.length !== cachedSizes?.length) {
             sizes = config.columns.map((c) => c.defaultSizePercentage);
         }
-        columnSizes = sizes.map((n) => `${n}%`);
-        gridRowStyle = `grid-template-columns: ${columnSizes.join(" ")};`;
-        Split(cols, {
-            gutterSize: 4,
+        const colsSplitInstance = Split(cols, {
+            gutterSize: gutterSizePx,
             sizes,
             onDrag(sizes) {
-                columnSizes = sizes.map((s) => `${s}%`);
-                gridRowStyle = `grid-template-columns: ${columnSizes.join(" ")};`;
+                setSizes(sizes);
                 DynamicGridSizeCache.setByCollectionType(config.gridType, sizes);
                 checkOverflowBody();
             },
+            elementStyle: function (dimension, size, gutterSize) {
+                return {};
+            },
         });
+
+        let actualSizes = colsSplitInstance.getSizes();
+
+        setSizes(actualSizes);
     });
 
     afterUpdate(() => {
@@ -45,18 +63,22 @@
     });
 </script>
 
-<div data-role="table-container" {...$$restProps} class="flex flex-col overflow-x-auto {cssClass}">
-    <div data-role="header" class="flex-0 text-gray-800 flex flex-row bg-gray-200 {gridBodyOverflow ? 'pr-4' : ''}">
+<div data-role="table-container" {...$$restProps} class="overflow-x-auto {cssClass} bg-red-200 relative">
+    <div data-role="header" style={gridHeadStyle} class="flex-0 grid bg-gray-200 {gridBodyOverflowY ? 'pr-4' : ''}">
         {#each config.columns as column, i}
-            <div bind:this={cols[i]} data-role="col-head" class="py-4 pl-4 pr-3">
+            <div bind:this={cols[i]} data-role="col-head" class="text-gray-800 bg-gray-200 py-4 pl-4 pr-3">
                 {column.title}
             </div>
         {/each}
     </div>
 
-    <div data-role="body" class="flex-1 w-full h-full overflow-y-auto border-b dynamic-grid-body" bind:this={gridBody}>
+    <div
+        data-role="body"
+        class="flex-0 h-full overflow-y-auto overflow-x-visible dynamic-grid-body bg-green-100"
+        bind:this={gridBody}
+    >
         {#each items as item, index}
-            <div data-role="row" class="w-full grid border-b" style={gridRowStyle}>
+            <div data-role="row" class="grid overflow-x-visible {gridBodyOverflowY ? 'pr-4' : ''}" style={gridRowStyle}>
                 <slot name="item" {item} {index} />
             </div>
         {/each}
@@ -78,6 +100,9 @@
         width: 1em;
         overflow-y: overlay;
     }
+    .dynamic-grid-body::-webkit-scrollbar:horizontal {
+        display: none;
+    }
 
     .dynamic-grid-body::-webkit-scrollbar-track {
         box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
@@ -86,5 +111,11 @@
     .dynamic-grid-body::-webkit-scrollbar-thumb {
         background-color: darkgrey;
         outline: 1px solid rgb(208, 208, 208);
+    }
+
+    :global(.my-test) {
+        position: absolute;
+        width: 100%;
+        left: 0;
     }
 </style>

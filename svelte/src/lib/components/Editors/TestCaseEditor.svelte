@@ -535,7 +535,7 @@
                         {/if}
                     </DynamicCell>
                 {:else if isComment(item)}
-                    <DynamicCell colspan={gridConfig.columns.length - 1}>
+                    <DynamicCell colspan={gridConfig.columns.length - 1 + (gridConfig.columns.length - 2)}>
                         <CommentTextField
                             name={`${formContext.formName}_${index}_comment`}
                             value={item.comment}

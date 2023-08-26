@@ -34,8 +34,8 @@
     $: selectedItem = options?.find((opt) => opt.key === value);
 
     // Best we can do is put a name on the container and then we overrride in app.css
-    $: selectCss = "";
-    $: containerCss = dropdownTheme?.dropdownContainer;
+    $: selectCss = "h-full";
+    $: containerCss = "mt-0";
 
     let rootId = `${name}_root`;
     let labelId = `${name}_label`;
@@ -58,11 +58,11 @@
     };
 </script>
 
-<div id={rootId} class="dropdown-field-root {dropdownTheme.root}">
+<div id={rootId} class="dropdown-field-root h-full {dropdownTheme.root}">
     {#if label}
         <label id={labelId} for={name} class="dropdown-field-label {dropdownTheme?.label}">{label}</label>
     {/if}
-    <div class="dropdown-field-select-container {containerCss} relative">
+    <div class="dropdown-field-select-container {containerCss} relative !border-b-0 h-full">
         <Select
             {floatingConfig}
             id={selectId}
