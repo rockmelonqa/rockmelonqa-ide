@@ -32,11 +32,12 @@
     import CommentTextField from "$lib/components/CommentTextField.svelte";
     import { removeFileExtension } from "$lib/utils/utils";
     import type { IRoutineStep } from "rockmelonqa.common/file-defs";
-    import type { ColumnOptions, GridConfig } from "../DynamicGrid/DynamicGrid";
+    import type { ButtonOptions, ColumnOptions, GridConfig } from "../DynamicGrid/DynamicGrid";
     import DynamicGrid from "../DynamicGrid/DynamicGrid.svelte";
     import DynamicCell from "../DynamicGrid/DynamicCell.svelte";
     import { _ } from "svelte-i18n";
     import lodash from "lodash";
+    import ActionsMenu from "../DynamicGrid/ActionsMenu.svelte";
 
     export let formContext: IFormContext;
     let { mode: formMode, formName } = formContext;
@@ -292,9 +293,42 @@
             gridType: "TestRoutineSteps",
             columns,
         };
-
-        console.log("gridConfig", gridConfig);
     }
+
+    const buildActionMenuButtons = (index: number): ButtonOptions[] => {
+        return [
+            {
+                label: uiContext.str(stringResKeys.general.add),
+                icon: AddIcon,
+                action: handleInsertStep,
+                visible: true,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.delete),
+                icon: DeleteIcon,
+                action: handleDeleteClick,
+                visible: true,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.addComment),
+                icon: CommentIcon,
+                action: handleInsertComment,
+                visible: true,
+            },
+            {
+                label: uiContext.str(uiContext.str(stringResKeys.general.moveUp)),
+                icon: MoveUpIcon,
+                action: handleMoveUpClick,
+                visible: index > 0,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.moveDown),
+                icon: MoveDownIcon,
+                action: handleMoveDownClick,
+                visible: index < $listStep.items.length - 1,
+            },
+        ];
+    };
 </script>
 
 {#if gridConfig}
@@ -350,43 +384,8 @@
                     {/each}
                 {/if}
 
-                <DynamicCell isLast={true}>
-                    <div class="h-full flex flex-row items-center">
-                        <IconLinkButton
-                            on:click={() => handleInsertStep(index)}
-                            title={uiContext.str(stringResKeys.testCaseEditor.addStep)}
-                        >
-                            <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
-                        </IconLinkButton>
-                        <IconLinkButton
-                            on:click={() => handleInsertComment(index)}
-                            title={uiContext.str(stringResKeys.testCaseEditor.addComment)}
-                        >
-                            <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
-                        </IconLinkButton>
-                        <IconLinkButton
-                            on:click={() => handleDeleteClick(index)}
-                            title={uiContext.str(stringResKeys.general.delete)}
-                        >
-                            <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
-                        </IconLinkButton>
-                        {#if index > 0}
-                            <IconLinkButton
-                                on:click={() => handleMoveUpClick(index)}
-                                title={uiContext.str(stringResKeys.general.moveUp)}
-                            >
-                                <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>
-                            </IconLinkButton>
-                        {/if}
-                        {#if index < $listStep.items.length - 1}
-                            <IconLinkButton
-                                on:click={() => handleMoveDownClick(index)}
-                                title={uiContext.str(stringResKeys.general.moveDown)}
-                            >
-                                <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>
-                            </IconLinkButton>
-                        {/if}
-                    </div>
+                <DynamicCell>
+                    <ActionsMenu {index} buttons={buildActionMenuButtons(index)} />
                 </DynamicCell>
             </svelte:fragment>
         </DynamicGrid>

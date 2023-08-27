@@ -1,25 +1,25 @@
 <script lang="ts">
-    import type { ButtonType } from './types';
+    import type { ButtonType } from "./types";
 
     //******************************************
     // Props
     //******************************************
     /** Unique id for the button element */
-    export let id = '';
+    export let id = "";
 
     /** Button type */
-    export let type: ButtonType = 'button';
+    export let type: ButtonType = "button";
 
     /** Additional CSS class */
     export { cssClass as class };
-    let cssClass = '';
+    let cssClass = "";
 
     /** Flag to show the button or not */
     export let show: boolean = true;
 
     export let disabled: boolean = false;
 
-    export let title = '';
+    export let title = "";
 </script>
 
 {#if show}
@@ -33,7 +33,7 @@
         on:blur
         {title}
     >
-        <div class="flex items-center gap-x-2">
+        <div class="flex items-center">
             {#if $$slots.icon}
                 <span class="icon-link-button-icon"><slot name="icon" /></span>
             {/if}

@@ -1,61 +1,68 @@
 <script lang="ts">
     import IconLinkButton from "$lib/components/IconLinkButton.svelte";
-    import { stringResKeys } from "$lib/context/StringResKeys";
-    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
-    import AddIcon from "$lib/icons/AddIcon.svelte";
-    import CommentIcon from "$lib/icons/CommentIcon.svelte";
-    import DeleteIcon from "$lib/icons/DeleteIcon.svelte";
-    import MoveDownIcon from "$lib/icons/MoveDownIcon.svelte";
-    import MoveUpIcon from "$lib/icons/MoveUpIcon.svelte";
+    import EllipsisIcon from "$lib/icons/EllipsisIcon.svelte";
     import { onMount } from "svelte";
-    import { createEventDispatcher, getContext } from "svelte";
-    const dispatch = createEventDispatcher();
+    import type { ButtonOptions } from "./DynamicGrid";
 
     export let index: number;
-    export let canMoveDown: boolean = true;
-    export let canMoveUp: boolean = true;
+    export let buttons: ButtonOptions[] = [];
+    const visibleButtons = 2;
 
-    const uiContext = getContext(uiContextKey) as IUiContext;
+    let isDropdownOpen = false;
+    const handleDropdownClick = () => {
+        isDropdownOpen = !isDropdownOpen;
+    };
 
-    const handleInsertElement = (index: number) => dispatch("insertElement", { index });
-    const handleInsertComment = (index: number) => dispatch("insertComment", { index });
-    const handleDeleteClick = (index: number) => dispatch("deleteClick", { index });
-    const handleMoveUpClick = (index: number) => dispatch("moveUpClick", { index });
-    const handleMoveDownClick = (index: number) => dispatch("moveDownClick", { index });
-
+    const handleDropdownFocusLoss = (e: any) => {
+        if (e.relatedTarget instanceof HTMLElement && e.currentTarget.contains(e.relatedTarget)) return;
+        isDropdownOpen = false;
+    };
     onMount(() => {});
 </script>
 
-<div class="h-full flex flex-nowrap items-center justify-start px-4" data-row-index={index}>
-    <IconLinkButton
-        on:click={() => handleInsertElement(index)}
-        title={uiContext.str(stringResKeys.pageDefinitionEditor.addElement)}
-    >
-        <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
-    </IconLinkButton>
-    <IconLinkButton
-        on:click={() => handleInsertComment(index)}
-        title={uiContext.str(stringResKeys.pageDefinitionEditor.addComment)}
-    >
-        <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
-    </IconLinkButton>
-    <IconLinkButton on:click={() => handleDeleteClick(index)} title={uiContext.str(stringResKeys.general.delete)}>
-        <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
-    </IconLinkButton>
-    {#if canMoveUp}
-        <IconLinkButton on:click={() => handleMoveUpClick(index)} title={uiContext.str(stringResKeys.general.moveUp)}>
-            <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>
+<div class="h-full flex gap-2 flex-nowrap items-center justify-start px-4" data-row-index={index}>
+    {#each buttons.filter((b) => b.visible).slice(0, visibleButtons) as button}
+        <IconLinkButton on:click={(e) => button.action(index)} title={button.label}>
+            <svelte:fragment slot="icon">
+                <svelte:component this={button.icon} />
+            </svelte:fragment>
         </IconLinkButton>
-    {/if}
-    {#if canMoveDown}
-        <IconLinkButton
-            on:click={() => handleMoveDownClick(index)}
-            title={uiContext.str(stringResKeys.general.moveDown)}
+    {/each}
+
+    <div class="dropdown relative" on:focusout={handleDropdownFocusLoss}>
+        <button
+            class="icon-link-button border-none font-bold flex items-center justify-center"
+            on:click={handleDropdownClick}
         >
-            <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>
-        </IconLinkButton>
-    {/if}
+            <EllipsisIcon />
+        </button>
+        <ul
+            class="dropdown-content menu flex items-center flex-col shadow-lg bg-gray-50 border border-gray-200 hover:bg-gray-100 rounded-box absolute right-1/2 translate-x-1/2 z-10 {isDropdownOpen
+                ? ''
+                : 'hidden'}"
+        >
+            {#each buttons.filter((b) => b.visible) as button}
+                <li class="bg-gray-50 p-3 text-center">
+                    <IconLinkButton
+                        on:click={(e) => {
+                            button.action(index);
+                            isDropdownOpen = false;
+                        }}
+                        title={button.label}
+                        class="flex items-stretch justify-between hover:brightness-75"
+                    >
+                        <svelte:fragment slot="icon">
+                            <svelte:component this={button.icon} />
+                        </svelte:fragment>
+                    </IconLinkButton>
+                </li>
+            {/each}
+        </ul>
+    </div>
 </div>
 
 <style>
+    .icon-link-button {
+        color: var(--color-brand);
+    }
 </style>

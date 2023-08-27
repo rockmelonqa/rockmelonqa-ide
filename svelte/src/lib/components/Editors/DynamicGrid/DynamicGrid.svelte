@@ -1,4 +1,6 @@
 <script lang="ts">
+    import Spinner from "$lib/components/Spinner.svelte";
+
     import { afterUpdate, onMount } from "svelte";
     import { DynamicGridSizeCache, type GridConfig } from "./DynamicGrid";
     import Split from "split.js";
@@ -6,6 +8,12 @@
     type ItemType = $$Generic;
     export let config: GridConfig;
     export let items: ItemType[];
+    /** If processing, we will show a spinner */
+    export let isProcessing = true;
+    /** Text to show on the spinner if isProcessing is true */
+    export let processingText = "Loading";
+    export { cssClass as class };
+    let cssClass = "";
 
     let cols: HTMLElement[] = [];
     let columnSizes: string[] = [];
@@ -13,11 +21,15 @@
     let gridHeadStyle: string;
     let gridBody: HTMLElement;
     let gridBodyOverflowY: boolean = false;
-    export { cssClass as class };
-    let cssClass = "";
     let gutterSizePx = 4;
 
     const checkOverflowBody = () => {
+        // console.log(
+        //     "checkOverflowBody()",
+        //     gridBody.scrollHeight,
+        //     gridBody.clientHeight,
+        //     gridBody.scrollHeight > gridBody.clientHeight
+        // );
         gridBodyOverflowY = gridBody.scrollHeight > gridBody.clientHeight;
     };
 
@@ -54,7 +66,10 @@
 
         setSizes(actualSizes);
 
-        checkOverflowBody();
+        window.addEventListener("resize", () => {
+            checkOverflowBody();
+        });
+        isProcessing = false;
     });
 
     afterUpdate(() => {
@@ -65,7 +80,7 @@
 <div
     data-role="table-container"
     {...$$restProps}
-    class="overflow-x-auto {cssClass} "
+    class="overflow-x-auto {cssClass} flex flex-col"
     data-gridBodyOverflowY={gridBodyOverflowY}
 >
     <div data-role="header" style={gridHeadStyle} class="grid bg-gray-200 {gridBodyOverflowY ? 'pr-4' : ''}">
@@ -76,12 +91,23 @@
         {/each}
     </div>
 
-    <div data-role="body" class="overflow-y-auto overflow-x-visible dynamic-grid-body shadow-sm" bind:this={gridBody}>
-        {#each items as item, index}
-            <div data-role="row" class="grid overflow-x-visible border-x border-gray-300" style={gridRowStyle}>
-                <slot name="item" {item} {index} />
+    <div
+        data-role="body"
+        class="h-full overflow-y-auto overflow-x-visible dynamic-grid-body shadow-sm"
+        bind:this={gridBody}
+    >
+        {#if isProcessing}
+            <div class="mt-4">
+                <Spinner textRight={processingText} />
             </div>
-        {/each}
+        {/if}
+        {#if !isProcessing}
+            {#each items as item, index}
+                <div data-role="row" class="grid overflow-x-visible border-x border-gray-300" style={gridRowStyle}>
+                    <slot name="item" {item} {index} />
+                </div>
+            {/each}
+        {/if}
     </div>
 </div>
 

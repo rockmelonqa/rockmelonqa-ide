@@ -1,3 +1,5 @@
+import type { ComponentType, SvelteComponentTyped } from "svelte";
+
 /** Grid config */
 export type GridConfig = {
     /** Type of collection that the grid is being used to render */
@@ -12,6 +14,13 @@ export type ColumnOptions = {
     defaultSizePercentage: number;
     /** Title of the column */
     title: string;
+};
+
+export type ButtonOptions = {
+    label: string;
+    icon: ComponentType<SvelteComponentTyped>;
+    action: (index: number) => void;
+    visible: boolean;
 };
 
 type CacheSizeMap = Map<string, number[]>;

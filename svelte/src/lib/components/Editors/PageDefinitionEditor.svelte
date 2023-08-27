@@ -41,7 +41,7 @@
     import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
     import { toTitle } from "./Editor";
-    import type { GridConfig } from "./DynamicGrid/DynamicGrid";
+    import type { ButtonOptions, GridConfig } from "./DynamicGrid/DynamicGrid";
     import DynamicGrid from "./DynamicGrid/DynamicGrid.svelte";
     import DynamicCell from "./DynamicGrid/DynamicCell.svelte";
     import ActionsMenu from "./DynamicGrid/ActionsMenu.svelte";
@@ -345,6 +345,41 @@
             },
         ],
     };
+
+    const buildActionMenuButtons = (index: number): ButtonOptions[] => {
+        return [
+            {
+                label: uiContext.str(stringResKeys.general.add),
+                icon: AddIcon,
+                action: handleInsertElement,
+                visible: true,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.delete),
+                icon: DeleteIcon,
+                action: handleDeleteClick,
+                visible: true,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.addComment),
+                icon: CommentIcon,
+                action: handleInsertComment,
+                visible: true,
+            },
+            {
+                label: uiContext.str(uiContext.str(stringResKeys.general.moveUp)),
+                icon: MoveUpIcon,
+                action: handleMoveUpClick,
+                visible: index > 0,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.moveDown),
+                icon: MoveDownIcon,
+                action: handleMoveDownClick,
+                visible: index < $listData.items.length - 1,
+            },
+        ];
+    };
 </script>
 
 <div class="flex-1 page-definition-editor p-8 pb-0 flex flex-col">
@@ -423,16 +458,7 @@
                     </DynamicCell>
                 {/if}
                 <DynamicCell isLast={true}>
-                    <ActionsMenu
-                        canMoveDown={index < $listData.items.length - 1}
-                        canMoveUp={index > 0}
-                        {index}
-                        on:insertElement={(e) => handleInsertElement(e.detail.index)}
-                        on:insertComment={(e) => handleInsertComment(e.detail.index)}
-                        on:deleteClick={(e) => handleDeleteClick(e.detail.index)}
-                        on:moveUpClick={(e) => handleMoveUpClick(e.detail.index)}
-                        on:moveDownClick={(e) => handleMoveDownClick(e.detail.index)}
-                    />
+                    <ActionsMenu {index} buttons={buildActionMenuButtons(index)} />
                 </DynamicCell>
             </svelte:fragment>
         </DynamicGrid>

@@ -25,9 +25,10 @@
     import { StandardFolder, type IDataSet, ActionType } from "rockmelonqa.common";
     import { createEventDispatcher, getContext } from "svelte";
     import { v4 as uuidv4 } from "uuid";
-    import type { GridConfig } from "../DynamicGrid/DynamicGrid";
+    import type { ButtonOptions, GridConfig } from "../DynamicGrid/DynamicGrid";
     import DynamicGrid from "../DynamicGrid/DynamicGrid.svelte";
     import DynamicCell from "../DynamicGrid/DynamicCell.svelte";
+    import ActionsMenu from "../DynamicGrid/ActionsMenu.svelte";
 
     export let formContext: IFormContext;
     let { formName, mode: formMode, data: formData } = formContext;
@@ -196,6 +197,35 @@
             },
         ],
     };
+
+    const buildActionMenuButtons = (dataSetItem: IDictionary, index: number): ButtonOptions[] => {
+        return [
+            {
+                label: uiContext.str(stringResKeys.general.add),
+                icon: AddIcon,
+                action: handleInsert,
+                visible: true,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.delete),
+                icon: DeleteIcon,
+                action: () => handleDeleteClick(dataSetItem, index),
+                visible: true,
+            },
+            {
+                label: uiContext.str(uiContext.str(stringResKeys.general.moveUp)),
+                icon: MoveUpIcon,
+                action: handleMoveUpClick,
+                visible: index > 0,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.moveDown),
+                icon: MoveDownIcon,
+                action: handleMoveDownClick,
+                visible: index < $listDataSet.items.length - 1,
+            },
+        ];
+    };
 </script>
 
 <div class="flex-1 overflow-x-auto min-h-0">
@@ -218,36 +248,7 @@
                 />
             </DynamicCell>
             <DynamicCell isLast={true}>
-                <div class="h-full flex flex-nowrap items-center justify-start px-4">
-                    <IconLinkButton
-                        on:click={() => handleInsert(index)}
-                        title={uiContext.str(stringResKeys.general.add)}
-                    >
-                        <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
-                    </IconLinkButton>
-                    <IconLinkButton
-                        on:click={() => handleDeleteClick(item, index)}
-                        title={uiContext.str(stringResKeys.general.delete)}
-                    >
-                        <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
-                    </IconLinkButton>
-                    {#if index > 0}
-                        <IconLinkButton
-                            on:click={() => handleMoveUpClick(index)}
-                            title={uiContext.str(stringResKeys.general.moveUp)}
-                        >
-                            <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>
-                        </IconLinkButton>
-                    {/if}
-                    {#if index < $listDataSet.items.length - 1}
-                        <IconLinkButton
-                            on:click={() => handleMoveDownClick(index)}
-                            title={uiContext.str(stringResKeys.general.moveDown)}
-                        >
-                            <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>
-                        </IconLinkButton>
-                    {/if}
-                </div>
+                <ActionsMenu {index} buttons={buildActionMenuButtons(item, index)} />
             </DynamicCell>
         </svelte:fragment>
     </DynamicGrid>
