@@ -20,11 +20,11 @@
     onMount(() => {});
 </script>
 
-<div class="h-full flex gap-2 flex-nowrap items-center justify-start px-4" data-row-index={index}>
+<div class="h-full flex gap-2 flex-nowrap items-center justify-start px-4 icon-link-button" data-row-index={index}>
     {#each buttons.filter((b) => b.visible).slice(0, visibleButtons) as button}
         <IconLinkButton on:click={(e) => button.action(index)} title={button.label}>
             <svelte:fragment slot="icon">
-                <svelte:component this={button.icon} />
+                <svelte:component this={button.icon} class="icon-link-button" />
             </svelte:fragment>
         </IconLinkButton>
     {/each}

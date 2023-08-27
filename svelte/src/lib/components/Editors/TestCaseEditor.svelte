@@ -572,6 +572,7 @@
                 {:else if isComment(item)}
                     <DynamicCell colspan={gridConfig.columns.length - 1 + (gridConfig.columns.length - 2)}>
                         <CommentTextField
+                            class="!bg-transparent"
                             name={`${formContext.formName}_${index}_comment`}
                             value={item.comment}
                             placeholder={uiContext.str(stringResKeys.testCaseEditor.comment)}

@@ -45,6 +45,7 @@
 <style>
     .icon-link-button {
         color: var(--color-brand);
+        z-index: 1;
     }
     .icon-link-button:hover {
         text-decoration: underline;

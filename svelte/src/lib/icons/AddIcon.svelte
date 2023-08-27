@@ -1,10 +1,10 @@
 <script lang="ts">
-    let cssClass = 'h-10 w-10';
+    let cssClass = "h-10 w-10";
     export { cssClass as class };
 
-    export let fill = 'none';
-    export let color = 'currentColor';
-    export let strokeColor = 'currentColor';
+    export let fill = "none";
+    export let color = "currentColor";
+    export let strokeColor = "currentColor";
     export let strokeWidth = 2;
 </script>
 

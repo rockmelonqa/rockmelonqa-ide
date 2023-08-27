@@ -34,7 +34,7 @@
     $: selectedItem = options?.find((opt) => opt.key === value);
 
     // Best we can do is put a name on the container and then we overrride in app.css
-    $: selectCss = "h-full";
+    $: selectCss = "h-full !bg-transparent";
     $: containerCss = "mt-0";
 
     let rootId = `${name}_root`;

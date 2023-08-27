@@ -233,6 +233,7 @@
         <svelte:fragment slot="item" let:item let:index>
             <DynamicCell>
                 <TextField
+                    class="!bg-transparent"
                     name={`${formName}_${index}_name`}
                     value={item.name}
                     on:input={(event) => {

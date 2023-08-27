@@ -1,4 +1,6 @@
 <script lang="ts">
+    import DynamicRow from "./DynamicRow.svelte";
+
     import Spinner from "$lib/components/Spinner.svelte";
 
     import { afterUpdate, onMount } from "svelte";
@@ -21,7 +23,7 @@
     let gridHeadStyle: string;
     let gridBody: HTMLElement;
     let gridBodyOverflowY: boolean = false;
-    let gutterSizePx = 4;
+    let gutterSizePx = 5;
 
     const checkOverflowBody = () => {
         // console.log(
@@ -103,9 +105,11 @@
         {/if}
         {#if !isProcessing}
             {#each items as item, index}
-                <div data-role="row" class="grid overflow-x-visible border-x border-gray-300" style={gridRowStyle}>
-                    <slot name="item" {item} {index} />
-                </div>
+                <DynamicRow {gridRowStyle}>
+                    <svelte:fragment>
+                        <slot name="item" {item} {index} />
+                    </svelte:fragment>
+                </DynamicRow>
             {/each}
         {/if}
     </div>

@@ -392,22 +392,24 @@
     </div>
 {/if}
 
-<div class="py-4 flex items-center gap-x-2 flex-grow-0">
-    <IconLinkButton on:click={handleAddStep}>
-        <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
-        <svelte:fragment slot="label">
-            {uiContext.str(stringResKeys.general.add)}
-        </svelte:fragment>
-    </IconLinkButton>
-    <span>|</span>
-    <IconLinkButton on:click={handleAddComment}>
-        <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
-        <svelte:fragment slot="label">
-            {uiContext.str(stringResKeys.testRoutineEditor.addComment)}
-        </svelte:fragment>
-    </IconLinkButton>
+<div class="py-4 flex items-center justify-between flex-grow-0">
+    <div>
+        <IconLinkButton on:click={handleAddStep}>
+            <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
+            <svelte:fragment slot="label">
+                {uiContext.str(stringResKeys.general.add)}
+            </svelte:fragment>
+        </IconLinkButton>
+        <span>|</span>
+        <IconLinkButton on:click={handleAddComment}>
+            <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
+            <svelte:fragment slot="label">
+                {uiContext.str(stringResKeys.testRoutineEditor.addComment)}
+            </svelte:fragment>
+        </IconLinkButton>
+    </div>
 
-    <div class="ml-auto absolute right-5">
+    <div class="">
         <PrimaryButton on:click={() => dispatch("save")}>
             <span class="flex items-center gap-x-2">
                 <SaveIcon class="w-5 h-5" />
