@@ -260,7 +260,7 @@
     $: {
         let columns: ColumnOptions[] = [
             {
-                defaultSizePercentage: 25,
+                defaultSizePercentage: 20,
                 title: uiContext.str(stringResKeys.testRoutineEditor.action),
             },
             {
@@ -273,12 +273,12 @@
             },
         ];
 
-        //let remainingPercentage = 100 - lodash.sumBy(columns, (c) => c.defaultSizePercentage);
-        //let splitPortions = spreadInteger(remainingPercentage, dataSetItems.length);
+        let remainingPercentage = 85 - lodash.sumBy(columns, (c) => c.defaultSizePercentage);
+        let splitPortions = spreadInteger(remainingPercentage, dataSetItems.length);
 
         for (let [index, item] of dataSetItems.entries()) {
             columns.push({
-                defaultSizePercentage: 25,
+                defaultSizePercentage: splitPortions[index],
                 title: item.name,
             });
         }
@@ -299,10 +299,10 @@
 
 {#if gridConfig}
     <div class="flex-1 overflow-x-auto min-h-0">
-        <DynamicGrid config={gridConfig} items={$listStep.items} class="h-full flex flex-col items-stretch ">
+        <DynamicGrid config={gridConfig} items={$listStep.items} class="h-full">
             <svelte:fragment slot="item" let:item let:index>
                 {#if isComment(item)}
-                    <DynamicCell colspan={gridConfig.columns.length + dataSetItems.length} isLast={true}>
+                    <DynamicCell colspan={gridConfig.columns.length * 2 - 2} isLast={true}>
                         <CommentTextField
                             name={`${formName}_${index}_comment`}
                             value={item.comment}

@@ -3,7 +3,7 @@
     export let colspan: number = 1;
 </script>
 
-<div data-role="cell" class="border-b text-base {isLast ? 'border-r' : ''} {`col-span-${colspan}`}">
+<div data-role="cell" class="border-b text-base {`col-span-${colspan}`}">
     <slot />
 </div>
 {#if !isLast}

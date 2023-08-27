@@ -32,8 +32,6 @@
     };
 
     onMount(() => {
-        checkOverflowBody();
-
         let cachedSizes = DynamicGridSizeCache.getByCollectionType(config.gridType);
         let sizes = cachedSizes;
         if (!sizes || config.columns.length !== cachedSizes?.length) {
@@ -55,16 +53,22 @@
         let actualSizes = colsSplitInstance.getSizes();
 
         setSizes(actualSizes);
+
+        checkOverflowBody();
     });
 
     afterUpdate(() => {
-        console.log("afterUpdate()", gridBody.clientHeight, gridBody.scrollHeight);
         checkOverflowBody();
     });
 </script>
 
-<div data-role="table-container" {...$$restProps} class="overflow-x-auto {cssClass} bg-red-200 relative">
-    <div data-role="header" style={gridHeadStyle} class="flex-0 grid bg-gray-200 {gridBodyOverflowY ? 'pr-4' : ''}">
+<div
+    data-role="table-container"
+    {...$$restProps}
+    class="overflow-x-auto {cssClass} "
+    data-gridBodyOverflowY={gridBodyOverflowY}
+>
+    <div data-role="header" style={gridHeadStyle} class="grid bg-gray-200 {gridBodyOverflowY ? 'pr-4' : ''}">
         {#each config.columns as column, i}
             <div bind:this={cols[i]} data-role="col-head" class="text-gray-800 bg-gray-200 py-4 pl-4 pr-3">
                 {column.title}
@@ -72,13 +76,9 @@
         {/each}
     </div>
 
-    <div
-        data-role="body"
-        class="flex-0 h-full overflow-y-auto overflow-x-visible dynamic-grid-body bg-green-100"
-        bind:this={gridBody}
-    >
+    <div data-role="body" class="overflow-y-auto overflow-x-visible dynamic-grid-body shadow-sm" bind:this={gridBody}>
         {#each items as item, index}
-            <div data-role="row" class="grid overflow-x-visible {gridBodyOverflowY ? 'pr-4' : ''}" style={gridRowStyle}>
+            <div data-role="row" class="grid overflow-x-visible border-x border-gray-300" style={gridRowStyle}>
                 <slot name="item" {item} {index} />
             </div>
         {/each}
