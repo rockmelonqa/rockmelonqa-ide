@@ -269,23 +269,19 @@
                 title: uiContext.str(stringResKeys.testRoutineEditor.page),
             },
             {
-                defaultSizePercentage: 15,
+                defaultSizePercentage: dataSetItems.length ? 15 : 45,
                 title: uiContext.str(stringResKeys.testRoutineEditor.element),
             },
         ];
 
-        if (dataSetItems.length) {
-            let remainingPercentage = 85 - lodash.sumBy(columns, (c) => c.defaultSizePercentage);
-            let splitPortions = spreadInteger(remainingPercentage, dataSetItems.length);
+        let remainingPercentage = 85 - lodash.sumBy(columns, (c) => c.defaultSizePercentage);
+        let splitPortions = spreadInteger(remainingPercentage, dataSetItems.length);
 
-            for (let [index, item] of dataSetItems.entries()) {
-                columns.push({
-                    defaultSizePercentage: splitPortions[index],
-                    title: item.name,
-                });
-            }
-        } else {
-            columns[2].defaultSizePercentage = 65;
+        for (let [index, item] of dataSetItems.entries()) {
+            columns.push({
+                defaultSizePercentage: splitPortions[index],
+                title: item.name,
+            });
         }
         columns.push({
             defaultSizePercentage: 15,
@@ -339,8 +335,9 @@
         <DynamicGrid config={gridConfig} items={$listStep.items} class="h-full">
             <svelte:fragment slot="item" let:item let:index>
                 {#if isComment(item)}
-                    <DynamicCell colspan={gridConfig.columns.length * 2 - 2} isLast={true}>
+                    <DynamicCell colspan={gridConfig.columns.length * 2 - 3}>
                         <CommentTextField
+                            class="!bg-transparent"
                             name={`${formName}_${index}_comment`}
                             value={item.comment}
                             placeholder={uiContext.str(stringResKeys.testRoutineEditor.comment)}
@@ -396,7 +393,7 @@
 {/if}
 
 <div class="py-4 flex items-center justify-between flex-grow-0">
-    <div>
+    <div class="flex items-center justify-between gap-2">
         <IconLinkButton on:click={handleAddStep}>
             <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
             <svelte:fragment slot="label">

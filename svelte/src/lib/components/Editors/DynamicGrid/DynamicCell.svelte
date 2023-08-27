@@ -36,7 +36,7 @@
     <slot />
 </div>
 {#if !isLast}
-    <div data-role="gutter" class="flex items-center justify-center border-gray-300 border-b">
+    <div data-role="cell-gutter" class="flex items-center justify-center border-gray-300 border-b">
         <div class="border-l border-gray-300 h-full" />
     </div>
 {/if}
@@ -44,5 +44,9 @@
 <style>
     :global([data-role="cell"]:first-child [data-role="background"]) {
         left: 0;
+    }
+
+    :global([data-role="cell-gutter"]:last-child) {
+        display: none;
     }
 </style>
