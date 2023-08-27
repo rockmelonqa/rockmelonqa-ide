@@ -457,7 +457,7 @@
                         <i class="text-red">(This item cannot be shown)</i>
                     </DynamicCell>
                 {/if}
-                <DynamicCell isLast={true}>
+                <DynamicCell allowHighlight={false}>
                     <ActionsMenu {index} buttons={buildActionMenuButtons(index)} />
                 </DynamicCell>
             </svelte:fragment>

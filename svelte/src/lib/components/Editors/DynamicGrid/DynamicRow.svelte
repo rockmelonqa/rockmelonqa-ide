@@ -9,16 +9,13 @@
     onMount(() => {
         element.addEventListener("focusout", function (e: any) {
             if (e.currentTarget.contains(e.relatedTarget)) {
-                console.log("Row Focus will still be within the container");
                 focused = true;
             } else {
-                console.log("Row Focus will leave the containe");
                 focused = false;
             }
         });
 
         element.addEventListener("focusin", function (e: any) {
-            console.log("Row Focus in");
             focused = true;
         });
     });

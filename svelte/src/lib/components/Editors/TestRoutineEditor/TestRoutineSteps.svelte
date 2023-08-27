@@ -274,16 +274,19 @@
             },
         ];
 
-        let remainingPercentage = 85 - lodash.sumBy(columns, (c) => c.defaultSizePercentage);
-        let splitPortions = spreadInteger(remainingPercentage, dataSetItems.length);
+        if (dataSetItems.length) {
+            let remainingPercentage = 85 - lodash.sumBy(columns, (c) => c.defaultSizePercentage);
+            let splitPortions = spreadInteger(remainingPercentage, dataSetItems.length);
 
-        for (let [index, item] of dataSetItems.entries()) {
-            columns.push({
-                defaultSizePercentage: splitPortions[index],
-                title: item.name,
-            });
+            for (let [index, item] of dataSetItems.entries()) {
+                columns.push({
+                    defaultSizePercentage: splitPortions[index],
+                    title: item.name,
+                });
+            }
+        } else {
+            columns[2].defaultSizePercentage = 65;
         }
-
         columns.push({
             defaultSizePercentage: 15,
             title: uiContext.str(stringResKeys.testRoutineEditor.actions),
@@ -384,7 +387,7 @@
                     {/each}
                 {/if}
 
-                <DynamicCell>
+                <DynamicCell allowHighlight={false}>
                     <ActionsMenu {index} buttons={buildActionMenuButtons(index)} />
                 </DynamicCell>
             </svelte:fragment>

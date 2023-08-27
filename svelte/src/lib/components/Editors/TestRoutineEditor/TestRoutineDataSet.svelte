@@ -248,7 +248,7 @@
                     on:input={(event) => handleItemChange(index, "description", event.detail.value)}
                 />
             </DynamicCell>
-            <DynamicCell isLast={true}>
+            <DynamicCell allowHighlight={false}>
                 <ActionsMenu {index} buttons={buildActionMenuButtons(item, index)} />
             </DynamicCell>
         </svelte:fragment>

@@ -38,6 +38,10 @@
     import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
     import { toTitle } from "./Editor";
+    import type { ButtonOptions, GridConfig } from "./DynamicGrid/DynamicGrid";
+    import DynamicGrid from "./DynamicGrid/DynamicGrid.svelte";
+    import DynamicCell from "./DynamicGrid/DynamicCell.svelte";
+    import ActionsMenu from "./DynamicGrid/ActionsMenu.svelte";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -237,11 +241,48 @@
 
         dispatchChange();
     };
+
+    const gridConfig: GridConfig = {
+        gridType: "TestCaseItems",
+        columns: [
+            {
+                defaultSizePercentage: 80,
+                title: uiContext.str(stringResKeys.testSuiteEditor.testCase),
+            },
+            {
+                defaultSizePercentage: 20,
+                title: uiContext.str(stringResKeys.testCaseEditor.actions),
+            },
+        ],
+    };
+
+    const buildActionMenuButtons = (index: number): ButtonOptions[] => {
+        return [
+            {
+                label: uiContext.str(stringResKeys.general.delete),
+                icon: DeleteIcon,
+                action: handleDeleteClick,
+                visible: true,
+            },
+            {
+                label: uiContext.str(uiContext.str(stringResKeys.general.moveUp)),
+                icon: MoveUpIcon,
+                action: handleMoveUpClick,
+                visible: index > 0,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.moveDown),
+                icon: MoveDownIcon,
+                action: handleMoveDownClick,
+                visible: index < $listData.items.length - 1,
+            },
+        ];
+    };
 </script>
 
-<div class="flex-1 test-case-editor p-8">
-    <div class="font-semibold text-xl mb-4">{title}</div>
-    <Form {formContext}>
+<div class="flex-1 test-suite-editor p-8 flex flex-col">
+    <div class="font-semibold text-xl mb-4 flex-grow-0">{title}</div>
+    <Form {formContext} class="flex-grow-0">
         <FormGroup columns={1}>
             <FormGroupColumn>
                 <FormTextField
@@ -255,61 +296,25 @@
         </FormGroup>
     </Form>
 
-    <ListTable
-        class="table-fixed mb-8"
-        isProcessing={$formMode.isLoading() || $formMode.isProcessing()}
-        isEmpty={false}
-    >
-        <svelte:fragment slot="header">
-            <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-11/12">
-                {uiContext.str(stringResKeys.testSuiteEditor.testCase)}
-            </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-1/12">
-                {uiContext.str(stringResKeys.testSuiteEditor.actions)}
-            </ListTableHeaderCell>
-        </svelte:fragment>
-        <svelte:fragment slot="body">
-            {#each $listData.items as item, index}
-                <ListTableBodyRow>
-                    <ListTableBodyCell type={ListTableCellType.First}>
-                        <FancyDropdownField
-                            name={`${formContext.formName}_${index}_id`}
-                            value={item.id}
-                            options={testCaseOptions}
-                            on:change={(event) => handleSelectTestCase(index, "id", event.detail.value)}
-                        />
-                    </ListTableBodyCell>
+    <div class="flex-1 min-h-0 flex flex-col pb-0">
+        <DynamicGrid config={gridConfig} items={$listData.items} class="h-full flex flex-col">
+            <svelte:fragment slot="item" let:item let:index>
+                <DynamicCell>
+                    <FancyDropdownField
+                        name={`${formContext.formName}_${index}_id`}
+                        value={item.id}
+                        options={testCaseOptions}
+                        on:change={(event) => handleSelectTestCase(index, "id", event.detail.value)}
+                    />
+                </DynamicCell>
+                <DynamicCell allowHighlight={false}>
+                    <ActionsMenu {index} buttons={buildActionMenuButtons(index)} />
+                </DynamicCell>
+            </svelte:fragment>
+        </DynamicGrid>
+    </div>
 
-                    <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">
-                        <IconLinkButton
-                            on:click={() => handleDeleteClick(index)}
-                            title={uiContext.str(stringResKeys.general.delete)}
-                        >
-                            <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
-                        </IconLinkButton>
-                        {#if index > 0}
-                            <IconLinkButton
-                                on:click={() => handleMoveUpClick(index)}
-                                title={uiContext.str(stringResKeys.general.moveUp)}
-                            >
-                                <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>
-                            </IconLinkButton>
-                        {/if}
-                        {#if index < $listData.items.length - 1}
-                            <IconLinkButton
-                                on:click={() => handleMoveDownClick(index)}
-                                title={uiContext.str(stringResKeys.general.moveDown)}
-                            >
-                                <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>
-                            </IconLinkButton>
-                        {/if}
-                    </ListTableBodyCell>
-                </ListTableBodyRow>
-            {/each}
-        </svelte:fragment>
-    </ListTable>
-
-    <div class="flex items-center gap-x-2">
+    <div class="flex items-center flex-grow-0 py-4">
         <IconLinkButton on:click={handleAddTestCase}>
             <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
             <svelte:fragment slot="label">
