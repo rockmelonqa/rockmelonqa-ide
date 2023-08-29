@@ -1,21 +1,21 @@
 <script lang="ts">
-    import type { IUiTheme } from "$lib/context/UiTheme";
+    import type { IUiTheme } from '$lib/context/UiTheme';
     /**
      * Wrapper for svelte-select
      * https://github.com/rob-balfre/svelte-select
      */
-    import { createEventDispatcher, getContext } from "svelte";
-    import Select from "svelte-select";
-    import type { IDropdownOption } from "../controls/DropdownField";
+    import { createEventDispatcher, getContext } from 'svelte';
+    import Select from 'svelte-select';
+    import type { IDropdownOption } from '../controls/DropdownField';
     import {
         FieldDataType,
         getFieldLabel,
         getFieldPlaceholder,
         isFieldRequired,
         type IDropdownFieldDef,
-    } from "../form/FieldDef";
-    import { formContextKey, type IFormContext } from "../form/FormContext";
-    import { FormDataActionType } from "../form/FormData";
+    } from '../form/FieldDef';
+    import { formContextKey, type IFormContext } from '../form/FormContext';
+    import { FormDataActionType } from '../form/FormData';
 
     //*****************************************
     // Props
@@ -23,9 +23,9 @@
     export let name: string;
     export let readonly: boolean = false;
     export let disabled = false;
-    export let label = "";
+    export let label = '';
     export let options: IDropdownOption[];
-    export let placeholder = "";
+    export let placeholder = '';
     export let displayLabel = true;
 
     //*****************************************
@@ -56,26 +56,26 @@
     $: isRequired =
         isFieldRequired($formData.values, dropdownFieldDef.isRequired) &&
         ($formMode.isAdding() || $formMode.isEditing());
-    $: labelText = getFieldLabel(label, formName, name, fieldDef, uiContext) + (isRequired && isEditable ? " *" : "");
+    $: labelText = getFieldLabel(label, formName, name, fieldDef, uiContext) + (isRequired && isEditable ? ' *' : '');
     $: errorMessage = $formData.errorsToShow[name];
 
     $: value = $formData.values[name];
     $: selectedItem = options?.find((opt) => opt.key === value);
-    $: valueText = selectedItem?.text ?? "";
+    $: valueText = selectedItem?.text ?? '';
 
     // Input only displayed in view mode
-    $: inputCssClassReadOnly = isReadOnly ? textTheme.inputReadonly ?? "" : "";
-    $: inputCssClassDisabled = isDisabled ? textTheme.inputDisabled ?? "" : "";
-    $: inputCssHidden = isEditable ? "hidden" : "";
+    $: inputCssClassReadOnly = isReadOnly ? textTheme.inputReadonly ?? '' : '';
+    $: inputCssClassDisabled = isDisabled ? textTheme.inputDisabled ?? '' : '';
+    $: inputCssHidden = isEditable ? 'hidden' : '';
     $: inputCssClass = `${textTheme?.input} ${inputCssClassReadOnly} ${inputCssClassDisabled} ${inputCssHidden}`.trim();
 
     // Best we can do is put a name on the container and then we overrride in app.css
-    $: selectCss = errorMessage ? "select-error" : "";
+    $: selectCss = errorMessage ? 'select-error' : '';
     $: containerCss = isEditable
-        ? `${dropdownTheme?.dropdownContainer} ${errorMessage ? "error" : "valid"} z-50`
+        ? `${dropdownTheme?.dropdownContainer} ${errorMessage ? 'error' : 'valid'}`
         : textTheme?.inputContainer;
 
-    $: selectPlaceholder = isEditable ? getFieldPlaceholder(placeholder, formName, name, fieldDef, uiContext) : "";
+    $: selectPlaceholder = isEditable ? getFieldPlaceholder(placeholder, formName, name, fieldDef, uiContext) : '';
 
     let rootId = `${formName}_${name}_root`;
     let labelId = `${formName}_${name}_label`;
@@ -83,16 +83,14 @@
     let selectId = `${formName}_${name}_select`;
     let errorId = `${formName}_${name}_error`;
     const dispatch = createEventDispatcher();
-    let floatingConfig = {
-        strategy: "absolute",
-    };
+
     //*****************************************
     // Events
     //*****************************************
     const handleSelect = (e: any) => {
         const value = e.detail.key;
         formContext.dataDispatch({ type: FormDataActionType.SetValues, newValues: { [name]: value } });
-        dispatch("change", { value: value });
+        dispatch('change', { value: value });
     };
 
     const handleBlur = (e: any) => {
@@ -102,8 +100,8 @@
     };
 
     const handleClear = () => {
-        formContext.dataDispatch({ type: FormDataActionType.SetValues, newValues: { [name]: "" } });
-        dispatch("change", { value: "" });
+        formContext.dataDispatch({ type: FormDataActionType.SetValues, newValues: { [name]: '' } });
+        dispatch('change', { value: '' });
     };
 </script>
 
@@ -123,7 +121,6 @@
         />
         {#if isEditable}
             <Select
-                {floatingConfig}
                 id={selectId}
                 items={options}
                 value={selectedItem}
@@ -135,7 +132,6 @@
                 on:select={handleSelect}
                 on:blur={handleBlur}
                 on:clear={handleClear}
-                listOpen={true}
             />
         {/if}
     </div>
