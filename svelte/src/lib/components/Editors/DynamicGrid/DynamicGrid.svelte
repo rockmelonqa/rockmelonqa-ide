@@ -20,10 +20,9 @@
     let cols: HTMLElement[] = [];
     let columnSizes: string[] = [];
     let gridRowStyle: string;
-    let gridHeadStyle: string;
     let gridBody: HTMLElement;
     let gridBodyOverflowY: boolean = false;
-    let gutterSizePx = 5;
+    let gutterSizePx = 3;
 
     const checkOverflowBody = () => {
         // console.log(
@@ -40,9 +39,6 @@
         gridRowStyle = `grid-template-columns: ${sizes
             .map((n) => `calc((100% - ${(sizes.length - 1) * gutterSizePx}px) * ${n} / 100)`)
             .join(` ${gutterSizePx}px `)}`;
-        gridHeadStyle = `grid-template-columns: ${sizes
-            .map((n) => `calc((100% - ${(sizes.length - 1) * gutterSizePx}px) * ${n} / 100)`)
-            .join(` ${gutterSizePx}px `)};`;
     };
 
     onMount(() => {
@@ -54,6 +50,13 @@
         const colsSplitInstance = Split(cols, {
             gutterSize: gutterSizePx,
             sizes,
+            gutter: (index, direction) => {
+                const gutter = document.createElement("div");
+                gutter.className = `gutter relative opacity-1 bg-gray-200 after:bg-gray-400 after:absolute after:top-0 after:h-full after:w-[1px] after:left-[1px] hover:cursor-col-resize hover:opacity-1/2 gutter-${direction}`;
+                gutter.style.width = "5px";
+                gutter.setAttribute("data-index", String(index));
+                return gutter;
+            },
             onDrag(sizes) {
                 setSizes(sizes);
                 DynamicGridSizeCache.setByCollectionType(config.gridType, sizes);
@@ -85,9 +88,13 @@
     class="overflow-x-auto {cssClass} flex flex-col"
     data-gridBodyOverflowY={gridBodyOverflowY}
 >
-    <div data-role="header" style={gridHeadStyle} class="grid bg-gray-200 {gridBodyOverflowY ? 'pr-4' : ''}">
+    <div
+        data-role="header-row"
+        style={gridRowStyle}
+        class="grid bg-gray-200 border-x border-gray-200 {gridBodyOverflowY ? 'pr-4' : ''}"
+    >
         {#each config.columns as column, i}
-            <div bind:this={cols[i]} data-role="col-head" class="text-gray-800 bg-gray-200 py-4 pl-4 pr-3">
+            <div bind:this={cols[i]} data-role="header-col" class="text-gray-800 bg-gray-200 py-4 pl-4 pr-3">
                 {column.title}
             </div>
         {/each}
@@ -116,20 +123,17 @@
 </div>
 
 <style>
-    :global(.gutter) {
-        background-color: #c2c2c2;
-        background-repeat: no-repeat;
-        background-position: 50%;
-    }
-
-    :global(.gutter.gutter-horizontal:hover) {
-        cursor: col-resize;
+    :global(.gutter:hover::after),
+    :global(.gutter:hover) {
+        background-color: var(--color-input-border--focus);
+        transition: background-color 0.7s;
     }
 
     .dynamic-grid-body::-webkit-scrollbar {
         width: 1em;
         overflow-y: overlay;
     }
+
     .dynamic-grid-body::-webkit-scrollbar:horizontal {
         display: none;
     }
