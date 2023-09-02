@@ -388,7 +388,6 @@
         <FormGroup columns={1}>
             <FormGroupColumn>
                 <FormTextField
-                    class="focus:border-b"
                     name="description"
                     theme={uiTheme.inlineTextField}
                     on:input={dispatchChange}
@@ -404,7 +403,6 @@
                 {#if item.type === "pageElement"}
                     <DynamicCell>
                         <TextField
-                            class="py-2 px-3 h-auto border-white focus:border-b"
                             name={`${formContext.formName}_${index}_name`}
                             value={item.name}
                             on:input={(event) => handleItemChange(index, "name", event.detail.value)}
@@ -416,7 +414,6 @@
                     </DynamicCell>
                     <DynamicCell>
                         <FancyDropdownField
-                            class="py-2 px-3 h-auto border-white focus:border-b"
                             name={`${formContext.formName}_${index}_findBy`}
                             value={item.findBy}
                             options={locatorTypeOptions}
@@ -425,7 +422,6 @@
                     </DynamicCell>
                     <DynamicCell>
                         <TextField
-                            class="py-2 px-3 h-auto border-white focus:border-b"
                             placeholder={(item.findBy === LocatorType.RelativeCss ? "MyField:.css-class-name" : "") ||
                                 (item.findBy === LocatorType.RelativeXpath ? "MyField://div[text() = 'abc']" : "")}
                             name={`${formContext.formName}_${index}_locator`}
@@ -435,7 +431,6 @@
                     </DynamicCell>
                     <DynamicCell>
                         <TextField
-                            class="py-2 px-3 h-auto border-white focus:border-b"
                             name={`${formContext.formName}_${index}_description`}
                             value={item.description}
                             on:input={(event) => handleItemChange(index, "description", event.detail.value)}

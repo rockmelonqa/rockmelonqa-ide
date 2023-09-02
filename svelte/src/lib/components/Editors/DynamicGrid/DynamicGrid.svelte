@@ -25,12 +25,6 @@
     let gutterSizePx = 3;
 
     const checkOverflowBody = () => {
-        // console.log(
-        //     "checkOverflowBody()",
-        //     gridBody.scrollHeight,
-        //     gridBody.clientHeight,
-        //     gridBody.scrollHeight > gridBody.clientHeight
-        // );
         gridBodyOverflowY = gridBody.scrollHeight > gridBody.clientHeight;
     };
 

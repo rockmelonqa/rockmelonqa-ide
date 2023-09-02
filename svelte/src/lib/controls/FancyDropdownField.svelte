@@ -17,6 +17,7 @@
     export let options: IDropdownOption[];
     export let label: string = "";
     export let errorMessage: string = "";
+    export let hasBorderBottom: boolean = false;
     let floatingConfig = {
         strategy: "absolute",
     };
@@ -35,7 +36,7 @@
 
     // Best we can do is put a name on the container and then we overrride in app.css
     $: selectCss = "h-full !bg-transparent";
-    $: containerCss = "mt-0";
+    $: containerCss = `mt-0 relative h-full ${hasBorderBottom ? "" : "!border-b-0"}`;
 
     let rootId = `${name}_root`;
     let labelId = `${name}_label`;
@@ -62,7 +63,7 @@
     {#if label}
         <label id={labelId} for={name} class="dropdown-field-label {dropdownTheme?.label}">{label}</label>
     {/if}
-    <div class="dropdown-field-select-container {containerCss} relative !border-b-0 h-full">
+    <div class="dropdown-field-select-container {containerCss} ">
         <Select
             {floatingConfig}
             id={selectId}
