@@ -224,7 +224,7 @@
     };
 </script>
 
-<div class="rm-project-editor p-8">
+<div class="flex-1 rm-project-editor p-8">
     <Form {formContext}>
         <Alert bind:alertLevel class="mb-8">
             <svelte:fragment slot="title">{alertMessage}</svelte:fragment>

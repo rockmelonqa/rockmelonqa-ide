@@ -1,30 +1,34 @@
 <script lang="ts">
-    import { AlertDialogButtons, AlertDialogType } from '$lib/components/Alert';
-    import AlertDialog from '$lib/components/AlertDialog.svelte';
-    import { combinePath, toTreePath } from '$lib/components/FileExplorer/Node';
-    import IconLinkButton from '$lib/components/IconLinkButton.svelte';
-    import { ListTableCellType } from '$lib/components/ListTable';
-    import ListTable from '$lib/components/ListTable.svelte';
-    import ListTableBodyCell from '$lib/components/ListTableBodyCell.svelte';
-    import ListTableBodyRow from '$lib/components/ListTableBodyRow.svelte';
-    import ListTableHeaderCell from '$lib/components/ListTableHeaderCell.svelte';
-    import PrimaryButton from '$lib/components/PrimaryButton.svelte';
-    import StandardButton from '$lib/components/StandardButton.svelte';
-    import { appContextKey, type IAppContext } from '$lib/context/AppContext';
-    import { stringResKeys } from '$lib/context/StringResKeys';
-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import TextField from '$lib/controls/TextField.svelte';
-    import type { IDictionary } from '$lib/form/FieldDef';
-    import type { IFormContext } from '$lib/form/FormContext';
-    import { ListDataActionType, type IListDataContext } from '$lib/form/ListData';
-    import AddIcon from '$lib/icons/AddIcon.svelte';
-    import DeleteIcon from '$lib/icons/DeleteIcon.svelte';
-    import MoveDownIcon from '$lib/icons/MoveDownIcon.svelte';
-    import MoveUpIcon from '$lib/icons/MoveUpIcon.svelte';
-    import SaveIcon from '$lib/icons/SaveIcon.svelte';
-    import { StandardFolder, type IDataSet, ActionType } from 'rockmelonqa.common';
-    import { createEventDispatcher, getContext } from 'svelte';
-    import { v4 as uuidv4 } from 'uuid';
+    import { AlertDialogButtons, AlertDialogType } from "$lib/components/Alert";
+    import AlertDialog from "$lib/components/AlertDialog.svelte";
+    import { combinePath, toTreePath } from "$lib/components/FileExplorer/Node";
+    import IconLinkButton from "$lib/components/IconLinkButton.svelte";
+    import { ListTableCellType } from "$lib/components/ListTable";
+    import ListTable from "$lib/components/ListTable.svelte";
+    import ListTableBodyCell from "$lib/components/ListTableBodyCell.svelte";
+    import ListTableBodyRow from "$lib/components/ListTableBodyRow.svelte";
+    import ListTableHeaderCell from "$lib/components/ListTableHeaderCell.svelte";
+    import PrimaryButton from "$lib/components/PrimaryButton.svelte";
+    import StandardButton from "$lib/components/StandardButton.svelte";
+    import { appContextKey, type IAppContext } from "$lib/context/AppContext";
+    import { stringResKeys } from "$lib/context/StringResKeys";
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import TextField from "$lib/controls/TextField.svelte";
+    import type { IDictionary } from "$lib/form/FieldDef";
+    import type { IFormContext } from "$lib/form/FormContext";
+    import { ListDataActionType, type IListDataContext } from "$lib/form/ListData";
+    import AddIcon from "$lib/icons/AddIcon.svelte";
+    import DeleteIcon from "$lib/icons/DeleteIcon.svelte";
+    import MoveDownIcon from "$lib/icons/MoveDownIcon.svelte";
+    import MoveUpIcon from "$lib/icons/MoveUpIcon.svelte";
+    import SaveIcon from "$lib/icons/SaveIcon.svelte";
+    import { StandardFolder, type IDataSet, ActionType } from "rockmelonqa.common";
+    import { createEventDispatcher, getContext } from "svelte";
+    import { v4 as uuidv4 } from "uuid";
+    import type { ButtonOptions, GridConfig } from "../DynamicGrid/DynamicGrid";
+    import DynamicGrid from "../DynamicGrid/DynamicGrid.svelte";
+    import DynamicCell from "../DynamicGrid/DynamicCell.svelte";
+    import ActionsMenu from "../DynamicGrid/ActionsMenu.svelte";
 
     export let formContext: IFormContext;
     let { formName, mode: formMode, data: formData } = formContext;
@@ -99,8 +103,8 @@
     const newItem = () => {
         return {
             id: uuidv4(),
-            name: '',
-            description: '',
+            name: "",
+            description: "",
         } as IDataSet;
     };
 
@@ -109,27 +113,31 @@
      * @param changeScheme: True if add, delete or update the order
      */
     const dispatchChange = (changeScheme: boolean) => {
-        dispatch('change', { changeScheme });
+        dispatch("change", { changeScheme });
     };
 
-        /**************************************
+    /**************************************
      * Handle data set deletion
      ***************************************/
-     let showReferenceWarningDialog: boolean = false;
+    let showReferenceWarningDialog: boolean = false;
     let relatedTestCasePaths: string[] = [];
 
     const hasReferenceData = async (dataSetItem: IDictionary): Promise<boolean> => {
         const testCaseFolderPath = combinePath(
-            [$appState.projectFile?.folderPath ?? '', StandardFolder.TestCases],
+            [$appState.projectFile?.folderPath ?? "", StandardFolder.TestCases],
             uiContext.pathSeparator
         );
 
         relatedTestCasePaths = Array.from($appState.testCases.values())
-            .filter((tc) => tc.steps.some((s) => 
-                s.action === ActionType.RunTestRoutine && 
-                s.data === $formData.values.id && 
-                s.dataset?.includes(dataSetItem.id)))
-            .map((tc) => toTreePath(tc.filePath, testCaseFolderPath, uiContext.pathSeparator) ?? '');
+            .filter((tc) =>
+                tc.steps.some(
+                    (s) =>
+                        s.action === ActionType.RunTestRoutine &&
+                        s.data === $formData.values.id &&
+                        s.dataset?.includes(dataSetItem.id)
+                )
+            )
+            .map((tc) => toTreePath(tc.filePath, testCaseFolderPath, uiContext.pathSeparator) ?? "");
 
         if (relatedTestCasePaths.length > 0) {
             showReferenceWarningDialog = true;
@@ -137,21 +145,21 @@
         }
 
         return false;
-    }
+    };
 
     const handleDeleteClick = async (dataSetItem: IDictionary, index: number) => {
         // Determine if this row has any input.
         // If yes, show confirmation dialog. Otherwise, delete straight away
         if (isEmptyItem(dataSetItem)) {
             doDeleteRow(index);
-        } else if (!await hasReferenceData(dataSetItem)) {
+        } else if (!(await hasReferenceData(dataSetItem))) {
             deleteDialogType = AlertDialogType.Question;
             indexToDelete = index;
         }
     };
 
     const isEmptyItem = (item: IDictionary) => {
-        const ignoredProperties: string[] = ['id'];
+        const ignoredProperties: string[] = ["id"];
         return Object.entries(item)
             .filter(([key, value]) => !ignoredProperties.includes(key))
             .map(([key, value]) => value)
@@ -159,7 +167,7 @@
     };
 
     const handleDeleteConfirmation = async (event: any) => {
-        if (event.detail.button === 'delete') {
+        if (event.detail.button === "delete") {
             doDeleteRow(indexToDelete);
         }
     };
@@ -171,75 +179,83 @@
         });
         dispatchChange(true);
     };
+
+    let gridConfig: GridConfig = {
+        gridType: "TestRoutineDataSet",
+        columns: [
+            {
+                defaultSizePercentage: 30,
+                title: uiContext.str(stringResKeys.testRoutineEditor.name),
+            },
+            {
+                defaultSizePercentage: 55,
+                title: uiContext.str(stringResKeys.testRoutineEditor.description),
+            },
+            {
+                defaultSizePercentage: 15,
+                title: uiContext.str(stringResKeys.testRoutineEditor.actions),
+            },
+        ],
+    };
+
+    const buildActionMenuButtons = (dataSetItem: IDictionary, index: number): ButtonOptions[] => {
+        return [
+            {
+                label: uiContext.str(stringResKeys.general.add),
+                icon: AddIcon,
+                action: handleInsert,
+                visible: true,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.delete),
+                icon: DeleteIcon,
+                action: () => handleDeleteClick(dataSetItem, index),
+                visible: true,
+            },
+            {
+                label: uiContext.str(uiContext.str(stringResKeys.general.moveUp)),
+                icon: MoveUpIcon,
+                action: handleMoveUpClick,
+                visible: index > 0,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.moveDown),
+                icon: MoveDownIcon,
+                action: handleMoveDownClick,
+                visible: index < $listDataSet.items.length - 1,
+            },
+        ];
+    };
 </script>
 
-<ListTable class="table-fixed mb-4" isProcessing={$formMode.isLoading() || $formMode.isProcessing()} isEmpty={false}>
-    <svelte:fragment slot="header">
-        <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-4/12">
-            {uiContext.str(stringResKeys.testRoutineEditor.name)}
-        </ListTableHeaderCell>
-        <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-7/12">
-            {uiContext.str(stringResKeys.testRoutineEditor.description)}
-        </ListTableHeaderCell>
-        <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-1/12">
-            {uiContext.str(stringResKeys.testRoutineEditor.actions)}
-        </ListTableHeaderCell>
-    </svelte:fragment>
-    <svelte:fragment slot="body">
-        {#each $listDataSet.items as item, index}
-            <ListTableBodyRow>
-                <ListTableBodyCell type={ListTableCellType.First}>
-                    <TextField
-                        name={`${formName}_${index}_name`}
-                        value={item.name}
-                        on:input={(event) => {
-                            handleItemChange(index, 'name', event.detail.value);
-                        }}
-                    />
-                </ListTableBodyCell>
-                <ListTableBodyCell type={ListTableCellType.Last}>
-                    <TextField
-                        name={`${formName}_${index}_description`}
-                        value={item.description}
-                        on:input={(event) => handleItemChange(index, 'description', event.detail.value)}
-                    />
-                </ListTableBodyCell>
-                <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">
-                    <IconLinkButton
-                        on:click={() => handleInsert(index)}
-                        title={uiContext.str(stringResKeys.general.add)}
-                    >
-                        <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
-                    </IconLinkButton>
-                    <IconLinkButton
-                        on:click={() => handleDeleteClick(item, index)}
-                        title={uiContext.str(stringResKeys.general.delete)}
-                    >
-                        <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
-                    </IconLinkButton>
-                    {#if index > 0}
-                        <IconLinkButton
-                            on:click={() => handleMoveUpClick(index)}
-                            title={uiContext.str(stringResKeys.general.moveUp)}
-                        >
-                            <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>
-                        </IconLinkButton>
-                    {/if}
-                    {#if index < $listDataSet.items.length - 1}
-                        <IconLinkButton
-                            on:click={() => handleMoveDownClick(index)}
-                            title={uiContext.str(stringResKeys.general.moveDown)}
-                        >
-                            <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>
-                        </IconLinkButton>
-                    {/if}
-                </ListTableBodyCell>
-            </ListTableBodyRow>
-        {/each}
-    </svelte:fragment>
-</ListTable>
+<div class="flex-1 overflow-x-auto min-h-0">
+    <DynamicGrid config={gridConfig} items={$listDataSet.items} class="h-full flex flex-col">
+        <svelte:fragment slot="item" let:item let:index>
+            <DynamicCell>
+                <TextField
+                    class="!bg-transparent"
+                    name={`${formName}_${index}_name`}
+                    value={item.name}
+                    on:input={(event) => {
+                        handleItemChange(index, "name", event.detail.value);
+                    }}
+                />
+            </DynamicCell>
+            <DynamicCell>
+                <TextField
+                    name={`${formName}_${index}_description`}
+                    value={item.description}
+                    on:input={(event) => handleItemChange(index, "description", event.detail.value)}
+                />
+            </DynamicCell>
+            <DynamicCell allowHighlight={false}>
+                <ActionsMenu {index} buttons={buildActionMenuButtons(item, index)} />
+            </DynamicCell>
+        </svelte:fragment>
+    </DynamicGrid>
+</div>
 
-<div class="mb-8 flex items-center gap-x-2">
+<div class="flex items-center gap-x-2 flex-grow-0 py-4">
     <IconLinkButton on:click={handleAdd}>
         <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
         <svelte:fragment slot="label">
@@ -248,7 +264,7 @@
     </IconLinkButton>
 
     <div class="ml-auto">
-        <PrimaryButton on:click={() => dispatch('save')}>
+        <PrimaryButton on:click={() => dispatch("save")}>
             <span class="flex items-center gap-x-2">
                 <SaveIcon class="w-5 h-5" />
                 {uiContext.str(stringResKeys.general.save)}
@@ -280,20 +296,21 @@
                         {uiContext.str(stringResKeys.general.warning)}
                     </div>
                     <div class="modal-content mb-8 flex flex-col gap-y-4">
-                          <div>
-                            This dataset is being used by following test cases. Please update test case before deleting dataset
-                          </div>
-                          <ul class="list-disc list-inside">
+                        <div>
+                            This dataset is being used by following test cases. Please update test case before deleting
+                            dataset
+                        </div>
+                        <ul class="list-disc list-inside">
                             {#each relatedTestCasePaths as testCasePath}
-                              <li>{testCasePath}</li>
+                                <li>{testCasePath}</li>
                             {/each}
-                          </ul>
-                      </div>
+                        </ul>
+                    </div>
                     <div class="modal-buttons flex justify-start items-end gap-x-4">
                         <div class="ml-auto">
                             <StandardButton
                                 label={uiContext.str(stringResKeys.general.cancel)}
-                                on:click={() => showReferenceWarningDialog = false}
+                                on:click={() => (showReferenceWarningDialog = false)}
                             />
                         </div>
                     </div>

@@ -48,6 +48,10 @@
     import type { ITestCaseStep } from "rockmelonqa.common/file-defs/testCaseFile";
     import { removeFileExtension } from "$lib/utils/utils";
     import RoutinePickerDialog from "$lib/dialogs/RoutinePickerDialog.svelte";
+    import DynamicCell from "./DynamicGrid/DynamicCell.svelte";
+    import DynamicGrid from "./DynamicGrid/DynamicGrid.svelte";
+    import type { ButtonOptions, GridConfig } from "./DynamicGrid/DynamicGrid";
+    import ActionsMenu from "./DynamicGrid/ActionsMenu.svelte";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -426,11 +430,72 @@
 
         dispatchChange();
     };
+
+    const gridConfig: GridConfig = {
+        gridType: "TestCaseItems",
+        columns: [
+            {
+                defaultSizePercentage: 20,
+                title: uiContext.str(stringResKeys.testCaseEditor.action),
+            },
+            {
+                defaultSizePercentage: 20,
+                title: uiContext.str(stringResKeys.testCaseEditor.page),
+            },
+            {
+                defaultSizePercentage: 20,
+                title: uiContext.str(stringResKeys.testCaseEditor.element),
+            },
+            {
+                defaultSizePercentage: 25,
+                title: uiContext.str(stringResKeys.testCaseEditor.data),
+            },
+            {
+                defaultSizePercentage: 15,
+                title: uiContext.str(stringResKeys.testCaseEditor.actions),
+            },
+        ],
+    };
+
+    const buildActionMenuButtons = (index: number): ButtonOptions[] => {
+        return [
+            {
+                label: uiContext.str(stringResKeys.general.add),
+                icon: AddIcon,
+                action: handleInsertStep,
+                visible: true,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.delete),
+                icon: DeleteIcon,
+                action: handleDeleteClick,
+                visible: true,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.addComment),
+                icon: CommentIcon,
+                action: handleInsertComment,
+                visible: true,
+            },
+            {
+                label: uiContext.str(uiContext.str(stringResKeys.general.moveUp)),
+                icon: MoveUpIcon,
+                action: handleMoveUpClick,
+                visible: index > 0,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.moveDown),
+                icon: MoveDownIcon,
+                action: handleMoveDownClick,
+                visible: index < $listData.items.length - 1,
+            },
+        ];
+    };
 </script>
 
-<div class="test-case-editor p-8">
-    <div class="font-semibold text-xl mb-4">{title}</div>
-    <Form {formContext}>
+<div class="flex-1 test-case-editor p-8 pb-0 flex flex-col">
+    <div class="font-semibold text-xl mb-4 flex-grow-0">{title}</div>
+    <Form {formContext} class="flex-grow-0">
         <FormGroup columns={1}>
             <FormGroupColumn>
                 <FormTextField
@@ -444,143 +509,89 @@
         </FormGroup>
     </Form>
 
-    <ListTable
-        class="table-fixed mb-8"
-        isProcessing={$formMode.isLoading() || $formMode.isProcessing()}
-        isEmpty={false}
-    >
-        <svelte:fragment slot="header">
-            <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-2/12">
-                {uiContext.str(stringResKeys.testCaseEditor.action)}
-            </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-3/12">
-                {uiContext.str(stringResKeys.testCaseEditor.page)}
-            </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-3/12">
-                {uiContext.str(stringResKeys.testCaseEditor.element)}
-            </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.Last} class="text-left w-3/12">
-                {uiContext.str(stringResKeys.testCaseEditor.data)}
-            </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-40">
-                {uiContext.str(stringResKeys.testCaseEditor.actions)}
-            </ListTableHeaderCell>
-        </svelte:fragment>
-        <svelte:fragment slot="body">
-            {#each $listData.items as item, index}
-                <ListTableBodyRow>
-                    {#if isComment(item)}
-                        <ListTableBodyCell type={ListTableCellType.First} colspan={4}>
-                            <CommentTextField
-                                name={`${formContext.formName}_${index}_comment`}
-                                value={item.comment}
-                                placeholder={uiContext.str(stringResKeys.testCaseEditor.comment)}
-                                on:input={(event) => handleItemChange(index, "comment", event.detail.value)}
-                            />
-                        </ListTableBodyCell>
-                    {:else}
-                        <ListTableBodyCell type={ListTableCellType.First}>
+    <div class="flex-1 min-h-0">
+        <DynamicGrid config={gridConfig} items={$listData.items} class="h-full flex flex-col">
+            <svelte:fragment slot="item" let:item let:index>
+                {#if isTestStep(item)}
+                    <DynamicCell>
+                        <FancyDropdownField
+                            name={`${formContext.formName}_${index}_action`}
+                            value={item.action}
+                            options={actionTypeOptions}
+                            on:change={(event) => handleItemChange(index, ITEM_KEY_ACTION, event.detail.value)}
+                        />
+                    </DynamicCell>
+                    <DynamicCell>
+                        {#if !isPagelessAction(item.action)}
                             <FancyDropdownField
-                                name={`${formContext.formName}_${index}_action`}
-                                value={item.action}
-                                options={actionTypeOptions}
-                                on:change={(event) => handleItemChange(index, ITEM_KEY_ACTION, event.detail.value)}
+                                name={`${formContext.formName}_${index}_page`}
+                                value={item.page}
+                                options={pageDefinitionOptions}
+                                on:change={(event) => handlePageChange(index, event.detail.value)}
                             />
-                        </ListTableBodyCell>
-                        <ListTableBodyCell type={ListTableCellType.Normal}>
-                            {#if !isPagelessAction(item.action)}
-                                <FancyDropdownField
-                                    name={`${formContext.formName}_${index}_page`}
-                                    value={item.page}
-                                    options={pageDefinitionOptions}
-                                    on:change={(event) => handlePageChange(index, event.detail.value)}
-                                />
-                            {/if}
-                        </ListTableBodyCell>
-                        <ListTableBodyCell type={ListTableCellType.Normal}>
-                            {#if !isPagelessAction(item.action)}
-                                <FancyDropdownField
-                                    name={`${formContext.formName}_${index}_element`}
-                                    value={item.element}
-                                    options={pageElementsMap.get(item.page) ?? []}
-                                    on:change={(event) => handleItemChange(index, ITEM_KEY_ELEMENT, event.detail.value)}
-                                />
-                            {/if}
-                        </ListTableBodyCell>
-                        <ListTableBodyCell type={ListTableCellType.Last}>
-                            {#if item.action === ActionType.RunTestRoutine.toString()}
-                                <div class="flex justify-between items-center">
-                                    <div class="grow">
-                                        <TextField
-                                            name={`${formContext.formName}_${index}_data`}
-                                            value={toRoutineData(item)}
-                                            class="truncate"
-                                            readonly={true}
-                                        />
-                                    </div>
-                                    <IconLinkButton
-                                        on:click={() => handleShowRoutinePickerDialog(item, index)}
-                                        title="Select routine"
-                                    >
-                                        <svelte:fragment slot="icon"
-                                            ><ListIcon
-                                                class="h-5 w-5"
-                                                strokeColor="var(--color-brand)"
-                                            /></svelte:fragment
-                                        >
-                                    </IconLinkButton>
+                        {/if}
+                    </DynamicCell>
+                    <DynamicCell>
+                        {#if !isPagelessAction(item.action)}
+                            <FancyDropdownField
+                                name={`${formContext.formName}_${index}_element`}
+                                value={item.element}
+                                options={pageElementsMap.get(item.page) ?? []}
+                                on:change={(event) => handleItemChange(index, ITEM_KEY_ELEMENT, event.detail.value)}
+                            />
+                        {/if}
+                    </DynamicCell>
+                    <DynamicCell>
+                        {#if item.action === ActionType.RunTestRoutine.toString()}
+                            <div class="flex justify-between items-center">
+                                <div class="grow">
+                                    <TextField
+                                        name={`${formContext.formName}_${index}_data`}
+                                        value={toRoutineData(item)}
+                                        class="truncate"
+                                        readonly={true}
+                                    />
                                 </div>
-                            {:else}
-                                <TextField
-                                    name={`${formContext.formName}_${index}_data`}
-                                    value={item.data}
-                                    on:input={(event) => handleItemChange(index, ITEM_KEY_DATA, event.detail.value)}
-                                />
-                            {/if}
-                        </ListTableBodyCell>
-                    {/if}
-                    <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">
-                        <IconLinkButton
-                            on:click={() => handleInsertStep(index)}
-                            title={uiContext.str(stringResKeys.testCaseEditor.addStep)}
-                        >
-                            <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
-                        </IconLinkButton>
-                        <IconLinkButton
-                            on:click={() => handleInsertComment(index)}
-                            title={uiContext.str(stringResKeys.testCaseEditor.addComment)}
-                        >
-                            <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
-                        </IconLinkButton>
-                        <IconLinkButton
-                            on:click={() => handleDeleteClick(index)}
-                            title={uiContext.str(stringResKeys.general.delete)}
-                        >
-                            <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
-                        </IconLinkButton>
-                        {#if index > 0}
-                            <IconLinkButton
-                                on:click={() => handleMoveUpClick(index)}
-                                title={uiContext.str(stringResKeys.general.moveUp)}
-                            >
-                                <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>
-                            </IconLinkButton>
+                                <IconLinkButton
+                                    on:click={() => handleShowRoutinePickerDialog(item, index)}
+                                    title="Select routine"
+                                >
+                                    <svelte:fragment slot="icon"
+                                        ><ListIcon class="h-5 w-5" strokeColor="var(--color-brand)" /></svelte:fragment
+                                    >
+                                </IconLinkButton>
+                            </div>
+                        {:else}
+                            <TextField
+                                name={`${formContext.formName}_${index}_data`}
+                                value={item.data}
+                                on:input={(event) => handleItemChange(index, ITEM_KEY_DATA, event.detail.value)}
+                            />
                         {/if}
-                        {#if index < $listData.items.length - 1}
-                            <IconLinkButton
-                                on:click={() => handleMoveDownClick(index)}
-                                title={uiContext.str(stringResKeys.general.moveDown)}
-                            >
-                                <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>
-                            </IconLinkButton>
-                        {/if}
-                    </ListTableBodyCell>
-                </ListTableBodyRow>
-            {/each}
-        </svelte:fragment>
-    </ListTable>
+                    </DynamicCell>
+                {:else if isComment(item)}
+                    <DynamicCell colspan={gridConfig.columns.length - 1 + (gridConfig.columns.length - 2)}>
+                        <CommentTextField
+                            class=""
+                            name={`${formContext.formName}_${index}_comment`}
+                            value={item.comment}
+                            placeholder={uiContext.str(stringResKeys.testCaseEditor.comment)}
+                            on:input={(event) => handleItemChange(index, "comment", event.detail.value)}
+                        />
+                    </DynamicCell>
+                {:else}
+                    <DynamicCell isLast={true} colspan={gridConfig.columns.length - 1}>
+                        <i class="text-red">(This item cannot be shown)</i>
+                    </DynamicCell>
+                {/if}
+                <DynamicCell allowHighlight={false}>
+                    <ActionsMenu {index} buttons={buildActionMenuButtons(index)} />
+                </DynamicCell>
+            </svelte:fragment>
+        </DynamicGrid>
+    </div>
 
-    <div class="flex items-center gap-x-2">
+    <div class="flex items-center gap-x-2 flex-grow-0 py-4">
         <IconLinkButton on:click={handleAddStep}>
             <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
             <svelte:fragment slot="label">

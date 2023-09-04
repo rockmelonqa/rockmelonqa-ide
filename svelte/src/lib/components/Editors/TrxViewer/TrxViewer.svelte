@@ -1,15 +1,15 @@
 <script lang="ts">
-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import { UiParserFormatter } from '$lib/context/UiParserFormatter';
-    import TextField from '$lib/controls/TextField.svelte';
-    import { fileSystem } from '$lib/ipc';
-    import { getContext, onMount } from 'svelte';
-    import { writable } from 'svelte/store';
-    import { combinePath } from '../../FileExplorer/Node';
-    import { toTitle } from '../Editor';
-    import OutcomeCounter from './OutcomeCounter.svelte';
-    import TestOutcomeIcon from './TestOutcomeIcon.svelte';
-    import TestSuite from './TestSuite.svelte';
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import { UiParserFormatter } from "$lib/context/UiParserFormatter";
+    import TextField from "$lib/controls/TextField.svelte";
+    import { fileSystem } from "$lib/ipc";
+    import { getContext, onMount } from "svelte";
+    import { writable } from "svelte/store";
+    import { combinePath } from "../../FileExplorer/Node";
+    import { toTitle } from "../Editor";
+    import OutcomeCounter from "./OutcomeCounter.svelte";
+    import TestOutcomeIcon from "./TestOutcomeIcon.svelte";
+    import TestSuite from "./TestSuite.svelte";
     import {
         formatDuration,
         parseTestRun,
@@ -18,7 +18,7 @@
         type ITestResult,
         type ITestRun,
         type ITrxViewerModel,
-    } from './trxViewer';
+    } from "./trxViewer";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const uiParserFormatter = new UiParserFormatter(uiContext);
@@ -33,10 +33,10 @@
     let totalTests: number = 0;
     let totalPassedTests: number = 0;
     let totalFailedTests: number = 0;
-    let startTime: string = '';
+    let startTime: string = "";
     let totalDuration: number = 0; // in second
 
-    let keyword: string = '';
+    let keyword: string = "";
     let selectedOutcome: TestOutcome = TestOutcome.Unknown;
 
     onMount(async () => {
@@ -64,7 +64,7 @@
     };
 
     const onKeyUp = (e: KeyboardEvent) => {
-        if (e.key === 'Enter') {
+        if (e.key === "Enter") {
             doFilter();
         }
     };
@@ -97,7 +97,7 @@
 </script>
 
 {#if $viewModel}
-    <div class="trx-viewer p-8 flex flex-col">
+    <div class="flex-1 trx-viewer p-8 flex flex-col">
         <div class="filter-container flex items-center">
             <div class="grow mr-16">
                 <TextField

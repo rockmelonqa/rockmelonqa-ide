@@ -168,10 +168,24 @@ hr {
 
 .dropdown-field-root.inline-fancy .dropdown-field-select-container {
     border-bottom: 1px solid var(--color-input-border);
+    position: relative;
 }
 
 .dropdown-field-root.inline-fancy .dropdown-field-select-container:focus-within {
     border-bottom: 2px solid rgb(99 102 241); /* border-indigo-500 */
+}
+
+/* Add a invisible 1px line at the bottom, 
+and hide it when the select is focused 
+so that the select doesn't cause the height to increase */
+.dropdown-field-root.inline-fancy .dropdown-field-select-container::after {
+    display: block;
+    content: " ";
+    height: 1px;
+}
+
+.dropdown-field-root.inline-fancy .dropdown-field-select-container:focus-within::after {
+    display: none;
 }
 
 .dropdown-field-root.inline-fancy .svelte-select {

@@ -117,6 +117,7 @@ export interface IFileExplorerStringRes {
 
 export interface IGeneralStringRes {
     add: string;
+    addComment: string;
     and: string;
     cancel: string;
     close: string;

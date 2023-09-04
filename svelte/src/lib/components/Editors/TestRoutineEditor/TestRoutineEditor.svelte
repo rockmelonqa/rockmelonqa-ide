@@ -110,6 +110,7 @@
 
     type tabButton = "btnDataSets" | "btnSteps";
     let activeBtn: tabButton = "btnSteps";
+    let loadedDataSets = false;
 
     onMount(async () => {
         // default/empty data
@@ -153,6 +154,7 @@
 
         const dataSets = serializer.deserializeList(model.dataSets, listDataSetDef.fields);
         listDataSetDispatch({ type: ListDataActionType.SetItems, items: dataSets, hasMoreItems: false });
+        loadedDataSets = true;
 
         registerOnSaveHandler(contentIndex, doSave);
 
@@ -250,9 +252,9 @@
     };
 </script>
 
-<div class="test-routine-editor p-8">
-    <div class="font-semibold text-xl mb-4">{title}</div>
-    <Form {formContext}>
+<div class="flex-1 test-routine-editor p-8 pb-0 flex flex-col">
+    <div class="font-semibold text-xl mb-4 flex-grow-0">{title}</div>
+    <Form {formContext} class="flex-grow-0">
         <FormGroup columns={1}>
             <FormGroupColumn>
                 <FormTextField
@@ -266,7 +268,7 @@
         </FormGroup>
     </Form>
 
-    <div class="mb-8 flex">
+    <div class="mb-8 flex flex-grow-0">
         <button
             class={`tab-switcher px-6 py-4 ${activeBtn === "btnSteps" ? "active" : ""}`}
             on:click={() => (activeBtn = "btnSteps")}
@@ -284,13 +286,15 @@
     {#if activeBtn === "btnDataSets"}
         <TestRoutineDataSet {formContext} {listDataSetContext} on:change={handleDataSetChange} on:save={handleSave} />
     {:else if activeBtn === "btnSteps"}
-        <TestRoutineSteps
-            {formContext}
-            {listStepContext}
-            dataSetItems={$listDataSet.items}
-            on:change={dispatchChange}
-            on:save={handleSave}
-        />
+        {#if loadedDataSets}
+            <TestRoutineSteps
+                {formContext}
+                {listStepContext}
+                dataSetItems={$listDataSet.items}
+                on:change={dispatchChange}
+                on:save={handleSave}
+            />
+        {/if}
     {/if}
 </div>
 

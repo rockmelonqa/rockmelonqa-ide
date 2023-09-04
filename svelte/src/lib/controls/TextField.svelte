@@ -15,15 +15,15 @@
     export let type = "text";
     export let readonly: boolean = false;
     export let disabled: boolean = false;
-    export let errorMessage: string = '';
+    export let errorMessage: string = "";
     export let focus: boolean = false;
-    export let title: string = '';
-    export let prefixPadding = '';
-    export let suffixPadding = '';
+    export let title: string = "";
+    export let prefixPadding = "";
+    export let suffixPadding = "";
     export let isRightAligned = false;
 
     export { cssClass as class };
-    let cssClass = '';
+    let cssClass = "";
 
     $: displayLabel = label.length > 0;
 
@@ -46,12 +46,13 @@
     let labelId = `${name}_label`;
     let inputId = `${name}_input`;
 
-    $: inputCssClass = `${thisTheme?.input} ${thisTheme.inputValid} h-10 focus-visible:outline-0 ${cssClass}`.trim();
+    $: inputCssClass =
+        `!focus:text-white block w-full text-base px-4 border-0 focus:ring-0 ${thisTheme.inputValid} h-10 ${cssClass} !bg-transparent`.trim();
 
     $: inputStyle = (
-        `${prefixPadding ? 'padding-left: ' + prefixPadding + '; ' : ' '}` +
-        `${suffixPadding ? 'padding-right: ' + suffixPadding + '; ' : ' '}` +
-        `${isRightAligned ? 'text-align: right; ' : ' '}`
+        `${prefixPadding ? "padding-left: " + prefixPadding + "; " : " "}` +
+        `${suffixPadding ? "padding-right: " + suffixPadding + "; " : " "}` +
+        `${isRightAligned ? "text-align: right; " : " "}`
     ).trim();
     //*****************************************
     // Events
@@ -69,7 +70,7 @@
     };
 </script>
 
-<div id={rootId} class="text-field-root {thisTheme.root}">
+<div id={rootId} class="text-field-root {thisTheme.root} mt-0">
     {#if displayLabel}
         <label id={labelId} for={name} class="text-field-label {thisTheme?.label}">{label}</label>
     {/if}
