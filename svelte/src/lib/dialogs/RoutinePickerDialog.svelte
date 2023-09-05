@@ -134,7 +134,6 @@
                         on:change={handleSelectRoutine}
                         label={uiContext.str(stringResKeys.routinePickerDialog.routine)}
                         errorMessage={isSubmitted ? routineErrorMessage : ""}
-                        hasBorderBottom={true}
                     />
                     <FancyDropdownField
                         name="routinePickerDialog_mode"
@@ -142,7 +141,6 @@
                         options={modeOptions}
                         on:change={handleSelectMode}
                         label={uiContext.str(stringResKeys.routinePickerDialog.mode)}
-                        hasBorderBottom={true}
                     />
                     {#if mode === "select"}
                         <div>
