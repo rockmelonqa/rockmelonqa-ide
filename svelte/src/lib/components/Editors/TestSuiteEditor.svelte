@@ -31,11 +31,6 @@
     import { appActionContextKey, type IAppActionContext } from "../Application";
     import { combinePath } from "../FileExplorer/Node";
     import IconLinkButton from "../IconLinkButton.svelte";
-    import { ListTableCellType } from "../ListTable";
-    import ListTable from "../ListTable.svelte";
-    import ListTableBodyCell from "../ListTableBodyCell.svelte";
-    import ListTableBodyRow from "../ListTableBodyRow.svelte";
-    import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
     import { toTitle } from "./Editor";
     import type { ButtonOptions, GridConfig } from "./DynamicGrid/DynamicGrid";
@@ -246,17 +241,17 @@
         gridType: "TestCaseItems",
         columns: [
             {
-                defaultSizePercentage: 80,
+                size: 80,
                 title: uiContext.str(stringResKeys.testSuiteEditor.testCase),
             },
             {
-                defaultSizePercentage: 20,
+                size: 20,
                 title: uiContext.str(stringResKeys.testCaseEditor.actions),
             },
         ],
     };
 
-    const buildActionMenuButtons = (index: number): ButtonOptions[] => {
+    const getActionButtons = (index: number): ButtonOptions[] => {
         return [
             {
                 label: uiContext.str(stringResKeys.general.delete),
@@ -297,7 +292,7 @@
     </Form>
 
     <div class="flex-1 min-h-0 flex flex-col pb-0">
-        <DynamicGrid config={gridConfig} items={$listData.items} class="h-full flex flex-col">
+        <DynamicGrid config={gridConfig} items={$listData.items}>
             <svelte:fragment slot="item" let:item let:index>
                 <DynamicCell>
                     <FancyDropdownField
@@ -308,7 +303,7 @@
                     />
                 </DynamicCell>
                 <DynamicCell allowHighlight={false}>
-                    <ActionsMenu {index} buttons={buildActionMenuButtons(index)} />
+                    <ActionsMenu {index} buttons={getActionButtons(index)} />
                 </DynamicCell>
             </svelte:fragment>
         </DynamicGrid>

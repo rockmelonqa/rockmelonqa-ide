@@ -3,25 +3,30 @@
 
     import Spinner from "$lib/components/Spinner.svelte";
 
-    import { afterUpdate, onMount } from "svelte";
+    import { afterUpdate, onDestroy, onMount } from "svelte";
     import { DynamicGridSizeCache, type GridConfig } from "./DynamicGrid";
     import Split from "split.js";
 
-    type ItemType = $$Generic;
+    
     export let config: GridConfig;
+
+    type ItemType = $$Generic;
     export let items: ItemType[];
+    
     /** If processing, we will show a spinner */
     export let isProcessing = true;
     /** Text to show on the spinner if isProcessing is true */
     export let processingText = "Loading";
+
     export { cssClass as class };
     let cssClass = "";
 
     let cols: HTMLElement[] = [];
     let columnSizes: string[] = [];
-    let gridRowStyle: string;
+
     let gridBody: HTMLElement;
     let gridBodyOverflowY: boolean = false;
+    let gridRowStyle: string;
     let gutterSizePx = 3;
 
     const checkOverflowBody = () => {
@@ -36,24 +41,23 @@
     };
 
     onMount(() => {
-        let cachedSizes = DynamicGridSizeCache.getByCollectionType(config.gridType);
-        let sizes = cachedSizes;
-        if (!sizes || config.columns.length !== cachedSizes?.length) {
-            sizes = config.columns.map((c) => c.defaultSizePercentage);
+        let sizes = DynamicGridSizeCache.get(config.gridType) ?? [];
+        if (config.columns.length !== sizes.length) {
+            sizes = config.columns.map((c) => c.size);
         }
+        
         const colsSplitInstance = Split(cols, {
             gutterSize: gutterSizePx,
             sizes,
             gutter: (index, direction) => {
                 const gutter = document.createElement("div");
-                gutter.className = `gutter relative opacity-1 bg-gray-200 after:bg-gray-400 after:absolute after:top-0 after:h-full after:w-[1px] after:left-[1px] hover:cursor-col-resize hover:opacity-1/2 gutter-${direction}`;
-                gutter.style.width = "5px";
+                gutter.className = `gutter relative opacity-1 bg-neutral-200 after:bg-neutral-300 after:absolute after:top-0 after:h-full after:w-[1px] after:left-[1px] hover:cursor-col-resize hover:opacity-1/2 gutter-${direction}`;
                 gutter.setAttribute("data-index", String(index));
                 return gutter;
             },
             onDrag(sizes) {
                 setSizes(sizes);
-                DynamicGridSizeCache.setByCollectionType(config.gridType, sizes);
+                DynamicGridSizeCache.set(config.gridType, sizes);
                 checkOverflowBody();
             },
             elementStyle: function (dimension, size, gutterSize) {
@@ -62,33 +66,37 @@
         });
 
         let actualSizes = colsSplitInstance.getSizes();
-
         setSizes(actualSizes);
 
-        window.addEventListener("resize", () => {
-            checkOverflowBody();
-        });
+        window.addEventListener("resize", onResize);
+        
         isProcessing = false;
     });
 
-    afterUpdate(() => {
+    const onResize = () => {
         checkOverflowBody();
+    }
+
+    afterUpdate(onResize);
+
+    onDestroy(() => {
+        window?.removeEventListener("resize", onResize);
     });
 </script>
 
 <div
     data-role="table-container"
     {...$$restProps}
-    class="overflow-x-auto {cssClass} flex flex-col"
+    class="overflow-x-auto h-full flex flex-col {cssClass}"
     data-gridBodyOverflowY={gridBodyOverflowY}
 >
     <div
         data-role="header-row"
         style={gridRowStyle}
-        class="grid bg-gray-200 border-x border-gray-200 {gridBodyOverflowY ? 'pr-4' : ''}"
+        class="dynamic-grid-header grid bg-neutral-200 border-x border-t {gridBodyOverflowY ? 'pr-4' : ''}"
     >
         {#each config.columns as column, i}
-            <div bind:this={cols[i]} data-role="header-col" class="text-gray-800 bg-gray-200 py-4 pl-4 pr-3">
+            <div bind:this={cols[i]} data-role="header-col" class="font-semibold p-4">
                 {column.title}
             </div>
         {/each}
@@ -96,7 +104,7 @@
 
     <div
         data-role="body"
-        class="h-full overflow-y-auto overflow-x-visible dynamic-grid-body shadow-sm"
+        class="dynamic-grid-body h-full overflow-y-auto overflow-x-visible shadow-sm"
         bind:this={gridBody}
     >
         {#if isProcessing}
@@ -123,6 +131,10 @@
         transition: background-color 0.7s;
     }
 
+    .dynamic-grid-header {
+        border-color: var(--color-panel-border);
+    }
+
     .dynamic-grid-body::-webkit-scrollbar {
         width: 1em;
         overflow-y: overlay;
@@ -137,13 +149,6 @@
     }
 
     .dynamic-grid-body::-webkit-scrollbar-thumb {
-        background-color: darkgrey;
-        outline: 1px solid rgb(208, 208, 208);
-    }
-
-    :global(.my-test) {
-        position: absolute;
-        width: 100%;
-        left: 0;
+        background-color: rgb(212 212 216);; /* bg-zinc-300 */
     }
 </style>

@@ -47,7 +47,7 @@
     let inputId = `${name}_input`;
 
     $: inputCssClass =
-        `!focus:text-white block w-full text-base px-4 border-0 focus:ring-0 ${thisTheme.inputValid} h-10 ${cssClass} !bg-transparent`.trim();
+        `block w-full border-0 focus:ring-0 ${thisTheme.inputValid} h-10 ${cssClass} !bg-transparent !focus:text-white`.trim();
 
     $: inputStyle = (
         `${prefixPadding ? "padding-left: " + prefixPadding + "; " : " "}` +
@@ -70,7 +70,7 @@
     };
 </script>
 
-<div id={rootId} class="text-field-root {thisTheme.root} mt-0">
+<div id={rootId} class="text-field-root {thisTheme.root}">
     {#if displayLabel}
         <label id={labelId} for={name} class="text-field-label {thisTheme?.label}">{label}</label>
     {/if}

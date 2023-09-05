@@ -2,11 +2,6 @@
     import { AlertDialogButtons, AlertDialogType } from "$lib/components/Alert";
     import AlertDialog from "$lib/components/AlertDialog.svelte";
     import IconLinkButton from "$lib/components/IconLinkButton.svelte";
-    import { ListTableCellType } from "$lib/components/ListTable";
-    import ListTable from "$lib/components/ListTable.svelte";
-    import ListTableBodyCell from "$lib/components/ListTableBodyCell.svelte";
-    import ListTableBodyRow from "$lib/components/ListTableBodyRow.svelte";
-    import ListTableHeaderCell from "$lib/components/ListTableHeaderCell.svelte";
     import PrimaryButton from "$lib/components/PrimaryButton.svelte";
     import { appContextKey, type IAppContext } from "$lib/context/AppContext";
     import { stringResKeys } from "$lib/context/StringResKeys";
@@ -32,7 +27,7 @@
     import CommentTextField from "$lib/components/CommentTextField.svelte";
     import { removeFileExtension } from "$lib/utils/utils";
     import type { IRoutineStep } from "rockmelonqa.common/file-defs";
-    import type { ButtonOptions, ColumnOptions, GridConfig } from "../DynamicGrid/DynamicGrid";
+    import { calCommentColSpan, type ButtonOptions, type ColumnOptions, type GridConfig } from "../DynamicGrid/DynamicGrid";
     import DynamicGrid from "../DynamicGrid/DynamicGrid.svelte";
     import DynamicCell from "../DynamicGrid/DynamicCell.svelte";
     import { _ } from "svelte-i18n";
@@ -261,30 +256,30 @@
     $: {
         let columns: ColumnOptions[] = [
             {
-                defaultSizePercentage: 20,
+                size: 20,
                 title: uiContext.str(stringResKeys.testRoutineEditor.action),
             },
             {
-                defaultSizePercentage: 20,
+                size: 20,
                 title: uiContext.str(stringResKeys.testRoutineEditor.page),
             },
             {
-                defaultSizePercentage: dataSetItems.length ? 15 : 45,
+                size: dataSetItems.length ? 15 : 45,
                 title: uiContext.str(stringResKeys.testRoutineEditor.element),
             },
         ];
 
-        let remainingPercentage = 85 - lodash.sumBy(columns, (c) => c.defaultSizePercentage);
+        let remainingPercentage = 85 - lodash.sumBy(columns, (c) => c.size);
         let splitPortions = spreadInteger(remainingPercentage, dataSetItems.length);
 
         for (let [index, item] of dataSetItems.entries()) {
             columns.push({
-                defaultSizePercentage: splitPortions[index],
+                size: splitPortions[index],
                 title: item.name,
             });
         }
         columns.push({
-            defaultSizePercentage: 15,
+            size: 15,
             title: uiContext.str(stringResKeys.testRoutineEditor.actions),
         });
 
@@ -294,7 +289,7 @@
         };
     }
 
-    const buildActionMenuButtons = (index: number): ButtonOptions[] => {
+    const getActionButtons = (index: number): ButtonOptions[] => {
         return [
             {
                 label: uiContext.str(stringResKeys.general.add),
@@ -332,10 +327,10 @@
 
 {#if gridConfig}
     <div class="flex-1 overflow-x-auto min-h-0">
-        <DynamicGrid config={gridConfig} items={$listStep.items} class="h-full">
+        <DynamicGrid config={gridConfig} items={$listStep.items}>
             <svelte:fragment slot="item" let:item let:index>
                 {#if isComment(item)}
-                    <DynamicCell colspan={gridConfig.columns.length * 2 - 3}>
+                    <DynamicCell colspan={calCommentColSpan(gridConfig.columns.length)}>
                         <CommentTextField
                             class="!bg-transparent"
                             name={`${formName}_${index}_comment`}
@@ -385,7 +380,7 @@
                 {/if}
 
                 <DynamicCell allowHighlight={false}>
-                    <ActionsMenu {index} buttons={buildActionMenuButtons(index)} />
+                    <ActionsMenu {index} buttons={getActionButtons(index)} />
                 </DynamicCell>
             </svelte:fragment>
         </DynamicGrid>

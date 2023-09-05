@@ -1,7 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    export let isLast: boolean = false;
     export let colspan: number = 1;
     export let allowHighlight = true;
 
@@ -37,16 +36,17 @@
     {/if}
     <slot />
 </div>
-{#if !isLast}
-    <div data-role="cell-gutter" class="flex items-center justify-center border-gray-300 border-b">
-        <div class="border-l border-gray-300 h-full" />
-    </div>
-{/if}
+
+<div data-role="cell-gutter" class="flex items-center justify-center  border-b">
+    <div class="border-l h-full" />
+</div>
+
 
 <style>
     :global([data-role="cell"]:first-child [data-role="background"]) {
         left: 0;
     }
+
     :global([data-role="cell"].focused .dropdown-field-root .value-container) {
         color: white;
     }
@@ -59,5 +59,9 @@
     }
     :global([data-role="cell-gutter"]:last-child) {
         display: none;
+    }
+
+    div[data-role="cell-gutter"], div[data-role="cell-gutter"] > div {
+        border-color: var(--color-panel-border);
     }
 </style>

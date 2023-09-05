@@ -18,6 +18,7 @@
     export let label: string = "";
     export let errorMessage: string = "";
     export let hasBorderBottom: boolean = false;
+    
     let floatingConfig = {
         strategy: "absolute",
     };
@@ -36,7 +37,7 @@
 
     // Best we can do is put a name on the container and then we overrride in app.css
     $: selectCss = "h-full !bg-transparent";
-    $: containerCss = `mt-0 relative h-full ${hasBorderBottom ? "" : "!border-b-0"}`;
+    $: containerCss = `relative h-full ${hasBorderBottom ? "" : "!border-b-0"}`;
 
     let rootId = `${name}_root`;
     let labelId = `${name}_label`;

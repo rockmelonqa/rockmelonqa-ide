@@ -184,21 +184,21 @@
         gridType: "TestRoutineDataSet",
         columns: [
             {
-                defaultSizePercentage: 30,
+                size: 30,
                 title: uiContext.str(stringResKeys.testRoutineEditor.name),
             },
             {
-                defaultSizePercentage: 55,
+                size: 55,
                 title: uiContext.str(stringResKeys.testRoutineEditor.description),
             },
             {
-                defaultSizePercentage: 15,
+                size: 15,
                 title: uiContext.str(stringResKeys.testRoutineEditor.actions),
             },
         ],
     };
 
-    const buildActionMenuButtons = (dataSetItem: IDictionary, index: number): ButtonOptions[] => {
+    const getActionButtons = (dataSetItem: IDictionary, index: number): ButtonOptions[] => {
         return [
             {
                 label: uiContext.str(stringResKeys.general.add),
@@ -229,7 +229,7 @@
 </script>
 
 <div class="flex-1 overflow-x-auto min-h-0">
-    <DynamicGrid config={gridConfig} items={$listDataSet.items} class="h-full flex flex-col">
+    <DynamicGrid config={gridConfig} items={$listDataSet.items}>
         <svelte:fragment slot="item" let:item let:index>
             <DynamicCell>
                 <TextField
@@ -249,7 +249,7 @@
                 />
             </DynamicCell>
             <DynamicCell allowHighlight={false}>
-                <ActionsMenu {index} buttons={buildActionMenuButtons(item, index)} />
+                <ActionsMenu {index} buttons={getActionButtons(item, index)} />
             </DynamicCell>
         </svelte:fragment>
     </DynamicGrid>

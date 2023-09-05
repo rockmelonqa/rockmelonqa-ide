@@ -33,8 +33,9 @@
     let inputId = `${name}_input`;
     let isFocus = false;
 
-    $: inputCssClass = `!bg-transparent focus:text-white text-green-500 text-base px-4  
-        border-0 focus:ring-0 focus:border-indigo-500 grow ${cssClass}`.trim();
+    $: inputCssClass = `text-green-500 text-base px-4  
+        border-0 focus:ring-0 focus:border-indigo-500 grow ${cssClass}
+        !bg-transparent focus:text-white`.trim();
 
     //*****************************************
     // Events
