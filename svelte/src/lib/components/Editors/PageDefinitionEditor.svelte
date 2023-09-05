@@ -437,7 +437,7 @@
                         />
                     </DynamicCell>
                 {:else if item.type === "comment"}
-                    <DynamicCell colspan={gridConfig.columns.length - 1}>
+                    <DynamicCell colspan={gridConfig.columns.length * 2 - 3}>
                         <CommentTextField
                             class="py-2 px-3 h-auto"
                             name={`${formContext.formName}_${index}_comment`}
