@@ -47,7 +47,7 @@
     let inputId = `${name}_input`;
 
     $: inputCssClass =
-        `block w-full border-0 focus:ring-0 ${thisTheme.inputValid} h-10 ${cssClass} !bg-transparent !focus:text-white`.trim();
+        `text-field-input block w-full border-0 focus:ring-0 ${thisTheme.inputValid} h-10 ${cssClass}`.trim();
 
     $: inputStyle = (
         `${prefixPadding ? "padding-left: " + prefixPadding + "; " : " "}` +

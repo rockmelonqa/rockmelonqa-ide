@@ -332,7 +332,6 @@
                 {#if isComment(item)}
                     <DynamicCell colspan={calCommentColSpan(gridConfig.columns.length)}>
                         <CommentTextField
-                            class="!bg-transparent"
                             name={`${formName}_${index}_comment`}
                             value={item.comment}
                             placeholder={uiContext.str(stringResKeys.testRoutineEditor.comment)}
