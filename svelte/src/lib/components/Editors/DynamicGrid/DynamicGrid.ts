@@ -1,62 +1,55 @@
+import { LocalCache } from "$lib/utils/LocalCache";
 import type { ComponentType, SvelteComponentTyped } from "svelte";
 
 /** Grid config */
 export type GridConfig = {
-    /** Type of collection that the grid is being used to render */
+    /** Grid type / name to be rendered */
     gridType: string;
-    /** Collection of column options */
+
+    /** Column options */
     columns: ColumnOptions[];
 };
 
 /** Column options */
 export type ColumnOptions = {
     /** Size of the column in percentage */
-    defaultSizePercentage: number;
+    size: number;
+
     /** Title of the column */
     title: string;
 };
 
 export type ButtonOptions = {
     label: string;
+    
     icon: ComponentType<SvelteComponentTyped>;
+
+    /** index: list data row index */
     action: (index: number) => void;
+
     visible: boolean;
 };
 
-type CacheSizeMap = Map<string, number[]>;
-
 export const DynamicGridSizeCache = {
-    getByCollectionType(collectionType: string): number[] | undefined {
-        if (localStorage.DynamicGridSizeCache) {
-            const cache = this.readLocalStorage();
-            if (cache.has(collectionType)) {
-                return cache.get(collectionType);
-            }
-            return undefined;
-        }
-        return undefined;
+    get(gridType: string): number[] | undefined {
+        const key = cacheKey.replace("{name}", gridType);
+        return (LocalCache.get(key) as number[] || undefined);
     },
 
-    setByCollectionType(collectionType: string, sizes: number[]): void {
-        if (localStorage.DynamicGridSizeCache) {
-            const cache = this.readLocalStorage();
-            cache.set(collectionType, sizes);
-            this.writeLocalStorage(cache);
-            return;
-        }
-
-        const cache = new Map<string, number[]>();
-        cache.set(collectionType, sizes);
-        this.writeLocalStorage(cache);
-        return;
-    },
-
-    readLocalStorage() {
-        const obj = JSON.parse(localStorage.DynamicGridSizeCache);
-        return new Map(Object.entries(obj)) as Map<string, number[]>;
-    },
-    writeLocalStorage(map: CacheSizeMap) {
-        const obj = Object.fromEntries(map);
-        localStorage.DynamicGridSizeCache = JSON.stringify(obj);
+    set(gridType: string, sizes: number[]): void {
+        const key = cacheKey.replace("{name}", gridType);
+        LocalCache.set(key, sizes, Number.MAX_SAFE_INTEGER);
     },
 };
+const cacheKey = "dynamic-grid-{name}-size";
+
+export const calCommentColSpan = (numOfColumns: number): number => {
+    // *2: columns and their gutter
+
+    // -3:
+    // - one is its own gutter
+    // - action column
+    // - action column's gutter
+
+    return numOfColumns * 2 - 3;
+}

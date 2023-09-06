@@ -1,7 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    export let isLast: boolean = false;
     export let colspan: number = 1;
     export let allowHighlight = true;
 
@@ -25,39 +24,58 @@
 <div
     bind:this={element}
     data-role="cell"
-    class="relative bg-transparent border-b text-base {`col-span-${colspan}`} px-[2px] {focused
-        ? ' focused !text-white'
-        : ''}"
+    class="dynamic-grid-cell relative border-b text-base {`col-span-${colspan}`} px-[2px] {focused ? ' focused' : ''}"
 >
     {#if allowHighlight}
         <div
             data-role="background"
-            class="absolute top-0 bottom-0 left-[-2px] right-[-2px] bg-transparent {focused ? ' !bg-blue-400 ' : ''}"
+            class="absolute top-0 bottom-0 left-[-2px] right-[-2px] {focused ? ' !bg-blue-400 ' : ''}"
         />
     {/if}
     <slot />
 </div>
-{#if !isLast}
-    <div data-role="cell-gutter" class="flex items-center justify-center border-gray-300 border-b">
-        <div class="border-l border-gray-300 h-full" />
-    </div>
-{/if}
+
+<div data-role="cell-gutter" class="dynamic-grid-cell-gutter flex items-center justify-center border-b">
+    <div class="border-l h-full" />
+</div>
 
 <style>
-    :global([data-role="cell"]:first-child [data-role="background"]) {
+    .dynamic-grid-cell:first-child [data-role="background"] {
         left: 0;
     }
-    :global([data-role="cell"].focused .dropdown-field-root .value-container) {
-        color: white;
+
+    :global(
+    .dynamic-grid-cell .text-field-input, 
+    .dynamic-grid-cell .dropdown-field-root .svelte-select) {
+        background-color: transparent !important;
     }
 
-    :global([data-role="cell"].focused .dropdown-field-root .value-container input::placeholder) {
+    :global(
+    .dynamic-grid-cell.focused .text-field-input,
+    .dynamic-grid-cell.focused .dropdown-field-root .svelte-select) {
+        color: white !important;
+    }
+
+    :global(.dynamic-grid-cell .dropdown-field-root .dropdown-field-select-container) {
+        position: relative;
+        height: 100%;
+        border-bottom-width: 0 !important;
+    }
+
+    :global(.dynamic-grid-cell.focused .dropdown-field-root .svelte-select input::placeholder) {
         color: lightgray;
     }
-    :global([data-role="cell"].focused .dropdown-field-root .svelte-select-list) {
-        color: grey;
+
+    :global(.dynamic-grid-cell.focused .dropdown-field-root .svelte-select-list) {
+        color: var(--color-secondary--extra-dark);
     }
-    :global([data-role="cell-gutter"]:last-child) {
+
+    .dynamic-grid-cell-gutter,
+    .dynamic-grid-cell-gutter > div {
+        border-color: var(--color-panel-border);
+    }
+
+    .dynamic-grid-cell-gutter:last-child {
         display: none;
     }
 </style>

@@ -37,11 +37,6 @@
     import CommentTextField from "../CommentTextField.svelte";
     import { combinePath } from "../FileExplorer/Node";
     import IconLinkButton from "../IconLinkButton.svelte";
-    import { ListTableCellType } from "../ListTable";
-    import ListTable from "../ListTable.svelte";
-    import ListTableBodyCell from "../ListTableBodyCell.svelte";
-    import ListTableBodyRow from "../ListTableBodyRow.svelte";
-    import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
     import { toTitle, isPagelessAction } from "./Editor";
     import type { ITestStepComment } from "rockmelonqa.common/file-defs/shared";
@@ -50,7 +45,7 @@
     import RoutinePickerDialog from "$lib/dialogs/RoutinePickerDialog.svelte";
     import DynamicCell from "./DynamicGrid/DynamicCell.svelte";
     import DynamicGrid from "./DynamicGrid/DynamicGrid.svelte";
-    import type { ButtonOptions, GridConfig } from "./DynamicGrid/DynamicGrid";
+    import { calCommentColSpan, type ButtonOptions, type GridConfig } from "./DynamicGrid/DynamicGrid";
     import ActionsMenu from "./DynamicGrid/ActionsMenu.svelte";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
@@ -435,29 +430,29 @@
         gridType: "TestCaseItems",
         columns: [
             {
-                defaultSizePercentage: 20,
+                size: 20,
                 title: uiContext.str(stringResKeys.testCaseEditor.action),
             },
             {
-                defaultSizePercentage: 20,
+                size: 20,
                 title: uiContext.str(stringResKeys.testCaseEditor.page),
             },
             {
-                defaultSizePercentage: 20,
+                size: 20,
                 title: uiContext.str(stringResKeys.testCaseEditor.element),
             },
             {
-                defaultSizePercentage: 25,
+                size: 25,
                 title: uiContext.str(stringResKeys.testCaseEditor.data),
             },
             {
-                defaultSizePercentage: 15,
+                size: 15,
                 title: uiContext.str(stringResKeys.testCaseEditor.actions),
             },
         ],
     };
 
-    const buildActionMenuButtons = (index: number): ButtonOptions[] => {
+    const getActionButtons = (index: number): ButtonOptions[] => {
         return [
             {
                 label: uiContext.str(stringResKeys.general.add),
@@ -510,7 +505,7 @@
     </Form>
 
     <div class="flex-1 min-h-0">
-        <DynamicGrid config={gridConfig} items={$listData.items} class="h-full flex flex-col">
+        <DynamicGrid config={gridConfig} items={$listData.items}>
             <svelte:fragment slot="item" let:item let:index>
                 {#if isTestStep(item)}
                     <DynamicCell>
@@ -570,7 +565,7 @@
                         {/if}
                     </DynamicCell>
                 {:else if isComment(item)}
-                    <DynamicCell colspan={gridConfig.columns.length - 1 + (gridConfig.columns.length - 2)}>
+                    <DynamicCell colspan={calCommentColSpan(gridConfig.columns.length)}>
                         <CommentTextField
                             class=""
                             name={`${formContext.formName}_${index}_comment`}
@@ -579,13 +574,9 @@
                             on:input={(event) => handleItemChange(index, "comment", event.detail.value)}
                         />
                     </DynamicCell>
-                {:else}
-                    <DynamicCell isLast={true} colspan={gridConfig.columns.length - 1}>
-                        <i class="text-red">(This item cannot be shown)</i>
-                    </DynamicCell>
                 {/if}
                 <DynamicCell allowHighlight={false}>
-                    <ActionsMenu {index} buttons={buildActionMenuButtons(index)} />
+                    <ActionsMenu {index} buttons={getActionButtons(index)} />
                 </DynamicCell>
             </svelte:fragment>
         </DynamicGrid>

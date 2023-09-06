@@ -18,6 +18,7 @@
     export let label: string = "";
     export let errorMessage: string = "";
     export let hasBorderBottom: boolean = false;
+    
     let floatingConfig = {
         strategy: "absolute",
     };
@@ -35,8 +36,8 @@
     $: selectedItem = options?.find((opt) => opt.key === value);
 
     // Best we can do is put a name on the container and then we overrride in app.css
-    $: selectCss = "h-full !bg-transparent";
-    $: containerCss = `mt-0 relative h-full ${hasBorderBottom ? "" : "!border-b-0"}`;
+    $: selectCss = "";
+    $: containerCss = dropdownTheme?.dropdownContainer;
 
     let rootId = `${name}_root`;
     let labelId = `${name}_label`;

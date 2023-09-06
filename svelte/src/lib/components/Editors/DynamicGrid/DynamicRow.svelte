@@ -24,8 +24,19 @@
 <div
     bind:this={element}
     data-role="row"
-    class="grid relative overflow-x-visible border-x border-gray-300 {focused ? ' !bg-blue-100' : ''}"
+    class="dynamic-grid-row grid relative overflow-x-visible border-x {focused ? ' focused' : ''}"
     style={gridRowStyle}
 >
     <slot />
 </div>
+
+<style>
+    .dynamic-grid-row {
+        border-color: var(--color-panel-border);
+    }
+
+    .dynamic-grid-row.focused {
+        /* Same as `.treeview-item-selected.treeview-item-root` in app.css */
+        background-color: var(--f7-treeview-selectable-selected-bg-color, rgba(var(--f7-theme-color-rgb), 0.2)) !important;
+    }
+</style>

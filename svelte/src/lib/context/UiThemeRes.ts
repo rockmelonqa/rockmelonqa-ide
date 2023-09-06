@@ -5,8 +5,8 @@ export type ITheme = IUiTheme;
 export const uiThemeRes: ITheme = {
     textField: {
         root: '',
-        label: 'block font-semibold text-base',
-        inputContainer: 'mt-1 relative',
+        label: 'block font-semibold text-base mb-1',
+        inputContainer: 'relative',
         input: 'text-field-input text-base px-4',
         inputValid: 'focus:ring-indigo-500 focus:border-indigo-500 block w-full border-slate-300 rounded-md',
         inputError:
@@ -23,8 +23,8 @@ export const uiThemeRes: ITheme = {
     },
     numberField: {
         root: '',
-        label: 'block font-semibold text-base',
-        inputContainer: 'mt-1 relative',
+        label: 'block font-semibold text-base mb-1',
+        inputContainer: 'relative',
         input: 'number-field-input text-base px-4',
         inputValid: 'focus:ring-indigo-500 focus:border-indigo-500 block w-full border-slate-300 rounded-md',
         inputError:
@@ -41,8 +41,8 @@ export const uiThemeRes: ITheme = {
     },
     fancyDropdownField: {
         root: 'fancy',
-        label: 'block font-semibold text-base',
-        dropdownContainer: 'mt-1',
+        label: 'block font-semibold text-base mb-1',
+        dropdownContainer: '',
         select: 'dropdown-field-select',
         selectValid: 'shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full border-slate-300 rounded-lg',
         selectError:
@@ -51,8 +51,8 @@ export const uiThemeRes: ITheme = {
     },
     nativeDropdownField: {
         root: 'native',
-        label: 'block font-semibold text-base',
-        dropdownContainer: 'mt-1',
+        label: 'block font-semibold text-base mb-1',
+        dropdownContainer: '',
         select: 'dropdown-field-select',
         selectValid: 'shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full border-slate-300 rounded-lg',
         selectError:
@@ -61,8 +61,8 @@ export const uiThemeRes: ITheme = {
     },
     inlineTextField: {
         root: '',
-        label: 'block font-semibold text-base',
-        inputContainer: 'mt-1 relative',
+        label: 'block font-semibold text-base mb-1',
+        inputContainer: 'relative',
         input: 'text-field-input block w-full text-base px-4 border-0 border-b focus:ring-0 focus:border-b-2',
         inputValid: 'border-slate-300 focus:border-indigo-500',
         inputError: 'border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:border-red-500',
@@ -76,8 +76,8 @@ export const uiThemeRes: ITheme = {
     },
     inlineFancyDropdownField: {
         root: 'inline-fancy',
-        label: 'block font-semibold text-base',
-        dropdownContainer: 'mt-1',
+        label: 'block font-semibold text-base mb-1',
+        dropdownContainer: '',
         select: 'dropdown-field-select',
         selectValid: 'shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full border-slate-300',
         selectError:
