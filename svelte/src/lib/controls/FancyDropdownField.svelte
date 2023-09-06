@@ -17,7 +17,6 @@
     export let options: IDropdownOption[];
     export let label: string = "";
     export let errorMessage: string = "";
-    export let hasBorderBottom: boolean = false;
     
     let floatingConfig = {
         strategy: "absolute",
