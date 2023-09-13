@@ -10,21 +10,15 @@
     //*****************************************
     export let name: string;
     export let value: string;
-    export let label = "";
     export let placeholder = "";
     export let readonly: boolean = false;
     export let disabled: boolean = false;
     export let errorMessage: string = "";
     export let focus: boolean = false;
     export let title: string = "";
-    export let prefixPadding = "";
-    export let suffixPadding = "";
-    export let isRightAligned = false;
 
     export { cssClass as class };
     let cssClass = "";
-
-    $: displayLabel = label.length > 0;
 
     let desiredTheme: ITextFieldTheme | undefined = undefined;
     export { desiredTheme as theme };
@@ -42,17 +36,11 @@
     let inputElement: HTMLTextAreaElement;
 
     let rootId = `${name}_root`;
-    let labelId = `${name}_label`;
     let inputId = `${name}_input`;
 
     $: inputCssClass =
         `text-field-input block w-full border-0 focus:ring-0 ${thisTheme.inputValid} h-10 ${cssClass}`.trim();
 
-    $: inputStyle = (
-        `${prefixPadding ? "padding-left: " + prefixPadding + "; " : " "}` +
-        `${suffixPadding ? "padding-right: " + suffixPadding + "; " : " "}` +
-        `${isRightAligned ? "text-align: right; " : " "}`
-    ).trim();
     //*****************************************
     // Events
     //*****************************************
@@ -71,17 +59,19 @@
 
 <div id={rootId} class="text-field-root {thisTheme.root}">
     <div class="text-field-input-container w-full relative isolate {thisTheme?.inputContainer}">
-        <input type="text" class="invisible w-full" {name} {value} {placeholder} {readonly} {disabled} />
+        <input type="text" class="invisible w-full border-0" {name} {value} {placeholder} {readonly} {disabled} />
 
-        <div class="height-holder relative isolate h-fit !bg-green-200 !text-green-800 break-words {inputCssClass}">
-            <div class="full-text ">
+        <div
+            class="outer-wrapper whitespace-nowrap py-2 px-3 absolute inset-0 isolate h-fit break-words overflow-hidden focus-within:shadow-md focus-within:shadow-blue-200 focus-within:break-all focus-within:overflow-y-auto {inputCssClass}"
+        >
+            <div class="full-text">
                 {#if value}
-                {value}
+                    {value}
                 {:else}
-                {@html "&nbsp;"}
+                    {@html "&nbsp;"}
                 {/if}
             </div>
-            <div class="wrapper">
+            <div class="absolute inset-0 h-full">
                 <textarea
                     bind:this={inputElement}
                     id={inputId}
@@ -91,8 +81,7 @@
                     {readonly}
                     {disabled}
                     title={(title || value) ?? value}
-                    class="{inputCssClass} border border-gray-300 h-full"
-                    style={inputStyle}
+                    class="{inputCssClass} border border-gray-300 h-full whitespace-nowrap overflow-hidden resize-none focus:whitespace-normal focus:text-white focus:overflow-auto"
                     {...$$restProps}
                     on:input={handleInput}
                     on:keyup
@@ -114,53 +103,17 @@
 </div>
 
 <style>
-    .text-field-root .height-holder {
-        isolation: isolate;
-        position: absolute;
-        inset: 0;
+    .outer-wrapper {
         width: calc(100% + 8px);
         transform: translateX(-4px);
-        box-shadow: 0 0 1px gray;
-        padding-top: 0.5rem;
-        padding-right: 0.75rem;
-        padding-bottom: 0.5rem;
-        padding-left: 0.75rem;
-        color: red !important;
-        height: 100%;
-        overflow-y: hidden;
-        white-space: nowrap;
-        overflow-x: hidden;
-        z-index: 10;
-        height: 100%;
     }
 
-    .text-field-root .height-holder:focus-within {
-        color: blue !important;
-        height: fit-content;
-        overflow-y: unset;
+    .outer-wrapper:focus-within {
         white-space: wrap;
-        word-break: break-all;
         box-shadow: 0px 0px 2px 2px lightblue;
     }
 
-    .text-field-root .wrapper {
-        z-index: 10;
-        position: absolute;
-        inset: 0;
-        height: 100%;
-    }
-
-    .text-field-root textarea {
-        white-space: nowrap;
-        overflow: hidden;
-        resize: none;
-        height: 100%;
-    }
-    .text-field-root textarea:focus {
-        white-space: unset;
+    textarea:focus {
         background-color: rgb(96 165 250) !important;
-        color: white !important;
-        text-overflow: unset;
-        height: 100%;
     }
 </style>
