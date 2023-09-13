@@ -24,7 +24,7 @@
 <div
     bind:this={element}
     data-role="cell"
-    class="dynamic-grid-cell relative border-b text-base {`col-span-${colspan}`} px-[2px] {focused ? ' focused' : ''}"
+    class="dynamic-grid-cell relative isolate border-b text-base {`col-span-${colspan}`} px-[2px] {focused ? ' focused' : ''}"
 >
     {#if allowHighlight}
         <div

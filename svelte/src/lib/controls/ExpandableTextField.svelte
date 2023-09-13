@@ -70,12 +70,16 @@
 </script>
 
 <div id={rootId} class="text-field-root {thisTheme.root}">
-    <div class="text-field-input-container relative isolate {thisTheme?.inputContainer}">
-        <input type="text" class="invisible" {name} {value} {placeholder} {readonly} {disabled} />
+    <div class="text-field-input-container w-full relative isolate {thisTheme?.inputContainer}">
+        <input type="text" class="invisible w-full" {name} {value} {placeholder} {readonly} {disabled} />
 
-        <div class="height-holder relative h-fit !bg-green-200 !text-green-800 break-words {inputCssClass}">
-            <div class="full-text">
+        <div class="height-holder relative isolate h-fit !bg-green-200 !text-green-800 break-words {inputCssClass}">
+            <div class="full-text ">
+                {#if value}
                 {value}
+                {:else}
+                {@html "&nbsp;"}
+                {/if}
             </div>
             <div class="wrapper">
                 <textarea
@@ -87,7 +91,7 @@
                     {readonly}
                     {disabled}
                     title={(title || value) ?? value}
-                    class="{inputCssClass} border border-gray-300"
+                    class="{inputCssClass} border border-gray-300 h-full"
                     style={inputStyle}
                     {...$$restProps}
                     on:input={handleInput}
@@ -127,6 +131,7 @@
         white-space: nowrap;
         overflow-x: hidden;
         z-index: 10;
+        height: 100%;
     }
 
     .text-field-root .height-holder:focus-within {
@@ -135,18 +140,21 @@
         overflow-y: unset;
         white-space: wrap;
         word-break: break-all;
+        box-shadow: 0px 0px 2px 2px lightblue;
     }
 
     .text-field-root .wrapper {
         z-index: 10;
         position: absolute;
         inset: 0;
+        height: 100%;
     }
 
     .text-field-root textarea {
         white-space: nowrap;
         overflow: hidden;
         resize: none;
+        height: 100%;
     }
     .text-field-root textarea:focus {
         white-space: unset;

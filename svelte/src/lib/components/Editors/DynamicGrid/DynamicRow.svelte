@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
 
     export let gridRowStyle: string;
+    export let zIndex: number = 0;
 
     let element: HTMLElement;
     let focused: boolean = false;
@@ -25,7 +26,7 @@
     bind:this={element}
     data-role="row"
     class="dynamic-grid-row grid relative overflow-x-visible border-x {focused ? ' focused' : ''}"
-    style={gridRowStyle}
+    style="{gridRowStyle}; z-index: {zIndex}"
 >
     <slot />
 </div>

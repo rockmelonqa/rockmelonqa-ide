@@ -114,7 +114,7 @@
         {/if}
         {#if !isProcessing}
             {#each items as item, index}
-                <DynamicRow {gridRowStyle}>
+                <DynamicRow {gridRowStyle} zIndex={items.length - index}>
                     <svelte:fragment>
                         <slot name="item" {item} {index} />
                     </svelte:fragment>
