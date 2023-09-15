@@ -41,6 +41,7 @@ export interface IActionTypeStringRes {
     click: string;
     clickPopup: string;
     closePopup: string;
+    dblClick: string;
     delay: string;
     goToUrl: string;
     input: string;

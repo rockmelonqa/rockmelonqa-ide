@@ -5,6 +5,7 @@ export enum ActionType {
   ClickPopup = "ClickPopup",
   ClosePopup = "ClosePopup",
   Delay = "Delay",
+  DblClick = "DblClick",
   GoToUrl = "GoToUrl",
   Input = "Input",
   InputByCode = "InputByCode",

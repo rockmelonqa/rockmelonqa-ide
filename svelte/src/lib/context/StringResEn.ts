@@ -19,6 +19,7 @@ export const stringResEn: IStringRes = {
         click: "Click",
         clickPopup: "Click Popup",
         closePopup: "Close Popup",
+        dblClick: "Double Click",
         delay: "Delay",
         goToUrl: "Go To Url",
         input: "Input",

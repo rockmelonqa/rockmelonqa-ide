@@ -4,6 +4,7 @@ import clear from "./action-generator-dotnet/clear";
 import click from "./action-generator-dotnet/click";
 import clickPopup from "./action-generator-dotnet/clickPopup";
 import closePopup from "./action-generator-dotnet/closePopup";
+import dblClick from "./action-generator-dotnet/dblClick";
 import delay from "./action-generator-dotnet/delay";
 import gotoUrl from "./action-generator-dotnet/gotoUrl";
 import input from "./action-generator-dotnet/input";
@@ -30,6 +31,7 @@ actionRegistyDotnet
   .set(ActionType.ClickPopup, clickPopup)
   .set(ActionType.ClosePopup, closePopup)
   .set(ActionType.Delay, delay)
+  .set(ActionType.DblClick, dblClick)
   .set(ActionType.GoToUrl, gotoUrl)
   .set(ActionType.Input, input)
   .set(ActionType.InputByCode, inputByCode)
