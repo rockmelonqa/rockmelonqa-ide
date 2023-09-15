@@ -15,7 +15,7 @@ const createPlaywrightMsTestTestData = (): RmpSpec => {
 
   return {
     // Name of the project file, should be unique among tests in `codegen` test
-    projectName: "google-test-playwright-mstest",
+    projectName: "playwright-csharp-mstest",
     // The content of the rmproj file
     content: {
       fileVersion: 1,
