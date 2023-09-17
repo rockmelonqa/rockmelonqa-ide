@@ -21,6 +21,7 @@ import verifyIsVisible from "./action-generator/verifyIsVisible";
 import verifyTitle from "./action-generator/verifyTitle";
 import verifyTitleContains from "./action-generator/verifyTitleContains";
 import verifyUrl from "./action-generator/verifyUrl";
+import dblClick from "./action-generator/dblClick";
 
 export const actionRegistyPlaywright = new Map<ActionType, (params: IActionTemplateParam) => string>();
 
@@ -30,6 +31,7 @@ actionRegistyPlaywright
   .set(ActionType.ClickPopup, clickPopup)
   .set(ActionType.ClosePopup, closePopup)
   .set(ActionType.Delay, delay)
+  .set(ActionType.DblClick, dblClick)
   .set(ActionType.GoToUrl, gotoUrl)
   .set(ActionType.Input, input)
   .set(ActionType.InputByCode, inputByCode)

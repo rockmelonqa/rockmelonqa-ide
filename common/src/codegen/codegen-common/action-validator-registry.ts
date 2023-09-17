@@ -6,6 +6,7 @@ import clear from "./action-validators/clear";
 import click from "./action-validators/click";
 import clickPopup from "./action-validators/clickPopup";
 import closePopup from "./action-validators/closePopup";
+import dblClick from "./action-validators/dblClick";
 import delay from "./action-validators/delay";
 import gotoUrl from "./action-validators/gotoUrl";
 import input from "./action-validators/input";
@@ -33,6 +34,7 @@ actionValidatorRegistry
   .set(ActionType.ClickPopup, clickPopup)
   .set(ActionType.ClosePopup, closePopup)
   .set(ActionType.Delay, delay)
+  .set(ActionType.DblClick, dblClick)
   .set(ActionType.GoToUrl, gotoUrl)
   .set(ActionType.Input, input)
   .set(ActionType.InputByCode, inputByCode)
