@@ -99,6 +99,7 @@ export enum AppActionType {
     /** Set the selected node on File Explorer */
     SelectFile = "SelectFile",
 
+    SetTabs = "SetTabs",
     AddTab = "AddTab",
     CloseTab = "CloseTab",
     CloseTabs = "CloseTabs",
@@ -126,6 +127,7 @@ export type AppAction =
     | { type: AppActionType.SetFiles; files: Node[] }
     | { type: AppActionType.UpdateFile; nodePath: string; value: Partial<Node> }
     | { type: AppActionType.SelectFile; nodePath: string | undefined }
+    | { type: AppActionType.SetTabs; tabs: ITab[] }
     | { type: AppActionType.AddTab; tab: ITab }
     | { type: AppActionType.CloseTab; tabIndex: number }
     | { type: AppActionType.CloseTabs; tabIndexes: number[] }
@@ -249,6 +251,13 @@ export function appContextReducer(state: IAppState, action: AppAction): IAppStat
             return {
                 ...state,
                 selectedFile: action.nodePath,
+            };
+        }
+        case AppActionType.SetTabs: {
+            const tabs = [...state.tabs];
+            return {
+                ...state,
+                tabs: tabs,
             };
         }
         case AppActionType.AddTab: {
