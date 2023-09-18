@@ -85,8 +85,8 @@ html {
 body {
     color: var(--color-secondary--extra-dark);
     font-family: var(--font-family--default);
-    font-size: 1rem;
-    line-height: 1rem;
+    font-size: 1.1rem;
+    line-height: 1.5rem;
     overflow-x: hidden;
 }
 
