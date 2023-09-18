@@ -3,6 +3,8 @@
 
     export let colspan: number = 1;
     export let allowHighlight = true;
+    export { cssClass as class };
+    let cssClass = "";
 
     let element: HTMLElement;
     let focused: boolean = false;
@@ -24,7 +26,9 @@
 <div
     bind:this={element}
     data-role="cell"
-    class="dynamic-grid-cell relative border-b text-base {`col-span-${colspan}`} px-[2px] {focused ? ' focused' : ''}"
+    class="dynamic-grid-cell relative border-b text-base {`col-span-${colspan}`} px-[2px] {focused
+        ? ' focused'
+        : ''} {cssClass}"
 >
     {#if allowHighlight}
         <div
@@ -44,15 +48,14 @@
         left: 0;
     }
 
-    :global(
-    .dynamic-grid-cell .text-field-input, 
-    .dynamic-grid-cell .dropdown-field-root .svelte-select) {
+    :global(.dynamic-grid-cell .text-field-input, .dynamic-grid-cell .dropdown-field-root .svelte-select) {
         background-color: transparent !important;
     }
 
     :global(
-    .dynamic-grid-cell.focused .text-field-input,
-    .dynamic-grid-cell.focused .dropdown-field-root .svelte-select) {
+            .dynamic-grid-cell.focused .text-field-input,
+            .dynamic-grid-cell.focused .dropdown-field-root .svelte-select
+        ) {
         color: white !important;
     }
 

@@ -21,7 +21,7 @@ export type ColumnOptions = {
 
 export type ButtonOptions = {
     label: string;
-    
+
     icon: ComponentType<SvelteComponentTyped>;
 
     /** index: list data row index */
@@ -33,7 +33,7 @@ export type ButtonOptions = {
 export const DynamicGridSizeCache = {
     get(gridType: string): number[] | undefined {
         const key = cacheKey.replace("{name}", gridType);
-        return (LocalCache.get(key) as number[] || undefined);
+        return (LocalCache.get(key) as number[]) || undefined;
     },
 
     set(gridType: string, sizes: number[]): void {
@@ -52,4 +52,4 @@ export const calCommentColSpan = (numOfColumns: number): number => {
     // - action column's gutter
 
     return numOfColumns * 2 - 3;
-}
+};

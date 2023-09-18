@@ -28,6 +28,10 @@
     import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
     import { toTitle } from "./Editor";
+    import type { ButtonOptions, GridConfig } from "./DynamicGrid/DynamicGrid";
+    import DynamicGrid from "./DynamicGrid/DynamicGrid.svelte";
+    import DynamicCell from "./DynamicGrid/DynamicCell.svelte";
+    import ActionsMenu from "./DynamicGrid/ActionsMenu.svelte";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
 
@@ -209,62 +213,67 @@
                 return "";
         }
     };
+
+    const gridConfig: GridConfig = {
+        gridType: "EnvironmentEditor",
+        columns: [
+            {
+                size: 30,
+                title: uiContext.str(stringResKeys.environmentEditor.name),
+            },
+            {
+                size: 60,
+                title: uiContext.str(stringResKeys.environmentEditor.value),
+            },
+            {
+                size: 10,
+                title: uiContext.str(stringResKeys.environmentEditor.actions),
+            },
+        ],
+    };
+
+    const getActionButtons = (index: number): ButtonOptions[] => {
+        return [
+            {
+                label: uiContext.str(stringResKeys.general.delete),
+                icon: DeleteIcon,
+                action: handleDeleteClick,
+                visible: true,
+            },
+        ];
+    };
 </script>
 
-<div class="flex-1 environment-editor p-8">
-    <div class="font-semibold text-xl mb-4">{title}</div>
+<div class="flex-1 environment-editor p-8 pb-0 flex flex-col">
+    <div class="font-semibold text-xl mb-4 flex-grow-0">{title}</div>
 
-    <ListTable
-        class="table-fixed mb-8"
-        isProcessing={$formMode.isLoading() || $formMode.isProcessing()}
-        isEmpty={false}
-    >
-        <svelte:fragment slot="header">
-            <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-1/4">
-                {uiContext.str(stringResKeys.environmentEditor.name)}
-            </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.Last} class="text-left w-3/4">
-                {uiContext.str(stringResKeys.environmentEditor.value)}
-            </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-20">
-                {uiContext.str(stringResKeys.environmentEditor.actions)}
-            </ListTableHeaderCell>
-        </svelte:fragment>
-        <svelte:fragment slot="body">
-            {#each $listData.items as item, index}
-                <ListTableBodyRow>
-                    <ListTableBodyCell type={ListTableCellType.First}>
-                        <TextField
-                            name={`${formContext.formName}_${index}_name`}
-                            value={item.name}
-                            on:input={(event) => handleItemChange(index, "name", event.detail.value)}
-                            errorMessage={validateName(item.name)}
-                        />
-                    </ListTableBodyCell>
+    <div class="flex-1 min-h-0 flex flex-col pb-0">
+        <DynamicGrid config={gridConfig} items={$listData.items}>
+            <svelte:fragment slot="item" let:item let:index>
+                <DynamicCell>
+                    <TextField
+                        name={`${formContext.formName}_${index}_name`}
+                        value={item.name}
+                        on:input={(event) => handleItemChange(index, "name", event.detail.value)}
+                        errorMessage={validateName(item.name)}
+                    />
+                </DynamicCell>
+                <DynamicCell>
+                    <TextField
+                        name={`${formContext.formName}_${index}_value`}
+                        value={item.value}
+                        placeholder={getDefaultPlaceholder(item.name)}
+                        on:input={(event) => handleItemChange(index, "value", event.detail.value)}
+                    />
+                </DynamicCell>
+                <DynamicCell class="text-center" allowHighlight={false}>
+                    <ActionsMenu {index} buttons={getActionButtons(index)} />
+                </DynamicCell>
+            </svelte:fragment>
+        </DynamicGrid>
+    </div>
 
-                    <ListTableBodyCell type={ListTableCellType.Last}>
-                        <TextField
-                            name={`${formContext.formName}_${index}_value`}
-                            value={item.value}
-                            placeholder={getDefaultPlaceholder(item.name)}
-                            on:input={(event) => handleItemChange(index, "value", event.detail.value)}
-                        />
-                    </ListTableBodyCell>
-
-                    <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">
-                        <IconLinkButton
-                            on:click={() => handleDeleteClick(index)}
-                            title={uiContext.str(stringResKeys.general.delete)}
-                        >
-                            <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
-                        </IconLinkButton>
-                    </ListTableBodyCell>
-                </ListTableBodyRow>
-            {/each}
-        </svelte:fragment>
-    </ListTable>
-
-    <div class="flex items-center gap-x-2">
+    <div class="flex items-center flex-grow-0 py-4">
         <IconLinkButton on:click={handleAdd}>
             <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
             <svelte:fragment slot="label">
