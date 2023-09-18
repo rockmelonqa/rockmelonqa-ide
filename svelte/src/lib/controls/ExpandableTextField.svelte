@@ -57,21 +57,19 @@
     };
 </script>
 
-<div id={rootId} class="text-field-root {thisTheme.root}">
-    <div class="text-field-input-container w-full relative isolate {thisTheme?.inputContainer}">
-        <input type="text" class="invisible w-full border-0" {name} {value} {placeholder} {readonly} {disabled} />
+<div id={rootId} class="text-field-root expandable {thisTheme.root}">
+    <div class="text-field-input-container {thisTheme?.inputContainer}">
+        <input type="text" class="invisible" />
 
-        <div
-            class="outer-wrapper whitespace-nowrap py-2 px-3 absolute inset-0 isolate h-fit break-words overflow-hidden focus-within:shadow-md focus-within:shadow-blue-200 focus-within:break-all focus-within:overflow-y-auto {inputCssClass}"
-        >
-            <div class="full-text">
+        <div class="outer-wrapper truncate py-2 px-3 absolute inset-0 focus-within:h-fit focus-within:overflow-y-auto">
+            <div class="invisible">
                 {#if value}
                     {value}
                 {:else}
                     {@html "&nbsp;"}
                 {/if}
             </div>
-            <div class="absolute inset-0 h-full">
+            <div class="absolute inset-0">
                 <textarea
                     bind:this={inputElement}
                     id={inputId}
@@ -81,7 +79,8 @@
                     {readonly}
                     {disabled}
                     title={(title || value) ?? value}
-                    class="{inputCssClass} border border-gray-300 h-full whitespace-nowrap overflow-hidden resize-none focus:whitespace-normal focus:text-white focus:overflow-auto"
+                    class="{inputCssClass} !h-full resize-none
+                        whitespace-nowrap overflow-hidden focus:whitespace-normal focus:overflow-auto"
                     {...$$restProps}
                     on:input={handleInput}
                     on:keyup
@@ -110,10 +109,5 @@
 
     .outer-wrapper:focus-within {
         white-space: wrap;
-        box-shadow: 0px 0px 2px 2px lightblue;
-    }
-
-    textarea:focus {
-        background-color: rgb(96 165 250) !important;
     }
 </style>
