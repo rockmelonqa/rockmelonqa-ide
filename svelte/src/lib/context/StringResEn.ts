@@ -15,6 +15,7 @@ export const stringResEn: IStringRes = {
         version: "Version",
     },
     actionType: {
+        addComment: "Add Comment",
         clear: "Clear",
         click: "Click",
         clickPopup: "Click Popup",

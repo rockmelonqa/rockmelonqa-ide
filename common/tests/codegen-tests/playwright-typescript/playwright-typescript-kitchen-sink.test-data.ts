@@ -386,6 +386,14 @@ export const createTestDataKitchenSink = (): RmpSpec => {
           {
             id: "",
             type: "testStep",
+            page: "",
+            element: "",
+            action: "AddComment",
+            data: "Here is a comment",
+          },
+          {
+            id: "",
+            type: "testStep",
             page: "KitchenSinkScreen",
             element: "clear",
             action: "Clear",

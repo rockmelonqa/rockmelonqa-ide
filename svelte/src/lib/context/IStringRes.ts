@@ -37,6 +37,7 @@ export interface IAboutDialogStringRes {
 }
 
 export interface IActionTypeStringRes {
+    addComment: string;
     clear: string;
     click: string;
     clickPopup: string;
