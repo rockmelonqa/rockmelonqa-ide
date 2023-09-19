@@ -40,6 +40,7 @@
     import DynamicGrid from "./DynamicGrid/DynamicGrid.svelte";
     import DynamicCell from "./DynamicGrid/DynamicCell.svelte";
     import ActionsMenu from "./DynamicGrid/ActionsMenu.svelte";
+    import ExpandableTextField from "$lib/controls/ExpandableTextField.svelte";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -416,7 +417,7 @@
                         />
                     </DynamicCell>
                     <DynamicCell>
-                        <TextField
+                        <ExpandableTextField
                             placeholder={(item.findBy === LocatorType.RelativeCss ? "MyField:.css-class-name" : "") ||
                                 (item.findBy === LocatorType.RelativeXpath ? "MyField://div[text() = 'abc']" : "")}
                             name={`${formContext.formName}_${index}_locator`}
