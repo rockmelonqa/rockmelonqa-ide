@@ -61,7 +61,7 @@
     <div class="text-field-input-container {thisTheme?.inputContainer}">
         <input type="text" class="invisible" />
 
-        <div class="outer-wrapper truncate py-2 px-3 absolute inset-0 focus-within:h-fit focus-within:overflow-y-auto">
+        <div class="outer-wrapper truncate py-2 px-3 absolute inset-0 focus-within:h-fit focus-within:whitespace-normal focus-within:overflow-y-auto">
             <div class="invisible">
                 {#if value}
                     {value}
@@ -105,9 +105,5 @@
     .outer-wrapper {
         width: calc(100% + 8px);
         transform: translateX(-4px);
-    }
-
-    .outer-wrapper:focus-within {
-        white-space: wrap;
     }
 </style>

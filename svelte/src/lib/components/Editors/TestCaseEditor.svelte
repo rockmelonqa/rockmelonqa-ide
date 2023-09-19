@@ -198,7 +198,7 @@
     };
 
     const isCommentAction = (item: IDictionary) => {
-        return (item as ITestStep).type === "testStep" && (item as ITestCaseActionStep).action === "AddComment";
+        return (item as ITestStep).type === "testStep" && (item as ITestCaseActionStep).action === ActionType.AddComment.toString();
     };
 
     const isTestStep = (item: IDictionary) => {
