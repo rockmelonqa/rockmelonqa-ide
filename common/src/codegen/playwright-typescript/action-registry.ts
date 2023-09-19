@@ -22,10 +22,12 @@ import verifyTitle from "./action-generator/verifyTitle";
 import verifyTitleContains from "./action-generator/verifyTitleContains";
 import verifyUrl from "./action-generator/verifyUrl";
 import dblClick from "./action-generator/dblClick";
+import addComment from "./action-generator/addComment";
 
 export const actionRegistyPlaywright = new Map<ActionType, (params: IActionTemplateParam) => string>();
 
 actionRegistyPlaywright
+  .set(ActionType.AddComment, addComment)
   .set(ActionType.Clear, clear)
   .set(ActionType.Click, click)
   .set(ActionType.ClickPopup, clickPopup)
@@ -35,7 +37,6 @@ actionRegistyPlaywright
   .set(ActionType.GoToUrl, gotoUrl)
   .set(ActionType.Input, input)
   .set(ActionType.InputByCode, inputByCode)
-  //.set(ActionType.Run, run)
   .set(ActionType.RunCode, runCode)
   .set(ActionType.SelectOption, selectOption)
   .set(ActionType.VerifyAttribute, verifyAttribute)

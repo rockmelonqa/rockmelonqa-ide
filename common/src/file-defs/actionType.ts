@@ -1,5 +1,6 @@
 /** Test action type */
 export enum ActionType {
+  AddComment = "AddComment",
   Clear = "Clear",
   Click = "Click",
   ClickPopup = "ClickPopup",

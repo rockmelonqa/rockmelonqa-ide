@@ -40,7 +40,7 @@
     import PrimaryButton from "../PrimaryButton.svelte";
     import { toTitle, isPagelessAction } from "./Editor";
     import type { ITestStepComment } from "rockmelonqa.common/file-defs/shared";
-    import type { ITestCaseStep } from "rockmelonqa.common/file-defs/testCaseFile";
+    import type { ITestCaseActionStep, ITestCaseStep } from "rockmelonqa.common/file-defs/testCaseFile";
     import { removeFileExtension } from "$lib/utils/utils";
     import RoutinePickerDialog from "$lib/dialogs/RoutinePickerDialog.svelte";
     import DynamicCell from "./DynamicGrid/DynamicCell.svelte";
@@ -197,6 +197,10 @@
         return (item as ITestStep).type === "comment";
     };
 
+    const isCommentAction = (item: IDictionary) => {
+        return (item as ITestStep).type === "testStep" && (item as ITestCaseActionStep).action === "AddComment";
+    };
+
     const isTestStep = (item: IDictionary) => {
         return (item as ITestStep).type === "testStep";
     };
@@ -345,26 +349,6 @@
             page: lastUsedPage,
         } as ITestCaseStep;
     };
-
-    const handleAddComment = () => {
-        listDataDispatch({
-            type: ListDataActionType.AppendItems,
-            items: [newComment()],
-            hasMoreItems: false,
-        });
-
-        dispatchChange();
-    };
-
-    const handleInsertComment = (index: number) => {
-        listDataDispatch({
-            type: ListDataActionType.InsertItem,
-            item: newComment(),
-            index: index + 1,
-        });
-
-        dispatchChange();
-    };
     const newComment = (): ITestStepComment => {
         return { id: uuidv4(), type: "comment", comment: "" } as ITestStepComment;
     };
@@ -467,12 +451,6 @@
                 visible: true,
             },
             {
-                label: uiContext.str(stringResKeys.general.addComment),
-                icon: CommentIcon,
-                action: handleInsertComment,
-                visible: true,
-            },
-            {
                 label: uiContext.str(uiContext.str(stringResKeys.general.moveUp)),
                 icon: MoveUpIcon,
                 action: handleMoveUpClick,
@@ -507,7 +485,25 @@
     <div class="flex-1 min-h-0">
         <DynamicGrid config={gridConfig} items={$listData.items}>
             <svelte:fragment slot="item" let:item let:index>
-                {#if isTestStep(item)}
+                {#if isCommentAction(item)}
+                    <DynamicCell>
+                        <FancyDropdownField
+                            name={`${formContext.formName}_${index}_action`}
+                            value={item.action}
+                            options={actionTypeOptions}
+                            on:change={(event) => handleItemChange(index, ITEM_KEY_ACTION, event.detail.value)}
+                        />
+                    </DynamicCell>
+                    <DynamicCell colspan={calCommentColSpan(gridConfig.columns.length) - 2}>
+                        <CommentTextField
+                            class=""
+                            name={`${formContext.formName}_${index}_data`}
+                            value={item.data}
+                            placeholder={uiContext.str(stringResKeys.testCaseEditor.comment)}
+                            on:input={(event) => handleItemChange(index, ITEM_KEY_DATA, event.detail.value)}
+                        />
+                    </DynamicCell>
+                {:else if isTestStep(item)}
                     <DynamicCell>
                         <FancyDropdownField
                             name={`${formContext.formName}_${index}_action`}
@@ -589,14 +585,6 @@
                 {uiContext.str(stringResKeys.testCaseEditor.addStep)}
             </svelte:fragment>
         </IconLinkButton>
-        <span>|</span>
-        <IconLinkButton on:click={handleAddComment}>
-            <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
-            <svelte:fragment slot="label">
-                {uiContext.str(stringResKeys.testCaseEditor.addComment)}
-            </svelte:fragment>
-        </IconLinkButton>
-
         <div class="ml-auto">
             <PrimaryButton on:click={handleSave}>
                 <span class="flex items-center gap-x-2">
