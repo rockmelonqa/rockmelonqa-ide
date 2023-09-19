@@ -8,7 +8,7 @@
   },
   "homepage": "https://github.com/rockmelonqa/rockmelonqa-ide",
   "license": "MIT",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "main": "dist/index.js",
   "scripts": {
     "nodemon": "nodemon",
@@ -54,6 +54,7 @@
     "fs-extra": "^11.1.1",
     "moment": "^2.29.4",
     "rockmelonqa.common": "file:./common/dist/commonjs",
+    "split.js": "^1.6.5",
     "ts-replace-all": "^1.0.0",
     "xml-js": "^1.6.11"
   },

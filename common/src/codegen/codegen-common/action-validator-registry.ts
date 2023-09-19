@@ -2,10 +2,12 @@ import { ActionType, ITestRoutineActionStep } from "../../file-defs";
 import { ITestActionStep } from "../../file-defs/shared";
 import { ITestCaseActionStep } from "../../file-defs/testCaseFile";
 import { IActionTemplateParam } from "../types";
+import addComment from "./action-validators/addComment";
 import clear from "./action-validators/clear";
 import click from "./action-validators/click";
 import clickPopup from "./action-validators/clickPopup";
 import closePopup from "./action-validators/closePopup";
+import dblClick from "./action-validators/dblClick";
 import delay from "./action-validators/delay";
 import gotoUrl from "./action-validators/gotoUrl";
 import input from "./action-validators/input";
@@ -28,15 +30,16 @@ import verifyUrl from "./action-validators/verifyUrl";
 export const actionValidatorRegistry = new Map<ActionType, (step: ITestActionStep) => string | undefined>();
 
 actionValidatorRegistry
+  .set(ActionType.AddComment, addComment)
   .set(ActionType.Clear, clear)
   .set(ActionType.Click, click)
   .set(ActionType.ClickPopup, clickPopup)
   .set(ActionType.ClosePopup, closePopup)
   .set(ActionType.Delay, delay)
+  .set(ActionType.DblClick, dblClick)
   .set(ActionType.GoToUrl, gotoUrl)
   .set(ActionType.Input, input)
   .set(ActionType.InputByCode, inputByCode)
-  //.set(ActionType.Run, run)
   .set(ActionType.RunCode, runCode)
   .set(ActionType.RunTestRoutine, runTestRoutine)
   .set(ActionType.SelectOption, selectOption)

@@ -236,6 +236,14 @@ export const createTestDataKitchenSink = (): RmpSpec => {
           {
             id: "",
             type: "pageElement",
+            name: "dblClickButton",
+            findBy: LocatorType.Css,
+            locator: `.action-click-button`,
+            description: "",
+          },
+          {
+            id: "",
+            type: "pageElement",
             name: "clickInput",
             findBy: LocatorType.Css,
             locator: `.action-click-input`,
@@ -378,6 +386,14 @@ export const createTestDataKitchenSink = (): RmpSpec => {
           {
             id: "",
             type: "testStep",
+            page: "",
+            element: "",
+            action: "AddComment",
+            data: "Here is a comment",
+          },
+          {
+            id: "",
+            type: "testStep",
             page: "KitchenSinkScreen",
             element: "clear",
             action: "Clear",
@@ -414,6 +430,14 @@ export const createTestDataKitchenSink = (): RmpSpec => {
             element: "",
             action: "Delay",
             data: "{DelayMs}",
+          },
+          {
+            id: "",
+            type: "testStep",
+            page: "KitchenSinkScreen",
+            element: "dblClickButton",
+            action: "DblClick",
+            data: "",
           },
           {
             id: "",

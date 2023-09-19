@@ -34,13 +34,13 @@
     import CommentTextField from "../CommentTextField.svelte";
     import { combinePath } from "../FileExplorer/Node";
     import IconLinkButton from "../IconLinkButton.svelte";
-    import { ListTableCellType } from "../ListTable";
-    import ListTable from "../ListTable.svelte";
-    import ListTableBodyCell from "../ListTableBodyCell.svelte";
-    import ListTableBodyRow from "../ListTableBodyRow.svelte";
-    import ListTableHeaderCell from "../ListTableHeaderCell.svelte";
     import PrimaryButton from "../PrimaryButton.svelte";
     import { toTitle } from "./Editor";
+    import { calCommentColSpan, type ButtonOptions, type GridConfig } from "./DynamicGrid/DynamicGrid";
+    import DynamicGrid from "./DynamicGrid/DynamicGrid.svelte";
+    import DynamicCell from "./DynamicGrid/DynamicCell.svelte";
+    import ActionsMenu from "./DynamicGrid/ActionsMenu.svelte";
+    import ExpandableTextField from "$lib/controls/ExpandableTextField.svelte";
 
     const uiContext = getContext(uiContextKey) as IUiContext;
     const { theme } = uiContext;
@@ -231,6 +231,7 @@
         dispatchChange();
     };
     const handleInsertElement = (index: number) => {
+        console.log("handle Insert", index);
         focusFieldId = `pageDefinitionEditor_${index + 1}_name_input`;
 
         listDataDispatch({
@@ -314,11 +315,72 @@
     };
     $: isListDataValid = $listData.items.every((item) => isElementNameValid(item.name));
     $: isDataValid = $formData.isValid && isListDataValid;
+
+    let gridConfig: GridConfig = {
+        gridType: "PageElements",
+        columns: [
+            {
+                size: 15,
+                title: uiContext.str(stringResKeys.pageDefinitionEditor.elementName),
+            },
+            {
+                size: 20,
+                title: uiContext.str(stringResKeys.pageDefinitionEditor.findBy),
+            },
+            {
+                size: 30,
+                title: uiContext.str(stringResKeys.pageDefinitionEditor.locator),
+            },
+            {
+                size: 20,
+                title: uiContext.str(stringResKeys.pageDefinitionEditor.description),
+            },
+            {
+                size: 15,
+                title: uiContext.str(stringResKeys.pageDefinitionEditor.actions),
+            },
+        ],
+    };
+
+    const getActionButtons = (index: number): ButtonOptions[] => {
+        return [
+            {
+                label: uiContext.str(stringResKeys.general.add),
+                icon: AddIcon,
+                action: handleInsertElement,
+                visible: true,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.delete),
+                icon: DeleteIcon,
+                action: handleDeleteClick,
+                visible: true,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.addComment),
+                icon: CommentIcon,
+                action: handleInsertComment,
+                visible: true,
+            },
+            {
+                label: uiContext.str(uiContext.str(stringResKeys.general.moveUp)),
+                icon: MoveUpIcon,
+                action: handleMoveUpClick,
+                visible: index > 0,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.moveDown),
+                icon: MoveDownIcon,
+                action: handleMoveDownClick,
+                visible: index < $listData.items.length - 1,
+            },
+        ];
+    };
 </script>
 
-<div class="page-definition-editor p-8">
-    <div class="font-semibold text-xl mb-4">{title}</div>
-    <Form {formContext}>
+<div class="flex-1 page-definition-editor p-8 pb-0 flex flex-col">
+    <div class="font-semibold text-xl mb-4 flex-grow-0">{title}</div>
+    <Form {formContext} class="flex-grow-0 ">
         <FormGroup columns={1}>
             <FormGroupColumn>
                 <FormTextField
@@ -331,123 +393,64 @@
             </FormGroupColumn>
         </FormGroup>
     </Form>
-
-    <ListTable
-        class="table-fixed mb-8"
-        isProcessing={$formMode.isLoading() || $formMode.isProcessing()}
-        isEmpty={false}
-    >
-        <svelte:fragment slot="header">
-            <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-1/6">
-                {uiContext.str(stringResKeys.pageDefinitionEditor.elementName)}
-            </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-52">
-                {uiContext.str(stringResKeys.pageDefinitionEditor.findBy)}
-            </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left">
-                {uiContext.str(stringResKeys.pageDefinitionEditor.locator)}
-            </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.Last} class="text-left w-1/6">
-                {uiContext.str(stringResKeys.pageDefinitionEditor.description)}
-            </ListTableHeaderCell>
-            <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-40">
-                {uiContext.str(stringResKeys.pageDefinitionEditor.actions)}
-            </ListTableHeaderCell>
-        </svelte:fragment>
-        <svelte:fragment slot="body">
-            {#each $listData.items as item, index (item.id)}
-                <ListTableBodyRow>
-                    {#if isComment(item)}
-                        <ListTableBodyCell type={ListTableCellType.First} colspan={4}>
-                            <CommentTextField
-                                name={`${formContext.formName}_${index}_comment`}
-                                value={item.comment}
-                                placeholder={uiContext.str(stringResKeys.pageDefinitionEditor.comment)}
-                                on:input={(event) => handleItemChange(index, "comment", event.detail.value)}
-                                focus={`${formContext.formName}_${index}_comment_input` === focusFieldId}
-                            />
-                        </ListTableBodyCell>
-                    {:else}
-                        <ListTableBodyCell type={ListTableCellType.First}>
-                            <TextField
-                                name={`${formContext.formName}_${index}_name`}
-                                value={item.name}
-                                on:input={(event) => handleItemChange(index, "name", event.detail.value)}
-                                errorMessage={isElementNameValid(item.name)
-                                    ? ""
-                                    : uiContext.str(stringResKeys.pageDefinitionEditor.elementNameInvalidMessage)}
-                                focus={`${formContext.formName}_${index}_name_input` === focusFieldId}
-                            />
-                        </ListTableBodyCell>
-                        <ListTableBodyCell type={ListTableCellType.Normal}>
-                            <FancyDropdownField
-                                name={`${formContext.formName}_${index}_findBy`}
-                                value={item.findBy}
-                                options={locatorTypeOptions}
-                                on:change={(event) => handleItemChange(index, "findBy", event.detail.value)}
-                            />
-                        </ListTableBodyCell>
-                        <ListTableBodyCell type={ListTableCellType.Normal}>
-                            <TextField
-                                placeholder={(item.findBy === LocatorType.RelativeCss
-                                    ? "MyField:.css-class-name"
-                                    : "") ||
-                                    (item.findBy === LocatorType.RelativeXpath ? "MyField://div[text() = 'abc']" : "")}
-                                name={`${formContext.formName}_${index}_locator`}
-                                value={item.locator}
-                                on:input={(event) => handleItemChange(index, "locator", event.detail.value)}
-                            />
-                        </ListTableBodyCell>
-                        <ListTableBodyCell type={ListTableCellType.Last}>
-                            <TextField
-                                name={`${formContext.formName}_${index}_description`}
-                                value={item.description}
-                                on:input={(event) => handleItemChange(index, "description", event.detail.value)}
-                            />
-                        </ListTableBodyCell>
-                    {/if}
-                    <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">
-                        <IconLinkButton
-                            on:click={() => handleInsertElement(index)}
-                            title={uiContext.str(stringResKeys.pageDefinitionEditor.addElement)}
-                        >
-                            <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
-                        </IconLinkButton>
-                        <IconLinkButton
-                            on:click={() => handleInsertComment(index)}
-                            title={uiContext.str(stringResKeys.pageDefinitionEditor.addComment)}
-                        >
-                            <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
-                        </IconLinkButton>
-                        <IconLinkButton
-                            on:click={() => handleDeleteClick(index)}
-                            title={uiContext.str(stringResKeys.general.delete)}
-                        >
-                            <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
-                        </IconLinkButton>
-                        {#if index > 0}
-                            <IconLinkButton
-                                on:click={() => handleMoveUpClick(index)}
-                                title={uiContext.str(stringResKeys.general.moveUp)}
-                            >
-                                <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>
-                            </IconLinkButton>
-                        {/if}
-                        {#if index < $listData.items.length - 1}
-                            <IconLinkButton
-                                on:click={() => handleMoveDownClick(index)}
-                                title={uiContext.str(stringResKeys.general.moveDown)}
-                            >
-                                <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>
-                            </IconLinkButton>
-                        {/if}
-                    </ListTableBodyCell>
-                </ListTableBodyRow>
-            {/each}
-        </svelte:fragment>
-    </ListTable>
-
-    <div class="flex items-center gap-x-2">
+    <div class="flex-1 min-h-0">
+        <DynamicGrid config={gridConfig} items={$listData.items}>
+            <svelte:fragment slot="item" let:item let:index>
+                {#if item.type === "pageElement"}
+                    <DynamicCell>
+                        <TextField
+                            name={`${formContext.formName}_${index}_name`}
+                            value={item.name}
+                            on:input={(event) => handleItemChange(index, "name", event.detail.value)}
+                            errorMessage={isElementNameValid(item.name)
+                                ? ""
+                                : uiContext.str(stringResKeys.pageDefinitionEditor.elementNameInvalidMessage)}
+                            focus={`${formContext.formName}_${index}_name_input` === focusFieldId}
+                        />
+                    </DynamicCell>
+                    <DynamicCell>
+                        <FancyDropdownField
+                            name={`${formContext.formName}_${index}_findBy`}
+                            value={item.findBy}
+                            options={locatorTypeOptions}
+                            on:change={(event) => handleItemChange(index, "findBy", event.detail.value)}
+                        />
+                    </DynamicCell>
+                    <DynamicCell>
+                        <ExpandableTextField
+                            placeholder={(item.findBy === LocatorType.RelativeCss ? "MyField:.css-class-name" : "") ||
+                                (item.findBy === LocatorType.RelativeXpath ? "MyField://div[text() = 'abc']" : "")}
+                            name={`${formContext.formName}_${index}_locator`}
+                            value={item.locator}
+                            on:input={(event) => handleItemChange(index, "locator", event.detail.value)}
+                        />
+                    </DynamicCell>
+                    <DynamicCell>
+                        <TextField
+                            name={`${formContext.formName}_${index}_description`}
+                            value={item.description}
+                            on:input={(event) => handleItemChange(index, "description", event.detail.value)}
+                        />
+                    </DynamicCell>
+                {:else if isComment(item)}
+                    <DynamicCell colspan={calCommentColSpan(gridConfig.columns.length)}>
+                        <CommentTextField
+                            class="py-2 px-3 h-auto"
+                            name={`${formContext.formName}_${index}_comment`}
+                            value={item.comment}
+                            placeholder={uiContext.str(stringResKeys.pageDefinitionEditor.comment)}
+                            on:input={(event) => handleItemChange(index, "comment", event.detail.value)}
+                            focus={`${formContext.formName}_${index}_comment_input` === focusFieldId}
+                        />
+                    </DynamicCell>
+                {/if}
+                <DynamicCell allowHighlight={false}>
+                    <ActionsMenu {index} buttons={getActionButtons(index)} />
+                </DynamicCell>
+            </svelte:fragment>
+        </DynamicGrid>
+    </div>
+    <div class="flex items-center gap-x-2 flex-grow-0 py-4">
         <IconLinkButton on:click={handleAddElement}>
             <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
             <svelte:fragment slot="label">

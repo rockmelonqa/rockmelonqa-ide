@@ -2,10 +2,9 @@
     Clone from 'controls/TextField.svelte'
 -->
 <script lang="ts">
-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import type { IUiTheme } from '$lib/context/UiTheme';
-    import { createEventDispatcher, getContext, onMount } from 'svelte';
-
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import type { IUiTheme } from "$lib/context/UiTheme";
+    import { createEventDispatcher, getContext, onMount } from "svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -14,8 +13,10 @@
     //*****************************************
     export let name: string;
     export let value: string;
-    export let placeholder = '';
+    export let placeholder = "";
     export let focus: boolean = false;
+    export { cssClass as class };
+    let cssClass = "";
 
     //*****************************************
     // Init
@@ -32,8 +33,8 @@
     let inputId = `${name}_input`;
     let isFocus = false;
 
-    $: inputCssClass = `text-field-input !text-green-500 text-base px-4  
-        rounded-md border-l-0 rounded-l-none border-slate-300 focus:ring-0 focus:border-indigo-500 grow`.trim();
+    $: inputCssClass = `${thisTheme.input} !text-green-500 
+        border-0 focus:ring-0 focus:border-indigo-500 grow ${cssClass}`.trim();
 
     //*****************************************
     // Events
@@ -47,22 +48,13 @@
 
     const handleInput = (e: any) => {
         const value = inputElement.value;
-        dispatch('input', { value });
+        dispatch("input", { value });
     };
 </script>
 
 <div id={rootId} class="text-field-root {thisTheme.root}">
     <div class="text-field-input-container {thisTheme?.inputContainer}">
         <div class="flex">
-            <button
-                type="button"
-                class={`bg-slate-100 cursor-default px-6 py-3 
-                    border ${isFocus ? 'border-indigo-500' : 'border-slate-300'} font-bold rounded-l-md shadow-sm`}
-                {...$$restProps}
-            >
-                <span>Comment</span>
-            </button>
-
             <input
                 bind:this={inputElement}
                 type="text"

@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import type { IUiTheme } from '$lib/context/UiTheme';
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import type { IUiTheme } from "$lib/context/UiTheme";
     /**
      * Wrapper for svelte-select
      * https://github.com/rob-balfre/svelte-select
      */
-    import { createEventDispatcher, getContext } from 'svelte';
-    import Select from 'svelte-select';
-    import type { IDropdownOption } from './DropdownField';
+    import { createEventDispatcher, getContext } from "svelte";
+    import Select from "svelte-select";
+    import type { IDropdownOption } from "./DropdownField";
 
     //*****************************************
     // Props
@@ -15,8 +15,13 @@
     export let name: string;
     export let value: string;
     export let options: IDropdownOption[];
-    export let label: string = '';
-    export let errorMessage: string = '';
+    export let label: string = "";
+    export let errorMessage: string = "";
+    
+    let floatingConfig = {
+        strategy: "absolute",
+    };
+    //*****************************************
 
     //*****************************************
     // Init
@@ -30,7 +35,7 @@
     $: selectedItem = options?.find((opt) => opt.key === value);
 
     // Best we can do is put a name on the container and then we overrride in app.css
-    $: selectCss = '';
+    $: selectCss = "";
     $: containerCss = dropdownTheme?.dropdownContainer;
 
     let rootId = `${name}_root`;
@@ -40,26 +45,27 @@
 
     $: inputAttributes = {
         title: selectedItem?.text,
-    }
+    };
     //*****************************************
     // Events
     //*****************************************
     const handleSelect = (e: any) => {
         const value = e.detail.key;
-        dispatch('change', { value });
+        dispatch("change", { value });
     };
 
     const handleClear = () => {
-        dispatch('change', { value: '' });
+        dispatch("change", { value: "" });
     };
 </script>
 
-<div id={rootId} class="dropdown-field-root {dropdownTheme.root}">
+<div id={rootId} class="dropdown-field-root h-full {dropdownTheme.root}">
     {#if label}
         <label id={labelId} for={name} class="dropdown-field-label {dropdownTheme?.label}">{label}</label>
     {/if}
-    <div class="dropdown-field-select-container {containerCss}">
+    <div class="dropdown-field-select-container {containerCss} ">
         <Select
+            {floatingConfig}
             id={selectId}
             items={options}
             value={selectedItem}

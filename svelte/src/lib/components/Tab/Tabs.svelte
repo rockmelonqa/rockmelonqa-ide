@@ -1,4 +1,6 @@
 <script lang="ts">
+    import Sortable, { MultiDrag, Swap } from "sortablejs";
+
     import { AppActionType, appContextKey, type IAppContext } from "$lib/context/AppContext";
     import CircleIcon from "$lib/icons/CircleIcon.svelte";
     import CloseIcon from "$lib/icons/CloseIcon.svelte";
@@ -28,13 +30,27 @@
     let tabToClose: number;
 
     $: tabTitleContainerCss = "tab-item-title-container pl-4 pr-2 py-3 flex items-center gap-x-3";
-    $: tabContentCss = "tab-item-content flex-1 overflow-y-auto";
+    $: tabContentCss = "tab-item-content flex-1 overflow-y-auto flex";
 
     onMount(() => {
         // Enable horizontal scroll
         titleBar.addEventListener("wheel", function (e) {
             titleBar.scrollLeft = titleBar.scrollLeft + (e.deltaY > 0 ? 100 : -100);
             e.preventDefault();
+        });
+
+        Sortable.create(titleBar, {
+            draggable: "button[draggable]",
+
+            onEnd: function (evt: any) {
+                var tab = tabs[evt.oldIndex];
+                tabs.splice(evt.oldIndex, 1);
+                tabs.splice(evt.newIndex, 0, tab);
+                appStateDispatch({
+                    type: AppActionType.SetTabs,
+                    tabs,
+                });
+            },
         });
 
         mounted = true;
@@ -135,7 +151,11 @@
 <div class="tabs h-screen flex flex-col">
     <div class="tab-item-title-bar flex bg-neutral-200" bind:this={titleBar}>
         {#each tabs as tab, idx (tab.id)}
-            <button on:mousedown={(e) => handleMouseDown(e, tab, idx)} on:click={() => handleSelectTab(tab, idx)}>
+            <button
+                draggable
+                on:mousedown={(e) => handleMouseDown(e, tab, idx)}
+                on:click={() => handleSelectTab(tab, idx)}
+            >
                 <div
                     class={`${tabTitleContainerCss}
                     ${idx === $appState.activeTabIndex ? "active bg-white font-bold" : "bg-neutral-100"}
@@ -157,6 +177,7 @@
             </button>
         {/each}
     </div>
+
     {#each tabs as tab, idx (tab.id)}
         <div class={`${tabContentCss} ${idx === $appState.activeTabIndex ? "" : "hidden"}`}>
             <svelte:component

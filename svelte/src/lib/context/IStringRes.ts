@@ -37,10 +37,12 @@ export interface IAboutDialogStringRes {
 }
 
 export interface IActionTypeStringRes {
+    addComment: string;
     clear: string;
     click: string;
     clickPopup: string;
     closePopup: string;
+    dblClick: string;
     delay: string;
     goToUrl: string;
     input: string;
@@ -117,6 +119,7 @@ export interface IFileExplorerStringRes {
 
 export interface IGeneralStringRes {
     add: string;
+    addComment: string;
     and: string;
     cancel: string;
     close: string;

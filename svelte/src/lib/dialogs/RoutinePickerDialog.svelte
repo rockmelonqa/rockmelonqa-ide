@@ -21,7 +21,7 @@
 
     export let datasets: string[] = [];
     const isSelectAll = (datasets: string[]): boolean => {
-        return datasets.length === 1 && datasets[0] === '*';
+        return datasets.length === 1 && datasets[0] === "*";
     };
     let selectingDatasets: string[] = isSelectAll(datasets) ? [] : datasets;
 
@@ -33,7 +33,7 @@
             .sort((a, b) => a.text.localeCompare(b.text));
     });
 
-    let mode: "all" | "select" = isSelectAll(datasets) || datasets.length === 0 ? 'all' : 'select';
+    let mode: "all" | "select" = isSelectAll(datasets) || datasets.length === 0 ? "all" : "select";
     let modeOptions: IDropdownOption[] = [
         { key: "all", text: "Run all datasets" },
         { key: "select", text: "Run selected datasets" },
@@ -45,8 +45,9 @@
     }
 
     let isSubmitted: boolean = false;
-    $: routineErrorMessage = selectingRoutineId === '' ? uiContext.str(stringResKeys.form.isRequiredError) : '';
-    $: datasetsErrorMessage = mode === 'select' && selectingDatasets.length === 0 ? uiContext.str(stringResKeys.form.isRequiredError) : '';
+    $: routineErrorMessage = selectingRoutineId === "" ? uiContext.str(stringResKeys.form.isRequiredError) : "";
+    $: datasetsErrorMessage =
+        mode === "select" && selectingDatasets.length === 0 ? uiContext.str(stringResKeys.form.isRequiredError) : "";
     $: isValid = routineErrorMessage || datasetsErrorMessage ? false : true;
 
     const dispatch = createEventDispatcher();
@@ -82,7 +83,7 @@
             dispatch("submit", {
                 value: {
                     routine: selectingRoutineId,
-                    datasets: mode === 'all' ? ['*'] : selectingDatasets,
+                    datasets: mode === "all" ? ["*"] : selectingDatasets,
                 },
             });
         }
@@ -132,7 +133,7 @@
                         options={routineOptions}
                         on:change={handleSelectRoutine}
                         label={uiContext.str(stringResKeys.routinePickerDialog.routine)}
-                        errorMessage={isSubmitted ? routineErrorMessage : ''}
+                        errorMessage={isSubmitted ? routineErrorMessage : ""}
                     />
                     <FancyDropdownField
                         name="routinePickerDialog_mode"
@@ -141,7 +142,7 @@
                         on:change={handleSelectMode}
                         label={uiContext.str(stringResKeys.routinePickerDialog.mode)}
                     />
-                    {#if mode === 'select'}
+                    {#if mode === "select"}
                         <div>
                             <div class="mb-4 block font-semibold text-base">
                                 {uiContext.str(stringResKeys.routinePickerDialog.dataset)}
@@ -180,7 +181,7 @@
                                         <span>{uiContext.str(stringResKeys.routinePickerDialog.selectedOptions)}</span>
                                     </div>
                                     <div class="box-content mt-2 p-4 flex flex-col gap-y-2 overflow-y-auto">
-                                        {#each datasetOptions.filter((x) => selectingDatasets.includes(x.key)) as option (option.key)}
+                                        {#each datasetOptions.filter( (x) => selectingDatasets.includes(x.key) ) as option (option.key)}
                                             <div class="flex items-center gap-x-2">
                                                 <input
                                                     type="checkbox"

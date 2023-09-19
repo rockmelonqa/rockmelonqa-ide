@@ -2,11 +2,6 @@
     import { AlertDialogButtons, AlertDialogType } from "$lib/components/Alert";
     import AlertDialog from "$lib/components/AlertDialog.svelte";
     import IconLinkButton from "$lib/components/IconLinkButton.svelte";
-    import { ListTableCellType } from "$lib/components/ListTable";
-    import ListTable from "$lib/components/ListTable.svelte";
-    import ListTableBodyCell from "$lib/components/ListTableBodyCell.svelte";
-    import ListTableBodyRow from "$lib/components/ListTableBodyRow.svelte";
-    import ListTableHeaderCell from "$lib/components/ListTableHeaderCell.svelte";
     import PrimaryButton from "$lib/components/PrimaryButton.svelte";
     import { appContextKey, type IAppContext } from "$lib/context/AppContext";
     import { stringResKeys } from "$lib/context/StringResKeys";
@@ -32,6 +27,12 @@
     import CommentTextField from "$lib/components/CommentTextField.svelte";
     import { removeFileExtension } from "$lib/utils/utils";
     import type { IRoutineStep } from "rockmelonqa.common/file-defs";
+    import { calCommentColSpan, type ButtonOptions, type ColumnOptions, type GridConfig } from "../DynamicGrid/DynamicGrid";
+    import DynamicGrid from "../DynamicGrid/DynamicGrid.svelte";
+    import DynamicCell from "../DynamicGrid/DynamicCell.svelte";
+    import { _ } from "svelte-i18n";
+    import lodash from "lodash";
+    import ActionsMenu from "../DynamicGrid/ActionsMenu.svelte";
 
     export let formContext: IFormContext;
     let { mode: formMode, formName } = formContext;
@@ -236,56 +237,117 @@
     const dispatchChange = () => {
         dispatch("change");
     };
+
+    /** Spread the total into `parts` */
+    let spreadInteger = (total: number, parts: number) => {
+        let remain = total;
+        let current = 0;
+        let portions = [];
+        for (let i = 0; i < parts; i++) {
+            current = Math.round(remain / (parts - i));
+            portions.push(current);
+            remain -= current;
+        }
+        return portions;
+    };
+
+    let gridConfig: GridConfig;
+
+    $: {
+        let columns: ColumnOptions[] = [
+            {
+                size: 20,
+                title: uiContext.str(stringResKeys.testRoutineEditor.action),
+            },
+            {
+                size: 20,
+                title: uiContext.str(stringResKeys.testRoutineEditor.page),
+            },
+            {
+                size: dataSetItems.length ? 15 : 45,
+                title: uiContext.str(stringResKeys.testRoutineEditor.element),
+            },
+        ];
+
+        let remainingPercentage = 85 - lodash.sumBy(columns, (c) => c.size);
+        let splitPortions = spreadInteger(remainingPercentage, dataSetItems.length);
+
+        for (let [index, item] of dataSetItems.entries()) {
+            columns.push({
+                size: splitPortions[index],
+                title: item.name,
+            });
+        }
+        columns.push({
+            size: 15,
+            title: uiContext.str(stringResKeys.testRoutineEditor.actions),
+        });
+
+        gridConfig = {
+            gridType: "TestRoutineSteps",
+            columns,
+        };
+    }
+
+    const getActionButtons = (index: number): ButtonOptions[] => {
+        return [
+            {
+                label: uiContext.str(stringResKeys.general.add),
+                icon: AddIcon,
+                action: handleInsertStep,
+                visible: true,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.delete),
+                icon: DeleteIcon,
+                action: handleDeleteClick,
+                visible: true,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.addComment),
+                icon: CommentIcon,
+                action: handleInsertComment,
+                visible: true,
+            },
+            {
+                label: uiContext.str(uiContext.str(stringResKeys.general.moveUp)),
+                icon: MoveUpIcon,
+                action: handleMoveUpClick,
+                visible: index > 0,
+            },
+            {
+                label: uiContext.str(stringResKeys.general.moveDown),
+                icon: MoveDownIcon,
+                action: handleMoveDownClick,
+                visible: index < $listStep.items.length - 1,
+            },
+        ];
+    };
 </script>
 
-<ListTable class="table-fixed mb-4" isProcessing={$formMode.isLoading() || $formMode.isProcessing()} isEmpty={false}>
-    <svelte:fragment slot="header">
-        <ListTableHeaderCell type={ListTableCellType.First} class="text-left w-48">
-            {uiContext.str(stringResKeys.testRoutineEditor.action)}
-        </ListTableHeaderCell>
-        <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-48">
-            {uiContext.str(stringResKeys.testRoutineEditor.page)}
-        </ListTableHeaderCell>
-        <ListTableHeaderCell type={ListTableCellType.Normal} class="text-left w-48">
-            {uiContext.str(stringResKeys.testRoutineEditor.element)}
-        </ListTableHeaderCell>
-        {#if dataSetItems.length > 0}
-            {#each dataSetItems as item, index}
-                <ListTableHeaderCell
-                    type={index < dataSetItems.length - 1 ? ListTableCellType.Normal : ListTableCellType.Last}
-                    class="text-left w-48"
-                >
-                    {item.name}
-                </ListTableHeaderCell>
-            {/each}
-        {/if}
-
-        <ListTableHeaderCell type={ListTableCellType.LastAction} class="text-center w-36">
-            {uiContext.str(stringResKeys.testRoutineEditor.actions)}
-        </ListTableHeaderCell>
-    </svelte:fragment>
-    <svelte:fragment slot="body">
-        {#each $listStep.items as item, index}
-            <ListTableBodyRow>
+{#if gridConfig}
+    <div class="flex-1 overflow-x-auto min-h-0">
+        <DynamicGrid config={gridConfig} items={$listStep.items}>
+            <svelte:fragment slot="item" let:item let:index>
                 {#if isComment(item)}
-                    <ListTableBodyCell type={ListTableCellType.First} colspan={3 + dataSetItems.length}>
+                    <DynamicCell colspan={calCommentColSpan(gridConfig.columns.length)}>
                         <CommentTextField
                             name={`${formName}_${index}_comment`}
                             value={item.comment}
                             placeholder={uiContext.str(stringResKeys.testRoutineEditor.comment)}
                             on:input={(event) => handleItemChange(index, "comment", event.detail.value)}
                         />
-                    </ListTableBodyCell>
+                    </DynamicCell>
                 {:else}
-                    <ListTableBodyCell type={ListTableCellType.First}>
+                    <DynamicCell>
                         <FancyDropdownField
                             name={`${formName}_${index}_action`}
                             value={item.action}
                             options={actionTypeOptions}
                             on:change={(event) => handleItemChange(index, "action", event.detail.value)}
                         />
-                    </ListTableBodyCell>
-                    <ListTableBodyCell type={ListTableCellType.Normal}>
+                    </DynamicCell>
+                    <DynamicCell>
                         {#if !isPagelessAction(item.action)}
                             <FancyDropdownField
                                 name={`${formName}_${index}_page`}
@@ -294,8 +356,8 @@
                                 on:change={(event) => handlePageChange(index, event.detail.value)}
                             />
                         {/if}
-                    </ListTableBodyCell>
-                    <ListTableBodyCell type={ListTableCellType.Normal}>
+                    </DynamicCell>
+                    <DynamicCell>
                         {#if !isPagelessAction(item.action)}
                             <FancyDropdownField
                                 name={`${formName}_${index}_element`}
@@ -304,80 +366,44 @@
                                 on:change={(event) => handleItemChange(index, "element", event.detail.value)}
                             />
                         {/if}
-                    </ListTableBodyCell>
-                    {#if item.data.length > 0}
-                        {#each item.data as data, dataIndex}
-                            <ListTableBodyCell
-                                type={dataIndex < item.data.length - 1
-                                    ? ListTableCellType.Normal
-                                    : ListTableCellType.Last}
-                            >
-                                <TextField
-                                    name={`${formName}_${index}_data_${dataIndex}`}
-                                    value={data.value}
-                                    on:input={(event) => handleStepDataItemChange(index, dataIndex, event.detail.value)}
-                                />
-                            </ListTableBodyCell>
-                        {/each}
-                    {/if}
+                    </DynamicCell>
+                    {#each item.data as data, dataIndex}
+                        <DynamicCell>
+                            <TextField
+                                name={`${formName}_${index}_data_${dataIndex}`}
+                                value={data.value}
+                                on:input={(event) => handleStepDataItemChange(index, dataIndex, event.detail.value)}
+                            />
+                        </DynamicCell>
+                    {/each}
                 {/if}
-                <ListTableBodyCell type={ListTableCellType.LastAction} class="align-bottom whitespace-nowrap">
-                    <IconLinkButton
-                        on:click={() => handleInsertStep(index)}
-                        title={uiContext.str(stringResKeys.testCaseEditor.addStep)}
-                    >
-                        <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
-                    </IconLinkButton>
-                    <IconLinkButton
-                        on:click={() => handleInsertComment(index)}
-                        title={uiContext.str(stringResKeys.testCaseEditor.addComment)}
-                    >
-                        <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
-                    </IconLinkButton>
-                    <IconLinkButton
-                        on:click={() => handleDeleteClick(index)}
-                        title={uiContext.str(stringResKeys.general.delete)}
-                    >
-                        <svelte:fragment slot="icon"><DeleteIcon /></svelte:fragment>
-                    </IconLinkButton>
-                    {#if index > 0}
-                        <IconLinkButton
-                            on:click={() => handleMoveUpClick(index)}
-                            title={uiContext.str(stringResKeys.general.moveUp)}
-                        >
-                            <svelte:fragment slot="icon"><MoveUpIcon /></svelte:fragment>
-                        </IconLinkButton>
-                    {/if}
-                    {#if index < $listStep.items.length - 1}
-                        <IconLinkButton
-                            on:click={() => handleMoveDownClick(index)}
-                            title={uiContext.str(stringResKeys.general.moveDown)}
-                        >
-                            <svelte:fragment slot="icon"><MoveDownIcon /></svelte:fragment>
-                        </IconLinkButton>
-                    {/if}
-                </ListTableBodyCell>
-            </ListTableBodyRow>
-        {/each}
-    </svelte:fragment>
-</ListTable>
 
-<div class="mb-8 flex items-center gap-x-2">
-    <IconLinkButton on:click={handleAddStep}>
-        <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
-        <svelte:fragment slot="label">
-            {uiContext.str(stringResKeys.general.add)}
-        </svelte:fragment>
-    </IconLinkButton>
-    <span>|</span>
-    <IconLinkButton on:click={handleAddComment}>
-        <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
-        <svelte:fragment slot="label">
-            {uiContext.str(stringResKeys.testRoutineEditor.addComment)}
-        </svelte:fragment>
-    </IconLinkButton>
+                <DynamicCell allowHighlight={false}>
+                    <ActionsMenu {index} buttons={getActionButtons(index)} />
+                </DynamicCell>
+            </svelte:fragment>
+        </DynamicGrid>
+    </div>
+{/if}
 
-    <div class="ml-auto absolute right-5">
+<div class="py-4 flex items-center justify-between flex-grow-0">
+    <div class="flex items-center justify-between gap-2">
+        <IconLinkButton on:click={handleAddStep}>
+            <svelte:fragment slot="icon"><AddIcon /></svelte:fragment>
+            <svelte:fragment slot="label">
+                {uiContext.str(stringResKeys.general.add)}
+            </svelte:fragment>
+        </IconLinkButton>
+        <span>|</span>
+        <IconLinkButton on:click={handleAddComment}>
+            <svelte:fragment slot="icon"><CommentIcon /></svelte:fragment>
+            <svelte:fragment slot="label">
+                {uiContext.str(stringResKeys.testRoutineEditor.addComment)}
+            </svelte:fragment>
+        </IconLinkButton>
+    </div>
+
+    <div class="">
         <PrimaryButton on:click={() => dispatch("save")}>
             <span class="flex items-center gap-x-2">
                 <SaveIcon class="w-5 h-5" />

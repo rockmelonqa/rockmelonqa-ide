@@ -10,22 +10,15 @@
     //*****************************************
     export let name: string;
     export let value: string;
-    export let label = "";
     export let placeholder = "";
-    export let type = "text";
     export let readonly: boolean = false;
     export let disabled: boolean = false;
     export let errorMessage: string = "";
     export let focus: boolean = false;
     export let title: string = "";
-    export let prefixPadding = "";
-    export let suffixPadding = "";
-    export let isRightAligned = false;
 
     export { cssClass as class };
     let cssClass = "";
-
-    $: displayLabel = label.length > 0;
 
     let desiredTheme: ITextFieldTheme | undefined = undefined;
     export { desiredTheme as theme };
@@ -40,20 +33,14 @@
     const defaultTheme = ($theme as IUiTheme).inlineTextField ?? {};
     const thisTheme = desiredTheme ?? defaultTheme;
 
-    let inputElement: HTMLInputElement;
+    let inputElement: HTMLTextAreaElement;
 
     let rootId = `${name}_root`;
-    let labelId = `${name}_label`;
     let inputId = `${name}_input`;
 
     $: inputCssClass =
         `text-field-input block w-full border-0 focus:ring-0 ${thisTheme.inputValid} h-10 ${cssClass}`.trim();
 
-    $: inputStyle = (
-        `${prefixPadding ? "padding-left: " + prefixPadding + "; " : " "}` +
-        `${suffixPadding ? "padding-right: " + suffixPadding + "; " : " "}` +
-        `${isRightAligned ? "text-align: right; " : " "}`
-    ).trim();
     //*****************************************
     // Events
     //*****************************************
@@ -70,32 +57,39 @@
     };
 </script>
 
-<div id={rootId} class="text-field-root {thisTheme.root}">
-    {#if displayLabel}
-        <label id={labelId} for={name} class="text-field-label {thisTheme?.label}">{label}</label>
-    {/if}
+<div id={rootId} class="text-field-root expandable {thisTheme.root}">
     <div class="text-field-input-container {thisTheme?.inputContainer}">
-        {#if $$slots.prefix}
-            <div class={thisTheme?.prefixContainer}>
-                <slot name="prefix" />
+        <input type="text" class="invisible" />
+
+        <div class="outer-wrapper truncate py-2 px-3 absolute inset-0 focus-within:h-fit focus-within:whitespace-normal focus-within:overflow-y-auto">
+            <div class="invisible">
+                {#if value}
+                    {value}
+                {:else}
+                    {@html "&nbsp;"}
+                {/if}
             </div>
-        {/if}
-        <input
-            bind:this={inputElement}
-            id={inputId}
-            {type}
-            {name}
-            {value}
-            {placeholder}
-            {readonly}
-            {disabled}
-            title={(title || value) ?? value}
-            class={inputCssClass}
-            style={inputStyle}
-            {...$$restProps}
-            on:input={handleInput}
-            on:keyup
-        />
+            <div class="absolute inset-0">
+                <textarea
+                    bind:this={inputElement}
+                    id={inputId}
+                    {name}
+                    {value}
+                    {placeholder}
+                    {readonly}
+                    {disabled}
+                    title={(title || value) ?? value}
+                    class="{inputCssClass} !h-full resize-none
+                        whitespace-nowrap overflow-hidden focus:whitespace-normal focus:overflow-auto"
+                    {...$$restProps}
+                    on:input={handleInput}
+                    on:keyup
+                    wrap="soft"
+                    rows="1"
+                />
+            </div>
+        </div>
+
         {#if $$slots.suffix}
             <div class={thisTheme?.suffixContainer}>
                 <slot name="suffix" />
@@ -106,3 +100,10 @@
         <p id={`${inputId}-error`} class="text-field-error absolute {thisTheme?.errorMessage}">{errorMessage}</p>
     {/if}
 </div>
+
+<style>
+    .outer-wrapper {
+        width: calc(100% + 8px);
+        transform: translateX(-4px);
+    }
+</style>

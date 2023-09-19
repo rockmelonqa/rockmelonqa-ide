@@ -1,10 +1,12 @@
 /** Test action type */
 export enum ActionType {
+  AddComment = "AddComment",
   Clear = "Clear",
   Click = "Click",
   ClickPopup = "ClickPopup",
   ClosePopup = "ClosePopup",
   Delay = "Delay",
+  DblClick = "DblClick",
   GoToUrl = "GoToUrl",
   Input = "Input",
   InputByCode = "InputByCode",

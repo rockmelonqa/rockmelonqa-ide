@@ -1,4 +1,13 @@
-import { AutomationFramework, Indent, IRmProj, ITestCase, ITestSuite, Language, LocatorType, TestFramework } from "../../../src/file-defs";
+import {
+  AutomationFramework,
+  Indent,
+  IRmProj,
+  ITestCase,
+  ITestSuite,
+  Language,
+  LocatorType,
+  TestFramework,
+} from "../../../src/file-defs";
 import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
 
 export const createTestData = (): RmpSpec => {
@@ -75,9 +84,11 @@ export const createTestData = (): RmpSpec => {
           },
           {
             id: "",
-            type: "routine",
-            routine: "FillName",
-            dataset: "DataSet Number Two",
+            type: "testStep",
+            page: "FillsScreen",
+            element: "street",
+            action: "DblClick",
+            data: "",
           },
           {
             id: "",
@@ -94,12 +105,6 @@ export const createTestData = (): RmpSpec => {
             element: "district",
             action: "Click",
             data: "",
-          },
-          {
-            id: "",
-            type: "routine",
-            routine: "FillDistrictAndBio",
-            dataset: "DS One",
           },
           {
             id: "",
