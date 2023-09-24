@@ -206,7 +206,7 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
     let pageInitItems = [];
     for (let page of pages) {
       let pageName = upperCaseFirstChar(this._outProjMeta.get(page.id)!.outputFileClassName);
-      pageInitItems.push(`this.${pageName} = new ${pageName}(page);`);
+      pageInitItems.push(`this.${pageName} = new ${pageName}(pageTest);`);
     }
 
     let pageInits = pageInitItems.join(EOL);
@@ -520,7 +520,7 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
       let dataset = routine.dataSets.find((ds) => ds.id === dataSetId)!;
       let datasetName = createCleanName(dataset.name);
       let finalRoutineClassName = `${routineName}${datasetName}`;
-      routineCalls.push(`await new ${finalRoutineClassName}(this.page).run();`);
+      routineCalls.push(`await new ${finalRoutineClassName}(this).run();`);
     }
 
     return routineCalls;

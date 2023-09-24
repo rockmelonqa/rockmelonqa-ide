@@ -1,7 +1,7 @@
 import { ActionDataType, IActionTemplateParam } from "../../types";
 import { createEnvironmentVariableString, escapeStr, getParameters } from "../../utils/stringUtils";
 
-/** Generates Csharp code for action VerifyHasValue */
+/** Generates Typescript code for action VerifyHasValue */
 export default (params: IActionTemplateParam) => {
   const { pageName, elementName, parameters } = params;
 
@@ -10,5 +10,5 @@ export default (params: IActionTemplateParam) => {
       ? `"${escapeStr(String(params.data.rawData))}"`
       : createEnvironmentVariableString(String(params.data.rawData));
 
-  return `await expect(defs.${pageName}.${elementName}(${getParameters(parameters)})).toHaveValue(${data});`;
+  return `await expect(this.defs.${pageName}.${elementName}(${getParameters(parameters)})).toHaveValue(${data});`;
 };

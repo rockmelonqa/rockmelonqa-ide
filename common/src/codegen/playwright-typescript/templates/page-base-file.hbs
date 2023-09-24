@@ -1,8 +1,14 @@
-import { Page } from "@playwright/test";
+import PageTest from "./PageTest";
 
+/** Base class for Pages */
 export default class {
-  public page: Page;
-  constructor(page: Page) {
-    this.page = page;
+  public readonly pageTest: PageTest;
+
+  public get page() {
+    return this.pageTest.page;
+  }
+
+  constructor(pageTest: PageTest) {
+    this.pageTest = pageTest;
   }
 }

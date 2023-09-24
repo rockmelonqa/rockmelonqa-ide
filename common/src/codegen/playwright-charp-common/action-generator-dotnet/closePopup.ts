@@ -1,7 +1,7 @@
 /** Generates Csharp code for action Closing a "Popup" tab */
 export default () => {
   return `
-await defs.Page.CloseAsync();
+await this.defs.Page.CloseAsync();
 defs = new PageDefinitions(this.Page);
   `.trim();
 };

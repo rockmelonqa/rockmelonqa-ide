@@ -16,6 +16,7 @@ export enum ActionType {
   RunCode = "RunCode",
   RunTestRoutine = "RunTestRoutine",
   SelectOption = "SelectOption",
+  SwitchTab = "SwitchTab",
   VerifyAttribute = "VerifyAttribute",
   VerifyHasText = "VerifyHasText",
   VerifyHasValue = "VerifyHasValue",

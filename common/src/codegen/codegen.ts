@@ -11,7 +11,10 @@ import { createSourceProjectMetadata } from "./codegenSourceProjectMeta";
 import { CodegenSourceProjectValidator } from "./codegenSourceProjectValidator";
 
 /** Generates test project */
-export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: ProgressEventCallback): Promise<boolean> => {
+export const generateCode = async (
+  rmprojFile: IRmProjFile,
+  progressNotify: ProgressEventCallback
+): Promise<boolean> => {
   info("#################");
   info("# GENERATE CODE #");
   info("#################");
@@ -32,7 +35,12 @@ export const generateCode = async (rmprojFile: IRmProjFile, progressNotify: Prog
   const validationErrors = new CodegenSourceProjectValidator(sourceProjMeta).validate();
 
   if (validationErrors.length) {
-    progressNotify({ type: "validation-errors", log: `Validation of source files returned errors`, data: validationErrors });
+    progressNotify({
+      type: "validation-errors",
+      log: `Validation of source files returned errors`,
+      data: validationErrors,
+    });
+    console.error(validationErrors);
     return false;
   }
 

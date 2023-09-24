@@ -1,8 +1,20 @@
-import { Page } from "@playwright/test";
-import { TestCaseBase } from "./TestCaseBase";
+import { Page } from '@playwright/test';
+import PageTest from "./PageTest";
+import PageDefinitions from "~/PageDefinitions";
 
-export class TestRoutineBase extends TestCaseBase {
-  constructor(page: Page) {
-    super(page);
+/** Base class of TestRoutine */
+export default class extends PageTest {
+  protected defs: PageDefinitions;
+  protected pageTest: PageTest;
+
+  /** Get the current Playwright Page instance */
+  public get page(): Page {
+      return this.pageTest.page;
+  }
+
+  constructor(pageTest: PageTest) {
+    super(pageTest.page);
+    this.pageTest = pageTest;
+    this.defs = new PageDefinitions(pageTest);
   }
 }

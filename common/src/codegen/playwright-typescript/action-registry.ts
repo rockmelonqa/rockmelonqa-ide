@@ -23,6 +23,7 @@ import verifyTitleContains from "./action-generator/verifyTitleContains";
 import verifyUrl from "./action-generator/verifyUrl";
 import dblClick from "./action-generator/dblClick";
 import addComment from "./action-generator/addComment";
+import switchTab from "./action-generator/switchTab";
 
 export const actionRegistyPlaywright = new Map<ActionType, (params: IActionTemplateParam) => string>();
 
@@ -39,6 +40,7 @@ actionRegistyPlaywright
   .set(ActionType.InputByCode, inputByCode)
   .set(ActionType.RunCode, runCode)
   .set(ActionType.SelectOption, selectOption)
+  .set(ActionType.SwitchTab, switchTab)
   .set(ActionType.VerifyAttribute, verifyAttribute)
   .set(ActionType.VerifyHasText, verifyHasText)
   .set(ActionType.VerifyHasValue, verifyHasValue)

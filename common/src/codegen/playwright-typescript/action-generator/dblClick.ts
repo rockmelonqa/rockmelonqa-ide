@@ -1,6 +1,6 @@
 import { IActionTemplateParam } from "../../types";
 
-/** Generates ts code for action DblClick */
+/** Generates Typescript code for action DblClick */
 export default (params: IActionTemplateParam) => {
-  return `await defs.${params.pageName}.${params.elementName}().dblclick();`;
+  return `await this.defs.${params.pageName}.${params.elementName}().dblclick();`;
 };

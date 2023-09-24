@@ -1,14 +1,13 @@
 import { Page } from "@playwright/test";
 import PageTest from "./PageTest";
+import PageDefinitions from "~/PageDefinitions";
 
 export class TestCaseBase extends PageTest {
-  protected TestSuiteInstance: PageTest;
+  protected pageTest: PageTest;
+  protected defs: PageDefinitions;
 
   constructor(page: Page) {
     super(page);
-  }
-
-  protected async delay(ms: number) {
-    await new Promise((rs) => setTimeout(rs, ms));
+    this.defs = new PageDefinitions(this);
   }
 }

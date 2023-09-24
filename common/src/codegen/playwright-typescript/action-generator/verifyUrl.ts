@@ -1,7 +1,7 @@
 import { ActionDataType, IActionTemplateParam } from "../../types";
 import { createEnvironmentVariableString, escapeStr } from "../../utils/stringUtils";
 
-/** Generates Csharp code for action Verify Url */
+/** Generates Typescript code for action Verify Url */
 export default (params: IActionTemplateParam) => {
   const data =
     params.data.dataType === ActionDataType.LiteralValue

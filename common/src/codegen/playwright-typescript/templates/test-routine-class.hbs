@@ -2,13 +2,11 @@
 /** {{{description}}} */
 {{/if}}
 export class {{{testRoutineName}}} extends TestRoutineBase {
-  constructor(page: Page) {
-    super(page);
+  constructor(pageTest: PageTest) {
+    super(pageTest);
   }
 
   public async run() {
-    let defs: PageDefinitions = new PageDefinitions(this.page);
-
 {{{body}}}
   }
 }
