@@ -70,7 +70,9 @@ export const generateCode = async (
 
   // Done
   info(``);
+  info(`###########################`);
+  info(`# Finish generating code! #`);
+  info(`###########################`);
   info(``);
-  info(`Finish generating code!`);
   return true;
 };

@@ -70,4 +70,8 @@ export default class {
     var popup = await popupPromise;
     await popup.waitForLoadState();
   }
+
+  public async closePopup() {
+    await this._page.close();
+  }
 }

@@ -355,21 +355,6 @@ export const createTestDataKitchenSink = (): RmpSpec => {
       },
       {
         id: "",
-        name: "Actions/ClickScreen",
-        description: "Click page",
-        elements: [
-          {
-            id: "",
-            type: "pageElement",
-            name: "clickMe",
-            findBy: LocatorType.Css,
-            locator: "button",
-            description: "Click button",
-          },
-        ],
-      },
-      {
-        id: "",
         name: "Popup1",
         description: "Popup 1",
         elements: [
@@ -416,21 +401,6 @@ export const createTestDataKitchenSink = (): RmpSpec => {
       },
     ],
     testcases: [
-      {
-        id: "",
-        name: "Rooms/LivingRoom",
-        description: "",
-        steps: [
-          {
-            id: "",
-            type: "testStep",
-            page: "",
-            element: "",
-            action: "GoToUrl",
-            data: "http://localhost:3000/kitchen-sink.html",
-          },
-        ],
-      },
       {
         id: "",
         name: "KichenSink",
@@ -835,12 +805,6 @@ export const createTestDataKitchenSink = (): RmpSpec => {
         name: "Kichen",
         description: "Test Kichen",
         testcases: ["KichenSink"],
-      },
-      {
-        id: "",
-        name: "Yard",
-        description: "Yard tests",
-        testcases: ["Rooms/LivingRoom"],
       },
     ],
     outputFiles: [],

@@ -1,4 +1,3 @@
-import { Page } from '@playwright/test';
 import PageTest from "./PageTest";
 import PageDefinitions from "~/PageDefinitions";
 
@@ -6,9 +5,7 @@ import PageDefinitions from "~/PageDefinitions";
 export default class extends PageTest {
   protected defs: PageDefinitions;
   protected pageTest: PageTest;
-
-  /** Get the current Playwright Page instance */
-  public get page(): Page {
+  public override get page() {
       return this.pageTest.page;
   }
 

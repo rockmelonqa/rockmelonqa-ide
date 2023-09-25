@@ -56,10 +56,6 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
     await this.generateSuiteFiles(writeFile);
     await this.generateSupportFiles(writeFile);
 
-    if (full) {
-      await this.generateProjectFiles(writeFile);
-    }
-
     await this.generateMetaFiles(writeFile);
     return "";
   }
@@ -79,8 +75,6 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
       content
     );
   }
-
-  private async generateProjectFiles(writeFile: WriteFileFn) {}
 
   private async generateMetaFiles(writeFile: WriteFileFn) {
     // Write output project metadata
@@ -353,7 +347,7 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
 
     // If there is no step, we add an `await` so that there is no build warning about `async` method
     if (testcaseBody.length === 0) {
-      testcaseBody = `await Task.CompletedTask;`;
+      testcaseBody = `await Promise.resolve();`;
     }
 
     // Indent test method body with 2 indent;

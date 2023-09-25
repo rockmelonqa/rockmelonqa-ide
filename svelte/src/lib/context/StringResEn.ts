@@ -29,6 +29,7 @@ export const stringResEn: IStringRes = {
         runCode: "Run Code",
         runTestRoutine: "Run Test Routine",
         selectOption: "Select Option",
+        switchTab: "Switch Tab",
         verifyAttribute: "Verify Attribute",
         verifyHasText: "Verify Has Text",
         verifyHasValue: "Verify Has Value",

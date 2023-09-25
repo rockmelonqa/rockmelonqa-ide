@@ -100,6 +100,7 @@ export const pagelessActions = [
     ActionType.GoToUrl.toString(),
     ActionType.RunCode.toString(),
     ActionType.RunTestRoutine.toString(),
+    ActionType.SwitchTab.toString(),
     ActionType.VerifyTitle.toString(),
     ActionType.VerifyTitleContains.toString(),
     ActionType.VerifyUrl.toString(),
