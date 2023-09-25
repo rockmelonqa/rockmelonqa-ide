@@ -59,9 +59,8 @@
         color: white !important;
     }
 
-    :global(
-        .dynamic-grid-cell.focused .text-field-root.expandable .text-field-input) {
-        background-color: rgb(96 165 250) !important;   /* bg-blue-400 */
+    :global(.dynamic-grid-cell.focused .text-field-root.expandable .text-field-input) {
+        background-color: rgb(96 165 250) !important; /* bg-blue-400 */
     }
 
     :global(.dynamic-grid-cell .dropdown-field-root .dropdown-field-select-container) {
@@ -75,6 +74,8 @@
     }
 
     :global(.dynamic-grid-cell.focused .dropdown-field-root .svelte-select-list) {
+        z-index: 20;
+        background-color: white;
         color: var(--color-secondary--extra-dark);
     }
 

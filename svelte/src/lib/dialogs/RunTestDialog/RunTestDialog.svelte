@@ -255,7 +255,7 @@
 {#if showDialog}
     <div class="relative" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-gray-400 bg-opacity-75 transition-opacity" />
-        <div class="fixed inset-0 overflow-y-auto">
+        <div class="fixed inset-0 overflow-y-auto z-30">
             <div class="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0">
                 <div
                     class="modal-panel relative bg-white rounded-lg p-4 sm:p-6

@@ -1,20 +1,20 @@
 <script lang="ts">
-    import PrimaryButton from '$lib/components/PrimaryButton.svelte';
-    import StandardButton from '$lib/components/StandardButton.svelte';
-    import { stringResKeys } from '$lib/context/StringResKeys';
-    import { uiContextKey, type IUiContext } from '$lib/context/UiContext';
-    import { UiParserFormatter } from '$lib/context/UiParserFormatter';
-    import { application, autoUpdater } from '$lib/ipc';
-    import type { ProgressInfo, UpdateDownloadedEvent, UpdateInfo } from 'electron-updater';
-    import type { Action, IAppInfo } from 'rockmelonqa.common';
-    import { getContext, onDestroy, onMount } from 'svelte';
+    import PrimaryButton from "$lib/components/PrimaryButton.svelte";
+    import StandardButton from "$lib/components/StandardButton.svelte";
+    import { stringResKeys } from "$lib/context/StringResKeys";
+    import { uiContextKey, type IUiContext } from "$lib/context/UiContext";
+    import { UiParserFormatter } from "$lib/context/UiParserFormatter";
+    import { application, autoUpdater } from "$lib/ipc";
+    import type { ProgressInfo, UpdateDownloadedEvent, UpdateInfo } from "electron-updater";
+    import type { Action, IAppInfo } from "rockmelonqa.common";
+    import { getContext, onDestroy, onMount } from "svelte";
 
     export let showDialog: boolean = false;
     const uiContext = getContext(uiContextKey) as IUiContext;
 
     const cleanupFns: Action[] = [];
     let versionInfo: IAppInfo;
-    let autoUpdateMsg: string = '';
+    let autoUpdateMsg: string = "";
     let isProcessing: boolean = false;
     let showCheckUpdateBtn: boolean = true;
     let showUpdateBtn: boolean = false;
@@ -32,12 +32,12 @@
 
         registerListener(
             autoUpdater.onError((error: any) => {
-                console.log('Error on auto update');
+                console.log("Error on auto update");
                 console.error(error);
 
                 autoUpdateMsg = uiContext
                     .str(stringResKeys.aboutDialog.checkingForUpdateMsg)
-                    .replace('{{errorMessage}}', error.message);
+                    .replace("{{errorMessage}}", error.message);
                 isProcessing = false;
             })
         );
@@ -46,7 +46,7 @@
             autoUpdater.onUpdateAvailable((info: UpdateInfo) => {
                 autoUpdateMsg = uiContext
                     .str(stringResKeys.aboutDialog.updateAvailableMsg)
-                    .replace('{{version}}', info.version);
+                    .replace("{{version}}", info.version);
                 showCheckUpdateBtn = false;
                 showUpdateBtn = true;
                 isProcessing = false;
@@ -68,8 +68,8 @@
                 const totalSizeStr = parserFormatter.formatFloat(info.total / 1024 / 1024);
                 autoUpdateMsg = uiContext
                     .str(stringResKeys.aboutDialog.downloadingMsg)
-                    .replace('{{percent}}', percentStr)
-                    .replace('{{totalSize}}', totalSizeStr);
+                    .replace("{{percent}}", percentStr)
+                    .replace("{{totalSize}}", totalSizeStr);
                 // need progress-bar?
             })
         );
@@ -112,7 +112,7 @@
 {#if showDialog}
     <div class="relative" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-gray-400 bg-opacity-75 transition-opacity" />
-        <div class="fixed inset-0 overflow-y-auto">
+        <div class="fixed inset-0 overflow-y-auto z-30">
             <div class="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0">
                 <div
                     class="modal-panel relative bg-white rounded-lg p-4 sm:p-6
@@ -155,4 +155,3 @@
         </div>
     </div>
 {/if}
-
