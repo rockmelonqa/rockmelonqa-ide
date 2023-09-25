@@ -244,7 +244,7 @@
     };
 </script>
 
-<div class="flex-1 environment-editor p-8 pb-0 flex flex-col">
+<div class="flex-1 environment-editor isolate p-8 pb-0 flex flex-col">
     <div class="font-semibold text-xl mb-4 flex-grow-0">{title}</div>
 
     <div class="flex-1 min-h-0 flex flex-col pb-0">

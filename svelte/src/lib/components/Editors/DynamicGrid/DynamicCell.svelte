@@ -74,7 +74,7 @@
     }
 
     :global(.dynamic-grid-cell.focused .dropdown-field-root .svelte-select-list) {
-        z-index: 20;
+        z-index: 30;
         background-color: white;
         color: var(--color-secondary--extra-dark);
     }
