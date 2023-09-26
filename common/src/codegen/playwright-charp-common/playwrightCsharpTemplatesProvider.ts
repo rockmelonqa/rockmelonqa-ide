@@ -30,7 +30,6 @@ export interface IPlaywrightCsharpTemplatesProvider {
   getTestFunction: (name: string, description: string) => string;
 
   getLocator: (params: ILocatorTemplateParam) => string;
-  getLocatorHelper: (rootNamespace: string) => string;
   getPage: (fullNamespace: string, pageClassName: string, pageDescription: string, pageBody: string) => string;
   getPageDefinitions: (rootNamespace: string, usings: string, pageDeclaration: string, body: string) => string;
 

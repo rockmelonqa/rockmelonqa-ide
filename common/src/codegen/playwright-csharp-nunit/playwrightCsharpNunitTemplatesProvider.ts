@@ -114,10 +114,6 @@ export class PlaywrightCsharpNunitTemplatesProvider implements IPlaywrightCsharp
   getTestFunction(name: string, description: string) {
     return this._templateCollection.TEST_FUNCTION({ name, description });
   }
-
-  getLocatorHelper(rootNamespace: string): string {
-    return this._templateCollection.LOCATOR_HELPER_FILE({ rootNamespace });
-  }
   getTestSuiteBase(rootNamespace: string, testIdAttributeName: string): string {
     return this._templateCollection.TEST_SUITE_BASE_FILE({ rootNamespace, testIdAttributeName });
   }

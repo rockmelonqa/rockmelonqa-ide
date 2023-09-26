@@ -116,10 +116,6 @@ export class PlaywrightCsharpXUnitTemplatesProvider implements IPlaywrightCsharp
   getTestFunction(name: string, description: string) {
     return this._templateCollection.TEST_FUNCTION({ name, description });
   }
-
-  getLocatorHelper(rootNamespace: string): string {
-    return this._templateCollection.LOCATOR_HELPER_FILE({ rootNamespace });
-  }
   getBaseClasses(rootNamespace: string, testIdAttributeName: string): string {
     return this._templateCollection.BASE_CLASSES_FILE({ rootNamespace, testIdAttributeName });
   }

@@ -92,14 +92,6 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
       this.generatePageDefinitions(this._projMeta.pages.map((p) => p.content))
     );
 
-    // # Generate TestLocatorHelper
-
-    // Filename: LocatorHelper.cs
-    await writeFile(
-      `${StandardOutputFolder.Support}/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
-      this._templateProvider.getLocatorHelper(this._rmprojFile.content.rootNamespace)
-    );
-
     await writeFile(
       `${StandardOutputFolder.Support}/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,
       this._templateProvider.getTestCaseBase(this._rmprojFile.content.rootNamespace)

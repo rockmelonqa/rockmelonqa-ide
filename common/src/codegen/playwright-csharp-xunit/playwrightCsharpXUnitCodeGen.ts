@@ -51,7 +51,6 @@ export class PlaywrightCsharpXUnitCodeGen extends PlaywrightCsharpCodeGen implem
     await this.generateTestCaseFiles(writeFile);
     await this.generateRoutineFiles(writeFile);
     await this.generateTestSuiteFiles(writeFile);
-    await this.generateLocatorHelperFiles(writeFile);
     await this.generateSupportFiles(writeFile);
 
     if (full) {
@@ -99,13 +98,6 @@ export class PlaywrightCsharpXUnitCodeGen extends PlaywrightCsharpCodeGen implem
         this._rmprojFile.content.rootNamespace,
         this._rmprojFile.content.testIdAttributeName
       )
-    );
-  }
-
-  private async generateLocatorHelperFiles(writeFile: WriteFileFn) {
-    await writeFile(
-      `${StandardOutputFolder.Support}/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
-      this._templateProvider.getLocatorHelper(this._rmprojFile.content.rootNamespace)
     );
   }
 

@@ -137,10 +137,6 @@ export class PlaywrightCsharpMsTestTemplatesProvider
     return this._templateCollection.PAGE_DEFINITIONS_FILE({ rootNamespace, usings, pageDeclaration, body });
   }
 
-  getLocatorHelper(rootNamespace: string) {
-    return this._templateCollection.LOCATOR_HELPER_FILE({ rootNamespace });
-  }
-
   getPage(fullNamespace: string, pageClassName: string, pageDescription: string, pageBody: string) {
     return this._templateCollection.PAGE_FILE({ fullNamespace, pageClassName, pageDescription, pageBody });
   }

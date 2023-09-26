@@ -123,11 +123,6 @@ export class PlaywrightCsharpNunitCodeGen extends PlaywrightCsharpCodeGen implem
       this.generatePageDefinitions(this._projMeta.pages.map((p) => p.content))
     );
 
-    // Filename: Support/LocatorHelper.cs
-    await writeFile(
-      `${StandardOutputFolder.Support}/${StandardOutputFile.LocatorHelper}${this._outputFileExt}`,
-      this._templateProvider.getLocatorHelper(this._rmprojFile.content.rootNamespace)
-    );
     // Filename: Support/TestCaseBase.cs
     await writeFile(
       `${StandardOutputFolder.Support}/${StandardOutputFile.TestCaseBase}${this._outputFileExt}`,

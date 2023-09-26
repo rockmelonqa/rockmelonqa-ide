@@ -20,7 +20,6 @@ export class XUnitTemplateCollection extends BaseDotnetTemplateCollection implem
 
   public readonly TEST_FUNCTION: HandlebarsTemplateDelegate<any>;
   public readonly CSPROJECT_FILE: HandlebarsTemplateDelegate<any>;
-  public readonly LOCATOR_HELPER_FILE: HandlebarsTemplateDelegate<any>;
   public readonly RUNSETTINGS_FILE: HandlebarsTemplateDelegate<any>;
   public readonly USINGS_FILE: HandlebarsTemplateDelegate<any>;
 
@@ -42,7 +41,6 @@ export class XUnitTemplateCollection extends BaseDotnetTemplateCollection implem
     this.TEST_SUITE_FILE = this.loadAndCompile("TestSuiteFile");
 
     this.TEST_FUNCTION = this.loadAndCompile("TestFunction");
-    this.LOCATOR_HELPER_FILE = this.loadAndCompile("LocatorHelperFile");
     this.CSPROJECT_FILE = this.loadAndCompile("CsProjectFile");
     this.RUNSETTINGS_FILE = this.loadAndCompile("RunSettingsFile");
     this.USINGS_FILE = this.loadAndCompile("UsingsFile");
