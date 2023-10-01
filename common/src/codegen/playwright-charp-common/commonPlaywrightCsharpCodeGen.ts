@@ -300,15 +300,6 @@ export class CommonPlaywrightCsharpCodeGen extends CodeGenBase {
     return testFile;
   }
 
-  protected generateTestCaseFunction(testCase: ITestCase) {
-    const testcaseName = this._outProjMeta.get(testCase.id)!.outputFileClassName;
-    const testCaseMethod = this._commonCsharpTemplateProvider.getTestFunction(
-      upperCaseFirstChar(testcaseName),
-      testCase.description
-    );
-    return testCaseMethod;
-  }
-
   protected generatePage(page: IPage): string {
     let pageItems = [];
     for (let element of page.elements) {

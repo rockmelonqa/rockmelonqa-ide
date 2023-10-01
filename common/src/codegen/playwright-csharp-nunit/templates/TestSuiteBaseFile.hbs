@@ -9,7 +9,6 @@ public abstract partial class TestSuiteBase : PageTest
         {{#if testIdAttributeName}}
         Playwright.Selectors.SetTestIdAttribute("{{testIdAttributeName}}");
         {{/if}}
-        await base.PageSetup();
     }
 }
 

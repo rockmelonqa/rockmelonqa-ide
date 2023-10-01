@@ -37,7 +37,7 @@ export const createPlaywrightNunitTestData = (): RmpSpec => {
   };
 };
 
-test("CodeGen Playwright CSharp Nunit - General", async () => {
+test("CodeGen Playwright CSharp Nunit", async () => {
   // Arrange
   const tmpDir = createTempDir(PROJ_NAME);
   const projSpec = createPlaywrightNunitTestData();

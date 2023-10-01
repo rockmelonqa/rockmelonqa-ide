@@ -39,7 +39,7 @@ const createPlaywrightMsTestTestData = (): RmpSpec => {
   };
 };
 
-test("CodeGen Playwright CSharp MsTest - General", async () => {
+test("CodeGen Playwright CSharp MsTest", async () => {
   // Arrange
   const tmpDir = createTempDir("playwright-csharp-mstest");
   const projSpec = createPlaywrightMsTestTestData();

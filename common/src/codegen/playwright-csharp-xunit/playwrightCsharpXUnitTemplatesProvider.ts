@@ -69,4 +69,8 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
   getComment(message: string) {
     return this._templateCollection.COMMENT({ message });
   }
+
+  getTestFunction(name: string, description: string) {
+    return this._templateCollection.TEST_FUNCTION({ name, description });
+  }
 }

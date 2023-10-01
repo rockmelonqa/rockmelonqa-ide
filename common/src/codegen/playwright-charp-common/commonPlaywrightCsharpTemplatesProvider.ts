@@ -99,11 +99,6 @@ export class CommonPlaywrightCsharpTemplatesProvider {
   getComment(message: string) {
     return this._templateCollection.COMMENT({ message });
   }
-
-  getTestFunction(name: string, description: string) {
-    return this._templateCollection.TEST_FUNCTION({ name, description });
-  }
-
   getTestCaseBase(rootNamespace: string) {
     return this._templateCollection.TEST_CASE_BASE_FILE({ rootNamespace });
   }

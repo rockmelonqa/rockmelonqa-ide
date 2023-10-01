@@ -39,4 +39,8 @@ export class PlaywrightCsharpNUnitTemplatesProvider {
   getRunSettings() {
     return this._templateCollection.RUNSETTINGS_FILE({});
   }
+
+  getTestFunction(name: string, description: string) {
+    return this._templateCollection.TEST_FUNCTION({ name, description });
+  }
 }

@@ -139,4 +139,13 @@ export class PlaywrightCsharpMSTestCodeGen extends CommonPlaywrightCsharpCodeGen
     );
     return testClass;
   }
+
+  protected generateTestCaseFunction(testCase: ITestCase) {
+    const testcaseName = this._outProjMeta.get(testCase.id)!.outputFileClassName;
+    const testCaseMethod = this._templateProvider.getTestFunction(
+      upperCaseFirstChar(testcaseName),
+      testCase.description
+    );
+    return testCaseMethod;
+  }
 }

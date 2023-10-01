@@ -1,7 +1,7 @@
 import { compile } from "handlebars";
 import { loadTemplate } from "../utils/templateLoader";
 import { BaseTemplateCollection } from "../codegen-common/baseTemplateCollection";
-import { TemplateCollectionOptions } from "../playwright-csharp-mstest/templateCollection";
+import { TemplateCollectionOptions } from "../playwright-charp-common/commonCsharpTemplateCollection";
 
 /** Templates collection for PlaywrightTypescriptJest codegen*/
 export class JestTemplateCollection extends BaseTemplateCollection {

@@ -23,8 +23,6 @@ export class CommonCsharpTemplateCollection extends BaseDotnetTemplateCollection
   public readonly TEST_ROUTINE_FILE: HandlebarsTemplateDelegate<any>;
   public readonly TEST_ROUTINE_BASE_FILE: HandlebarsTemplateDelegate<any>;
 
-  public readonly TEST_FUNCTION: HandlebarsTemplateDelegate<any>;
-
   constructor(templateCollectionOptions: TemplateCollectionOptions) {
     super(templateCollectionOptions);
 
@@ -42,8 +40,6 @@ export class CommonCsharpTemplateCollection extends BaseDotnetTemplateCollection
     this.TEST_ROUTINE_CLASS = this.loadAndCompile("TestRoutineClass");
     this.TEST_ROUTINE_FILE = this.loadAndCompile("TestRoutineFile");
     this.TEST_ROUTINE_BASE_FILE = this.loadAndCompile("TestRoutineBaseFile");
-
-    this.TEST_FUNCTION = this.loadAndCompile("TestFunction");
   }
 }
 

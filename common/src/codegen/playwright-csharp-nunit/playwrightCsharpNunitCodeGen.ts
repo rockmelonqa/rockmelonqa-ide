@@ -10,6 +10,7 @@ import { IOutputProjectMetadataGenerator } from "../playwright-charp-common/outp
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 import { createOutputProjectMetadata } from "../codegenOutputProjectMeta";
 import { addIndent } from "../utils/codegenUtils";
+import { upperCaseFirstChar } from "../utils/stringUtils";
 
 export class PlaywrightCsharpNunitCodeGen extends CommonPlaywrightCsharpCodeGen implements ICodeGen {
   private _templateProvider: PlaywrightCsharpNUnitTemplatesProvider;
@@ -33,6 +34,7 @@ export class PlaywrightCsharpNunitCodeGen extends CommonPlaywrightCsharpCodeGen 
     await this.generateEnvironmentSetterScripts(writeFile);
 
     await this.generatePageFiles(writeFile);
+    await this.generatePageDefinitionsFile(writeFile);
     await this.generateTestCaseFiles(writeFile);
     await this.generateRoutineFiles(writeFile);
     await this.generateTestSuiteFiles(writeFile);
@@ -121,5 +123,14 @@ export class PlaywrightCsharpNunitCodeGen extends CommonPlaywrightCsharpCodeGen 
       this._outProjMeta.get(testSuite.id)!.outputFileFullNamespace
     );
     return testClass;
+  }
+
+  protected generateTestCaseFunction(testCase: ITestCase) {
+    const testcaseName = this._outProjMeta.get(testCase.id)!.outputFileClassName;
+    const testCaseMethod = this._templateProvider.getTestFunction(
+      upperCaseFirstChar(testcaseName),
+      testCase.description
+    );
+    return testCaseMethod;
   }
 }

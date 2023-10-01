@@ -14,6 +14,7 @@ export class XUnitTemplateCollection extends BaseTemplateCollection {
   public readonly CSPROJECT_FILE: HandlebarsTemplateDelegate<any>;
   public readonly RUNSETTINGS_FILE: HandlebarsTemplateDelegate<any>;
   public readonly USINGS_FILE: HandlebarsTemplateDelegate<any>;
+  public readonly TEST_FUNCTION: HandlebarsTemplateDelegate<any>;
 
   constructor(templateCollectionOptions: TemplateCollectionOptions) {
     super(templateCollectionOptions);
@@ -29,5 +30,6 @@ export class XUnitTemplateCollection extends BaseTemplateCollection {
     this.CSPROJECT_FILE = this.loadAndCompile("CsProjectFile");
     this.RUNSETTINGS_FILE = this.loadAndCompile("RunSettingsFile");
     this.USINGS_FILE = this.loadAndCompile("UsingsFile");
+    this.TEST_FUNCTION = this.loadAndCompile("TestFunction");
   }
 }
