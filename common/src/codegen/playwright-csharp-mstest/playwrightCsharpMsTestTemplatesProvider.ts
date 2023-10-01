@@ -80,6 +80,10 @@ export class PlaywrightCsharpMsTestTemplatesProvider
     });
   }
 
+  getTestRoutineBaseFile(rootNamespace: string) {
+    return this._templateCollection.TEST_ROUTINE_BASE_FILE({ rootNamespace });
+  }
+
   getAction(params: IActionTemplateParam) {
     const actionGenerateFn = actionRegistyDotnet.get(params.action);
 
@@ -131,6 +135,13 @@ export class PlaywrightCsharpMsTestTemplatesProvider
 
   getTestCaseBase(rootNamespace: string) {
     return this._templateCollection.TEST_CASE_BASE_FILE({ rootNamespace });
+  }
+
+  getBasePageFile(rootNamespace: string): string {
+    return this._templateCollection.BASE_PAGE_FILE({ rootNamespace });
+  }
+  getBasePageTestFile(rootNamespace: string): string {
+    return this._templateCollection.BASE_PAGE_TEST_FILE({ rootNamespace });
   }
 
   getPageDefinitions(rootNamespace: string, usings: string, pageDeclaration: string, body: string) {

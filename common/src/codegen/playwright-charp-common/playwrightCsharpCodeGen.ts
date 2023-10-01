@@ -189,7 +189,7 @@ export class PlaywrightCsharpCodeGen extends CodeGenBase {
       let dataset = routine.dataSets.find((ds) => ds.id === dataSetId)!;
       let datasetName = createCleanName(dataset.name);
       let finalRoutineClassName = `${routineName}${datasetName}`;
-      routineCalls.push(`await new ${finalRoutineClassName}(this.Page).RunAsync();`);
+      routineCalls.push(`await new ${finalRoutineClassName}(this).RunAsync();`);
     }
 
     return routineCalls;

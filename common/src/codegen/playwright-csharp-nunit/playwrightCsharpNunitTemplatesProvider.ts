@@ -81,6 +81,10 @@ export class PlaywrightCsharpNunitTemplatesProvider implements IPlaywrightCsharp
     });
   }
 
+  getTestRoutineBaseFile(rootNamespace: string) {
+    return this._templateCollection.TEST_ROUTINE_BASE_FILE({ rootNamespace });
+  }
+
   getRoutineAction(params: IActionTemplateParam) {
     const actionGenerate = actionRegistyDotnet.get(params.action);
     if (!actionGenerate) {
@@ -136,6 +140,13 @@ export class PlaywrightCsharpNunitTemplatesProvider implements IPlaywrightCsharp
 
   getPage(fullNamespace: string, pageName: string, pageDescription: string, pageBody: string) {
     return this._templateCollection.PAGE_FILE({ fullNamespace, pageName, pageDescription, pageBody });
+  }
+
+  getBasePageFile(rootNamespace: string): string {
+    return this._templateCollection.BASE_PAGE_FILE({ rootNamespace });
+  }
+  getBasePageTestFile(rootNamespace: string): string {
+    return this._templateCollection.BASE_PAGE_FILE({ rootNamespace });
   }
 
   getComment(message: string) {

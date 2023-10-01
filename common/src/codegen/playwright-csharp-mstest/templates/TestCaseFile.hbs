@@ -11,12 +11,10 @@ namespace {{{fullNamespace}}};
 /// </summary>
 public partial class {{{testCaseName}}} : TestCaseBase
 {
-    public {{{testCaseName}}}(PageTest testSuiteInstance): base(testSuiteInstance) {}
+    public {{{testCaseName}}}(IPage page) : base(page) {}
 
     public async Task RunAsync()
     {
-        PageDefinitions defs = new PageDefinitions(this.Page);
-
 {{{body}}}
     }
 }

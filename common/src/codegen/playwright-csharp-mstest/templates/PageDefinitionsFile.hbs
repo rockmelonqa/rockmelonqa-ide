@@ -4,13 +4,15 @@ namespace {{{rootNamespace}}};
 
 public class PageDefinitions
 {
-    public IPage Page { get; private set; }
+    protected BasePageTest PageTest;
+
+    public IPage Page => this.PageTest.Page;
 
 {{{pageDeclaration}}}
 
-    public PageDefinitions(IPage page)
+    public PageDefinitions(BasePageTest pageTest)
     {
-        Page = page;
+        PageTest = pageTest;
 
 {{{body}}}
     }

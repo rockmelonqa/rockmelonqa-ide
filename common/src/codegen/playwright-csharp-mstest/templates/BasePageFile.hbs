@@ -1,0 +1,8 @@
+namespace {{{rootNamespace}}};
+
+public abstract class PageBase
+{
+    protected IPage Page => this.PageTest.Page;
+    protected readonly BasePageTest PageTest;
+    public PageBase(BasePageTest pageTest) => PageTest = pageTest;
+}

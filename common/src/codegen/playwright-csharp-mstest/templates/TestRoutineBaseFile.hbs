@@ -1,0 +1,20 @@
+namespace {{{rootNamespace}}}.MsTestSupport;
+
+/// <summary>
+/// Base class for RM test routine
+/// </summary>
+public abstract class TestRoutineBase : BasePageTest
+{
+    protected BasePageTest PageTest { get; init; }
+    protected PageDefinitions defs { get; init; }
+    protected new IPage Page => PageTest.Page;
+
+    /// <summary>
+    /// Create new instance of TestRoutineBase with the provided IPage
+    /// </summary>
+    public TestRoutineBase(BasePageTest pageTest) : base(pageTest.Page)
+    {
+        this.PageTest = pageTest;
+        this.defs = new PageDefinitions(pageTest);
+    }
+}

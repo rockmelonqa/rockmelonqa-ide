@@ -3,12 +3,10 @@
 /// </summary>
 public partial class {{{testRoutineName}}} : TestRoutineBase
 {
-    public {{{testRoutineName}}}(IPage page) : base(page) { }
+    public {{{testRoutineName}}}(BasePageTest pageTest) : base(pageTest) { }
 
     public async Task RunAsync()
     {
-        PageDefinitions defs = new PageDefinitions(this.Page);
-
 {{{body}}}
     }
 }

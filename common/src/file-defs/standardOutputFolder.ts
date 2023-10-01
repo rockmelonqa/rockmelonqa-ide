@@ -17,6 +17,9 @@ export class StandardOutputFolder {
   static readonly TestRoutines: string = "TestRoutines";
   /** "Support" */
   static readonly Support: string = "Support";
+  static readonly MsTestSupport: string = "MsTestSupport";
+  static readonly NUnitSupport: string = "NUnitSupport";
+  static readonly XUnitSupport: string = "XUnitSupport";
 }
 
 export class StandardOutputFolderTypeScript {

@@ -519,9 +519,9 @@ export const createTestDataKitchenSink = (): RmpSpec => {
             element: "input",
             action: "InputByCode",
             // For typescript
-            data: "(new Date()).getFullYear().toString()",
+            //data: "(new Date()).getFullYear().toString()",
             // For C#
-            //data: "DateTime.Now.Year.ToString()",
+            data: "DateTime.Now.Year.ToString()",
           },
           {
             id: "",
@@ -530,9 +530,9 @@ export const createTestDataKitchenSink = (): RmpSpec => {
             element: "",
             action: "RunCode",
             // For typescript
-            data: 'await this.defs.KitchenSinkScreenPage.selectOption().selectOption("hello"); // RunCode',
+            //data: '// await this.defs.KitchenSinkScreenPage.selectOption().selectOption("hello"); // RunCode',
             // For C#
-            //data: 'await defs.KitchenSinkScreenPage.SelectOption().SelectOptionAsync("hello"); // RunCode',
+            data: '// await defs.KitchenSinkScreenPage.SelectOption().SelectOptionAsync("hello"); // RunCode',
           },
           {
             id: "",

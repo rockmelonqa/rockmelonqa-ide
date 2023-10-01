@@ -5,15 +5,13 @@ namespace {{{fullNamespace}}};
 /// {{{pageDescription}}}
 /// </summary>
 {{/if}}
-public class {{{pageClassName}}}
+public class {{{pageClassName}}}: PageBase
 {
-    private IPage _page;
-
     /// <summary>
     /// Default constructor
     /// </summary>
     /// <param name="page">Playwright Page</param>
-    public {{{pageClassName}}}(IPage page) => _page = page;
+    public {{{pageClassName}}}(BasePageTest pageTest) : base(pageTest) { }
 
 {{{pageBody}}}
 }

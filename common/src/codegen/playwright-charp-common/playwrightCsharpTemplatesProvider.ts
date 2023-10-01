@@ -13,6 +13,8 @@ export interface IPlaywrightCsharpTemplatesProvider {
   ) => string;
 
   getTestCaseBase: (rootNamespace: string) => string;
+  getBasePageFile: (rootNamespace: string) => string;
+  getBasePageTestFile: (rootNamespace: string) => string;
   getTestCaseFile: (
     testCaseName: string,
     description: string,
@@ -24,6 +26,7 @@ export interface IPlaywrightCsharpTemplatesProvider {
 
   getTestRoutineClass: (testRoutineName: string, description: string, body: string) => string;
   getTestRoutineFile: (rootNamespace: string, fullNamespace: string, testRoutineClasses: string[]) => string;
+  getTestRoutineBaseFile: (rootNamespace: string) => string;
 
   getAction: (params: IActionTemplateParam) => string;
   getComment: (message: string) => string;

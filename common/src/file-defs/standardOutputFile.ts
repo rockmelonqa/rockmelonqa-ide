@@ -4,6 +4,7 @@ export class StandardOutputFile {
   static readonly RunSettings: string = ".runsettings";
   static readonly Usings: string = "Usings";
   static readonly PageBase: string = "PageBase";
+  static readonly BasePageTest: string = "BasePageTest";
   static readonly PageTest: string = "PageTest";
   static readonly PageDefinitions: string = "PageDefinitions";
   static readonly TestCaseBase: string = "TestCaseBase";

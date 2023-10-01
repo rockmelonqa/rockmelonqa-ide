@@ -53,6 +53,8 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     await this.generateRoutineFiles(writeFile);
     await this.generateSuiteFiles(writeFile);
     await this.generateSupportFiles(writeFile);
+    await this.generateMsTestSupportFiles(writeFile);
+    await this.generatePageDefinitionsFile(writeFile);
 
     if (full) {
       await this.generateProjectFiles(writeFile);
@@ -63,11 +65,6 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
   }
 
   private async generateProjectFiles(writeFile: WriteFileFn) {
-    // # Generate full project files
-    // Files:
-    //     - {Namespace}.csproj
-    //     - Usings.cs
-    //     - .runsettings
     await writeFile(
       `${this._rmprojFile.content.rootNamespace}.csproj`,
       this._templateProvider.getCsProject(this._rmprojFile.content.rootNamespace)
@@ -86,10 +83,14 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
   }
 
   private async generateSupportFiles(writeFile: WriteFileFn) {
-    // Filename: PageDefinitions.cs
     await writeFile(
-      `${StandardOutputFile.PageDefinitions}${this._outputFileExt}`,
-      this.generatePageDefinitions(this._projMeta.pages.map((p) => p.content))
+      `${StandardOutputFolder.Support}/${StandardOutputFile.BasePageTest}${this._outputFileExt}`,
+      this._templateProvider.getBasePageTestFile(this._rmprojFile.content.rootNamespace)
+    );
+
+    await writeFile(
+      `${StandardOutputFolder.Support}/${StandardOutputFile.PageBase}${this._outputFileExt}`,
+      this._templateProvider.getBasePageFile(this._rmprojFile.content.rootNamespace)
     );
 
     await writeFile(
@@ -98,7 +99,21 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     );
 
     await writeFile(
-      `${StandardOutputFolder.Support}/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
+      `${StandardOutputFolder.Support}/${StandardOutputFile.TestRoutineBase}${this._outputFileExt}`,
+      this._templateProvider.getTestRoutineBaseFile(this._rmprojFile.content.rootNamespace)
+    );
+  }
+
+  private async generatePageDefinitionsFile(writeFile: WriteFileFn) {
+    await writeFile(
+      `${StandardOutputFile.PageDefinitions}${this._outputFileExt}`,
+      this.generatePageDefinitionsFileContent(this._projMeta.pages.map((p) => p.content))
+    );
+  }
+
+  private async generateMsTestSupportFiles(writeFile: WriteFileFn) {
+    await writeFile(
+      `${StandardOutputFolder.MsTestSupport}/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
       this._templateProvider.getTestSuiteBase(
         this._rmprojFile.content.rootNamespace,
         this._rmprojFile.content.testIdAttributeName
@@ -159,7 +174,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     }
   }
 
-  private generatePageDefinitions(pages: IPage[]): string {
+  private generatePageDefinitionsFileContent(pages: IPage[]): string {
     let usingDirectives: string[] = [];
     for (let page of pages) {
       let pageNamespace = this._outProjMeta.get(page.id)!.outputFileFullNamespace;
@@ -188,7 +203,7 @@ export class PlaywrightCsharpMSTestCodeGen extends PlaywrightCsharpCodeGen imple
     let propertyInitList = [];
     for (let page of pages) {
       let pageName = this._outProjMeta.get(page.id)!.outputFileClassName;
-      propertyInitList.push(`${pageName} = new ${pageName}(page);`);
+      propertyInitList.push(`${pageName} = new ${pageName}(pageTest);`);
     }
 
     let propertyInits = propertyInitList.join(EOL);

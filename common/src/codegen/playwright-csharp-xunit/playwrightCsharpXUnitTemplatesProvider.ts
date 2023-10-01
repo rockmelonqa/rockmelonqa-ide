@@ -34,6 +34,10 @@ export class PlaywrightCsharpXUnitTemplatesProvider implements IPlaywrightCsharp
     return this._templateCollection.TEST_CASE_BASE_FILE({ rootNamespace });
   }
 
+  getTestRoutineBaseFile(rootNamespace: string) {
+    return this._templateCollection.TEST_ROUTINE_BASE_FILE({ rootNamespace });
+  }
+
   getTestSuiteFile(
     usings: string,
     name: string,
@@ -131,6 +135,13 @@ export class PlaywrightCsharpXUnitTemplatesProvider implements IPlaywrightCsharp
 
   getPageDefinitions(usings: string, rootNamespace: string, pageDeclaration: string, body: string) {
     return this._templateCollection.PAGE_DEFINITIONS_FILE({ usings, rootNamespace, pageDeclaration, body });
+  }
+
+  getBasePageFile(rootNamespace: string): string {
+    return this._templateCollection.BASE_PAGE_FILE({ rootNamespace });
+  }
+  getBasePageTestFile(rootNamespace: string): string {
+    return this._templateCollection.BASE_PAGE_FILE({ rootNamespace });
   }
 
   getPage(fullNamespace: string, pageName: string, pageDescription: string, pageBody: string) {
