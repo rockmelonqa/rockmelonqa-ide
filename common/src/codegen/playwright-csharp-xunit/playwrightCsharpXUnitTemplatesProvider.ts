@@ -8,7 +8,7 @@ import { locatorRegistyDotnet } from "../playwright-charp-common/locator-registr
 import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 import { Indent } from "../../file-defs";
 
-export class PlaywrightCsharpXUnitTemplatesProvider implements IPlaywrightCsharpTemplatesProvider {
+export class PlaywrightCsharpXUnitTemplatesProvider {
   private _templateCollection: XUnitTemplateCollection;
 
   constructor(customTemplatesDir: string, requiredIndenChar: Indent, requiredIndexSize: number) {
@@ -23,19 +23,8 @@ export class PlaywrightCsharpXUnitTemplatesProvider implements IPlaywrightCsharp
     });
   }
 
-  getEnvironmentSettingsFiles(rootNamespace: string, allVariableNames: string[]): string {
-    return this._templateCollection.ENVIRONMENT_SETTINGS_FILE({ rootNamespace, allVariableNames });
-  }
-
   getTestSuiteBase(rootNamespace: string, testIdAttributeName: string): string {
     return this._templateCollection.TEST_SUITE_BASE_FILE({ rootNamespace, testIdAttributeName });
-  }
-  getTestCaseBase(rootNamespace: string): string {
-    return this._templateCollection.TEST_CASE_BASE_FILE({ rootNamespace });
-  }
-
-  getTestRoutineBaseFile(rootNamespace: string) {
-    return this._templateCollection.TEST_ROUTINE_BASE_FILE({ rootNamespace });
   }
 
   getTestSuiteFile(
@@ -49,24 +38,6 @@ export class PlaywrightCsharpXUnitTemplatesProvider implements IPlaywrightCsharp
     return this._templateCollection.TEST_SUITE_FILE({ usings, name, description, body, rootNamespace, fullNamespace });
   }
 
-  getTestCaseFile(
-    testCaseName: string,
-    description: string,
-    body: string,
-    rootNamespace: string,
-    fullNamespace: string,
-    usings: string[]
-  ) {
-    return this._templateCollection.TEST_CASE_FILE({
-      rootNamespace,
-      testCaseName,
-      description,
-      body,
-      fullNamespace,
-      usings,
-    });
-  }
-
   getAction(params: IActionTemplateParam) {
     const actionGenerate = actionRegistyDotnet.get(params.action);
     if (!actionGenerate) {
@@ -74,51 +45,6 @@ export class PlaywrightCsharpXUnitTemplatesProvider implements IPlaywrightCsharp
     }
 
     return actionGenerate(params);
-  }
-
-  getTestRoutineClass(testRoutineName: string, description: string, body: string) {
-    return this._templateCollection.TEST_ROUTINE_CLASS({
-      testRoutineName,
-      description,
-      body,
-    });
-  }
-
-  getTestRoutineFile(rootNamespace: string, fullNamespace: string, testRoutineClasses: string[]) {
-    return this._templateCollection.TEST_ROUTINE_FILE({
-      rootNamespace,
-      fullNamespace,
-      testRoutineClasses,
-    });
-  }
-
-  getLocator(params: ILocatorTemplateParam) {
-    let { elementName, locatorType, returnedLocatorType, description } = params;
-
-    if (!locatorType) {
-      throw new Error("(DEV) LocatorType required. Current locatorType value is " + locatorType);
-    }
-
-    const generateGetter = locatorRegistyDotnet.get(locatorType);
-
-    if (!generateGetter) {
-      throw new Error("(DEV) LocatorType is not supported: " + locatorType);
-    }
-    const getter = generateGetter(params);
-
-    let output = this._templateCollection.PAGE_ELEMENT_PROPERTY({
-      hasParams: params.hasParams,
-      elementName: upperCaseFirstChar(elementName),
-      getter,
-      description,
-      returnedLocatorType,
-    });
-
-    return output;
-  }
-
-  getTestFunction(name: string, description: string) {
-    return this._templateCollection.TEST_FUNCTION({ name, description });
   }
   getBaseClasses(rootNamespace: string, testIdAttributeName: string): string {
     return this._templateCollection.BASE_CLASSES_FILE({ rootNamespace, testIdAttributeName });
@@ -133,19 +59,11 @@ export class PlaywrightCsharpXUnitTemplatesProvider implements IPlaywrightCsharp
     return this._templateCollection.RUNSETTINGS_FILE({});
   }
 
-  getPageDefinitions(usings: string, rootNamespace: string, pageDeclaration: string, body: string) {
-    return this._templateCollection.PAGE_DEFINITIONS_FILE({ usings, rootNamespace, pageDeclaration, body });
-  }
-
   getBasePageFile(rootNamespace: string): string {
     return this._templateCollection.BASE_PAGE_FILE({ rootNamespace });
   }
   getBasePageTestFile(rootNamespace: string): string {
     return this._templateCollection.BASE_PAGE_FILE({ rootNamespace });
-  }
-
-  getPage(fullNamespace: string, pageName: string, pageDescription: string, pageBody: string) {
-    return this._templateCollection.PAGE_FILE({ fullNamespace, pageName, pageDescription, pageBody });
   }
 
   getComment(message: string) {
