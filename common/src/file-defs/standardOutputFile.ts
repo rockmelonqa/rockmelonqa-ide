@@ -12,6 +12,10 @@ export class StandardOutputFile {
   static readonly TestSuiteBase: string = "TestSuiteBase";
   static readonly MetaData: string = ".code-metadata";
 
+  static readonly PlaywrightLaunchOptionsSetting: string = "PlaywrightLaunchOptionsSetting";
+  static readonly PlaywrightSetting: string = "PlaywrightSetting";
+  static readonly RunSettingsClass: string = "RunSettings";
+
   // Nodejs
   static readonly ExtendPlaywright: string = "ExtendPlaywright";
   static readonly NodePackage: string = "package.json";

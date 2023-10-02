@@ -1,0 +1,72 @@
+namespace {{{rootNamespace}}}.XUnitSupport;
+
+/// <summary>
+/// Implement our PageTest for XUnit
+/// </summary>
+public abstract class PageTest
+{
+    protected IPlaywright Playwright { get; }
+    private IBrowser Browser { get; }
+    public IPage Page { get; }
+
+    protected PageTest? TestSuiteInstance;
+
+    BrowserTypeLaunchOptions LaunchOptions { get; }
+
+    public PageTest()
+    {
+        RunSettings runSettings = LoadFromRunSettings();
+
+        LaunchOptions = new BrowserTypeLaunchOptions
+        {
+            Headless = runSettings.Playwright.LaunchOptions.Headless
+        };
+
+        Playwright = Microsoft.Playwright.Playwright.CreateAsync().Result;
+        Browser = Playwright.Chromium.LaunchAsync(LaunchOptions).Result;
+        Page = Browser.NewPageAsync().Result;
+    }
+
+    public PageTest(PageTest testSuiteInstance)
+    {
+        LaunchOptions = testSuiteInstance.LaunchOptions;
+        Playwright = testSuiteInstance.Playwright;
+        TestSuiteInstance = testSuiteInstance;
+        Page = TestSuiteInstance.Page;
+        Browser = TestSuiteInstance.Browser;
+    }
+
+    public async Task Dispose()
+    {
+        await Page.CloseAsync();
+        await Browser.DisposeAsync();
+        Playwright.Dispose();
+    }
+
+    private IBrowserType GetBrowser(string browserName)
+    {
+        switch (browserName)
+        {
+            case "chromium": return Playwright.Chromium;
+            case "firefox": return Playwright.Firefox;
+            case "webkit": return Playwright.Webkit;
+        }
+        return Playwright.Chromium;
+    }
+
+    private RunSettings LoadFromRunSettings()
+    {
+        string runSettingsRaw = File.ReadAllText(".runsettings");
+        System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(RunSettings));
+        using (StringReader reader = new StringReader(runSettingsRaw))
+        {
+            RunSettings? runSettings = (serializer.Deserialize(reader)) as RunSettings;
+            if (runSettings is null)
+            {
+                return new RunSettings();
+            }
+
+            return runSettings;
+        }
+    }
+}

@@ -75,10 +75,26 @@ export class PlaywrightCsharpXUnitCodeGen extends CommonPlaywrightCsharpCodeGen 
       `${StandardOutputFile.Usings}${this._outputFileExt}`,
       this._templateProvider.getUsings(this._rmprojFile.content.rootNamespace, this._projMeta.testRoutines.length > 0)
     );
-    await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettings());
+    await writeFile(`${StandardOutputFile.RunSettings}`, this._templateProvider.getRunSettingXmlFile());
   }
 
   private async generateXUnitSupportFiles(writeFile: WriteFileFn) {
+    await writeFile(
+      `${StandardOutputFolder.XUnitSupport}/${StandardOutputFile.PageTest}${this._outputFileExt}`,
+      this._templateProvider.getPageTestFile(this._rmprojFile.content.rootNamespace)
+    );
+    await writeFile(
+      `${StandardOutputFolder.XUnitSupport}/${StandardOutputFile.PlaywrightLaunchOptionsSetting}${this._outputFileExt}`,
+      this._templateProvider.getPlaywrightLaunchOptionsSettingFile(this._rmprojFile.content.rootNamespace)
+    );
+    await writeFile(
+      `${StandardOutputFolder.XUnitSupport}/${StandardOutputFile.PlaywrightSetting}${this._outputFileExt}`,
+      this._templateProvider.getPlaywrightSettingFile(this._rmprojFile.content.rootNamespace)
+    );
+    await writeFile(
+      `${StandardOutputFolder.XUnitSupport}/${StandardOutputFile.RunSettingsClass}${this._outputFileExt}`,
+      this._templateProvider.getRunSettingClassFile(this._rmprojFile.content.rootNamespace)
+    );
     await writeFile(
       `${StandardOutputFolder.XUnitSupport}/${StandardOutputFile.TestSuiteBase}${this._outputFileExt}`,
       this._templateProvider.getTestSuiteBase(

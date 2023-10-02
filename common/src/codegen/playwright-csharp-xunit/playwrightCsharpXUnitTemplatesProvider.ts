@@ -1,11 +1,5 @@
 import path from "path";
-import { IActionTemplateParam, ILocatorTemplateParam } from "../types";
-import { upperCaseFirstChar } from "../utils/stringUtils";
 import { XUnitTemplateCollection } from "./templateCollection";
-import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
-import { actionRegistyDotnet } from "../playwright-charp-common/action-registry-dotnet";
-import { locatorRegistyDotnet } from "../playwright-charp-common/locator-registry-dotnet";
-import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 import { Indent } from "../../file-defs";
 
 export class PlaywrightCsharpXUnitTemplatesProvider {
@@ -23,8 +17,40 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
     });
   }
 
+  getCsProject(rootNamespace: string) {
+    return this._templateCollection.CSPROJECT_FILE({ rootNamespace });
+  }
+
+  getPageTestFile(rootNamespace: string) {
+    return this._templateCollection.PAGE_TEST_FILE({ rootNamespace });
+  }
+
+  getPlaywrightLaunchOptionsSettingFile(rootNamespace: string) {
+    return this._templateCollection.PLAYWRIGHT_LAUNCH_OPTIONS_SETTING_FILE({ rootNamespace });
+  }
+
+  getPlaywrightSettingFile(rootNamespace: string) {
+    return this._templateCollection.PLAYWRIGHT_SETTING_FILE({ rootNamespace });
+  }
+
+  getRunSettingClassFile(rootNamespace: string) {
+    return this._templateCollection.RUN_SETTINGS_CLASS_FILE({ rootNamespace });
+  }
+
+  getRunSettingXmlFile() {
+    return this._templateCollection.RUN_SETTINGS_XML_FILE({});
+  }
+
+  getTestFunction(name: string, description: string) {
+    return this._templateCollection.TEST_FUNCTION({ name, description });
+  }
+
   getTestSuiteBase(rootNamespace: string, testIdAttributeName: string): string {
     return this._templateCollection.TEST_SUITE_BASE_FILE({ rootNamespace, testIdAttributeName });
+  }
+
+  getUsings(rootNamespace: string, hasRoutines: boolean) {
+    return this._templateCollection.USINGS_FILE({ rootNamespace, hasRoutines });
   }
 
   getTestSuiteFile(
@@ -36,41 +62,5 @@ export class PlaywrightCsharpXUnitTemplatesProvider {
     fullNamespace: string
   ) {
     return this._templateCollection.TEST_SUITE_FILE({ usings, name, description, body, rootNamespace, fullNamespace });
-  }
-
-  getAction(params: IActionTemplateParam) {
-    const actionGenerate = actionRegistyDotnet.get(params.action);
-    if (!actionGenerate) {
-      throw new Error("(DEV) Action is not support: " + params.action);
-    }
-
-    return actionGenerate(params);
-  }
-  getBaseClasses(rootNamespace: string, testIdAttributeName: string): string {
-    return this._templateCollection.BASE_CLASSES_FILE({ rootNamespace, testIdAttributeName });
-  }
-  getCsProject(rootNamespace: string) {
-    return this._templateCollection.CSPROJECT_FILE({ rootNamespace });
-  }
-  getUsings(rootNamespace: string, hasRoutines: boolean) {
-    return this._templateCollection.USINGS_FILE({ rootNamespace, hasRoutines });
-  }
-  getRunSettings() {
-    return this._templateCollection.RUNSETTINGS_FILE({});
-  }
-
-  getBasePageFile(rootNamespace: string): string {
-    return this._templateCollection.BASE_PAGE_FILE({ rootNamespace });
-  }
-  getBasePageTestFile(rootNamespace: string): string {
-    return this._templateCollection.BASE_PAGE_FILE({ rootNamespace });
-  }
-
-  getComment(message: string) {
-    return this._templateCollection.COMMENT({ message });
-  }
-
-  getTestFunction(name: string, description: string) {
-    return this._templateCollection.TEST_FUNCTION({ name, description });
   }
 }

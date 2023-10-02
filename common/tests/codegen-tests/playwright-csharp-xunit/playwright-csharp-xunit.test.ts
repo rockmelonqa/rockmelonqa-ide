@@ -13,7 +13,7 @@ import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
 export const createPlaywrightXUnitTestData = (): RmpSpec => {
   const kitchenSinkData = createTestDataKitchenSink();
   return {
-    projectName: "google-test-playwright-nunit",
+    projectName: "playwright-csharp-xunit",
     content: {
       fileVersion: 1,
       name: "",
@@ -36,9 +36,9 @@ export const createPlaywrightXUnitTestData = (): RmpSpec => {
   };
 };
 
-test("CodeGen Playwright CSharp xUnit - General", async () => {
+test("CodeGen Playwright CSharp xUnit", async () => {
   // Arrange
-  const tmpDir = createTempDir("playwright-csharp-xunit-general");
+  const tmpDir = createTempDir("playwright-csharp-xunit");
   const projSpec = createPlaywrightXUnitTestData();
   const copyToDir = path.join(tmpDir, "rmproj");
   fs.mkdirSync(copyToDir);
