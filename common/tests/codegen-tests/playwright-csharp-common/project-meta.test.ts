@@ -6,7 +6,7 @@ import { MsTestProjMetaGenerator } from "../../../src/codegen/playwright-csharp-
 import { createSourceProjectMetadata } from "../../../src/codegen/codegenSourceProjectMeta";
 import { createTempDir } from "../../test-helpers/fsHelpers";
 import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
-import { createTestDataKitchenSink } from "../playwright-typescript/playwright-typescript-kitchen-sink.test-data";
+import { createTestDataKitchenSink } from "./playwright-common.test-data";
 import { AutomationFramework, Indent, Language, TestFramework } from "../../../src";
 
 const createTestData = (): RmpSpec => {
@@ -14,7 +14,7 @@ const createTestData = (): RmpSpec => {
 
   return {
     // Name of the project file, should be unique among tests in `codegen` test
-    projectName: "google-test-playwright-mstest",
+    projectName: "project-meta-mstest",
     // The content of the rmproj file
     content: {
       fileVersion: 1,

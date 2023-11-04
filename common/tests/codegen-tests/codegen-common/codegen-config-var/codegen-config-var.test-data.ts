@@ -10,7 +10,7 @@ import {
 } from "../../../../src/file-defs";
 import { RmpSpec } from "../../../test-helpers/rm-project-spec.types";
 import { commonMsTestOutputFiles } from "../../../test-helpers/common-files-dotnet";
-import { simpleRoutineTestData } from "../../playwright-csharp/simple-routine.test-data";
+import { simpleRoutineTestData } from "../../playwright-csharp-common/simple-routine.test-data";
 
 export const createCodegenWithConfigVarTestData = (): RmpSpec => {
   return {

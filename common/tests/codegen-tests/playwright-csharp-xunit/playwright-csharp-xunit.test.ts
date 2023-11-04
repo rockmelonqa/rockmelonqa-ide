@@ -7,7 +7,7 @@ import { IProgressEvent } from "../../../src/ipc-defs";
 import { generateCode } from "../../../src/codegen";
 import { writeOutputProjectFiles, createRmTestProject } from "../../test-helpers/rm-project-generator";
 import { createTempDir } from "../../test-helpers/fsHelpers";
-import { createTestDataKitchenSink } from "../playwright-typescript/playwright-typescript-kitchen-sink.test-data";
+import { createTestDataKitchenSink } from "../playwright-csharp-common/playwright-common.test-data";
 import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
 
 export const createPlaywrightXUnitTestData = (): RmpSpec => {
