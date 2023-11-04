@@ -8,7 +8,7 @@ import { createTempDir } from "../../test-helpers/fsHelpers";
 
 import { AutomationFramework, Indent, Language, StandardFolder, TestFramework } from "../../../src/file-defs";
 import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
-import { createTestDataKitchenSink } from "../playwright-typescript/playwright-typescript-kitchen-sink.test-data";
+import { createTestDataKitchenSink } from "../playwright-csharp-common/playwright-common.test-data";
 const PROJ_NAME = "playwright-csharp-nunit";
 
 export const createPlaywrightNunitTestData = (): RmpSpec => {

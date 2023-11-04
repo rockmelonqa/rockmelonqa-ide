@@ -41,7 +41,7 @@ const createTestData = (): RmpSpec => {
 test("Generate output project meta from RMProject", async () => {
   const projSpec = createTestData();
 
-  const tmpDir = createTempDir("playwright-csharp-mstest");
+  const tmpDir = createTempDir("project-meta-mstest");
   const copyToDir = path.join(tmpDir, "rmproj");
   fs.mkdirSync(copyToDir);
   const projFile = createRmTestProject(projSpec, copyToDir);
