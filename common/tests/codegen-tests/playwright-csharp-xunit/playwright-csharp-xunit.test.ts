@@ -1,7 +1,14 @@
 import fs from "fs";
 import path from "path";
 
-import { AutomationFramework, Indent, Language, TestFramework } from "../../../src/file-defs";
+import {
+  AutomationFramework,
+  IRmProjFile,
+  Indent,
+  Language,
+  StandardFolder,
+  TestFramework,
+} from "../../../src/file-defs";
 
 import { IProgressEvent } from "../../../src/ipc-defs";
 import { generateCode } from "../../../src/codegen";
@@ -9,6 +16,8 @@ import { writeOutputProjectFiles, createRmTestProject } from "../../test-helpers
 import { createTempDir } from "../../test-helpers/fsHelpers";
 import { createTestDataKitchenSink } from "../playwright-csharp-common/playwright-common.test-data";
 import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
+
+import { execSync } from "child_process";
 
 export const createPlaywrightXUnitTestData = (): RmpSpec => {
   const kitchenSinkData = createTestDataKitchenSink();
@@ -50,6 +59,17 @@ test("CodeGen Playwright CSharp xUnit", async () => {
 
   // Act
   await generateCode(projFile, (event: IProgressEvent) => console.log(event));
+
+  let command = "dotnet test";
+  // console.log(`Running command '${command}'`);
+  let outputCodeDir = path.join(copyToDir, StandardFolder.OutputCode);
+
+  let output = execSync(command, {
+    cwd: outputCodeDir,
+    encoding: "utf8",
+  });
+
+  expect(output).toContain("Passed!");
 
   // Assert: Run the codegen without exception for now
   // doAssert(path.join(projFile.folderPath, StandardFolder.OutputCode), sampleOutputDir);
