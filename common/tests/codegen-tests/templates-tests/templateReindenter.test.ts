@@ -1,7 +1,7 @@
 import path from "path";
 import { normalizeLineEndings } from "../../test-helpers/stringHelpers";
 import { Indent } from "../../../src";
-import { TemplateReindenter } from "../../../src/codegen/playwright-csharp-mstest/templateCollection";
+import { TemplateReindenter } from "../../../src/codegen/codegen-common/baseTemplateCollection";
 
 // ############################################
 // # Test the conversion of indentations

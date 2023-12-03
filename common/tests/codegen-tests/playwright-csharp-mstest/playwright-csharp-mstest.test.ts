@@ -5,10 +5,9 @@ import { AutomationFramework, Indent, Language, StandardFolder, TestFramework } 
 import { IProgressEvent } from "../../../src/ipc-defs";
 import { generateCode } from "../../../src/codegen";
 import { writeOutputProjectFiles, createRmTestProject } from "../../test-helpers/rm-project-generator";
-import { doAssert } from "../../test-helpers/assert-helper";
 import { createTempDir } from "../../test-helpers/fsHelpers";
 import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
-import { createTestDataKitchenSink } from "../playwright-typescript/playwright-typescript-kitchen-sink.test-data";
+import { createTestDataKitchenSink } from "../playwright-csharp-common/playwright-common.test-data";
 
 const createPlaywrightMsTestTestData = (): RmpSpec => {
   const kitchenSinkData = createTestDataKitchenSink();
@@ -39,7 +38,7 @@ const createPlaywrightMsTestTestData = (): RmpSpec => {
   };
 };
 
-test("CodeGen Playwright CSharp MsTest - General", async () => {
+test("CodeGen Playwright CSharp MsTest", async () => {
   // Arrange
   const tmpDir = createTempDir("playwright-csharp-mstest");
   const projSpec = createPlaywrightMsTestTestData();

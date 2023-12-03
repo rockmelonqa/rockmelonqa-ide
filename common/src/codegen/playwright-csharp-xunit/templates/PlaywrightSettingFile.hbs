@@ -1,0 +1,12 @@
+namespace {{{rootNamespace}}}.XUnitSupport;
+
+/// <summary>
+/// Playwright Setting tag in the .runsettings file
+/// </summary>
+public class PlaywrightSetting
+{
+    public string BrowserName { get; set; } = "";
+    public int ExpectTimeout { get; set; } = 10_000;
+
+    public PlaywrightLaunchOptionsSetting LaunchOptions { get; set; } = new PlaywrightLaunchOptionsSetting();
+}

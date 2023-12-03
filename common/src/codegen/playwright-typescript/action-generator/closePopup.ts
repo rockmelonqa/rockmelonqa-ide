@@ -1,7 +1,6 @@
-/** Generates Csharp code for action Closing a "Popup" tab */
+/** Generates Typescript code for action Closing a "Popup" tab */
 export default () => {
   return `
-await defs.page.close();
-defs = new PageDefinitions(this.page);
+await this.page.close();
   `.trim();
 };

@@ -1,7 +1,7 @@
 import { IActionTemplateParam } from "../../types";
 import { getParameters } from "../../utils/stringUtils";
 
-/** Generates Csharp code for action Clear */
+/** Generates Typescript code for action Clear */
 export default (params: IActionTemplateParam) => {
-  return `await defs.${params.pageName}.${params.elementName}().fill("");`;
+  return `await this.defs.${params.pageName}.${params.elementName}().fill("");`;
 };

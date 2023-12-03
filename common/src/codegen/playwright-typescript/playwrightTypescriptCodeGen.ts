@@ -56,10 +56,6 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
     await this.generateSuiteFiles(writeFile);
     await this.generateSupportFiles(writeFile);
 
-    if (full) {
-      await this.generateProjectFiles(writeFile);
-    }
-
     await this.generateMetaFiles(writeFile);
     return "";
   }
@@ -79,8 +75,6 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
       content
     );
   }
-
-  private async generateProjectFiles(writeFile: WriteFileFn) {}
 
   private async generateMetaFiles(writeFile: WriteFileFn) {
     // Write output project metadata
@@ -206,7 +200,7 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
     let pageInitItems = [];
     for (let page of pages) {
       let pageName = upperCaseFirstChar(this._outProjMeta.get(page.id)!.outputFileClassName);
-      pageInitItems.push(`this.${pageName} = new ${pageName}(page);`);
+      pageInitItems.push(`this.${pageName} = new ${pageName}(pageTest);`);
     }
 
     let pageInits = pageInitItems.join(EOL);
@@ -353,7 +347,7 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
 
     // If there is no step, we add an `await` so that there is no build warning about `async` method
     if (testcaseBody.length === 0) {
-      testcaseBody = `await Task.CompletedTask;`;
+      testcaseBody = `await Promise.resolve();`;
     }
 
     // Indent test method body with 2 indent;
@@ -520,7 +514,7 @@ export class PlaywrightTypeScriptCodeGen extends CodeGenBase implements ICodeGen
       let dataset = routine.dataSets.find((ds) => ds.id === dataSetId)!;
       let datasetName = createCleanName(dataset.name);
       let finalRoutineClassName = `${routineName}${datasetName}`;
-      routineCalls.push(`await new ${finalRoutineClassName}(this.page).run();`);
+      routineCalls.push(`await new ${finalRoutineClassName}(this).run();`);
     }
 
     return routineCalls;

@@ -12,6 +12,7 @@ import input from "./action-generator-dotnet/input";
 import inputByCode from "./action-generator-dotnet/inputByCode";
 import runCode from "./action-generator-dotnet/runCode";
 import selectOption from "./action-generator-dotnet/selectOption";
+import switchTab from "./action-generator-dotnet/switchTab";
 import verifyAttribute from "./action-generator-dotnet/verifyAttribute";
 import verifyHasText from "./action-generator-dotnet/verifyHasText";
 import verifyHasValue from "./action-generator-dotnet/verifyHasValue";
@@ -39,6 +40,7 @@ actionRegistyDotnet
   .set(ActionType.InputByCode, inputByCode)
   .set(ActionType.RunCode, runCode)
   .set(ActionType.SelectOption, selectOption)
+  .set(ActionType.SwitchTab, switchTab)
   .set(ActionType.VerifyAttribute, verifyAttribute)
   .set(ActionType.VerifyHasText, verifyHasText)
   .set(ActionType.VerifyHasValue, verifyHasValue)

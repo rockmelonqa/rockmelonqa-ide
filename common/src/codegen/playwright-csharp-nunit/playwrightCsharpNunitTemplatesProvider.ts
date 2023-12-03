@@ -1,14 +1,8 @@
 import path from "path";
-import { IActionTemplateParam, ILocatorTemplateParam } from "../types";
-import { upperCaseFirstChar } from "../utils/stringUtils";
 import { NunitTemplateCollection } from "./templateCollection";
-import { IDataSetInfo } from "../playwright-charp-common/dataSetInfo";
-import { actionRegistyDotnet } from "../playwright-charp-common/action-registry-dotnet";
-import { locatorRegistyDotnet } from "../playwright-charp-common/locator-registry-dotnet";
-import { IPlaywrightCsharpTemplatesProvider } from "../playwright-charp-common/playwrightCsharpTemplatesProvider";
 import { Indent } from "../../file-defs";
 
-export class PlaywrightCsharpNunitTemplatesProvider implements IPlaywrightCsharpTemplatesProvider {
+export class PlaywrightCsharpNUnitTemplatesProvider {
   private _templateCollection: NunitTemplateCollection;
 
   constructor(customTemplatesDir: string, requiredIndenChar: Indent, requiredIndexSize: number) {
@@ -23,10 +17,6 @@ export class PlaywrightCsharpNunitTemplatesProvider implements IPlaywrightCsharp
     });
   }
 
-  getEnvironmentSettingsFiles(rootNamespace: string, allVariableNames: string[]): string {
-    return this._templateCollection.ENVIRONMENT_SETTINGS_FILE({ rootNamespace, allVariableNames });
-  }
-
   getTestSuiteFile(
     usings: string,
     name: string,
@@ -37,92 +27,8 @@ export class PlaywrightCsharpNunitTemplatesProvider implements IPlaywrightCsharp
   ) {
     return this._templateCollection.TEST_SUITE_FILE({ usings, name, description, body, rootNamespace, fullNamespace });
   }
-
-  getTestCaseFile(
-    testCaseName: string,
-    description: string,
-    body: string,
-    rootNamespace: string,
-    fullNamespace: string,
-    usings: string[]
-  ) {
-    return this._templateCollection.TEST_CASE_FILE({
-      rootNamespace,
-      testCaseName,
-      description,
-      body,
-      fullNamespace,
-      usings,
-    });
-  }
-
-  getAction(params: IActionTemplateParam) {
-    const actionGenerate = actionRegistyDotnet.get(params.action);
-    if (!actionGenerate) {
-      throw new Error("(DEV) Action is not support: " + params.action);
-    }
-
-    return actionGenerate(params);
-  }
-
-  getTestRoutineClass(testRoutineName: string, description: string, body: string) {
-    return this._templateCollection.TEST_ROUTINE_CLASS({
-      testRoutineName,
-      description,
-      body,
-    });
-  }
-
-  getTestRoutineFile(rootNamespace: string, fullNamespace: string, testRoutineClasses: string[]) {
-    return this._templateCollection.TEST_ROUTINE_FILE({
-      rootNamespace,
-      fullNamespace,
-      testRoutineClasses,
-    });
-  }
-
-  getRoutineAction(params: IActionTemplateParam) {
-    const actionGenerate = actionRegistyDotnet.get(params.action);
-    if (!actionGenerate) {
-      throw new Error("(DEV) Action is not support: " + params.action);
-    }
-
-    return actionGenerate(params);
-  }
-
-  getLocator(params: ILocatorTemplateParam) {
-    let { elementName, locatorType, returnedLocatorType, description } = params;
-
-    const generateGetter = locatorRegistyDotnet.get(locatorType);
-
-    if (!generateGetter) {
-      throw new Error("(DEV) LocatorType is not supported: " + locatorType);
-    }
-    const getter = generateGetter(params);
-
-    let output = this._templateCollection.PAGE_ELEMENT_PROPERTY({
-      hasParams: params.hasParams,
-      elementName: upperCaseFirstChar(elementName),
-      getter,
-      description,
-      returnedLocatorType,
-    });
-
-    return output;
-  }
-
-  getTestFunction(name: string, description: string) {
-    return this._templateCollection.TEST_FUNCTION({ name, description });
-  }
-
-  getLocatorHelper(rootNamespace: string): string {
-    return this._templateCollection.LOCATOR_HELPER_FILE({ rootNamespace });
-  }
   getTestSuiteBase(rootNamespace: string, testIdAttributeName: string): string {
     return this._templateCollection.TEST_SUITE_BASE_FILE({ rootNamespace, testIdAttributeName });
-  }
-  getTestCaseBase(rootNamespace: string): string {
-    return this._templateCollection.TEST_CASE_BASE_FILE({ rootNamespace });
   }
   getCsProject(rootNamespace: string) {
     return this._templateCollection.CSPROJECT_FILE({ rootNamespace });
@@ -134,15 +40,7 @@ export class PlaywrightCsharpNunitTemplatesProvider implements IPlaywrightCsharp
     return this._templateCollection.RUNSETTINGS_FILE({});
   }
 
-  getPageDefinitions(usings: string, rootNamespace: string, pageDeclaration: string, body: string) {
-    return this._templateCollection.PAGE_DEFINITIONS_FILE({ usings, rootNamespace, pageDeclaration, body });
-  }
-
-  getPage(fullNamespace: string, pageName: string, pageDescription: string, pageBody: string) {
-    return this._templateCollection.PAGE_FILE({ fullNamespace, pageName, pageDescription, pageBody });
-  }
-
-  getComment(message: string) {
-    return this._templateCollection.COMMENT({ message });
+  getTestFunction(name: string, description: string) {
+    return this._templateCollection.TEST_FUNCTION({ name, description });
   }
 }

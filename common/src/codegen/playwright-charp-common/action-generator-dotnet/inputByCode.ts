@@ -4,5 +4,5 @@ import { getParameters } from "../../utils/stringUtils";
 /** Generates Csharp code for action Input */
 export default (params: IActionTemplateParam) => {
   const { pageName, elementName, parameters, data } = params;
-  return `await defs.${pageName}.${elementName}(${getParameters(parameters)}).InputAsync(${data.rawData});`;
+  return `await this.defs.${pageName}.${elementName}(${getParameters(parameters)}).FillAsync(${data.rawData});`;
 };

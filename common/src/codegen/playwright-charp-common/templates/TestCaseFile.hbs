@@ -1,0 +1,20 @@
+{{#if usings.length}}
+{{#each usings as |using|}}
+{{{using}}}
+{{/each}}
+{{/if}}
+
+namespace {{{fullNamespace}}};
+
+/// <summary>
+/// {{{description}}}
+/// </summary>
+public partial class {{{testCaseName}}} : TestCaseBase
+{
+    public {{{testCaseName}}}(IPage page) : base(page) {}
+
+    public async Task RunAsync()
+    {
+{{{body}}}
+    }
+}

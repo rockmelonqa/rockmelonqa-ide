@@ -1,7 +1,6 @@
 import { IActionTemplateParam } from "../../types";
-import { getParameters } from "../../utils/stringUtils";
 
-/** Generates Csharp code for action Click */
+/** Generates Typescript code for action Click */
 export default (params: IActionTemplateParam) => {
-  return `await defs.${params.pageName}.${params.elementName}().click();`;
+  return `await this.defs.${params.pageName}.${params.elementName}().click();`;
 };

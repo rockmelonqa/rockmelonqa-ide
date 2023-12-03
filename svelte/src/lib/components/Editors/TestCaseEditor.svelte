@@ -198,7 +198,10 @@
     };
 
     const isCommentAction = (item: IDictionary) => {
-        return (item as ITestStep).type === "testStep" && (item as ITestCaseActionStep).action === ActionType.AddComment.toString();
+        return (
+            (item as ITestStep).type === "testStep" &&
+            (item as ITestCaseActionStep).action === ActionType.AddComment.toString()
+        );
     };
 
     const isTestStep = (item: IDictionary) => {
@@ -466,7 +469,7 @@
     };
 </script>
 
-<div class="flex-1 test-case-editor p-8 pb-0 flex flex-col">
+<div class="flex-1 test-case-editor isolate p-8 pb-0 flex flex-col">
     <div class="font-semibold text-xl mb-4 flex-grow-0">{title}</div>
     <Form {formContext} class="flex-grow-0">
         <FormGroup columns={1}>

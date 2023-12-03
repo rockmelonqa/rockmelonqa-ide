@@ -5,7 +5,7 @@ import { ICsharpTemplateCollection } from "../playwright-charp-common/csharpTemp
 import { Indent } from "../../file-defs";
 import { EOL } from "os";
 import { indentCharMap } from "../../file-defs/shared";
-import { TemplateCollectionOptions } from "../playwright-csharp-mstest/templateCollection";
+import { TemplateCollectionOptions } from "../playwright-charp-common/commonCsharpTemplateCollection";
 
 helpers({ handlebars });
 

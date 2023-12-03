@@ -10,5 +10,5 @@ export default (params: IActionTemplateParam) => {
       ? `"${escapeStr(String(params.data.rawData))}"`
       : createEnvironmentVariableString(String(params.data.rawData));
 
-  return `await defs.${pageName}.${elementName}(${getParameters(parameters)}).SelectOptionAsync(${data});`;
+  return `await this.defs.${pageName}.${elementName}(${getParameters(parameters)}).SelectOptionAsync(${data});`;
 };

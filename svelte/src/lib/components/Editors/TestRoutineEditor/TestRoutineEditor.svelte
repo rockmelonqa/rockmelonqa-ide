@@ -252,7 +252,7 @@
     };
 </script>
 
-<div class="flex-1 test-routine-editor p-8 pb-0 flex flex-col">
+<div class="flex-1 test-routine-editor isolate p-8 pb-0 flex flex-col">
     <div class="font-semibold text-xl mb-4 flex-grow-0">{title}</div>
     <Form {formContext} class="flex-grow-0">
         <FormGroup columns={1}>

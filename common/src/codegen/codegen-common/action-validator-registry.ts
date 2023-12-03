@@ -15,6 +15,7 @@ import inputByCode from "./action-validators/inputByCode";
 import runCode from "./action-validators/runCode";
 import runTestRoutine from "./action-validators/runTestRoutine";
 import selectOption from "./action-validators/selectOption";
+import switchTab from "./action-validators/switchTab";
 import verifyAttribute from "./action-validators/verifyAttribute";
 import verifyHasText from "./action-validators/verifyHasText";
 import verifyHasValue from "./action-validators/verifyHasValue";
@@ -43,6 +44,7 @@ actionValidatorRegistry
   .set(ActionType.RunCode, runCode)
   .set(ActionType.RunTestRoutine, runTestRoutine)
   .set(ActionType.SelectOption, selectOption)
+  .set(ActionType.SwitchTab, switchTab)
   .set(ActionType.VerifyAttribute, verifyAttribute)
   .set(ActionType.VerifyHasText, verifyHasText)
   .set(ActionType.VerifyHasValue, verifyHasValue)

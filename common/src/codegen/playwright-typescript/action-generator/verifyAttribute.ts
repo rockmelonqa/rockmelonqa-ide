@@ -9,18 +9,18 @@ const getValuesFromDataString = (dataString: string) => {
   return [attributeName, attributeValue];
 };
 
-/** Generates Csharp code for action Verify Attribute */
+/** Generates Typescript code for action Verify Attribute */
 export default (params: IActionTemplateParam) => {
   const { pageName, elementName, parameters } = params;
 
   if (params.data.dataType === ActionDataType.LiteralValue) {
     const [attributeName, attributeValue] = getValuesFromDataString(params.data.rawData);
-    return `await expect(defs.${pageName}.${elementName}()).toHaveAttribute(\"${escapeStr(
+    return `await expect(this.defs.${pageName}.${elementName}()).toHaveAttribute(\"${escapeStr(
       attributeName
     )}\", \"${attributeValue}\");`;
   }
 
   const data = `${StandardOutputFile.EnvironmentSettings}.${params.data.rawData}.split("=")[0] ?? "", ${StandardOutputFile.EnvironmentSettings}.${params.data.rawData}.split("=")[1] ?? ""`;
 
-  return `await expect(defs.${pageName}.${elementName}()).toHaveAttribute(${data});`;
+  return `await expect(this.defs.${pageName}.${elementName}()).toHaveAttribute(${data});`;
 };

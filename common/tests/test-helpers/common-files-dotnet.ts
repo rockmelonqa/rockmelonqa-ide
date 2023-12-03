@@ -37,54 +37,6 @@ export const commonMsTestOutputFiles = [
 </RunSettings>
     `.trim(),
   },
-
-  {
-    fileRelPath: "LocatorHelper.cs",
-    fileContent: `
-namespace AutomationTests;
-
-public static class LocatorHelper
-{
-    public static async Task<string> GetLocatorTagTypeAsync(this ILocator locator)
-    {
-        return await locator.EvaluateAsync<string>("e => e.tagName");
-    }
-
-    /// <summary>
-    /// Dyanmic input based on locator tag
-    /// </summary>
-    /// <param name="locator">Locator name</param>
-    /// <param name="data">Data to be input</param>
-    public static async Task InputAsync(this ILocator locator, string data)
-    {
-        string tagName = await locator.GetLocatorTagTypeAsync();
-        switch (tagName.ToLower())
-        {
-            case "input":
-                await locator.FillAsync("");
-                await locator.TypeAsync(data);
-                break;
-            case "select":
-                await locator.SelectOptionAsync(new SelectOptionValue() { Label = data });
-                break;
-            default:
-                await locator.FillAsync("");
-                await locator.TypeAsync(data);
-                break;
-        }
-    }
-
-    /// <summary>
-    /// Click outside of element. This will helps Single Page Application sets it states to new value
-    /// </summary>
-    /// <param name="page">Playwright page</param>
-    public static async Task ClickOutsideAsync(this IPage page)
-    {
-        await page.Locator("xpath=//body >> nth=0").ClickAsync();
-    }
-}
-    `.trim(),
-  },
   {
     fileRelPath: "Usings.cs",
     fileContent: `
@@ -171,54 +123,6 @@ export const commonNunitOutputFiles = [
     `.trim(),
   },
 
-  {
-    fileRelPath: "LocatorHelper.cs",
-    fileContent: `
-namespace AutomationTests;
-
-public static class LocatorHelper
-{
-    public static async Task<string> GetLocatorTagTypeAsync(this ILocator locator)
-    {
-        return await locator.EvaluateAsync<string>("e => e.tagName");
-    }
-
-    /// <summary>
-    /// Dyanmic input based on locator tag
-    /// </summary>
-    /// <param name="locator">Locator name</param>
-    /// <param name="data">Data to be input</param>
-    public static async Task InputAsync(this ILocator locator, string data)
-    {
-        string tagName = await locator.GetLocatorTagTypeAsync();
-        switch (tagName.ToLower())
-        {
-            case "input":
-                await locator.FillAsync("");
-                await locator.TypeAsync(data);
-                break;
-            case "select":
-                await locator.SelectOptionAsync(new SelectOptionValue() { Label = data });
-                break;
-            default:
-                await locator.FillAsync("");
-                await locator.TypeAsync(data);
-                break;
-        }
-    }
-
-    /// <summary>
-    /// Click outside of element. This will helps Single Page Application sets it states to new value
-    /// </summary>
-    /// <param name="page">Playwright page</param>
-    public static async Task ClickOutsideAsync(this IPage page)
-    {
-        await page.Locator("xpath=//body >> nth=0").ClickAsync();
-    }
-
-}
-    `.trim(),
-  },
   {
     fileRelPath: "Usings.cs",
     fileContent: `

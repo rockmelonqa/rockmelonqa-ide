@@ -8,12 +8,13 @@ import { createTempDir } from "../../test-helpers/fsHelpers";
 
 import { AutomationFramework, Indent, Language, StandardFolder, TestFramework } from "../../../src/file-defs";
 import { RmpSpec } from "../../test-helpers/rm-project-spec.types";
-import { createTestDataKitchenSink } from "../playwright-typescript/playwright-typescript-kitchen-sink.test-data";
+import { createTestDataKitchenSink } from "../playwright-csharp-common/playwright-common.test-data";
+const PROJ_NAME = "playwright-csharp-nunit";
 
 export const createPlaywrightNunitTestData = (): RmpSpec => {
   const kitchenSinkData = createTestDataKitchenSink();
   return {
-    projectName: "google-test-playwright-nunit",
+    projectName: PROJ_NAME,
     content: {
       fileVersion: 1,
       name: "",
@@ -36,9 +37,9 @@ export const createPlaywrightNunitTestData = (): RmpSpec => {
   };
 };
 
-test("CodeGen Playwright CSharp Nunit - General", async () => {
+test("CodeGen Playwright CSharp Nunit", async () => {
   // Arrange
-  const tmpDir = createTempDir("playwright-csharp-nunit-general");
+  const tmpDir = createTempDir(PROJ_NAME);
   const projSpec = createPlaywrightNunitTestData();
   const copyToDir = path.join(tmpDir, "rmproj");
   fs.mkdirSync(copyToDir);

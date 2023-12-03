@@ -4,7 +4,6 @@ import { IActionTemplateParam } from "../../types";
 export default (params: IActionTemplateParam) => {
   const { pageName, elementName } = params;
   return `
-defs = new PageDefinitions(await this.Page.RunAndWaitForPopupAsync(async () => await defs.${pageName}.${elementName}().ClickAsync()));
-await defs.Page.WaitForLoadStateAsync();
+await this.ClickOpenPopupAsync(async () => await defs.${pageName}.${elementName}().ClickAsync());
     `.trim();
 };

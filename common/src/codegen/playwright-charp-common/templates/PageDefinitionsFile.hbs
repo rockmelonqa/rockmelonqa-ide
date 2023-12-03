@@ -1,0 +1,19 @@
+{{{usings}}}
+
+namespace {{{rootNamespace}}};
+
+public class PageDefinitions
+{
+    protected BasePageTest PageTest;
+
+    public IPage Page => this.PageTest.Page;
+
+{{{pageDeclaration}}}
+
+    public PageDefinitions(BasePageTest pageTest)
+    {
+        PageTest = pageTest;
+
+{{{body}}}
+    }
+}

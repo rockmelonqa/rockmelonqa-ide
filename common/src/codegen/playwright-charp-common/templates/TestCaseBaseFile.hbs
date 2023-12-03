@@ -1,0 +1,20 @@
+namespace {{{rootNamespace}}}.Support;
+
+/// <summary>
+/// Base class for RM test case
+/// </summary>
+public abstract class TestCaseBase : BasePageTest
+{
+  protected BasePageTest PageTest;
+  protected PageDefinitions defs;
+
+  /// <summary>
+  /// Default constructor
+  /// </summary>
+  public TestCaseBase(IPage page) : base(page)
+  {
+    this.PageTest = this;
+    this.defs = new PageDefinitions(this);
+  }
+
+}

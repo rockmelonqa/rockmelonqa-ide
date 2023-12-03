@@ -51,6 +51,7 @@ export interface IActionTypeStringRes {
     runCode: string;
     runTestRoutine: string;
     selectOption: string;
+    switchTab: string;
     verifyAttribute: string;
     verifyHasText: string;
     verifyIsEditable: string;

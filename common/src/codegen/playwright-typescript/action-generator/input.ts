@@ -1,7 +1,7 @@
 import { ActionDataType, IActionTemplateParam } from "../../types";
 import { createEnvironmentVariableString, escapeStr, getParameters } from "../../utils/stringUtils";
 
-/** Generates Csharp code for action Input */
+/** Generates Typescript code for action Input */
 export default (params: IActionTemplateParam) => {
   const { pageName, elementName } = params;
 
@@ -10,5 +10,5 @@ export default (params: IActionTemplateParam) => {
       ? `"${escapeStr(String(params.data.rawData))}"`
       : createEnvironmentVariableString(String(params.data.rawData));
 
-  return `await defs.${pageName}.${elementName}().fill(${data});`;
+  return `await this.defs.${pageName}.${elementName}().fill(${data});`;
 };

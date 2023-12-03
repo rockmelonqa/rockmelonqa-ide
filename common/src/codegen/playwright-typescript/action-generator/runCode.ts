@@ -1,6 +1,6 @@
 import { IActionTemplateParam } from "../../types";
 
-/** Generates Csharp code for action RunCode */
+/** Generates Typescript code for action RunCode */
 export default (params: IActionTemplateParam) => {
   return params.data.rawData;
 };

@@ -4,13 +4,17 @@ export class StandardOutputFile {
   static readonly RunSettings: string = ".runsettings";
   static readonly Usings: string = "Usings";
   static readonly PageBase: string = "PageBase";
+  static readonly BasePageTest: string = "BasePageTest";
   static readonly PageTest: string = "PageTest";
   static readonly PageDefinitions: string = "PageDefinitions";
-  static readonly LocatorHelper: string = "LocatorHelper";
   static readonly TestCaseBase: string = "TestCaseBase";
   static readonly TestRoutineBase: string = "TestRoutineBase";
   static readonly TestSuiteBase: string = "TestSuiteBase";
   static readonly MetaData: string = ".code-metadata";
+
+  static readonly PlaywrightLaunchOptionsSetting: string = "PlaywrightLaunchOptionsSetting";
+  static readonly PlaywrightSetting: string = "PlaywrightSetting";
+  static readonly RunSettingsClass: string = "RunSettings";
 
   // Nodejs
   static readonly ExtendPlaywright: string = "ExtendPlaywright";

@@ -1,6 +1,6 @@
 import { IActionTemplateParam } from "../../types";
 
-/** Generates Csharp code for action Run */
+/** Generates Typescript code for action Run */
 export default (params: IActionTemplateParam) => {
   return `// TODO: Action Run`;
 };

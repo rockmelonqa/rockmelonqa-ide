@@ -4,6 +4,6 @@ import { escapeStr } from "../../utils/stringUtils";
 /** Genrates Csharp code of Locator TestId */
 export default (params: ILocatorTemplateParam) => {
   return params.hasParams
-    ? `this._page.GetByTestId(string.Format("${escapeStr(params.locatorStr)}", parameters))`
-    : `this._page.GetByTestId("${escapeStr(params.locatorStr)}")`;
+    ? `this.Page.GetByTestId(string.Format("${escapeStr(params.locatorStr)}", parameters))`
+    : `this.Page.GetByTestId("${escapeStr(params.locatorStr)}")`;
 };
