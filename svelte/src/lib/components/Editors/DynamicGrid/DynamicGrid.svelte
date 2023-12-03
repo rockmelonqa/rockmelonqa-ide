@@ -7,12 +7,11 @@
     import { DynamicGridSizeCache, type GridConfig } from "./DynamicGrid";
     import Split from "split.js";
 
-    
     export let config: GridConfig;
 
     type ItemType = $$Generic;
     export let items: ItemType[];
-    
+
     /** If processing, we will show a spinner */
     export let isProcessing = true;
     /** Text to show on the spinner if isProcessing is true */
@@ -45,7 +44,7 @@
         if (config.columns.length !== sizes.length) {
             sizes = config.columns.map((c) => c.size);
         }
-        
+
         const colsSplitInstance = Split(cols, {
             gutterSize: gutterSizePx,
             sizes,
@@ -69,13 +68,13 @@
         setSizes(actualSizes);
 
         window.addEventListener("resize", onResize);
-        
+
         isProcessing = false;
     });
 
     const onResize = () => {
         checkOverflowBody();
-    }
+    };
 
     afterUpdate(onResize);
 
@@ -114,7 +113,7 @@
         {/if}
         {#if !isProcessing}
             {#each items as item, index}
-                <DynamicRow {gridRowStyle} zIndex={items.length - index}>
+                <DynamicRow {gridRowStyle} zIndex={items.length - index} maxZIndex={items.length}>
                     <svelte:fragment>
                         <slot name="item" {item} {index} />
                     </svelte:fragment>
@@ -149,6 +148,6 @@
     }
 
     .dynamic-grid-body::-webkit-scrollbar-thumb {
-        background-color: rgb(212 212 216);; /* bg-zinc-300 */
+        background-color: rgb(212 212 216); /* bg-zinc-300 */
     }
 </style>

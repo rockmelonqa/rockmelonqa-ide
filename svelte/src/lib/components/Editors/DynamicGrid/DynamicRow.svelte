@@ -3,9 +3,12 @@
 
     export let gridRowStyle: string;
     export let zIndex: number = 0;
+    export let maxZIndex: number = 0;
 
     let element: HTMLElement;
     let focused: boolean = false;
+
+    $: actualZIndex = focused ? maxZIndex + 1 : zIndex;
 
     onMount(() => {
         element.addEventListener("focusout", function (e: any) {
@@ -25,8 +28,9 @@
 <div
     bind:this={element}
     data-role="row"
+    data-focused={focused}
     class="dynamic-grid-row grid relative overflow-x-visible border-x {focused ? ' focused' : ''}"
-    style="{gridRowStyle}; z-index: {zIndex}"
+    style="{gridRowStyle}; z-index: {actualZIndex}"
 >
     <slot />
 </div>
@@ -38,6 +42,9 @@
 
     .dynamic-grid-row.focused {
         /* Same as `.treeview-item-selected.treeview-item-root` in app.css */
-        background-color: var(--f7-treeview-selectable-selected-bg-color, rgba(var(--f7-theme-color-rgb), 0.2)) !important;
+        background-color: var(
+            --f7-treeview-selectable-selected-bg-color,
+            rgba(var(--f7-theme-color-rgb), 0.2)
+        ) !important;
     }
 </style>
